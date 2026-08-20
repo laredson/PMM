@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "123e4567-e89b-12d3-a456-426614174000",
+  "submittedUtc": "2026-08-20T16:35:00Z",
+  "knowledge": {
+    "knowledgeId": "KL-EXAMPLE-MERGE-001",
+    "revision": 1,
+    "contentHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "mergeFingerprint": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+  },
+  "installation": {
+    "anonymousFingerprint": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+    "sessionId": "123e4567-e89b-12d3-a456-426614174001"
+  },
+  "environment": {
+    "pmmVersion": "1.1.0",
+    "gameBuild": "example-build",
+    "totalMods": 109,
+    "conflictSetFingerprint": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+    "otherModSetFingerprint": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+    "relevantOtherMods": []
+  },
+  "world": {
+    "classification": "new-world",
+    "createdDuringValidation": true,
+    "knownModHistory": true,
+    "worldLoaded": true
+  },
+  "runtime": {
+    "observationMode": "live",
+    "gameStarted": true,
+    "mainMenuReached": true,
+    "worldLoadDetected": true,
+    "runtimeSeconds": 900,
+    "crashDetected": false,
+    "mergeRelatedErrorDetected": false,
+    "normalExitDetected": true,
+    "logEvidenceHashes": []
+  },
+  "functional": {
+    "verification": "confirmed-working",
+    "alternativeKnowledgeId": null,
+    "notes": "Example only."
+  },
+  "outcome": "positive",
+  "attribution": {
+    "displayName": null,
+    "contact": null
+  },
+  "privacy": {
+    "containsSaveData": false,
+    "containsPersonalData": false,
+    "containsRawMachineIdentifiers": false,
+    "consentToShare": true
+  }
+}

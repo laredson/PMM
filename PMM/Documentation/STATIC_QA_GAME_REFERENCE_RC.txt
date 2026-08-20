@@ -1,0 +1,50 @@
+Palworld Manager Merger v1.1 Game Reference / Community contribution static QA
+==================================================================================
+Result: 22/22 checks passed
+
+[PASS] All shipped JSON parses
+       14 JSON files; OK
+[PASS] All XAML parses as XML
+       3 XAML files OK
+[PASS] Controller controls exist in every XAML
+       82 controls; missing=none
+[PASS] PowerShell structural delimiter scan
+       13 PS1 files; balanced
+[PASS] No obvious $variable: parser ambiguity in new services
+       none
+[PASS] New service project dependencies resolve
+       Get-PMMConfig, Get-Sha256, Get-PakEntriesCached, Get-PakLogicalStem, Invoke-RepakText, Export-PakAssetFamilyExact, Get-PakEntry, Read-PMMReviewCase, Write-PMMLog
+[PASS] Runtime-proven merger/deploy/reader components frozen
+       PMMCore, AssetReader, mappings, existing adapters/services unchanged
+[PASS] RRLD/FasterMounts runtime recipe retained
+       case/recipe present
+[PASS] Duplicate DataTable row support retained
+       checked PMMCore source markers
+[PASS] Production Game Reference selector validates against supplied Vanilla capture
+       7134 files, 3565 families, 66.8 MiB raw, missing=0
+[PASS] No ranch/branch substring false-positive outside exact scope
+       false branch count=0
+[PASS] Ranch/SpawnItem Knowledge reference exemplars are present
+       8 forced references; missing=[]
+[PASS] RRLD fresh-AI neighborhood trigger is represented
+       RRLD v2 focused provider can seed SpawnItem + BP_Boar; Ranch relation supplies 8 exact Vanilla exemplars
+[PASS] AI_HANDOFF invokes reference enrichment safely
+       integration present
+[PASS] Fresh AI zero-context instruction is embedded
+       README instruction present
+[PASS] Game Reference service has no merger/recipe authorization call
+       forbidden integration terms=[]
+[PASS] Imported returned solution ZIP is preserved
+       MergeEngine preserves exact imported ZIP
+[PASS] Tested contribution package schema implemented
+       self-contained evidence package
+[PASS] Contribution cannot auto-promote a recipe
+       no production recipe write in contribution service
+[PASS] Community intake/server trust contract documented
+       docs present
+[PASS] Release manifest declares new schemas
+       manifest fields valid
+[PASS] Public candidate does not bundle extracted Vanilla Game Reference
+       shipped GameReference files=0
+
+Important limitation: this Linux build environment cannot execute Windows PowerShell 5.1/WPF, repak.exe, the portable Windows .NET host, or Palworld. Runtime validation on the user Windows/Palworld environment is still required.

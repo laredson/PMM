@@ -1,0 +1,47 @@
+PASS VERSION.txt is v1.0 
+PASS XML UI/MainWindow.xaml 
+PASS XML UI/MainWindow.en.xaml 
+PASS XML UI/MainWindow.es.xaml 
+PASS JSON Data/config.json 
+PASS JSON Knowledge/known-behaviors.json 
+PASS JSON Knowledge/known-fixtures.json 
+PASS JSON Knowledge/behavior-symbols.json 
+PASS JSON Documentation/History/Fixtures/RELOCATABLE_FIXTURE_VALIDATION.json 
+PASS JSON Documentation/History/Fixtures/FIXTURE_VALIDATION.json 
+PASS JSON Documentation/History/Legacy_Docs/PREVIEW33_MULTIJUMP_NPROVIDER_FIXTURE.json 
+PASS JSON Documentation/History/Legacy_Docs/PREVIEW18_STATICITEM_REGRESSION.json 
+PASS JSON Documentation/History/Legacy_Docs/PREVIEW28_FIXTURE_VALIDATION.json 
+PASS Frozen Tools/PMMCore 21 files
+PASS Frozen Mappings 1 files
+PASS Frozen Core/LibraryService.ps1 
+PASS Frozen Core/PakService.ps1 
+PASS Frozen Core/SaveService.ps1 
+PASS Frozen Core/SemanticLab.ps1 
+PASS Frozen Core/Common.ps1 
+PASS Frozen Tools/AssetReader 2 files
+PASS Start controller release-only diff ['-Preview 34 RC2 freezes the proven merge adapters and finishes the release workflow around selectable saved overlays, source toggles, AI handoff, and the bundled Knowledge library. It does not use whole-asset fallback for Unreal asset families. Analyze', '+Palworld Manager Merger v1.0 freezes the proven merge adapters and ships the release workflow around selectable saved overlays, source toggles, AI handoff, and the bundled Knowledge library. It does not use whole-asset fallback for Unreal asset families. Analyze']
+PASS MergeEngine logic frozen / text-only diff ['-Palworld Manager Merger preview 34 RC3 merge engine', '+Palworld Manager Merger v1.0 merge engine', '-Preview 34 RC1 freezes the proven conservative composition adapters; the contained-superset proof remains unchanged:', '+Palworld Manager Merger v1.0 freezes the proven conservative composition adapters; the contained-superset proof remains unchanged:', "-    if([string]$solution.mode -ne 'replacement-cooked-family'){throw 'PMM RC34 accepts only mode=replacement-cooked-family.'}", "+    if([string]$solution.mode -ne 'replacement-cooked-family'){throw 'PMM v1.0 accepts only mode=replacement-cooked-family.'}", '-      Write-PMMLog ("RC34 analyzing shared {0}: {1} ({2})" -f $group.Kind,$group.Asset,($providerMods.Name -join \', \'))', '+      Write-PMMLog ("PMM v1.0 analyzing shared {0}: {1} ({2})" -f $group.Kind,$group.Asset,($providerMods.Name -join \', \'))']
+PASS No bundled Oodle 
+PASS repak 0.2.3 binary bundled 
+PASS MIT LICENSE 
+PASS Required release doc AI_CONTINUE_HERE.md 
+PASS Required release doc Documentation/AI_DEVELOPMENT_HANDOFF.md 
+PASS Required release doc Documentation/USER_GUIDE_EN.md 
+PASS Required release doc Documentation/USER_GUIDE_ES.md 
+PASS Required release doc THIRD_PARTY_NOTICES.md 
+PASS Required release doc RELEASE_NOTES.md 
+PASS Window title UI/MainWindow.xaml 
+PASS Window title UI/MainWindow.en.xaml 
+PASS Window title UI/MainWindow.es.xaml 
+PASS Setup v1.0 branding 
+PASS Smoke v1.0 branding 
+PASS Smoke RC3 regex bug stays fixed 
+PASS Smoke manager-only/saved-patch gate 
+PASS Brace balance Setup-Dependencies.ps1 91/91
+PASS Brace balance SmokeTest.ps1 146/146
+PASS Brace balance Start-PalModMerger.ps1 552/552
+PASS No stale release blockers / Wing2x error in active docs 
+PASS Historical errata included 
+PASS Mappings expected hash 
+
+TOTAL 45 | PASS 45 | FAIL 0

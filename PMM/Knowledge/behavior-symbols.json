@@ -1,0 +1,26 @@
+{
+  "schema": "PMM_BEHAVIOR_SYMBOL_HINTS_V1",
+  "rules": [
+    {
+      "symbols": ["SetVisibility", "SetHiddenInGame", "SetActorHiddenInGame"],
+      "effectClass": "visibility",
+      "hint": "Controls whether an actor/component/mesh is visible or hidden."
+    },
+    {
+      "symbols": ["GetMainMesh"],
+      "effectClass": "mesh-access",
+      "hint": "Reads or targets the actor's main mesh."
+    },
+    {
+      "symbols": ["bCanFlyWithoutFuel"],
+      "effectClass": "flight-resource-capability",
+      "hint": "Named capability related to flight without fuel/resource consumption."
+    },
+    {
+      "symbols": ["EqualEqual_ByteByte", "Not_PreBool"],
+      "effectClass": "condition-logic",
+      "hint": "Boolean/comparison logic used to select a control-flow path."
+    }
+  ],
+  "safety": "Hints are explanatory evidence only. They never make a merge safe by themselves."
+}

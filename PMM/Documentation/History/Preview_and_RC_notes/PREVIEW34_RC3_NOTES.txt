@@ -1,0 +1,18 @@
+Palworld Manager Merger v1-preview34-RC3
+
+RC3 is a surgical release-candidate hotfix over RC2.
+
+Fixed:
+- Enable/disable source-mod checkbox immediately after Import, before Analyze and before any compatibility patch exists.
+- Windows PowerShell 5.1 could evaluate the RC2 inline `(if(...))` logging expression as a command and throw: `if is not recognized as the name of a cmdlet...`.
+
+Implementation:
+- Compute the log action label with a normal PowerShell `if` statement, then pass the completed string to Write-PMMLog.
+- Add a static regression gate forbidding the exact problematic `((if` form in LibraryService.
+
+Unchanged:
+- PMMCore 0.8.1 and every merge adapter.
+- Mappings.usmap.
+- SaveService.
+- Manager-only/no-patch deployment semantics from RC2.
+- Saved-patch radio selection and Deploy behavior.

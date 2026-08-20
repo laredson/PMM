@@ -1,0 +1,61 @@
+PalModMerger v1 preview 29
+==========================
+
+Release intent
+--------------
+Preview29 is a hardening release. PMMCore stays at 0.7.1 and the proven merge
+adapters are intentionally unchanged after the runtime-successful preview28
+fixture (Fly + MultiJump Triple/Quad plus the other active test mods).
+
+Fixes
+-----
+1. Dependency health contract
+   - Common.ps1 now checks the PMMCore 0.7.1 self-test marker instead of the
+     stale 0.7.0 marker.
+   - SmokeTest now guards this exact startup/runtime contract.
+
+2. Analyze plan generation contract
+   - merge-plan schema advances to 11.
+   - A plan is current only when source signature, mappings, engine profile,
+     PMMCore identity and plan schema all match.
+   - Upgrading PMM can no longer leave a previous preview's Analyze plan looking
+     green/current merely because the mod hashes did not change.
+
+3. Quasi-duplicate suppression persistence
+   - Build manifests persist DeploymentSuppressions and AssetKey.
+   - Current-patch Analyze preserves those suppressions.
+   - A migration bridge reconstructs the Triple/Quad suppression from preview28
+     manifests that contain full Decisions but not DeploymentSuppressions.
+   - Re-Analyze after a successful Build/Deploy therefore does not silently
+     re-install an unselected pure alternative.
+
+4. Safer Delete/Disable -> Deploy lifecycle
+   - Pending removals store Name + SHA-256 (preview28 string records migrate).
+   - Pending names must be safe .pak leaf names.
+   - PMM removes a source PAK only when the game-folder hash matches a trusted
+     managed hash.
+   - PMM refuses to overwrite an unknown same-name PAK.
+
+5. Transactional Deploy
+   - The UI shows a deployment preview before commit.
+   - New/updated files are staged inside ~mods and SHA-256 verified before any
+     managed game file is changed.
+   - Existing managed targets are backed up before commit.
+   - Committed files are hash-verified.
+   - On a caught commit failure PMM restores managed targets and
+     deployment/pending-removal state; if rollback itself fails, PMM reports the
+     incomplete recovery and preserves the backup path instead of claiming success.
+   - The latest three successful deployment snapshots are kept under
+     Builds\DeploymentBackups; failed/incomplete recovery data is preserved.
+     Process/OS/power-loss recovery is intentionally tracked as follow-up
+     hardening rather than overclaimed here.
+
+What preview29 deliberately does NOT change
+--------------------------------------------
+- PMMCore remains 0.7.1.
+- RelocatableDelta-v2, StaticItem v0.4.0, BinaryRangeMerge-v2,
+  DataTableScalarTransfer-v2 and SupersetAnchor-v1 merge semantics are not
+  broadened or rewritten.
+- UAssetAPI/AssetReader remains read-only.
+- Unsupported still blocks Build.
+- Build still never mutates Palworld; Deploy remains the synchronization gate.

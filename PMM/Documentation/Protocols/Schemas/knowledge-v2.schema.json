@@ -1,0 +1,408 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pmm.local/schemas/knowledge-v2.schema.json",
+  "title": "PMM Knowledge Schema v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "knowledgeId",
+    "revision",
+    "contentHash",
+    "status",
+    "kind",
+    "merge",
+    "applicability",
+    "compatibility",
+    "provenance",
+    "safety"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "knowledgeId": {
+      "type": "string",
+      "pattern": "^KL-[A-Z0-9][A-Z0-9._-]{2,63}$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "status": {
+      "enum": [
+        "candidate",
+        "experimental",
+        "stable",
+        "deprecated",
+        "rejected"
+      ]
+    },
+    "kind": {
+      "enum": [
+        "merge-recipe",
+        "compatibility-rule",
+        "ordering-rule",
+        "behavior-case",
+        "mapping"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 160
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "merge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mergeFingerprint",
+        "conflictSet",
+        "orderSemantics",
+        "expectedResult"
+      ],
+      "properties": {
+        "mergeFingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "conflictSet": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/modRef"
+          }
+        },
+        "orderSemantics": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "relevant"
+          ],
+          "properties": {
+            "relevant": {
+              "type": "boolean"
+            },
+            "effectiveOrder": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "maxLength": 160
+              }
+            },
+            "equivalenceReason": {
+              "type": "string",
+              "maxLength": 1000
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "relevant": {
+                    "const": true
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "effectiveOrder"
+                ]
+              },
+              "else": {
+                "not": {
+                  "required": [
+                    "effectiveOrder"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/conflictRef"
+          }
+        },
+        "expectedResult": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "outputHash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "gameBuildMin": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "gameBuildMax": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "worldScope": {
+          "enum": [
+            "any",
+            "new-world-preferred",
+            "new-world-only",
+            "existing-world-supported",
+            "unknown"
+          ]
+        },
+        "requiredMods": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/modRef"
+          }
+        },
+        "excludedMods": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/modRef"
+          }
+        },
+        "contextNotes": {
+          "type": "string",
+          "maxLength": 2000
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pmmMin",
+        "knowledgeRuntimeMin"
+      ],
+      "properties": {
+        "pmmMin": {
+          "type": "string"
+        },
+        "pmmMax": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "knowledgeRuntimeMin": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "relationships": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "supersedes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^KL-"
+          }
+        },
+        "competesWith": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^KL-"
+          }
+        },
+        "derivedFrom": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^KL-"
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "createdUtc",
+        "sourceType"
+      ],
+      "properties": {
+        "createdUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sourceType": {
+          "enum": [
+            "community",
+            "maintainer",
+            "ai-handoff",
+            "developer-pr",
+            "migration"
+          ]
+        },
+        "sourceReference": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 300
+        },
+        "authorDisplayName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 120
+        }
+      }
+    },
+    "evidenceSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "independentInstallations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "positive": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "negative": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "inconclusive": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "newWorldPositive": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "functionalConfirmed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lastEvaluatedUtc": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "containsExecutablePayload",
+        "containsGameAssets",
+        "containsPersonalData"
+      ],
+      "properties": {
+        "containsExecutablePayload": {
+          "const": false
+        },
+        "containsGameAssets": {
+          "const": false
+        },
+        "containsPersonalData": {
+          "const": false
+        },
+        "reviewNotes": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      }
+    }
+  },
+  "$defs": {
+    "modRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "modId"
+      ],
+      "properties": {
+        "modId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contentHash": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "conflictRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "asset",
+        "property"
+      ],
+      "properties": {
+        "asset": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "property": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "participants": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "maxLength": 160
+          }
+        },
+        "orderRelevant": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

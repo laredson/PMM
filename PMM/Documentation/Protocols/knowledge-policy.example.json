@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "experimental": {
+    "minIndependentPositive": 3,
+    "trustedValidatorCanQualify": true,
+    "maxSevereNegative": 0
+  },
+  "stable": {
+    "minIndependentPositive": 10,
+    "minSuccessRatio": 0.9,
+    "minNewWorldPositive": 2,
+    "requireAutomatedValidation": true,
+    "maxUnresolvedSevereNegative": 0
+  },
+  "weights": {
+    "gameStarted": 1,
+    "mainMenuReached": 1,
+    "worldLoaded": 2,
+    "existingWorldRuntime": 2,
+    "newWorldCreated": 4,
+    "newWorldLoaded": 3,
+    "functionalConfirmed": 6,
+    "manualWorked": 3,
+    "worldLoadCrash": -5,
+    "mergeRelatedError": -8,
+    "functionalConfirmedFailure": -8
+  }
+}

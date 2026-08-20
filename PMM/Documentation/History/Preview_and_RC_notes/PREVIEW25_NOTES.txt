@@ -1,0 +1,26 @@
+PalModMerger v1 preview 25
+==========================
+
+Patch lifecycle
+---------------
+- Source mods remain installed. Compatibility overlay is the normal/public mode.
+- Every deployed PMM PAK now gets a sidecar `<pak>.manifest.json` in game ~mods.
+- The manifest records the exact source signature, patched providers, asset families,
+  output hash, mappings hash and KeepSourceModsInstalled policy.
+- PMM-generated PAKs are visible in the Mods list as CURRENT / STALE / NO METADATA
+  but are never fed back into the source-mod merge graph.
+- Analyze short-circuits when a deployed PMM patch exactly matches the current
+  source-mod hashes and output hash. It reports the patch as current instead of
+  proposing the same merge again.
+- Remerge and Rebuild from scratch deliberately bypass that short-circuit.
+- Preview24 deployed patches can be recognized when their legacy manifest is found
+  in a neighboring older PMM Builds folder; exact patched-provider metadata is only
+  guaranteed for preview25+ manifests.
+
+UX
+---
+- Start.cmd has a visible PALMODMERGER (PMM) console header/title.
+- Analyze progress reserves one final completion step (N shared assets => N+1 steps).
+- Build has its own green progress bar.
+- MegaMerge/single-PAK is removed from the normal UI; compatibility overlay is the
+  canonical mode so original source mods stay installed for later remerge/rebuild.

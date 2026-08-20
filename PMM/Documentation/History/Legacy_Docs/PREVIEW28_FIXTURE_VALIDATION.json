@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "fixture": "User preview27 tests + uploaded EarlyAquatic/MultiJump variants",
+  "staticItem": {
+    "asset": "Pal/Content/Pal/DataAsset/Item/DA_StaticItemDataAsset.uasset",
+    "providers": [
+      "FlyMode_P.pak",
+      "FoodNeverSpoils_P.pak",
+      "StackSize999999999ZeroWeight_P.pak",
+      "EarlyAquaticConstructionKit_P.pak"
+    ],
+    "preview27": {
+      "inferredIntents": 122,
+      "supportedPatchesBeforeInt32": 124,
+      "unsupported": [
+        "Rows[WaterBuildKit].Rank :: IntPropertyData"
+      ]
+    },
+    "preview28Expectation": {
+      "unsupported": 0,
+      "patches": 125,
+      "waterBuildKitRankCurrent": 2,
+      "waterBuildKitRankDesired": 1,
+      "waterBuildKitRankUexpOffset": 176433,
+      "expectedUexpSha256": "c1720969e6fac5fbf1a818ece1522a41fcb42bddac74348d8b4bc99781bb2254"
+    },
+    "goldenRegression": {
+      "withoutEarlyAquaticRankPatchSha256": "8f2ab2933c85bde0e8c9d74b39e466f9ad1c3b41c042106f7ffc624dea624bf8",
+      "meaning": "The first 124 patches still reproduce the previously runtime-confirmed Fly+Food+Stack cooked payload byte-for-byte."
+    }
+  },
+  "multiJump": {
+    "asset": "Pal/Content/Pal/Blueprint/Character/Base/BP_PlayerBase.uasset",
+    "providers": [
+      "FlyMode_P.pak",
+      "MultiJumpTriple_P.pak",
+      "MultiJumpQuad_P.pak"
+    ],
+    "variantUasset": {
+      "tripleSha256": "f45c4ef94522998fe747bc97df8fd3630e60207d32643a2e99e41c748bea10c0",
+      "quadSha256": "f45c4ef94522998fe747bc97df8fd3630e60207d32643a2e99e41c748bea10c0",
+      "identical": true,
+      "bytes": 24627
+    },
+    "variantUexp": {
+      "tripleBytes": 15546,
+      "quadBytes": 15546,
+      "differingByteCount": 1,
+      "conflictOffset": 1125,
+      "tripleValue": 3,
+      "quadValue": 4
+    },
+    "expectedConflict": {
+      "count": 1,
+      "choices": [
+        "Vanilla",
+        "MultiJumpTriple_P.pak",
+        "MultiJumpQuad_P.pak",
+        "Custom"
+      ],
+      "vanillaChoice": true,
+      "customChoice": true,
+      "meaning": "Resolve only the shared JumpMaxCount structural value; FlyMode remains an independent compatible provider on BP_PlayerBase."
+    },
+    "expectedMergedWithFly": {
+      "chooseTriple": {
+        "uassetSha256": "f45c4ef94522998fe747bc97df8fd3630e60207d32643a2e99e41c748bea10c0",
+        "uexpSha256": "3375ff19e9e81225f3821c98651714f20f1258398e82c71196c131034ecaf5ea"
+      },
+      "chooseQuad": {
+        "uassetSha256": "f45c4ef94522998fe747bc97df8fd3630e60207d32643a2e99e41c748bea10c0",
+        "uexpSha256": "02a5bce36d7bc98b67a287985e376fd03176582d0d6dd3850650396587daefc6"
+      },
+      "chooseVanilla": {
+        "uassetSha256": "0bc56b07d7014acbc81ca296105a225538788dae3c22b049b775412d48be9e67",
+        "uexpSha256": "463642a3e2d4dc77e00e03e0823ff81ae95dcb035c32b99be5ba597197ae2992"
+      },
+      "custom5": {
+        "uassetSha256": "f45c4ef94522998fe747bc97df8fd3630e60207d32643a2e99e41c748bea10c0",
+        "uexpSha256": "0823ebfd5da8965e3c3cbbac5e3607ddd5f218f1f9a6fdb9d80023ddec0bc6a7"
+      }
+    }
+  },
+  "deploymentPolicy": {
+    "exactDuplicates": "Keep one deployed copy; retain every source in PMM library.",
+    "singleConflictQuasiDuplicates": "After the true-conflict choice, keep the selected variant deployed and suppress unselected pure-alternative PAKs. Vanilla/Custom suppress all pure alternatives. Library copies remain available for Remerge/Rebuild.",
+    "independentProviders": "Remain deployed; compatibility overlay wins last."
+  }
+}

@@ -1,0 +1,31 @@
+name: PMM validation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reject user/game PAKs
+        shell: pwsh
+        run: |
+          $paks = @(Get-ChildItem -LiteralPath . -Filter *.pak -File -Recurse -ErrorAction SilentlyContinue)
+          if ($paks.Count -gt 0) {
+            $paks | ForEach-Object { Write-Error ("PAK must not be committed: " + $_.FullName) }
+            exit 1
+          }
+
+      - name: Source and package smoke test
+        shell: pwsh
+        run: |
+          ./SmokeTest.ps1 -Quiet

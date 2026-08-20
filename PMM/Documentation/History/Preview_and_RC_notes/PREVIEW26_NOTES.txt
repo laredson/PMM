@@ -1,0 +1,22 @@
+PalModMerger v1 preview 26
+===========================
+
+Patch library / backup lifecycle
+--------------------------------
+- A deployed zzzzzzzzzz_PMM_Merge_*_P.pak is still discovered from Palworld's
+  Pal\Content\Paks\~mods deployment directory.
+- Every discovered deployed PMM patch is now mirrored into this PMM portable
+  installation under Builds\Current, with its manifest when available.
+- This migration also works when a newer PMM preview is opened and the patch
+  was originally built by an older sibling preview.
+- A generated PMM patch is NEVER inserted into Mods/, because Mods/ is the
+  source merge graph. Treating PMM output as an input would create recursive
+  self-merges.
+- The Mods & Merge list displays managed patch state separately: deployed,
+  local backup present, backup only, source mods not imported, current/stale.
+- Importing a PMM patch manually or through Import game ~mods stores it as a
+  managed backup rather than silently skipping it.
+- Local backup copies remain available even when the deployed game copy is
+  later removed.
+
+Existing preview25 merge behavior is otherwise unchanged.

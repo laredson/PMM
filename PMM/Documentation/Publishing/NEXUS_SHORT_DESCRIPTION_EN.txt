@@ -1,0 +1,1 @@
+Creates compatibility patches so conflicting Palworld PAK mods can work together. Also manages mods, saved merge variants and world backups. Open source.

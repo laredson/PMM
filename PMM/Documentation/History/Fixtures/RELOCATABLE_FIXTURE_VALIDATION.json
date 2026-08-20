@@ -1,0 +1,14 @@
+{
+  "fixture": "BP_BuildObject_BreedFarm / EasyBreeding + NoCollisionFarmsAndExped",
+  "anchor": "EasyBreeding_P",
+  "secondary": "NoCollisionFarmsAndExped_P",
+  "secondaryUexpHunks": 2,
+  "secondaryUassetRelocationHunks": 25,
+  "appliedHunks": 27,
+  "output": {
+    "uassetBytes": 8405,
+    "uassetSha256": "7cf0ea1cde3829917b18a482e335ee7f4d2ab3866c75208f1331c417a2b9b5f0",
+    "uexpBytes": 3162,
+    "uexpSha256": "ff93361b08383b33ff635c13244012be4a029a1c20a8bdffe4e6567ac843b748"
+  }
+}

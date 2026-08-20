@@ -1,0 +1,42 @@
+PalModMerger preview34 RC1 static QA
+====================================
+Date: 2026-08-16
+
+PASS - all JSON files parse.
+PASS - MainWindow.xaml, MainWindow.en.xaml and MainWindow.es.xaml parse as XML.
+PASS - all 77 WPF controls referenced by Start-PalModMerger.ps1 exist in both
+       localized XAML files.
+PASS - all PowerShell files pass a structural delimiter/string/comment scan.
+PASS - no suspicious non-scope $variable: interpolation pattern was found.
+PASS - complete Tools/PMMCore tree is byte-identical to preview33.
+PASS - Mappings/Mappings.usmap is byte-identical to preview33:
+       604550ba90faab1e394c2789f38eeff625493d3729c2d7f6a6058bfedb90a67b
+PASS - Core/SaveService.ps1 is byte-identical to preview33.
+PASS - merge-plan schema remains 12 and PMMCore remains 0.8.1.
+PASS - saved-patch selector functions are present for Current + Previous +
+       deployed patches.
+PASS - rollback compatibility requires a valid patch output hash, exact active
+       source signature and exact mappings hash, while intentionally allowing a
+       different stored conflict DecisionSignature from the same source set.
+PASS - selected-patch deployment suppression comes from the selected manifest.
+PASS - newly built patches automatically become the selected patch.
+PASS - patch UI has a single radio group, disables patches from other source
+       sets, and displays a decision summary so 2x/3x/4x variants are identifiable.
+PASS - Knowledge remains evidence-only / non-authorizing.
+PASS - Fly+Wing, MultiJump Double/Triple/Quad, and Rushoar Bone->Leather runtime
+       evidence is present in the bundled Knowledge fixtures.
+PASS - AI_HANDOFF includes exact case inputs, involved source PAKs, Knowledge,
+       sanitized global context, community workflow, strict solution return
+       template, and a runtime-result contribution template.
+PASS - duplicate Remerge / Rebuild UI actions remain removed.
+
+Not executable in this Linux build environment
+----------------------------------------------
+- PowerShell's official System.Management.Automation parser / SmokeTest.ps1
+- portable .NET Windows PMMCore/AssetReader execution
+- WPF render and DPI behavior
+- Windows transactional Deploy
+- Palworld runtime
+
+Those remain the RC user acceptance gate documented in
+Docs/PREVIEW34_RC1_VALIDATION_TARGET.md.

@@ -1,0 +1,307 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pmm.local/schemas/evidence-v1.schema.json",
+  "title": "PMM Evidence Schema v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "evidenceId",
+    "submittedUtc",
+    "knowledge",
+    "environment",
+    "world",
+    "runtime",
+    "functional",
+    "outcome",
+    "privacy"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "evidenceId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "submittedUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "knowledge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "knowledgeId",
+        "revision",
+        "contentHash",
+        "mergeFingerprint"
+      ],
+      "properties": {
+        "knowledgeId": {
+          "type": "string",
+          "pattern": "^KL-"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "contentHash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "mergeFingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "installation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "anonymousFingerprint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "sessionId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pmmVersion",
+        "gameBuild",
+        "totalMods",
+        "conflictSetFingerprint"
+      ],
+      "properties": {
+        "pmmVersion": {
+          "type": "string"
+        },
+        "gameBuild": {
+          "type": "string"
+        },
+        "totalMods": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5000
+        },
+        "conflictSetFingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "otherModSetFingerprint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "relevantOtherMods": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "maxLength": 160
+          }
+        }
+      }
+    },
+    "world": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification"
+      ],
+      "properties": {
+        "classification": {
+          "enum": [
+            "new-world",
+            "existing-world",
+            "unknown"
+          ]
+        },
+        "createdDuringValidation": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "knownModHistory": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "worldLoaded": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observationMode"
+      ],
+      "properties": {
+        "observationMode": {
+          "enum": [
+            "live",
+            "post-run-logs",
+            "manual",
+            "none"
+          ]
+        },
+        "gameStarted": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "mainMenuReached": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "worldLoadDetected": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "runtimeSeconds": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "crashDetected": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "mergeRelatedErrorDetected": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "normalExitDetected": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "logEvidenceHashes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "functional": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verification"
+      ],
+      "properties": {
+        "verification": {
+          "enum": [
+            "confirmed-working",
+            "confirmed-failing",
+            "not-verified",
+            "partially-working",
+            "alternative-worked"
+          ]
+        },
+        "alternativeKnowledgeId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^KL-"
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2000
+        }
+      }
+    },
+    "outcome": {
+      "enum": [
+        "positive",
+        "negative",
+        "inconclusive"
+      ]
+    },
+    "attribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "displayName": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 120
+        },
+        "contact": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 200
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "containsSaveData",
+        "containsPersonalData",
+        "containsRawMachineIdentifiers",
+        "consentToShare"
+      ],
+      "properties": {
+        "containsSaveData": {
+          "const": false
+        },
+        "containsPersonalData": {
+          "const": false
+        },
+        "containsRawMachineIdentifiers": {
+          "const": false
+        },
+        "consentToShare": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

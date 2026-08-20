@@ -1,0 +1,254 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pmm.local/schemas/update-manifest-v1.schema.json",
+  "title": "PMM Update Manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "manifestId",
+    "kind",
+    "channel",
+    "version",
+    "publishedUtc",
+    "source",
+    "artifact",
+    "compatibility",
+    "signature"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "manifestId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "kind": {
+      "enum": [
+        "application",
+        "knowledge"
+      ]
+    },
+    "channel": {
+      "enum": [
+        "stable",
+        "beta",
+        "experimental",
+        "community"
+      ]
+    },
+    "version": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "publishedUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "commit"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{7,64}$"
+        },
+        "branch": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 200
+        },
+        "pullRequest": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "tag": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 160
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "sha256",
+        "size"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "format": {
+          "enum": [
+            "zip",
+            "tar.gz",
+            "json-bundle"
+          ]
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pmmMin": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pmmMax": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "knowledgeSchemaMin": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "knowledgeSchemaMax": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "gameBuildMin": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "gameBuildMax": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "releaseNotes": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 8000
+    },
+    "releaseNotesUrl": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uri"
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "preservePrevious": {
+          "type": "boolean"
+        },
+        "healthCheckRequired": {
+          "type": "boolean"
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "keyId",
+        "valueBase64"
+      ],
+      "properties": {
+        "algorithm": {
+          "const": "ed25519"
+        },
+        "keyId": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "valueBase64": {
+          "type": "string",
+          "minLength": 40,
+          "maxLength": 200
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "application"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "channel": {
+            "enum": [
+              "stable",
+              "beta",
+              "community"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "knowledge"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "channel": {
+            "enum": [
+              "stable",
+              "experimental"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

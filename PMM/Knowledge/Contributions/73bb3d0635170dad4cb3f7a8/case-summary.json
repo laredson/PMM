@@ -1,0 +1,20 @@
+{
+  "schema": "PMM_CONTRIBUTED_CASE_SUMMARY_V1",
+  "caseId": "73bb3d0635170dad4cb3f7a8",
+  "date": "2026-08-17",
+  "asset": "Pal/Content/Pal/DataTable/Character/DT_PalMonsterParameter_Common.uasset",
+  "providers": [
+    {
+      "name": "FasterMounts4xAllWorkSuitabilitiesLevel10_P.pak",
+      "pakSha256": "f91dd7ae1aa0d5ef1399d9185cee74a4ce06d907cfaf4c936489dbdf67b21e64"
+    },
+    {
+      "name": "RushRoarLeatherDrop_v2_P.pak",
+      "pakSha256": "b663b49a2a0825b01c45bfd223b2114e7dfc30bf108d8250aa89f6d82ee4a266"
+    }
+  ],
+  "originalStatus": "Unsupported",
+  "originalReason": "SupersetAnchor rejected the secondary layout; DataTable semantic mapping aborted on duplicate row ID RAID_NightLady_Dark.",
+  "privacyAndRedistribution": "The public PMM package intentionally does not include the original source PAKs or cooked assets from the contributed AI_HANDOFF. Only hashes, structural conclusions and runtime evidence are preserved.",
+  "aiHandoffArchiveSha256": "b46927f5fa9ed23685ff50a75a79e13cefd74d0043685b4f1bcf8a9ca7db00ad"
+}

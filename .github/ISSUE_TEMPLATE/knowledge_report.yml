@@ -1,0 +1,35 @@
+name: Knowledge report
+description: Report whether a knowledge rule/recipe worked
+title: "[Knowledge]: "
+labels: ["knowledge"]
+body:
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result
+      options:
+        - Worked
+        - Failed
+        - Partially worked
+        - Alternative recipe worked
+    validations:
+      required: true
+  - type: input
+    id: knowledge_id
+    attributes:
+      label: Knowledge entry ID
+  - type: input
+    id: pmm_version
+    attributes:
+      label: PMM version
+    validations:
+      required: true
+  - type: input
+    id: game_version
+    attributes:
+      label: Game version/build
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Do not include saves, copyrighted assets, personal data, or credentials.

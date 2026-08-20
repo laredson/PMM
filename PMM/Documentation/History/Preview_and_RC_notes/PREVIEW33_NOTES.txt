@@ -1,0 +1,21 @@
+PalModMerger v1-preview33
+==========================
+
+FOCUS
+-----
+Regression/hardening release after the successful runtime Fly+Wing manual overlay.
+No UI redesign and no new speculative merge architecture.
+
+CHANGES
+-------
+- Fix Build wrapper scalar `.Count` failure from preview32.
+- PMMCore 0.8.1 functional self-test now covers an N-provider scalar conflict.
+- Captured MultiJump Double/Triple/Quad fixture documented: same BP_PlayerBase .uasset,
+  one differing .uexp byte at offset 1125 with values 2/3/4.
+- Fly+Wing ContainedDeltaSuperset fixture marked runtime-proven for the captured hashes.
+
+EXPECTED 2/3/4 + FLY + WING RUN
+--------------------------------
+Shared 6 | Auto merged 4 | Decisions 1 | Unsupported 0 | Experimental 0 | Identical 1
+
+The only decision must be the jump count. Fly remains a compatible same-file provider.

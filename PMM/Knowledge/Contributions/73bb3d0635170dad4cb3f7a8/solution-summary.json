@@ -1,0 +1,13 @@
+{
+  "schema": "PMM_CONTRIBUTED_SOLUTION_SUMMARY_V1",
+  "caseId": "73bb3d0635170dad4cb3f7a8",
+  "mode": "replacement-cooked-family",
+  "result": "accepted-and-runtime-proven",
+  "solutionRelationship": "Solution cooked family equals FasterMounts provider byte-for-byte.",
+  "output": {
+    "uassetSha256": "7b362ec753640ded6fba9fbe24d2f8400eead6fe9a148f5fa915d6e1695b7dae",
+    "uexpSha256": "0e82b94bbba6fefaa8522f78548703366bfcc353ffacc7b78ede4413ca589d25"
+  },
+  "promotedRecipe": "rushroar-v2-fastermounts-palmonsterparameter-20260817",
+  "aiSolutionArchiveSha256": "276a6b2870caf2c1788f50c1937efc2184ee7eb42ca615bad39a205afe9c7953"
+}

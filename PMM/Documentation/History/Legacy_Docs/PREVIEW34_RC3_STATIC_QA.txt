@@ -1,0 +1,35 @@
+Palworld Manager Merger preview34 RC3 static QA
+PASS 32 / FAIL 0
+
+PASS VERSION is RC3
+PASS UI/MainWindow.xaml RC3 title
+PASS UI/MainWindow.xaml XML parse
+PASS UI/MainWindow.en.xaml RC3 title
+PASS UI/MainWindow.en.xaml XML parse
+PASS UI/MainWindow.es.xaml RC3 title
+PASS UI/MainWindow.es.xaml XML parse
+PASS JSON Knowledge/known-behaviors.json
+PASS JSON Knowledge/known-fixtures.json
+PASS JSON Knowledge/behavior-symbols.json
+PASS JSON Data/config.json
+PASS JSON Docs/PREVIEW33_MULTIJUMP_NPROVIDER_FIXTURE.json
+PASS JSON Docs/PREVIEW18_STATICITEM_REGRESSION.json
+PASS JSON Docs/RELOCATABLE_FIXTURE_VALIDATION.json
+PASS JSON Docs/FIXTURE_VALIDATION.json
+PASS JSON Docs/PREVIEW28_FIXTURE_VALIDATION.json
+PASS bad RC2 ((if form absent
+PASS RC3 actionLabel statement present
+PASS RC3 logging uses completed label
+PASS Set-PMMLibraryModEnabled still moves source folder
+PASS Set-PMMLibraryModEnabled clears analysis state
+PASS no runtime ps1 contains ((if
+PASS frozen Tools/PMMCore :: Tools/PMMCore
+PASS frozen Mappings/Mappings.usmap :: Mappings/Mappings.usmap
+PASS frozen Core/SaveService.ps1 :: Core/SaveService.ps1
+PASS frozen Core/PakService.ps1 :: Core/PakService.ps1
+PASS frozen Tools/AssetReader :: Tools/AssetReader
+PASS UI controller unchanged except RC branding
+PASS SmokeTest regression gate for ((if
+PASS SmokeTest checks actionLabel hotfix
+PASS RC3 validation doc exists
+PASS RC3 notes exist

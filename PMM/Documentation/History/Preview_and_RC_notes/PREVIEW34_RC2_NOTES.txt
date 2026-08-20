@@ -1,0 +1,23 @@
+Palworld Manager Merger v1-preview34-RC2
+=========================================
+
+Final pre-1.0 lifecycle/branding candidate based on the runtime-tested RC1.
+
+Changes from RC1
+----------------
+- Application branding is now "Palworld Manager Merger" (PMM).
+- Compatibility patches includes a permanent radio option:
+    No compatibility patch / source mods only
+- Selecting that option makes Deploy operate as a pure mod-manager deployment:
+  active source PAKs are synchronized, managed PMM overlays are removed, and
+  saved compatibility patches remain available in the PMM library.
+- Manager-only Deploy does not require Analyze. It intentionally leaves
+  unresolved source-mod conflicts to normal Palworld PAK load order.
+- Byte-identical duplicate source PAKs are still suppressed in manager-only
+  mode to avoid deploying redundant identical copies.
+- Selecting or building a compatibility patch returns to normal merger Deploy.
+
+Frozen merge baseline
+---------------------
+PMMCore 0.8.1, mappings and all production merge adapters are unchanged from
+preview34 RC1 / preview33 runtime-proven behavior.

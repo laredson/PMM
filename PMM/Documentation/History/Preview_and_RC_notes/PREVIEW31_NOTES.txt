@@ -1,0 +1,35 @@
+PalModMerger v1 preview 31
+============================
+
+Focus: UI/UX hardening after merge/deploy functionality reached a stable baseline.
+
+Changes
+-------
+- Replaces the one-line Analyze box with an Analysis Plan dashboard and asset table.
+- Shows which shared assets are auto-merged, conflicted, unsupported or identical.
+- Shows which mods participate in each shared asset and which adapter is used.
+- Adds draggable splitters between mod library/workspace, Analyze/conflicts, and conflict list/details.
+- Collapses Blocked shared assets to a compact header when unsupported count is zero.
+- Persists main window size and the three primary workspace divider positions.
+- Adds Reset workspace layout in Settings.
+- Adds mod-library filtering and active/disabled/patch counts.
+- Removes the obsolete Strategy ComboBox (ConflictGroups remains the only production mode).
+- Moves close/force-close deployment options into the Build/Deploy area.
+- Places Build, Deploy, Remerge, Rebuild and Restore on one line.
+- Gives Saves a draggable list/details divider.
+- Adds a restrained card/table visual system for clearer hierarchy.
+
+Safety boundary
+---------------
+PMMCore remains 0.7.1. PMMCore source, adapters and Mappings.usmap are unchanged
+from preview30. Preview31 does not reintroduce UAsset.Write(), whole-file winner
+fallbacks, or any new merge adapter.
+
+Validation target
+-----------------
+1. Run the known 41-mod fixture with Triple + Quad present.
+2. Analyze must still report Shared 4 / auto 3 / decisions 1 / unsupported 0 / identical 0.
+3. The Analysis Plan table must show the four shared assets and participating mods.
+4. Resolve Triple, Build, Deploy and perform the same short runtime smoke test.
+5. Resize the library, Analyze panel and conflict-list dividers; restart PMM and verify positions persist.
+6. Verify Reset workspace layout returns to the preview31 defaults.
