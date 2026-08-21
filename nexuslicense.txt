@@ -1,0 +1,43 @@
+# Palworld Manager Merger — Permissions
+
+Palworld Manager Merger (PMM) is open-source software released under the **MIT License**.
+
+### PMM code and original project files
+
+You may use, copy, modify, merge, publish, distribute, sublicense, port, and redistribute PMM, including modified versions and forks, in accordance with the MIT License.
+
+When redistributing PMM or substantial portions of its source code, the original copyright notice and MIT License must be preserved.
+
+Credit to **laredson / Palworld Manager Merger (PMM)** and a link to the original project are appreciated. Modified versions should be clearly identified as unofficial forks or derivatives and should not imply endorsement by the original project.
+
+### Re-uploading and modified versions
+
+Re-uploading PMM or publishing modified versions is permitted under the MIT License, provided the applicable copyright and license notices are retained.
+
+If you publish a modified build, please make it clear that it is not an official PMM release.
+
+### Third-party components
+
+The MIT License applies only to PMM-owned code and project material.
+
+PMM distributions may contain or use third-party components, libraries, runtimes, tools, mappings, or other material that remain subject to their respective licenses and terms.
+
+Redistribution of those components must comply with their original licenses.
+
+See `THIRD_PARTY_NOTICES.md` in the PMM distribution/repository for details.
+
+### Game and third-party content
+
+Palworld, Unreal Engine, third-party mods, game files, trademarks, and assets belonging to other authors or companies are **not** licensed by PMM and remain the property of their respective owners.
+
+PMM's license does not grant permission to redistribute copyrighted game content or third-party mods.
+
+### Commercial use
+
+The MIT License permits commercial use of PMM-owned software.
+
+Any such use must still comply with the licenses of included third-party components and with the applicable rules and terms of Nexus Mods, Palworld, Steam, Epic Games, Microsoft, and any other relevant platform or rights holder.
+
+The complete MIT License and third-party notices are available in the public source repository:
+
+**https://github.com/laredson/PMM**
