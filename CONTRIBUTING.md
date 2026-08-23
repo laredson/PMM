@@ -1,5 +1,11 @@
 # Contributing to Palworld Manager Merger (PMM)
 
+## v1.1 current community workflow
+
+The first public v1.1 release does not have automatic Knowledge upload/download yet. Normal users can export a tested `PMM_KNOWLEDGE_CONTRIBUTION_V1` from Settings and share that ZIP manually. See `Documentation/SHARING_KNOWLEDGE_MANUALLY.md`.
+
+Developers should use forks/branches/pull requests. Do not add direct arbitrary-branch execution or unsigned self-update behavior to the stable v1.1 line.
+
 PMM welcomes code, documentation, tests, mappings, validators, and knowledge-library contributions.
 
 ## Development contributions

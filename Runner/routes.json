@@ -1,0 +1,30 @@
+{
+  "schema": "PMM_HOST_ROUTES_V1",
+  "routes": {
+    "start": {
+      "kind": "native",
+      "executable": "PMMRuntime.exe",
+      "arguments": ["start"]
+    },
+    "runtime-self-test": {
+      "kind": "native",
+      "executable": "PMMRuntime.exe",
+      "arguments": ["self-test"]
+    },
+    "runtime-doctor": {
+      "kind": "native",
+      "executable": "PMMRuntime.exe",
+      "arguments": ["doctor"]
+    },
+    "runtime-security": {
+      "kind": "native",
+      "executable": "PMMRuntime.exe",
+      "arguments": ["security"]
+    },
+    "runtime-native-ui": {
+      "kind": "native",
+      "executable": "PMMRuntime.exe",
+      "arguments": ["ui-native"]
+    }
+  }
+}

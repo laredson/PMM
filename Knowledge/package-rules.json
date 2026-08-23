@@ -1,0 +1,41 @@
+{
+  "schema": "PMM_PACKAGE_RULES_V1",
+  "rules": [
+    {
+      "id": "nexus-palworld-4935-ribbuny-pelt-v1",
+      "title": "ribbuny's number 1 fan",
+      "source": "Nexus Mods #4935",
+      "sourceUrl": "https://www.nexusmods.com/palworld/mods/4935",
+      "trigger": "allMembersActive",
+      "members": [
+        "pelt1-luny_P.pak",
+        "pelt1-ribunny_P.pak",
+        "pelt1-ribunny-shine_P.pak"
+      ],
+      "choices": [
+        {
+          "id": "luny",
+          "label": "Luny",
+          "enabled": [
+            "pelt1-luny_P.pak"
+          ],
+          "suppressed": [
+            "pelt1-ribunny_P.pak",
+            "pelt1-ribunny-shine_P.pak"
+          ]
+        },
+        {
+          "id": "ribunny-shine",
+          "label": "Ribunny + Shine",
+          "enabled": [
+            "pelt1-ribunny_P.pak",
+            "pelt1-ribunny-shine_P.pak"
+          ],
+          "suppressed": [
+            "pelt1-luny_P.pak"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+PMM v1.2 RC1 - TEST THIS BUILD
+================================
+
+1) Run: PMMRuntime.exe self-test
+   Expected: PMMRUNTIME_SELFTEST_OK 1.2.0-rc1
+
+2) Run: PMM.exe runtime-self-test
+   Expected: Host reaches PMMRuntime through a native route.
+
+3) Run: PMMRuntime.exe ui-native
+   Expected: native PMM Runtime window opens without WPF/PowerShell objects.
+
+4) Run: Start.cmd
+   Expected on the normal maintainer test PC: complete proven PMM interface opens.
+   Host log should contain: CHILD START kind=native name=PMMRuntime.exe
+
+5) Regression: run the known Ribunny PackageChoice test.
+   Expected decision: Luny OR Ribunny + Shine.
+
+RC1 is a clean integration baseline. Full Analyze/Build/Deploy under ConstrainedLanguage is still a
+release gate; do not claim that specific fix complete until the remaining workflow is migrated/tested.

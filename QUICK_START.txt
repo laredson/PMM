@@ -1,0 +1,22 @@
+PMM v1.2 RC1 — QUICK START
+
+Normal use:
+  Start.cmd
+
+Native runtime shell test:
+  PMMRuntime.exe ui-native
+
+Runtime self-test:
+  PMMRuntime.exe self-test
+
+Host -> Runtime native route test:
+  PMM.exe runtime-self-test
+
+Architecture:
+  PMM.exe -> Runner/routes.json -> PMMRuntime.exe start
+
+The normal start route reaches PMMRuntime without PowerShell. On FullLanguage systems PMMRuntime
+opens the proven full WPF/Core workspace. On ConstrainedLanguage systems it opens the native Runtime
+shell and preserves diagnostics. The complete Analyze/Build/Deploy migration is still a final-release gate.
+
+Knowledge/*.json remains external and authoritative. Ribunny PackageChoice remains unchanged.

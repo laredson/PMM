@@ -1,0 +1,14 @@
+{
+  "title": "Palworld Manager Merger 1.2 RC1",
+  "heading": "PALWORLD MANAGER MERGER",
+  "subtitle": "Native runtime shell - no PowerShell FullLanguage required",
+  "refresh": "Refresh",
+  "detect_game": "Detect Palworld",
+  "open_pmm_folder": "Open PMM folder",
+  "open_library": "Open mod library",
+  "open_game_folder": "Open game folder",
+  "open_legacy_ui": "Open current PMM interface",
+  "runtime_self_test": "Runtime self-test",
+  "close": "Close",
+  "migration_note": "Native startup and diagnostics require no PowerShell FullLanguage. The complete Analyze/Build/Deploy workspace is still pending native migration before final 1.2."
+}

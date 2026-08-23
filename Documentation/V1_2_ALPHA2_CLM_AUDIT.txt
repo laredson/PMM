@@ -1,0 +1,33 @@
+PMM 1.2 Alpha 2 - CLM migration audit
+=====================================
+
+Critical startup scripts intended to remain usable in ConstrainedLanguage:
+  Setup-Dependencies.ps1
+  Runner/PMM-Runner.ps1
+  Runner/Operations/start.ps1
+  Runner/Operations/probe.ps1
+
+Static forbidden-pattern scan in those files:
+  Add-Type                      0
+  New-Object                    0
+  [pscustomobject]              0
+  System.Collections.Generic   0
+  ProcessStartInfo              0
+  PresentationFramework/WPF    0
+
+Native owner introduced in Alpha 2:
+  PMMRuntime.exe
+
+Native capabilities now outside PowerShell FullLanguage:
+  dependency verification/repair
+  hashing
+  ZIP archive operations
+  process execution + timeout/stdout/stderr capture
+  game discovery
+  Knowledge JSON validation
+
+Remaining regression path that still requires migration before 1.2 RC:
+  Start-PalModMerger.ps1
+  Core/*.ps1 runtime orchestration that uses non-CLM .NET/WPF constructs
+
+This audit does not claim full CLM compatibility yet.

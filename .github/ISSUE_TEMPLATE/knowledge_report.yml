@@ -1,7 +1,6 @@
 name: Knowledge report
 description: Report whether a knowledge rule/recipe worked
 title: "[Knowledge]: "
-labels: ["knowledge"]
 body:
   - type: dropdown
     id: result
