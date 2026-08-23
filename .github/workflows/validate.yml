@@ -2,7 +2,9 @@ name: PMM validation
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - 'release/**'
   pull_request:
   workflow_dispatch:
 
@@ -10,22 +12,40 @@ permissions:
   contents: read
 
 jobs:
-  smoke:
+  validate:
     runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Reject user/game PAKs
-        shell: pwsh
-        run: |
-          $paks = @(Get-ChildItem -LiteralPath . -Filter *.pak -File -Recurse -ErrorAction SilentlyContinue)
-          if ($paks.Count -gt 0) {
-            $paks | ForEach-Object { Write-Error ("PAK must not be committed: " + $_.FullName) }
-            exit 1
-          }
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.x'
 
-      - name: Source and package smoke test
+      - name: Validate PMM 1.2 repository and package contract
         shell: pwsh
         run: |
-          ./SmokeTest.ps1 -Quiet
+          ./Validation/Validate-v1.2.ps1 -Quiet
+
+      - name: Compile-test PMM Host source
+        shell: pwsh
+        working-directory: Host
+        run: |
+          go test ./...
+
+      - name: Test PMM Runtime source
+        shell: pwsh
+        working-directory: Runtime
+        run: |
+          go test ./...
+
+      - name: Native Runtime self-test
+        shell: pwsh
+        run: |
+          ./PMMRuntime.exe self-test
+
+      - name: Host to Runtime native-route self-test
+        shell: pwsh
+        run: |
+          ./PMM.exe runtime-self-test

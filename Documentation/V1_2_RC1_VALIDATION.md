@@ -41,3 +41,15 @@ workspace still uses the legacy PowerShell/WPF/Core path on FullLanguage systems
 Before publishing v1.2 specifically as the FullLanguage fix, migrate the remaining end-user
 Analyze/Build/Deploy/Saves workflow behind PMMRuntime (or prove each remaining script CLM-safe).
 PMM must not weaken or bypass Windows application-control policy.
+
+## GitHub validation for the v1.2 architecture
+
+The v1.1 `SmokeTest.ps1` remains in the tree as historical/FIX4 regression tooling, but it is no
+longer the GitHub Actions entrypoint because it asserts that dependency implementation details still
+live inside `Setup-Dependencies.ps1`. In v1.2 that script is intentionally only a CLM-safe wrapper
+around `PMMRuntime.exe`.
+
+The repository/CI entrypoint is now `Validation/Validate-v1.2.ps1`. GitHub Actions additionally
+compile-tests the Go Host/Runtime source, runs `PMMRuntime.exe self-test`, and verifies the native
+`PMM.exe -> PMMRuntime.exe` route. The workflow runs on `main`, `release/**`, pull requests and manual
+dispatches.
