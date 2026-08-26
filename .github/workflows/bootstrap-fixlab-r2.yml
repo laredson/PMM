@@ -25,7 +25,7 @@ jobs:
         shell: pwsh
         run: |
           $parts = Get-ChildItem -LiteralPath '.github/bootstrap' -Filter 'fixlab-r2-overlay.zip.b64.part*' -File | Sort-Object Name
-          if (-not $parts -or $parts.Count -ne 34) { throw "Expected 34 overlay chunks, found $($parts.Count)." }
+          if (-not $parts -or $parts.Count -ne 18) { throw "Expected 18 overlay chunks, found $($parts.Count)." }
           $encoded = ($parts | ForEach-Object { [System.IO.File]::ReadAllText($_.FullName) }) -join ''
           $archive = Join-Path $env:RUNNER_TEMP 'fixlab-r2-overlay.zip'
           [System.IO.File]::WriteAllBytes($archive, [Convert]::FromBase64String($encoded))
