@@ -1,0 +1,42 @@
+{
+  "schema": "PMM_RUNTIME_CONTRACT_V1",
+  "runtime": "PMMRuntime.exe",
+  "source": "Runtime/",
+  "principle": "Native capabilities, external policy/knowledge/data",
+  "capabilities": [
+    "dependencies.ensure",
+    "dependencies.status",
+    "security.status",
+    "knowledge.validate",
+    "game.detect",
+    "hash.sha256",
+    "archive.extract",
+    "archive.create",
+    "process.run",
+    "ui.bootstrap",
+    "start.dispatch",
+    "ui.native-shell"
+  ],
+  "external_authoritative_data": [
+    "CKL/Stable/*.json",
+    "Resources/UI/*.xaml",
+    "Workspace/State/*.json",
+    "Resources/Mappings/Mappings.usmap",
+    "Resources/UI/native-shell.json",
+    "Engine/Runner/routes.json"
+  ],
+  "policy": {
+    "requires_powershell_full_language": false,
+    "bypasses_windows_application_control": false
+  },
+  "startup": {
+    "normal_route": "PMM.exe -> Engine/Runner/routes.json -> PMMRuntime.exe start",
+    "powershell_required": false
+  },
+  "ui": {
+    "legacy_full_ui": "PowerShell/WPF temporary regression path on FullLanguage systems",
+    "native_shell": "Win32 shell used when FullLanguage is unavailable or when ui-native is requested",
+    "native_shell_source": "Runtime/native_shell_windows.go",
+    "native_shell_config": "Resources/UI/native-shell.json"
+  }
+}

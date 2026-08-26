@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - 'dev/**'
       - 'release/**'
   pull_request:
   workflow_dispatch:
@@ -23,29 +24,29 @@ jobs:
         with:
           go-version: '1.23.x'
 
-      - name: Validate PMM 1.2 repository and package contract
+      - name: Validate repository and PMM package contract
         shell: pwsh
         run: |
-          ./Validation/Validate-v1.2.ps1 -Quiet
+          ./Development/Scripts/validation/Validate-v1.2.ps1 -Quiet
 
-      - name: Compile-test PMM Host source
+      - name: Compile-test PMM Host source snapshot
         shell: pwsh
-        working-directory: Host
+        working-directory: Development/Source/Host
         run: |
           go test ./...
 
-      - name: Test PMM Runtime source
+      - name: Test PMM Runtime source snapshot
         shell: pwsh
-        working-directory: Runtime
+        working-directory: Development/Source/Runtime
         run: |
           go test ./...
 
-      - name: Native Runtime self-test
+      - name: Native Runtime self-test (packaged Guided Flow binary)
         shell: pwsh
         run: |
-          ./PMMRuntime.exe self-test
+          ./PMM/Engine/PMMRuntime.exe self-test
 
-      - name: Host to Runtime native-route self-test
+      - name: Host to Runtime native-route self-test (packaged Guided Flow binary)
         shell: pwsh
         run: |
-          ./PMM.exe runtime-self-test
+          ./PMM/PMM.exe runtime-self-test

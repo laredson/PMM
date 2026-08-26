@@ -1,0 +1,350 @@
+{
+  "schema": "PMM_CKL_CASE_INDEX_V1",
+  "generatedFrom": "PMM/CKL Stable + Experimental local libraries",
+  "sourceFiles": [
+    {
+      "path": "Experimental/library.json",
+      "sha256": "c1079c233a3855037a1ca93aca41c74922900e6a73b29ae2c1f3f26664e00874"
+    },
+    {
+      "path": "Stable/behavior-symbols.json",
+      "sha256": "93f561ae8cc5181411108e027c5d162a71fdd50bbc730d3c92564cee311282e4"
+    },
+    {
+      "path": "Stable/known-behaviors.json",
+      "sha256": "6d8c36ceb23d06435f7085a05d1882f92fa9fec05108b56892c762224c075307"
+    },
+    {
+      "path": "Stable/known-fixtures.json",
+      "sha256": "b9ddcbd034118660bf459030a01c9a0693bae58996f18129942f4ccfbf875b1b"
+    },
+    {
+      "path": "Stable/package-rules.json",
+      "sha256": "35b3cfe75e2daa262841c1f11d708c3b7b20d70b794f4faa6db0a0c1be38ca5f"
+    },
+    {
+      "path": "Stable/production-recipes.json",
+      "sha256": "6ce7ae675b5d3607488e6097410c5657d558b1488b619000acd7ca74ba2f8aeb"
+    },
+    {
+      "path": "Stable/reference-relations.json",
+      "sha256": "3834c5b3b840f0752c8cbacc94a44e73cd39c253247c28e59fd8a8717806994e"
+    }
+  ],
+  "entries": [
+    {
+      "knowledgeId": "multijump-double-triple-quad-playerbase",
+      "kind": "behavior",
+      "channel": "stable",
+      "asset": "Pal/Content/Pal/Blueprint/Character/Base/BP_PlayerBase.uasset",
+      "providers": [
+        {
+          "name": "MultiJumpDouble_P.pak",
+          "pakSha256": "73bd0efb4f08ec20996111ace6ae9674cbb787da38ea78ba8d39bf736df449d9"
+        },
+        {
+          "name": "MultiJumpTriple_P.pak",
+          "pakSha256": "5a35b07ff3509bbed245eefb5ca0bf2dda8537738d5759026661871ff152e604"
+        },
+        {
+          "name": "MultiJumpQuad_P.pak",
+          "pakSha256": "04ff4ef1eb636c217507d2b18f0cef03f8bdb46fc18a2eedcb70e92af4c620cc"
+        }
+      ],
+      "source": "Stable/known-behaviors.json",
+      "runtimeStatus": "Runtime-proven on 2026-08-16: preview33 presented one simultaneous 2/3/4 decision and the user confirmed the selected jump behavior plus Fly/Wing and the remaining tested stack worked in Palworld."
+    },
+    {
+      "knowledgeId": "multijump-double-triple-quad-20260816",
+      "kind": "fixture",
+      "channel": "stable",
+      "asset": "Pal/Content/Pal/Blueprint/Character/Base/BP_PlayerBase.uasset",
+      "providers": [
+        {
+          "name": "MultiJumpDouble_P.pak",
+          "pakSha256": "73bd0efb4f08ec20996111ace6ae9674cbb787da38ea78ba8d39bf736df449d9"
+        },
+        {
+          "name": "MultiJumpTriple_P.pak",
+          "pakSha256": "5a35b07ff3509bbed245eefb5ca0bf2dda8537738d5759026661871ff152e604"
+        },
+        {
+          "name": "MultiJumpQuad_P.pak",
+          "pakSha256": "04ff4ef1eb636c217507d2b18f0cef03f8bdb46fc18a2eedcb70e92af4c620cc"
+        }
+      ],
+      "source": "Stable/known-fixtures.json",
+      "runtimeStatus": "proven-2026-08-16"
+    },
+    {
+      "knowledgeId": "fly-wing-contained-superset",
+      "kind": "behavior",
+      "channel": "stable",
+      "asset": "Pal/Content/Pal/Blueprint/Equipment/Glider/BP_WingGlider.uasset",
+      "providers": [
+        {
+          "name": "FlyMode_P.pak",
+          "pakSha256": "8c9d74c5fbc220e4e0cbfef7952a73db53ff130bd7770761caa81e4e4e7bf080"
+        },
+        {
+          "name": "WingPackNoWingCells_VisibleOnlyWhileFlying_P.pak",
+          "pakSha256": "d3cc879ff2747cdfaf7544054fe5d6ce9ee5af083b6f6d0d6bd10efc464a3914"
+        }
+      ],
+      "source": "Stable/known-behaviors.json",
+      "runtimeStatus": "runtime-proven on 2026-08-16: Wing mesh visible during Fly/glider flight; Triple/Fly/Stack/NoSpoil/EarlyAquatic and other existing merged behaviors remained functional in the same overlay"
+    },
+    {
+      "knowledgeId": "fly-wing-bp-wingglider-20260816",
+      "kind": "fixture",
+      "channel": "stable",
+      "asset": "Pal/Content/Pal/Blueprint/Equipment/Glider/BP_WingGlider.uasset",
+      "providers": [
+        {
+          "name": "FlyMode_P.pak",
+          "pakSha256": "8c9d74c5fbc220e4e0cbfef7952a73db53ff130bd7770761caa81e4e4e7bf080"
+        },
+        {
+          "name": "WingPackNoWingCells_VisibleOnlyWhileFlying_P.pak",
+          "pakSha256": "d3cc879ff2747cdfaf7544054fe5d6ce9ee5af083b6f6d0d6bd10efc464a3914"
+        }
+      ],
+      "source": "Stable/known-fixtures.json",
+      "runtimeStatus": "proven-2026-08-16"
+    },
+    {
+      "knowledgeId": "breedfarm-easybreeding-nocollision",
+      "kind": "behavior",
+      "channel": "stable",
+      "asset": "Pal/Content/Pal/Blueprint/MapObject/BuildObject/BP_BuildObject_BreedFarm.uasset",
+      "providers": [
+        {
+          "name": "EasyBreeding_P.pak",
+          "pakSha256": ""
+        },
+        {
+          "name": "NoCollisionFarmsAndExped_P.pak",
+          "pakSha256": ""
+        }
+      ],
+      "source": "Stable/known-behaviors.json",
+      "runtimeStatus": "included in previously runtime-working application overlay"
+    },
+    {
+      "knowledgeId": "staticitem-fly-food-stack-earlyaquatic",
+      "kind": "behavior",
+      "channel": "stable",
+      "asset": "Pal/Content/Pal/DataAsset/Item/DA_StaticItemDataAsset.uasset",
+      "providers": [
+        {
+          "name": "FlyMode_P.pak",
+          "pakSha256": "8c9d74c5fbc220e4e0cbfef7952a73db53ff130bd7770761caa81e4e4e7bf080"
+        },
+        {
+          "name": "FoodNeverSpoils_P.pak",
+          "pakSha256": ""
+        },
+        {
+          "name": "StackSize999999999ZeroWeight_P.pak",
+          "pakSha256": ""
+        },
+        {
+          "name": "EarlyAquaticConstructionKit_P.pak",
+          "pakSha256": "4f682b17bb04e49042e8fc99be9f4ae64546e562c33545b7a7df628e774a3b1a"
+        }
+      ],
+      "source": "Stable/known-behaviors.json",
+      "runtimeStatus": "Fly/Food/Stack proven; later user 41-source Triple-only overlay including Early Aquatic reported working"
+    },
+    {
+      "knowledgeId": "rushroar-v2-fastermounts-runtime-recipe",
+      "kind": "behavior",
+      "channel": "stable",
+      "asset": "Pal/Content/Pal/DataTable/Character/DT_PalMonsterParameter_Common.uasset",
+      "providers": [
+        {
+          "name": "FasterMounts4xAllWorkSuitabilitiesLevel10_P.pak",
+          "pakSha256": "f91dd7ae1aa0d5ef1399d9185cee74a4ce06d907cfaf4c936489dbdf67b21e64"
+        },
+        {
+          "name": "RushRoarLeatherDrop_v2_P.pak",
+          "pakSha256": "b663b49a2a0825b01c45bfd223b2114e7dfc30bf108d8250aa89f6d82ee4a266"
+        }
+      ],
+      "source": "Stable/known-behaviors.json",
+      "runtimeStatus": "proven-2026-08-17"
+    },
+    {
+      "knowledgeId": "rushroar-v2-fastermounts-palmonsterparameter-20260817",
+      "kind": "fixture",
+      "channel": "stable",
+      "asset": "Pal/Content/Pal/DataTable/Character/DT_PalMonsterParameter_Common.uasset",
+      "providers": [
+        {
+          "name": "FasterMounts4xAllWorkSuitabilitiesLevel10_P.pak",
+          "pakSha256": "f91dd7ae1aa0d5ef1399d9185cee74a4ce06d907cfaf4c936489dbdf67b21e64"
+        },
+        {
+          "name": "RushRoarLeatherDrop_v2_P.pak",
+          "pakSha256": "b663b49a2a0825b01c45bfd223b2114e7dfc30bf108d8250aa89f6d82ee4a266"
+        }
+      ],
+      "source": "Stable/known-fixtures.json",
+      "runtimeStatus": "proven-2026-08-17"
+    },
+    {
+      "knowledgeId": "rushroar-v2-fastermounts-palmonsterparameter-20260817",
+      "kind": "production-recipe",
+      "channel": "stable",
+      "asset": "Pal/Content/Pal/DataTable/Character/DT_PalMonsterParameter_Common.uasset",
+      "providers": [
+        {
+          "name": "FasterMounts4xAllWorkSuitabilitiesLevel10_P.pak",
+          "pakSha256": "f91dd7ae1aa0d5ef1399d9185cee74a4ce06d907cfaf4c936489dbdf67b21e64"
+        },
+        {
+          "name": "RushRoarLeatherDrop_v2_P.pak",
+          "pakSha256": "b663b49a2a0825b01c45bfd223b2114e7dfc30bf108d8250aa89f6d82ee4a266"
+        }
+      ],
+      "source": "Stable/production-recipes.json",
+      "runtimeStatus": "proven-2026-08-17",
+      "productionEnabled": true
+    },
+    {
+      "knowledgeId": "playerstatus-superset",
+      "kind": "behavior",
+      "channel": "stable",
+      "asset": "Pal/Content/Pal/DataTable/DT_PlayerStatusRankMasterDataTable.uasset",
+      "providers": [
+        {
+          "name": "FreeEnhancePlayerAbility_P.pak",
+          "pakSha256": ""
+        },
+        {
+          "name": "IncreasedPlayerStatCaps1000Free_P.pak",
+          "pakSha256": ""
+        }
+      ],
+      "source": "Stable/known-behaviors.json",
+      "runtimeStatus": "included in previously runtime-working application overlay"
+    },
+    {
+      "knowledgeId": "rushoar-bone-to-leather-ranch",
+      "kind": "behavior",
+      "channel": "stable",
+      "asset": "Pal/Content/Pal/DataTable/Item/DT_ItemLotteryDataTable.uasset",
+      "providers": [
+        {
+          "name": "RushoarBoneToLeather_P.pak",
+          "pakSha256": "01623a62ade4d86fcc312a9282da43582c634a1dc96b0b1420ab06ea1f5a0b66"
+        }
+      ],
+      "source": "Stable/known-behaviors.json",
+      "runtimeStatus": "runtime-proven on 2026-08-16: Rushoar produced Leather in the Ranch while the full active PMM test stack remained functional"
+    },
+    {
+      "knowledgeId": "rushoar-bone-to-leather-20260816",
+      "kind": "fixture",
+      "channel": "stable",
+      "asset": "Pal/Content/Pal/DataTable/Item/DT_ItemLotteryDataTable.uasset",
+      "providers": [
+        {
+          "name": "RushoarBoneToLeather_P.pak",
+          "pakSha256": "01623a62ade4d86fcc312a9282da43582c634a1dc96b0b1420ab06ea1f5a0b66"
+        }
+      ],
+      "source": "Stable/known-fixtures.json",
+      "runtimeStatus": "proven-2026-08-16"
+    }
+  ],
+  "lookup": {
+    "byAsset": {
+      "Pal/Content/Pal/Blueprint/Character/Base/BP_PlayerBase.uasset": [
+        0,
+        1
+      ],
+      "Pal/Content/Pal/Blueprint/Equipment/Glider/BP_WingGlider.uasset": [
+        2,
+        3
+      ],
+      "Pal/Content/Pal/Blueprint/MapObject/BuildObject/BP_BuildObject_BreedFarm.uasset": [
+        4
+      ],
+      "Pal/Content/Pal/DataAsset/Item/DA_StaticItemDataAsset.uasset": [
+        5
+      ],
+      "Pal/Content/Pal/DataTable/Character/DT_PalMonsterParameter_Common.uasset": [
+        6,
+        7,
+        8
+      ],
+      "Pal/Content/Pal/DataTable/DT_PlayerStatusRankMasterDataTable.uasset": [
+        9
+      ],
+      "Pal/Content/Pal/DataTable/Item/DT_ItemLotteryDataTable.uasset": [
+        10,
+        11
+      ]
+    },
+    "byProviderNameLower": {
+      "multijumpdouble_p.pak": [
+        0,
+        1
+      ],
+      "multijumptriple_p.pak": [
+        0,
+        1
+      ],
+      "multijumpquad_p.pak": [
+        0,
+        1
+      ],
+      "flymode_p.pak": [
+        2,
+        3,
+        5
+      ],
+      "wingpacknowingcells_visibleonlywhileflying_p.pak": [
+        2,
+        3
+      ],
+      "easybreeding_p.pak": [
+        4
+      ],
+      "nocollisionfarmsandexped_p.pak": [
+        4
+      ],
+      "foodneverspoils_p.pak": [
+        5
+      ],
+      "stacksize999999999zeroweight_p.pak": [
+        5
+      ],
+      "earlyaquaticconstructionkit_p.pak": [
+        5
+      ],
+      "fastermounts4xallworksuitabilitieslevel10_p.pak": [
+        6,
+        7,
+        8
+      ],
+      "rushroarleatherdrop_v2_p.pak": [
+        6,
+        7,
+        8
+      ],
+      "freeenhanceplayerability_p.pak": [
+        9
+      ],
+      "increasedplayerstatcaps1000free_p.pak": [
+        9
+      ],
+      "rushoarbonetoleather_p.pak": [
+        10,
+        11
+      ]
+    }
+  },
+  "safety": "Index is discovery only. Production authorization still requires the exact validation contract of the referenced Stable production recipe. Experimental entries never authorize output."
+}

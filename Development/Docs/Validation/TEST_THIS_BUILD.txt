@@ -1,0 +1,101 @@
+PMM v1.2.1 - TEST THIS BUILD
+================================
+
+1) Run: PMMRuntime.exe self-test
+   Expected: PMMRUNTIME_SELFTEST_OK 1.2.1
+
+2) Run: PMM.exe runtime-self-test
+   Expected: Host reaches PMMRuntime through a native route.
+
+3) Run: PMMRuntime.exe ui-native
+   Expected: native PMM Runtime window opens without WPF/PowerShell objects.
+
+4) Double-click PMM.exe
+   Expected: complete proven PMM interface opens with no CMD/PowerShell console flash and the PMM icon is visible.
+   Host log should contain: CHILD START kind=native name=PMMRuntime.exe
+
+5) Desktop application polish:
+   Expected: PMM.exe has the PMM icon in Explorer; the WPF title bar, Alt-Tab and taskbar use the same icon.
+   Start.cmd may be used only as a compatibility launcher; normal use is PMM.exe.
+
+6) Regression: run the known Ribunny PackageChoice test.
+   Expected decision: Luny OR Ribunny + Shine.
+
+v1.2.1 is the stable QA2 baseline. Full Analyze/Build/Deploy under ConstrainedLanguage remains on the
+native-shell migration boundary; do not claim the complete WPF workflow itself is CLM-native.
+
+AIIO disk-safety regression
+===========================
+
+7) Run Analyze on a mod set with Unsupported assets.
+   Expected: Analyze finishes without creating any AI_HANDOFF ZIP and Data\Review contains metadata/reports only.
+   The temporary Cache\Analyze_* directory must disappear when Analyze ends.
+
+8) After Analyze, PMM should offer to create ONE AI handoff for the current Unsupported set.
+   Choose No once to confirm there is no automatic package creation.
+
+9) Use CREATE AI HANDOFF.
+   Expected: exactly one AI_HANDOFFS\AI_HANDOFF_<bundle>.zip for the current analysis.
+   It must contain sources\Vanilla\... and sources\<mod>\... exact conflict files, never a source .pak.
+
+10) If the raw bundle estimate exceeds 5 GiB or the completed ZIP exceeds the 512 MiB target,
+   PMM must ask before creating/keeping the large handoff. Cancel must leave no stage or .partial file.
+
+11) Close/reopen PMM after deliberately leaving a fake orphan under Data\AIIO\Stage or Cache\Analyze_*.
+    Expected: startup hygiene removes orphan staging without touching Mods, valid AI_HANDOFFS, Builds,
+    Saves, ManualSolutions, Knowledge or Game Reference.
+
+QA2 professional hardening regression
+=====================================
+
+12) Large Unsupported set / disk behavior:
+    Analyze a set with many conflicts (PalVariety-style is ideal). During Analyze, Cache\Analyze_* may
+    exist, but each asset scratch is reclaimed as soon as that asset finishes. At Analyze completion,
+    Cache\Analyze_* must be gone. Data\Review must remain metadata-only.
+
+13) Missing/corrupt review metadata:
+    After Analyze, temporarily rename one Unsupported case.json and try CREATE AI HANDOFF.
+    Expected: AIIO refuses the bundle and tells you to Analyze again. It must not silently omit that case.
+
+14) Stale source protection:
+    After Analyze, replace/change one active source PAK, then try CREATE AI HANDOFF or Build.
+    Expected: PMM refuses the stale plan. Restore the PAK and Analyze again.
+
+15) Palworld update protection:
+    After Analyze, change the Vanilla PAK set (or test after a real game update).
+    Expected: the old plan/saved patch is stale and PMM requires a new Analyze/Build.
+
+16) One bundle / exact sources:
+    CREATE AI HANDOFF must produce one combined ZIP containing every current Unsupported case,
+    including plain/non-Unreal Unsupported files. Verify the ZIP contains no *.pak entry.
+
+17) Provider-name collision:
+    Include a source mod named Vanilla.pak if available.
+    Expected: installed game files remain under sources\Vanilla and the mod uses a different provider folder.
+
+18) Low-disk / size gates:
+    AIIO must stop before staging if its conservative working-space requirement exceeds free space.
+    >5 GiB raw input or an actual ZIP >512 MiB requires explicit user approval. Cancel leaves no stage/.partial.
+
+19) Cross-process lock:
+    Open two PMM instances and start Analyze/Build/AI handoff concurrently.
+    Expected: only one background Analyze/Build/AIHandoff operation owns the installation at a time;
+    the second attempt fails cleanly instead of racing merge-plan/Review/staging.
+
+20) Hard-kill hygiene:
+    Kill PMM during Analyze, AIIO, Build, Import, manual-solution validation or Game Reference refresh.
+    Restart PMM. Expected: only abandoned PMM-owned transient stages are removed/recovered; user data,
+    valid handoffs, mods, saves, Knowledge and current Game Reference remain intact.
+
+21) Unsafe/corrupt returned ZIP:
+    A truncated ZIP, ../ or ..\\ path, ADS-style name (file:stream), Windows device name (CON/NUL/COM1/LPT1),
+    symlink entry, case-colliding duplicate path or returned solution expanding beyond 5 GiB must be rejected.
+
+22) Save backup/restore regression:
+    Create a backup, restore it, and verify Level.sav. Restore now fully extracts/validates to staging before
+    touching the live world, performs a safety backup first, and attempts rollback if the live copy fails.
+
+23) Knowledge contribution regression:
+    Create a tested Knowledge contribution for a validated manual solution.
+    Expected: native PMMRuntime archive creation succeeds and no PowerShell Compress-Archive path is used.
+

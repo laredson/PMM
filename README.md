@@ -1,28 +1,48 @@
-# Palworld Manager Merger 1.2 RC1
+# Palworld Manager Merger (PMM)
 
-Palworld Manager Merger (PMM) preserves original Palworld mods and builds compatibility patches
-for conflicting content. This clean RC1 is the integration baseline derived from the maintainer-tested
-v1.2 Alpha 3 build and includes the proven Ribunny package-choice improvement.
+**Current stable repository baseline: PMM 1.2.1 Guided Flow (without Fix Lab).**
 
-## Start
+PMM is a Palworld mod manager and compatibility merger. The application preserves source mods and, when necessary, builds a compatibility overlay instead of blindly combining every mod into a single MegaMerge.
 
-Run `Start.cmd` (or `PMM.exe start`). Normal startup is supervised by the small native `PMM.exe`
-Host and routed directly to `PMMRuntime.exe`; dependency preparation and the native fallback shell do
-not require PowerShell FullLanguage.
+## Repository layout
 
-The full current Mods & Merge workspace is still the proven PowerShell/WPF implementation on
-FullLanguage systems. If Windows restricts PowerShell to ConstrainedLanguage, PMM opens the native
-Runtime shell and preserves diagnostics instead of crashing during startup. The remaining full
-Analyze/Build/Deploy workflow still needs native migration before this candidate can honestly be
-published as the complete ConstrainedLanguage fix.
+The repository root is intentionally small:
 
-## Open source and modularity
+- `PMM/` — the complete portable application. This is the only folder packaged for normal users.
+- `Development/` — source, tests, build/validation tools, engineering documentation and AI handoff material.
+- `.github/` — GitHub Actions, issue/PR templates and community/security files.
+- `.gitignore` / `.gitattributes` — repository behavior.
+- `LICENSE` — project license.
 
-- `Host/` contains the complete PMM Host source.
-- `Runtime/` contains the complete PMMRuntime source and build script.
-- `Runner/` contains external routing and editable script operations.
-- `Knowledge/*.json` is the external Compatibility Knowledge Library source of truth.
-- UI/configuration stays external where practical.
-- Future Fix Lab knowledge should remain external in the same spirit.
+### Development layout
 
-See `Documentation/V1_2_RC1_VALIDATION.md` before public release.
+- `Development/Source/` — Host, Runtime, PMMCore, AssetReader and icon-helper source inherited from the 1.2.1 restructured repository baseline.
+- `Development/Scripts/` — build, CKL and validation tooling.
+- `Development/Tests/` — repository smoke tests.
+- `Development/Docs/` — architecture, protocol, validation, history and publishing documentation.
+- `Development/AI/` — continuation handoffs for developers and AI agents.
+
+For development or AI continuation, read **`Development/AI/CURRENT_STATE.md` first**, then `Development/AI/AI_CONTINUE_HERE.md`.
+
+## Start PMM
+
+Download the release ZIP, extract it, and run:
+
+`PMM.exe`
+
+The release ZIP is built from the **contents of `PMM/` only**. `Development/`, `.github/`, Git metadata and repository documentation are not part of the user package.
+
+## Branch model
+
+- `main` — stable/releasable code only.
+- `dev/<version-or-feature>` — active development.
+- `release/<version>` — optional release-candidate stabilization.
+- tags such as `v1.2.1` — exact public releases.
+
+The next feature line is intended to be **PMM 1.3 / Fix Lab** and should be developed on a separate branch from this stable 1.2.1 baseline.
+
+## Important source note
+
+`PMM/` in this repository is the user-confirmed working **Guided Flow** application and is the authority for the 1.2.1 release baseline. The native source snapshot originally came from the earlier 1.2.1 restructured repository package. The Guided Flow native `PMM.exe` / `PMMRuntime.exe` binaries are newer than that source snapshot, so do **not** rebuild and overwrite those two binaries from `Development/Source/` until the native source is reconciled. PowerShell/WPF application logic inside `PMM/Modules/` remains directly editable.
+
+Created by **laredson**.

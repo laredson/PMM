@@ -60,3 +60,15 @@ Knowledge/Rejected/
 *.key
 secrets.json
 appsettings.Development.json
+
+# PMM portable runtime workspace (always local/generated)
+PMM/Workspace/
+
+# Repository-local development outputs
+Development/Artifacts/
+Development/Temp/
+Development/TestResults/
+
+# Unreal / Palworld payloads must not be committed
+*.ucas
+*.utoc
