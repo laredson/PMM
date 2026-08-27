@@ -34,6 +34,14 @@ Palworld ~mods
 9. Import/Build and Deploy are separate lifecycle stages.
 10. Knowledge/AI interpretation is evidence, not automatic write permission.
 
+## Detailed Analyze–Merge reference
+
+For the complete internal flow—from source PAK identity, package choices, indexing and exact extraction through every merge adapter, conflict rows, plan invalidation, Build replay, PAK construction, manifests, AIIO/manual solutions and transactional Deploy—read:
+
+- [`ANALYZE_MERGE_INTERNALS.md`](./ANALYZE_MERGE_INTERNALS.md)
+
+That document is version-neutral as an architectural reference, with the PMM 1.2.1 Guided Flow stable tree recorded as its verified implementation baseline. It also explains the key product invariant: PMM normally keeps the original source mods installed and creates a minimal compatibility overlay rather than one autonomous megapak containing every source asset.
+
 ## Components
 
 - `Start-PalModMerger.ps1` + `UI/*.xaml`: Windows/WPF product shell.
@@ -43,4 +51,4 @@ Palworld ~mods
 - `Knowledge/`: reusable fixture/evidence library.
 - `Docs/`: engineering history/contracts/validation targets.
 
-For exact adapter preconditions and historical rationale, read the root `ARCHITECTURE.md`, `DEVELOPER_GUIDE.md`, `GOLDEN_REFERENCE.md` and `HANDOFF.md` shipped with the release.
+For exact adapter preconditions and historical rationale, read `ARCHITECTURE.md`, [`ANALYZE_MERGE_INTERNALS.md`](./ANALYZE_MERGE_INTERNALS.md), `DEVELOPER_GUIDE.md`, `GOLDEN_REFERENCE.md` and `HANDOFF.md` shipped with the release.
