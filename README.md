@@ -1,48 +1,33 @@
 # Palworld Manager Merger (PMM)
 
-**Current stable repository baseline: PMM 1.2.1 Guided Flow (without Fix Lab).**
+**Current release candidate: PMM 1.3.0 RC20.**
 
-PMM is a Palworld mod manager and compatibility merger. The application preserves source mods and, when necessary, builds a compatibility overlay instead of blindly combining every mod into a single MegaMerge.
+Palworld Manager Merger is a local Palworld mod manager, compatibility analyzer/overlay builder and legacy-mod repair platform. It preserves normal source mods and creates a compatibility overlay only for shared assets that actually require reconciliation.
 
 ## Repository layout
 
-The repository root is intentionally small:
-
-- `PMM/` — the complete portable application. This is the only folder packaged for normal users.
-- `Development/` — source, tests, build/validation tools, engineering documentation and AI handoff material.
-- `.github/` — GitHub Actions, issue/PR templates and community/security files.
-- `.gitignore` / `.gitattributes` — repository behavior.
-- `LICENSE` — project license.
-
-### Development layout
-
-- `Development/Source/` — Host, Runtime, PMMCore, AssetReader and icon-helper source inherited from the 1.2.1 restructured repository baseline.
-- `Development/Scripts/` — build, CKL and validation tooling.
-- `Development/Tests/` — repository smoke tests.
-- `Development/Docs/` — architecture, protocol, validation, history and publishing documentation.
-- `Development/AI/` — continuation handoffs for developers and AI agents.
-
-For development or AI continuation, read **`Development/AI/CURRENT_STATE.md` first**, then `Development/AI/AI_CONTINUE_HERE.md`.
+- `PMM/` — complete portable application. Release ZIPs are built from this folder only.
+- `Development/` — engineering source, tests, architecture and AI/developer handoffs.
+- `.github/` — GitHub workflows/community files.
+- `.gitignore` / `.gitattributes` — repository policy.
+- `LICENSE` — MIT project license.
 
 ## Start PMM
 
-Download the release ZIP, extract it, and run:
+Extract the release ZIP and run `PMM.exe`.
 
-`PMM.exe`
+The normal guided workflow is:
 
-The release ZIP is built from the **contents of `PMM/` only**. `Development/`, `.github/`, Git metadata and repository documentation are not part of the user package.
+`Detect (if needed) -> Import -> Fix Lab when required -> Analyze -> Build Merge -> Deploy -> Play optional`
 
-## Branch model
+PMM 1.3.0 includes Fix Lab for supported exact legacy cases, a portable current Game Reference, background processing, AUTO/ColorFlow guidance, backups/restores, Night/Light/custom themes and event sound profiles.
 
-- `main` — stable/releasable code only.
-- `dev/<version-or-feature>` — active development.
-- `release/<version>` — optional release-candidate stabilization.
-- tags such as `v1.2.1` — exact public releases.
+## 1.3.0 engineering notes
 
-The next feature line is intended to be **PMM 1.3 / Fix Lab** and should be developed on a separate branch from this stable 1.2.1 baseline.
+The `1.3.0final` branch is the canonical 1.3.0 stabilization branch. The runnable `PMM/` tree is authoritative for the release candidate. RC20 is based directly on the user-tested RC19 and adds final header/detection/settings UX, terminal Ready-to-play guidance and conservative persistent caches to make repeat Analyze passes lighter.
 
-## Important source note
+Future AIIO / **AI & Help** work should begin with `Development/AI/AIIO_1_3_0_HANDOFF.md` and reuse the existing `Modules/AIIO`, CKL, Game Reference and Fix Lab services rather than replacing them.
 
-`PMM/` in this repository is the user-confirmed working **Guided Flow** application and is the authority for the 1.2.1 release baseline. The native source snapshot originally came from the earlier 1.2.1 restructured repository package. The Guided Flow native `PMM.exe` / `PMMRuntime.exe` binaries are newer than that source snapshot, so do **not** rebuild and overwrite those two binaries from `Development/Source/` until the native source is reconciled. PowerShell/WPF application logic inside `PMM/Modules/` remains directly editable.
+Runtime-created `PMM/Workspace/` is local state and must never be committed or shipped in a clean public package.
 
 Created by **laredson**.
