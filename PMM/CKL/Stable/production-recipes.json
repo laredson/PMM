@@ -13,6 +13,31 @@
         "class": "exact-runtime-proven-reuse-provider",
         "requireExactProviderSet": true
       },
+      "semanticFallback": {
+        "enabled": true,
+        "class": "datatable-proven-dominance",
+      "safety": "Used only after the generic DataTable adapter has independently identified this exact overlapping scalar property. It does not reuse stale cooked output and it does not authorize any other property.",
+        "conflicts": [
+          {
+            "id": "rushroar-ranch-level-satisfied-by-fastermounts",
+            "path": "Rows[Boar].WorkSuitability_MonsterFarm",
+            "requireExactConflictProviders": true,
+            "providers": [
+              {
+                "name": "FasterMounts4xAllWorkSuitabilitiesLevel10_P.pak",
+                "canonicalValue": "10"
+              },
+              {
+                "name": "RushRoarLeatherDrop_v2_P.pak",
+                "canonicalValue": "1"
+              }
+            ],
+            "selectProvider": "FasterMounts4xAllWorkSuitabilitiesLevel10_P.pak",
+            "semanticReason": "RushRoar enables Boar ranch work with level 1. FasterMounts sets the same ranch suitability to level 10, which preserves that requirement while also preserving its all-suitabilities behavior. RushRoar's separate BP_Boar and spawn-action assets remain installed as source mods.",
+            "runtime": "proven-2026-08-17"
+          }
+        ]
+      },
       "providers": [
         {
           "name": "FasterMounts4xAllWorkSuitabilitiesLevel10_P.pak",

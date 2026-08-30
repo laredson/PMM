@@ -1,148 +1,88 @@
-# PMM 1.3.0 -> AIIO / AI & Help handoff
+# PMM 1.3.0 — AIIO / AI & Help implementation handoff
 
-**Project:** Palworld Manager Merger (PMM)  
-**Author:** `laredson` (always lowercase)  
-**Canonical branch:** `1.3.0final`  
-**Continuation baseline:** PMM 1.3.0 RC20, built directly over the user-tested RC19.
+**Project:** Palworld Manager Merger  
+**Creator:** `laredson`  
+**Baseline:** RC27, build `PMM-v1.3.0-RC27-AIIO-LOCAL-FIRST`  
+**Authority:** runnable `PMM/` tree plus the packaged RC27 binaries
 
-## Read first
+## What RC27 implements
 
-Do not restart this project from the older 1.2.x handoffs. The supplied/current 1.3.0 application tree is authoritative. RC19 was runtime-tested by the user. RC20 is intentionally narrow: final header/detection/settings UX, a terminal Ready-to-play ColorFlow state, the public `3 beeps` sound label, and conservative persistent repeat-Analyze caches.
+AIIO is no longer merely a proposed module. RC27 exposes it through the top-level **AI & Help** tab and keeps the WPF layer thin over these services:
 
-The next major feature is **AIIO**, presented to users primarily through a future **AI & Help** tab. AIIO should orchestrate existing PMM services rather than replace them.
+| Service | Responsibility |
+|---|---|
+| `Modules/AIIO/AIIO.ps1` | Exact Unsupported cases and bounded source handoffs |
+| `AIIO.SessionService.ps1` | Persistent sessions, capabilities, history and incremental bundles |
+| `AIIO.DiagnosticService.ps1` | Local diagnostic cases and sanitized evidence |
+| `AIIO.ResponseService.ps1` | Strict response validation, requested data and staged candidates |
+| `AIIO.ArtifactService.ps1` | Artifact inventory and conservative cleanup classification |
+| `AIIO.ValidationService.ps1` | Deterministic build IDs, immutable local evidence and feedback files |
+| `Operations/OperationJournal.ps1` | Recoverable operation state |
+| `Saves/SaveActivityService.ps1` | Metadata-only save activity evidence |
+| `Theme/ThemeEditorService.ps1` | Local V1/V2 editor, image assets and offline theme exchange |
 
-## Product and workflow contract
+Heavy preparation, requested-data packaging, response import, candidate activation and recursive artifact inventory run through `Modules/Operations/OperationWorker.ps1`. UI handlers render state and collect explicit decisions.
 
-PMM is a local Palworld mod manager, compatibility analyzer/overlay builder and Fix Lab repair platform. It keeps source mods separate and builds a compatibility overlay only for shared assets that require reconciliation.
+## Protocols
 
-The workflow state machine is:
+- session: `PMM_AIIO_SESSION_V2`;
+- initial/incremental request: `PMM_AI_HANDOFF_BUNDLE_V2`;
+- response: `PMM_AI_RESPONSE_V2`;
+- capability registry: `PMM_CAPABILITY_REGISTRY_V1`;
+- staged candidate: `PMM_AIIO_CANDIDATE_RECORD_V1`;
+- deterministic local evidence: `PMM_BUILD_VALIDATION_V1`;
+- color-scheme image pack: `PMM_COLOR_SCHEME_V2` inside `PMM_THEME_PACK_V1`.
 
-`Detect (only if needed) -> Import -> [Fix Lab: Game Reference -> human variant choice -> Repair -> Deploy Fix] -> Analyze -> Build Merge when required -> Deploy -> Play optional`
+RC27 transport is manual local ZIP only. Session exports distinguish Vanilla from every provider and never include whole source PAKs. Returned archives are untrusted data and pass Windows-safe path, case-insensitive duplicate, ADS/device-name, symlink, size, extension, nested-archive and schema checks before a candidate can be committed to staging.
 
-After successful current deployment, ColorFlow ends on Start Palworld with `Ready to play / Everything is ready to play`. AUTO launches the game only when `Run Palworld after Deploy` is enabled.
+## Authority levels
 
-Long operations must stay outside the WPF dispatcher. The UI must remain usable while Analyze, Build, Game Reference, Fix Lab Repair/validation, deployment preparation, or handoff generation runs.
+- Level A may read or extract only an exact allowlisted PMM/current-case target.
+- Level B may create or stage data but cannot activate it.
+- Level C remains an explicit user action at the moment it matters.
 
-## Runtime architecture
+Only one candidate form can enter the current Merge path: an exact `PMM_MANUAL_SOLUTION_V1` cooked family bound to one still-current Unsupported case. The user must press **Use candidate**. PMM then imports it as experimental/unproven and forces Analyze. It never triggers Build or Deploy.
 
-```text
-PMM.exe
-  -> Engine/PMMRuntime.exe
-       -> WPF/PowerShell UI
-       -> Modules/Operations/OperationWorker.ps1 for long work
-       -> Engine/PMMFixLab.exe for native Fix Lab operations where applicable
-       -> PMMCore / AssetReader / repak / portable .NET
-```
+Full PAK candidates may be retained for personal compatibility inspection but are not activated in RC27. Declarative recipes, development patches and other response types remain staged until their own native validators/executors exist.
 
-Do not move expensive filesystem/hash/extraction/analysis loops back into UI event handlers.
+## Forbidden shortcuts
 
-## Services AIIO must reuse
+Do not add any of these without a separately reviewed design:
 
-### `Modules/AIIO/AIIO.ps1`
+- automatic upload or provider login;
+- credential discovery/export;
+- executing returned PowerShell, Python, JavaScript, EXE, DLL or shell commands;
+- automatic Apply Fix, Restore, Build, Deploy, Knowledge promotion or publication;
+- a startup consent wizard or reset-installation-identity button;
+- writing outside PMM's explicit roots;
+- weakening candidate identity from exact hashes/topology to filenames;
+- treating AI confidence as runtime proof.
 
-Already provides the real foundations for AI handoffs: bundle IDs/de-duplication, estimates, disk-space limits, current Unsupported/review cases, exact provider/vanilla extraction, metadata export, CKL context, ZIP verification, `Find-PMMAIHandoffForCaseId`, and `New-PMMAIHandoffBundle`.
+The installation validation identity is a random secret protected with Windows DPAPI CurrentUser. It is not a hardware/account fingerprint and has no reset UI in RC27. Feedback remains a locally inspectable JSON file; no endpoint is present.
 
-Provider A, provider B and vanilla must remain distinguishable. Never flatten them into one ambiguous cooked folder.
+## Existing PMM contracts to preserve
 
-### `Modules/CKL/`
+1. Analyze plan schema 18 and build-manifest schema 9.
+2. Effective patch reuse only after complete shared-topology, provider/hash, adapter, decision/automatic-resolution, mappings, Vanilla, recipe/rule and priority evidence matches.
+3. Exact FasterMounts/RushRoar automatic resolution only for its pinned asset, property, provider set and canonical 10/1 values.
+4. Gura complete outputs are mutually exclusive and are resolved before expensive asset enumeration.
+5. Zero/one/many collections remain arrays under Windows PowerShell 5.1 StrictMode.
+6. Fix Lab Apply/Restore, source-mod operations and AI & Help never alter a deployed PMM compatibility patch. Only Deploy/No compatibility patch, UNDEPLOY and Delete merge may do so.
+7. Confirmed progress at 100% is immediate; interpolation is presentation-only and never exceeds proven progress.
 
-Contains semantic knowledge, production recipe matching and tested contribution packaging. Knowledge is evidence; it is not permission to invent an automatic writer. Community/tested contribution UI should be absorbed into AI & Help while these services remain the backend.
+## Themes
 
-### `Modules/GameReference/`
+Settings follows the sound architecture: eleven hash-pinned release JSON schemes plus Night/Light appear under Official PMM schemes; installed definitions under `Workspace/Themes` appear in a separate bordered user collection with Add/Open-folder actions. Official IDs cannot be shadowed.
 
-Game Reference is a local reusable reference built from the user's own Pal-Windows.pak and is not shipped publicly. AIIO should support an iterative loop: an AI can request exact additional current families, PMM expands/retains the appropriate reference locally, and a follow-up handoff includes only what is needed. Do not immediately delete historical/current reference data that may be reused; future Settings should expose retained reference versions and manual cleanup.
+The editor exists only in AI & Help. Every palette and ColorFlow brush has a required fallback color plus optional local PNG/JPEG image. V2 packs keep assets local, hash-bound and size/dimension constrained. Offline AI theme responses become drafts; they are never installed automatically.
 
-### `Modules/FixLab/FixLabService.ps1`, recipes, `Engine/PMMFixLab.exe`
+## Next engineering work
 
-Fix Lab is now a real local recipe/executor path. Case 001 established the reusable design: compare historical source/current structure; reconstruct against current providers rather than requiring identical SHA; use declarative/local repair primitives; preserve backups/revert; separate Repair from Deploy Fix; preserve human cosmetic/behavior choices; then return to normal Analyze. Do not regress this into copying a prebuilt golden PAK.
+RC27 first needs the full Windows checklist in `PMM/Documentation/TEST_THIS_BUILD_RC27.txt`. After acceptance:
 
-The `_P` naming convention is part of known Palworld/Fix Lab output handling where required.
+1. add PowerShell 5.1 contract fixtures for zero/one/many sessions, requests and candidates;
+2. add malicious/positive ZIP fixtures for every response and theme boundary;
+3. reconcile `Development/Source` with the packaged Host/Runtime before replacing binaries;
+4. design optional provider adapters as transport-only components with explicit scope and consent, leaving the current session/capability/validation core unchanged.
 
-### `Modules/Merge/MergeEngine.ps1` and `PakService.ps1`
-
-RC20 adds conservative persistent repeat-Analyze caches:
-
-- `Workspace/Cache/PakIndexesV1`: persists repak entry listings across worker processes; identity is path + length + LastWriteTimeUtc.
-- `Workspace/Cache/AnalyzeGroupsV1`: caches only deterministic decision-free automatic shared-asset results when PMM build, mappings, vanilla quick signature, asset key/kind and provider name/hash/priority inputs are unchanged.
-
-Unsupported/manual/AI solution paths, human decisions, and `KnownRecipeAuto` are deliberately not cached. Preserve that safety boundary; if future AI knowledge can change a result, add a knowledge-version identity or keep that route uncached.
-
-### Library/deployment and Saves
-
-Use the existing LibraryService and SaveService. AIIO must not create a second source of truth for active/disabled mods, priorities, merge patch lifecycle, pending removals, deployment transactions, rollback, backups or save backups.
-
-## AI & Help recommended UI
-
-Use progressive cards/sections rather than a developer dump:
-
-1. **Help / diagnosis** — explain current PMM state and recommended next action, open logs/folders, create compact support diagnostics.
-2. **AI repair / unsupported merge** — list AI-review cases, estimate/create exact handoffs, import a strictly validated AI response.
-3. **Fix Lab AI extension** — for unsupported legacy mods, package source inventory/current reference comparison and accept declarative recipe proposals only.
-4. **Knowledge / community** — move/present the existing Open Knowledge library, AI review cases, tested contribution creation and contribution folder here.
-5. **Documentation** — searchable help, build ID, release notes and diagnostics.
-
-## AI response safety direction
-
-An AI response must be data-first and reproducible, e.g. `manifest.json`, `solution.json`, notes, declarative recipe/patch data, exact input expectations and output validation expectations.
-
-Bind every response to exact case IDs, source hashes/family inventories, mappings identity, relevant Game Reference/current-provider identity, PMM schema/runtime version and required engine primitives. Reject stale/mismatched responses before writes.
-
-Do **not** define an AI response as `run this PowerShell/Python/EXE from a ZIP`. The safe model is: **AI decides/plans; PMM validates and executes supported local primitives.** If a primitive does not exist, AIIO should report an engine capability gap.
-
-## Future historical/current repair loop
-
-The long-term target is:
-
-1. user imports a legacy/broken mod;
-2. PMM identifies historical source/provider structure where possible;
-3. PMM retains/builds historical/current references available to the user;
-4. PMM compares families/imports/exports/data/Blueprint structure;
-5. a known recipe can repair locally and offline;
-6. otherwise AIIO packages the exact historical/current evidence;
-7. a successful new solution can later be promoted into CKL only after validation.
-
-This is why Game Reference/version retention should become a managed library rather than ephemeral scratch space.
-
-## UI and behavior rules
-
-- responsive grids/splitters/collapsible cards; no fixed-window assumptions;
-- dark-mode selected rows/tabs/combos must stay legible;
-- ColorFlow colors remain visually dominant over themes;
-- normal flow should avoid blocking confirmation dialogs;
-- sound defaults: Auto = Microwave finish, Semiauto = OK, Manual = Good, Attention = Short alert, Error = 3 beeps;
-- manually clicking Play is not a processing-completion sound event;
-- library selection handlers should not perform repeated heavy validation; stage changes and apply where appropriate.
-
-RC20 header: transparent PMM logo; PALWORLD / MANAGER / MERGER in three lines; subtitle; a single detection/status button that is disabled once a valid installation is known; AUTO controls and game/mod folder/Play actions.
-
-Settings: Apply changes is separated at the upper-right of Interface and Restore defaults resets UI/ColorFlow/sound preferences without erasing game path, language or the mod library.
-
-## Repository/release hygiene
-
-Public layout remains conceptually:
-
-```text
-.github/
-Development/
-PMM/
-.gitattributes
-.gitignore
-LICENSE
-README.md
-```
-
-`PMM/Workspace/` is local runtime state and must not be committed. Public releases must not contain user logs/saves, third-party PAKs, UCAS/UTOC, extracted vanilla assets or `oo2core_9_win64.dll`.
-
-Before a public release: keep default/EN/ES XAML `x:Name` contracts identical; parse JSON; regenerate `PMM/Resources/Metadata/SHA256SUMS.txt`; verify ZIP CRC and extracted bytes; preserve licenses/notices; and do not call a new RC runtime-tested until it has actually run on Windows.
-
-## First AIIO development steps
-
-1. Start from `1.3.0final` and the supplied complete PMM 1.3.0 package.
-2. Windows-smoke-test the RC20 delta over the user-tested RC19: startup/detection, Import/Analyze, known Fix Lab path, Build/Deploy, Ready-to-play ColorFlow, Settings Apply/Restore and second Analyze caching.
-3. Freeze 1.3.0 behavior.
-4. Inventory existing AIIO/CKL/GameReference/FixLab functions before adding services.
-5. Add AI & Help as a thin UI over those services.
-6. Define the AI response manifest/schema and strict validator before importing AI solutions.
-7. Then add iterative Game Reference requests and recipe-authoring assistance.
-
-When this document conflicts with an older 1.2.x AI handoff, the current 1.3.0 source/runtime plus this document wins.
+When this document conflicts with an older RC or 1.2.x handoff, the RC27 runtime and this document win. The separate continuity package retains older documents only as historical evidence.

@@ -1,4 +1,12 @@
-# Palworld Manager Merger v1.2.1
+# Palworld Manager Merger v1.3.0 RC27
+
+RC27 introduces the local-first **AI & Help** workspace, strict manual ZIP AIIO sessions/candidates, local diagnostics and validation, the image-capable theme editor, equal responsive header halves and the official/user theme architecture. It preserves the complete RC22–RC26 regression chain. See `RC27_RELEASE_NOTES.md` and `PMM/Documentation/TEST_THIS_BUILD_RC27.txt`.
+
+No automatic upload, provider login, returned-code execution, Apply Fix, Build, Deploy or publication is enabled. Windows acceptance remains required before final promotion.
+
+---
+
+# Historical: Palworld Manager Merger v1.2.1
 
 ## Stable 1.2.1 desktop polish
 
@@ -55,4 +63,3 @@ handoff after preserving this candidate's regression behavior.
 - Save backup and Knowledge contribution packaging use the native archiver. Save restore extracts/validates to staging before touching the live save, performs a safety backup, attempts rollback on copy failure, and now checks working disk space before extraction.
 - Game Reference refresh uses an owned incoming stage plus rollback/recovery markers so a hard process kill can be repaired on the next startup.
 - Startup hygiene recognizes active-process ownership and cleans only known abandoned PMM transient paths; unknown user context under Review is preserved.
-

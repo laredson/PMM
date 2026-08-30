@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - '1.3.0final'
       - 'dev/**'
       - 'release/**'
   pull_request:
@@ -27,7 +28,12 @@ jobs:
       - name: Validate repository and PMM package contract
         shell: pwsh
         run: |
-          ./Development/Scripts/validation/Validate-v1.2.ps1 -Quiet
+          ./Development/Scripts/validation/Validate-v1.3.ps1 -Quiet
+
+      - name: Run RC21 static smoke contract
+        shell: pwsh
+        run: |
+          ./Development/Tests/SmokeTest.ps1
 
       - name: Compile-test PMM Host source snapshot
         shell: pwsh

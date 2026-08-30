@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "PMM_FIXLAB_RECIPE_V1",
+  "title": "PMM Fix Lab Native Recipe v1",
+  "type": "object",
+  "required": ["schema", "id", "name", "version", "currentNameHashSources", "support", "relocate"],
+  "properties": {
+    "schema": {"const": "PMM_FIXLAB_RECIPE_V1"},
+    "id": {"type": "string"},
+    "name": {"type": "string"},
+    "version": {"type": "integer", "minimum": 1},
+    "status": {"type": "string"},
+    "targetBuild": {"type": "string"},
+    "sourceSignatures": {"type": "array"},
+    "currentNameHashSources": {"type": "array", "items": {"type": "string", "pattern": "\\.uasset$"}},
+    "requiredReferenceFamilies": {"type": "array", "items": {"type": "string", "pattern": "\\.uasset$"}},
+    "support": {
+      "type": "object",
+      "properties": {
+        "includeRoots": {"type": "array", "items": {"type": "string"}},
+        "includeFiles": {"type": "array", "items": {"type": "string"}},
+        "excludeRegex": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "relocate": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "donorUasset", "targetRegex"],
+        "properties": {
+          "name": {"type": "string"},
+          "donorUasset": {"type": "string"},
+          "targetRegex": {"type": "string"},
+          "expectedCount": {"type": "integer", "minimum": 0},
+          "minimumCount": {"type": "integer", "minimum": 0},
+          "knownBaselineCount": {"type": "integer", "minimum": 0},
+          "postProcess": {
+            "type": "object",
+            "required": ["staleClass", "safeClass"],
+            "properties": {
+              "staleClass": {"type": "string"},
+              "safeClass": {"type": "string"},
+              "expectedSerializedOffsets": {"type": "array", "items": {"type": "integer", "minimum": 0}}
+            }
+          }
+        }
+      }
+    },
+    "forbiddenOutputRegex": {"type": "array", "items": {"type": "string"}},
+    "mountPoint": {"type": "string"},
+    "pathHashSeed": {"type": "integer", "minimum": 0}
+  }
+}

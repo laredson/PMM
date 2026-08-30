@@ -1,4 +1,4 @@
-<#
+﻿<#
 LibraryService.ps1 - portable source-mod library
 ================================================
 
@@ -86,6 +86,86 @@ function Get-PMMModPriorityOrder {
     Write-PMMModPriorityOrder $normalized
   }
   return $normalized
+}
+
+function Set-PMMLibraryOrderBy([string]$Mode='Alphabetical') {
+  $files=@(Get-PMMAllLibrarySourcePakFiles)
+  if($files.Count -eq 0){Write-PMMModPriorityOrder @();return @()}
+
+  $rows=[System.Collections.Generic.List[object]]::new()
+  foreach($f in $files){
+    $imported=$null
+    try{
+      $metaPath=Join-Path $f.DirectoryName 'metadata.json'
+      if(Test-Path -LiteralPath $metaPath -PathType Leaf){
+        $meta=Get-Content -LiteralPath $metaPath -Raw|ConvertFrom-Json
+        if($meta -and ($meta.PSObject.Properties.Name -contains 'Imported') -and -not[string]::IsNullOrWhiteSpace([string]$meta.Imported)){$imported=[datetime]$meta.Imported}
+      }
+    }catch{}
+    if(-not$imported){$imported=$f.CreationTimeUtc}
+    $rows.Add([pscustomobject]@{Name=[string]$f.Name;Imported=[datetime]$imported;Modified=[datetime]$f.LastWriteTimeUtc})
+  }
+
+  switch($Mode){
+    'ImportedOldest' {$ordered=@($rows.ToArray()|Sort-Object Imported,Name)}
+    'ImportedNewest' {$ordered=@($rows.ToArray()|Sort-Object @{Expression={$_.Imported};Descending=$true},Name)}
+    'ModifiedNewest' {$ordered=@($rows.ToArray()|Sort-Object @{Expression={$_.Modified};Descending=$true},Name)}
+    default           {$ordered=@($rows.ToArray()|Sort-Object Name)}
+  }
+  $names=@($ordered|ForEach-Object{[string]$_.Name})
+  Write-PMMModPriorityOrder $names
+  return $names
+}
+
+function Get-PMMMergeValidationPath { return (Join-PMMPath 'State' 'merge-validations.json') }
+
+function Get-PMMMergeValidationRecords {
+  $path=Get-PMMMergeValidationPath
+  if(-not(Test-Path -LiteralPath $path -PathType Leaf)){return @()}
+  try{
+    $raw=Get-Content -LiteralPath $path -Raw
+    if([string]::IsNullOrWhiteSpace($raw)){return @()}
+    return @($raw|ConvertFrom-Json)
+  }catch{Write-PMMLog ('Could not read merge validation records: '+$_.Exception.Message);return @()}
+}
+
+function Write-PMMMergeValidationRecords([array]$Records) {
+  $path=Get-PMMMergeValidationPath
+  $temp=$path+'.tmp'
+  $normalized=@($Records|Where-Object{$_ -and -not[string]::IsNullOrWhiteSpace([string]$_.Hash)}|Sort-Object Hash -Unique)
+  ConvertTo-Json -InputObject @($normalized) -Depth 8|Set-Content -LiteralPath $temp -Encoding UTF8
+  Move-Item -LiteralPath $temp -Destination $path -Force
+}
+
+function Set-PMMMergeValidated($Patch) {
+  if(-not$Patch){throw (Get-PMMText 'Select a saved merge first.' 'Selecciona primero un merge guardado.')}
+  $hash=([string]$Patch.Hash).ToLowerInvariant()
+  if([string]::IsNullOrWhiteSpace($hash)){throw 'Selected merge has no content hash.'}
+  $rows=[System.Collections.Generic.List[object]]::new()
+  foreach($r in @(Get-PMMMergeValidationRecords)){if(([string]$r.Hash).ToLowerInvariant() -ne $hash){$rows.Add($r)}}
+  $rows.Add([pscustomobject]@{Schema='PMM_MERGE_VALIDATION_V1';Hash=$hash;Name=[string]$Patch.Name;ValidatedUtc=[DateTime]::UtcNow.ToString('o');Validated=$true})
+  Write-PMMMergeValidationRecords @($rows.ToArray())
+  Write-PMMLog ('User validated merge runtime result: '+[string]$Patch.Name+' | '+$hash)
+  return $true
+}
+
+function Test-PMMMergeValidated($Patch) {
+  if(-not$Patch){return $false}
+  $hash=([string]$Patch.Hash).ToLowerInvariant()
+  if([string]::IsNullOrWhiteSpace($hash)){return $false}
+  return (@(Get-PMMMergeValidationRecords|Where-Object{([string]$_.Hash).ToLowerInvariant() -eq $hash -and [bool]$_.Validated}).Count -gt 0)
+}
+
+
+function Remove-PMMMergeValidationByHash([string]$Hash) {
+  if([string]::IsNullOrWhiteSpace($Hash)){return $false}
+  $wanted=$Hash.ToLowerInvariant()
+  $before=@(Get-PMMMergeValidationRecords)
+  $after=@($before|Where-Object{([string]$_.Hash).ToLowerInvariant() -ne $wanted})
+  if($after.Count -eq $before.Count){return $false}
+  Write-PMMMergeValidationRecords $after
+  Write-PMMLog ('Removed merge runtime-validation record: '+$wanted)
+  return $true
 }
 
 function Get-PMMModPriorityMap {
@@ -187,8 +267,10 @@ function Get-PMMManifestEffectivePatchOrderSignature($Manifest) {
       $mods.Add([pscustomobject]@{Name=$name;Hash=[string]$source.Hash;Priority=$priorityValue})
     }
   }
-  $assets=if($Manifest.PSObject.Properties.Name -contains 'Assets'){@($Manifest.Assets)}else{@()}
-  $decisions=if($Manifest.PSObject.Properties.Name -contains 'Decisions'){@($Manifest.Decisions)}else{@()}
+  $assets=@()
+  if($Manifest.PSObject.Properties.Name -contains 'Assets'){$assets=@($Manifest.Assets)}
+  $decisions=@()
+  if($Manifest.PSObject.Properties.Name -contains 'Decisions'){$decisions=@($Manifest.Decisions)}
   return (Get-PMMEffectivePatchOrderSignature $assets @($mods.ToArray()) $decisions)
 }
 
@@ -196,10 +278,276 @@ function Test-PMMPatchEffectiveOrderCompatible($Patch,[array]$SourceMods) {
   if(-not$Patch -or -not$Patch.Manifest -or -not$Patch.ManifestHashOk){return $false}
   $stored=Get-PMMManifestEffectivePatchOrderSignature $Patch.Manifest
   if([string]::IsNullOrWhiteSpace($stored)){return $false}
-  $assets=if($Patch.Manifest.PSObject.Properties.Name -contains 'Assets'){@($Patch.Manifest.Assets)}else{@()}
-  $decisions=if($Patch.Manifest.PSObject.Properties.Name -contains 'Decisions'){@($Patch.Manifest.Decisions)}else{@()}
+  $assets=@()
+  if($Patch.Manifest.PSObject.Properties.Name -contains 'Assets'){$assets=@($Patch.Manifest.Assets)}
+  $decisions=@()
+  if($Patch.Manifest.PSObject.Properties.Name -contains 'Decisions'){$decisions=@($Patch.Manifest.Decisions)}
   $current=Get-PMMEffectivePatchOrderSignature $assets $SourceMods $decisions
   return ([string]$stored -eq [string]$current)
+}
+
+function Test-PMMStringSetEqual([array]$Left,[array]$Right) {
+  $a=@($Left|ForEach-Object{[string]$_}|Where-Object{-not[string]::IsNullOrWhiteSpace($_)}|ForEach-Object{$_.ToLowerInvariant()}|Sort-Object -Unique)
+  $b=@($Right|ForEach-Object{[string]$_}|Where-Object{-not[string]::IsNullOrWhiteSpace($_)}|ForEach-Object{$_.ToLowerInvariant()}|Sort-Object -Unique)
+  return (($a -join '|') -ceq ($b -join '|'))
+}
+
+function Get-PMMPatchAssetIdentity($Asset) {
+  if(-not$Asset){return ''}
+  $key=''
+  if($Asset.PSObject.Properties.Name -contains 'AssetKey'){$key=[string]$Asset.AssetKey}
+  if([string]::IsNullOrWhiteSpace($key) -and ($Asset.PSObject.Properties.Name -contains 'Asset')){$key=[string]$Asset.Asset}
+  return $key.Replace([char]92,[char]47).ToLowerInvariant()
+}
+
+function Get-PMMManifestSourceHashMap($Manifest) {
+  $map=[System.Collections.Generic.Dictionary[string,string]]::new([StringComparer]::OrdinalIgnoreCase)
+  if(-not$Manifest -or -not($Manifest.PSObject.Properties.Name -contains 'Sources')){return $map}
+  foreach($source in @($Manifest.Sources)){
+    $name=[string]$source.Name
+    if([string]::IsNullOrWhiteSpace($name)){continue}
+    $hash=if($source.PSObject.Properties.Name -contains 'Hash'){[string]$source.Hash}else{''}
+    $map[$name]=$hash.ToLowerInvariant()
+  }
+  return $map
+}
+
+function Get-PMMProductionRecipeLibrarySha256 {
+  $path=Get-PMMCKLStablePath 'production-recipes.json'
+  if(-not(Test-Path -LiteralPath $path -PathType Leaf)){return ''}
+  try{return (Get-Sha256 $path)}catch{return ''}
+}
+
+function Get-PMMAutomaticResolutionSignature($Asset) {
+  if(-not$Asset -or -not($Asset.PSObject.Properties.Name -contains 'AutomaticResolutions')){return ''}
+  $tokens=New-Object System.Collections.Generic.List[string]
+  foreach($resolution in @($Asset.AutomaticResolutions)){
+    if(-not$resolution){continue}
+    $providers=New-Object System.Collections.Generic.List[string]
+    if($resolution.PSObject.Properties.Name -contains 'ExpectedProviders'){
+      foreach($provider in @($resolution.ExpectedProviders)){
+        if(-not$provider){continue}
+        $providers.Add(('{0}={1}' -f [string]$provider.Name,[string]$provider.CanonicalValue))
+      }
+    }
+    $providerToken=@($providers.ToArray()|Sort-Object) -join ','
+    $tokens.Add(('{0}|{1}|{2}|{3}|{4}' -f [string]$resolution.RuleId,[string]$resolution.RecipeId,[string]$resolution.Property,[string]$resolution.SelectedChoice,$providerToken))
+  }
+  return (@($tokens.ToArray()|Sort-Object) -join ';')
+}
+
+function Get-PMMManifestBuildEvidenceForAsset($Manifest,$Asset) {
+  if(-not$Manifest -or -not$Asset -or -not($Manifest.PSObject.Properties.Name -contains 'BuildAssetEvidence')){return $null}
+  $id=Get-PMMPatchAssetIdentity $Asset
+  $matches=@($Manifest.BuildAssetEvidence|Where-Object{(Get-PMMPatchAssetIdentity $_) -eq $id})
+  if($matches.Count -ne 1){return $null}
+  return $matches[0]
+}
+
+function Test-PMMKnownRecipeAssetCompatible($StoredAsset,$PlanAsset,$Manifest) {
+  <#
+  KnownRecipeAuto is data-authorized rather than adapter-only. A changed CKL
+  recipe could keep the same asset/provider names while selecting different
+  output bytes, so mode/provider equality is insufficient. Current Analyze pins
+  the recipe identity; the saved build evidence must also equal the current
+  production recipe's exact output family. This lets schema-8 RC21 patches be
+  reused safely after full Analyze even though they did not store RecipeId.
+  #>
+  if(-not$StoredAsset -or -not$PlanAsset -or -not$Manifest){return $false}
+  if(-not($PlanAsset.PSObject.Properties.Name -contains 'RecipeId')){return $false}
+  $recipeId=[string]$PlanAsset.RecipeId
+  if([string]::IsNullOrWhiteSpace($recipeId)){return $false}
+  if($StoredAsset.PSObject.Properties.Name -contains 'RecipeId'){
+    $storedRecipe=[string]$StoredAsset.RecipeId
+    if(-not[string]::IsNullOrWhiteSpace($storedRecipe) -and $storedRecipe -cne $recipeId){return $false}
+  }
+
+  $documentCommand=Get-Command Get-PMMProductionRecipeDocument -ErrorAction SilentlyContinue
+  if(-not$documentCommand){return $false}
+  $document=Get-PMMProductionRecipeDocument
+  if(-not$document){return $false}
+  $recipes=@($document.recipes|Where-Object{[string]$_.id -ceq $recipeId})
+  if($recipes.Count -ne 1){return $false}
+  $recipe=$recipes[0]
+  if(-not($recipe.PSObject.Properties.Name -contains 'production') -or -not$recipe.production -or -not[bool]$recipe.production.enabled){return $false}
+  if(-not($recipe.PSObject.Properties.Name -contains 'status') -or -not$recipe.status -or -not($recipe.status.PSObject.Properties.Name -contains 'runtime') -or [string]$recipe.status.runtime -notmatch '(?i)^proven'){return $false}
+  if([string]$recipe.asset -cne [string]$PlanAsset.Asset){return $false}
+  if(-not($recipe.PSObject.Properties.Name -contains 'providers') -or -not($recipe.PSObject.Properties.Name -contains 'output') -or -not$recipe.output -or -not($recipe.output.PSObject.Properties.Name -contains 'family') -or -not$recipe.output.family -or [string]$recipe.output.mode -cne 'reuse-provider-family'){return $false}
+
+  $outputPakHash=([string]$recipe.output.providerPakSha256).ToLowerInvariant()
+  $outputProviders=@($recipe.providers|Where-Object{([string]$_.pakSha256).ToLowerInvariant() -eq $outputPakHash})
+  if($outputProviders.Count -ne 1){return $false}
+  $expectedProvider=[string]$outputProviders[0].name
+  if(-not($PlanAsset.PSObject.Properties.Name -contains 'RecipeOutputProvider') -or [string]$PlanAsset.RecipeOutputProvider -ine $expectedProvider){return $false}
+  if($StoredAsset.PSObject.Properties.Name -contains 'RecipeOutputProvider'){
+    $storedProvider=[string]$StoredAsset.RecipeOutputProvider
+    if(-not[string]::IsNullOrWhiteSpace($storedProvider) -and $storedProvider -ine $expectedProvider){return $false}
+  }
+
+  $evidence=Get-PMMManifestBuildEvidenceForAsset $Manifest $StoredAsset
+  if(-not$evidence -or -not($evidence.PSObject.Properties.Name -contains 'OutputParts')){return $false}
+  $actual=@{}
+  foreach($part in @($evidence.OutputParts)){
+    $extension=([string]$part.Part).ToLowerInvariant()
+    if([string]::IsNullOrWhiteSpace($extension) -or $actual.ContainsKey($extension)){return $false}
+    $actual[$extension]=$part
+  }
+  $expectedCount=0
+  foreach($partName in @('uasset','uexp','ubulk')){
+    $property=$recipe.output.family.PSObject.Properties[$partName]
+    if(-not$property){continue}
+    $expectedCount++
+    $extension='.'+$partName
+    if(-not$actual.ContainsKey($extension)){return $false}
+    $expected=$property.Value;$found=$actual[$extension]
+    if(([string]$found.Sha256).ToLowerInvariant() -cne ([string]$expected.sha256).ToLowerInvariant()){return $false}
+    if([int64]$found.Bytes -ne [int64]$expected.size){return $false}
+  }
+  return ($expectedCount -gt 0 -and $actual.Count -eq $expectedCount)
+}
+
+function Test-PMMPatchRuntimeCompatible($Patch,[array]$SourceMods) {
+  <#
+  Validate the immutable inputs that can change an overlay even when unrelated
+  source PAKs are added or removed. This deliberately does not compare the full
+  source-set signature; plan-level compatibility performs the narrower,
+  conflict-participant comparison after a current Analyze has proved topology.
+  #>
+  if(-not$Patch -or -not$Patch.Manifest -or -not$Patch.ManifestHashOk){return $false}
+  $manifest=$Patch.Manifest
+
+  if(-not($manifest.PSObject.Properties.Name -contains 'Engine')){return $false}
+  $engineCommand=Get-Command Get-PMMEngineId -ErrorAction SilentlyContinue
+  if(-not$engineCommand -or [string]$manifest.Engine -cne [string](Get-PMMEngineId)){return $false}
+
+  if(-not($manifest.PSObject.Properties.Name -contains 'VanillaSourceSignature')){return $false}
+  $vanillaCommand=Get-Command Get-PMMVanillaPakSetQuickSignature -ErrorAction SilentlyContinue
+  if(-not$vanillaCommand -or [string]$manifest.VanillaSourceSignature -cne [string](Get-PMMVanillaPakSetQuickSignature)){return $false}
+
+  if(-not($manifest.PSObject.Properties.Name -contains 'MappingsSha256')){return $false}
+  $map=Get-PMMMappingsPath
+  if(-not(Test-Path -LiteralPath $map -PathType Leaf)){return $false}
+  if([string]$manifest.MappingsSha256 -cne [string](Get-Sha256 $map)){return $false}
+
+  # Keep an actual Object[] for zero, one or many matches. In Windows
+  # PowerShell 5.1 an array emitted from an if branch is pipeline-unrolled; a
+  # single knowledge-authorized asset then becomes a PSCustomObject and StrictMode
+  # rejects `.Count` during the post-Build UI refresh.
+  $knowledgeAuthorizedAssets=@()
+  if($manifest.PSObject.Properties.Name -contains 'Assets'){
+    $knowledgeAuthorizedAssets=@($manifest.Assets|Where-Object{
+      [string]$_.Mode -eq 'KnownRecipeAuto' -or
+      (($_.PSObject.Properties.Name -contains 'AutomaticResolutions') -and @($_.AutomaticResolutions).Count -gt 0)
+    })
+  }
+  if($knowledgeAuthorizedAssets.Count -gt 0){
+    if(-not($manifest.PSObject.Properties.Name -contains 'ProductionRecipesSha256')){return $false}
+    $recipeHash=Get-PMMProductionRecipeLibrarySha256
+    if([string]::IsNullOrWhiteSpace($recipeHash) -or [string]$manifest.ProductionRecipesSha256 -cne $recipeHash){return $false}
+  }
+
+  if(-not(Test-PMMPatchEffectiveOrderCompatible $Patch $SourceMods)){return $false}
+  return $true
+}
+
+function Test-PMMPlanCurrentForPatchCompatibility($Plan,[array]$SourceMods) {
+  # An effective-match patch is selectable only behind a fresh Analyze plan for
+  # the exact current library. This prevents a stale manifest from blessing a
+  # newly added provider or a newly introduced shared asset.
+  if(-not$Plan){return $false}
+  if(-not($Plan.PSObject.Properties.Name -contains 'SchemaVersion') -or [int]$Plan.SchemaVersion -ne (Get-PMMPlanSchemaVersion)){return $false}
+  if(-not($Plan.PSObject.Properties.Name -contains 'Engine') -or [string]$Plan.Engine -cne [string](Get-PMMEngineId)){return $false}
+  if(-not($Plan.PSObject.Properties.Name -contains 'EngineProfile') -or [string]$Plan.EngineProfile -cne 'UE5_1'){return $false}
+  if(-not($Plan.PSObject.Properties.Name -contains 'Assets') -or -not($Plan.PSObject.Properties.Name -contains 'Rows')){return $false}
+  if([string]$Plan.SourceSignature -cne [string](Get-PMMLibrarySignature $SourceMods)){return $false}
+  if(-not($Plan.PSObject.Properties.Name -contains 'VanillaSourceSignature') -or [string]$Plan.VanillaSourceSignature -cne [string](Get-PMMVanillaPakSetQuickSignature)){return $false}
+  if(-not($Plan.PSObject.Properties.Name -contains 'MergeOrderSignature') -or [string]$Plan.MergeOrderSignature -cne [string](Get-PMMMergeOrderSignature $SourceMods)){return $false}
+  if(-not($Plan.PSObject.Properties.Name -contains 'MappingsSha256')){return $false}
+  $map=Get-PMMMappingsPath
+  if(-not(Test-Path -LiteralPath $map -PathType Leaf) -or [string]$Plan.MappingsSha256 -cne [string](Get-Sha256 $map)){return $false}
+  if(-not($Plan.PSObject.Properties.Name -contains 'KnowledgeRulesSha256') -or [string]$Plan.KnowledgeRulesSha256 -cne [string](Get-PMMProductionRecipeLibrarySha256)){return $false}
+  if(($Plan.PSObject.Properties.Name -contains 'PackageChoicePendingReanalysis') -and [bool]$Plan.PackageChoicePendingReanalysis){return $false}
+  if(@($Plan.Assets|Where-Object{[string]$_.Mode -eq 'Unsupported'}).Count -gt 0){return $false}
+  foreach($row in @($Plan.Rows)){
+    $choice=[string]$row.SelectedChoice
+    if([string]::IsNullOrWhiteSpace($choice)){return $false}
+    if($choice -eq 'Custom' -and [string]::IsNullOrWhiteSpace([string]$row.CustomValue)){return $false}
+  }
+  return $true
+}
+
+function Get-PMMCurrentPlanForPatchCompatibility([array]$SourceMods) {
+  $path=Join-PMMPath 'State' 'merge-plan.json'
+  if(-not(Test-Path -LiteralPath $path -PathType Leaf)){return $null}
+  try{
+    $plan=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json
+    if(Test-PMMPlanCurrentForPatchCompatibility $plan $SourceMods){return $plan}
+  }catch{}
+  return $null
+}
+
+function Test-PMMPatchPlanCompatible($Patch,$Plan,[array]$SourceMods) {
+  <#
+  Prove that a saved overlay is the same recipe required by a current Analyze.
+  Unique/non-conflicting PAKs are intentionally excluded. Every patched asset,
+  provider name, provider hash, adapter mode, decision, Vanilla identity,
+  mappings identity and output-relevant priority winner must still match.
+  #>
+  if(-not(Test-PMMPlanCurrentForPatchCompatibility $Plan $SourceMods)){return $false}
+  if(-not(Test-PMMPatchRuntimeCompatible $Patch $SourceMods)){return $false}
+  $manifest=$Patch.Manifest
+  if(-not($manifest.PSObject.Properties.Name -contains 'Assets') -or -not($manifest.PSObject.Properties.Name -contains 'Sources')){return $false}
+
+  $planAssets=@($Plan.Assets|Where-Object{[string]$_.Mode -notin @('Identical','Unsupported','PackageChoice')})
+  $patchAssets=@($manifest.Assets|Where-Object{[string]$_.Mode -notin @('Identical','Unsupported','PackageChoice')})
+  if($planAssets.Count -eq 0 -or $planAssets.Count -ne $patchAssets.Count){return $false}
+
+  # Experimental cooked/manual solutions can change independently of their
+  # source PAKs. They remain reusable only for the manifest's exact source set.
+  if(@($planAssets|Where-Object{[string]$_.Mode -eq 'ManualSolutionExperimental'}).Count -gt 0){
+    if([string]$Patch.SourceSignature -cne [string](Get-PMMLibrarySignature $SourceMods)){return $false}
+  }
+
+  $patchByAsset=@{}
+  foreach($asset in $patchAssets){
+    $id=Get-PMMPatchAssetIdentity $asset
+    if([string]::IsNullOrWhiteSpace($id) -or $patchByAsset.ContainsKey($id)){return $false}
+    $patchByAsset[$id]=$asset
+  }
+  $manifestHashes=Get-PMMManifestSourceHashMap $manifest
+  $currentHashes=[System.Collections.Generic.Dictionary[string,string]]::new([StringComparer]::OrdinalIgnoreCase)
+  foreach($mod in @($SourceMods)){$currentHashes[[string]$mod.Name]=([string]$mod.Hash).ToLowerInvariant()}
+
+  foreach($asset in $planAssets){
+    $id=Get-PMMPatchAssetIdentity $asset
+    if(-not$patchByAsset.ContainsKey($id)){return $false}
+    $stored=$patchByAsset[$id]
+    if([string]$asset.Mode -cne [string]$stored.Mode){return $false}
+    if([string]$asset.Mode -eq 'KnownRecipeAuto'){
+      $recipeCompatible=$false
+      try{$recipeCompatible=Test-PMMKnownRecipeAssetCompatible $stored $asset $manifest}catch{$recipeCompatible=$false}
+      if(-not$recipeCompatible){return $false}
+    }
+    if((Get-PMMAutomaticResolutionSignature $asset) -cne (Get-PMMAutomaticResolutionSignature $stored)){return $false}
+    $providers=@($asset.Providers|ForEach-Object{[string]$_})
+    if(-not(Test-PMMStringSetEqual $providers @($stored.Providers))){return $false}
+    foreach($name in $providers){
+      if(-not$currentHashes.ContainsKey($name) -or -not$manifestHashes.ContainsKey($name)){return $false}
+      if([string]$currentHashes[$name] -cne [string]$manifestHashes[$name]){return $false}
+    }
+  }
+
+  $rows=@($Plan.Rows)
+  $storedRows=@()
+  if($manifest.PSObject.Properties.Name -contains 'Decisions'){$storedRows=@($manifest.Decisions)}
+  if($manifest.PSObject.Properties.Name -contains 'DecisionSignature'){
+    $decisionCommand=Get-Command Get-PMMDecisionSignature -ErrorAction SilentlyContinue
+    if(-not$decisionCommand){return $false}
+    if([string]$manifest.DecisionSignature -cne [string](Get-PMMDecisionSignature $rows)){return $false}
+  }elseif($rows.Count -gt 0 -or $storedRows.Count -gt 0){
+    return $false
+  }
+  return $true
 }
 
 
@@ -444,14 +792,177 @@ function Set-PMMLibraryModEnabled([string]$Name,[bool]$Enabled) {
 }
 
 function Remove-PMMLibraryMod([string]$Name) {
+  <#
+  DELETE MOD lifecycle contract (PMM 1.3):
+    * Delete is immediate, not deferred until the next Deploy.
+    * Remove the managed source from the PMM library (active or disabled).
+    * Remove the exact same managed PAK from Palworld ~mods when present.
+    * Preserve every deployed compatibility merge and sidecar. Only explicit
+      actions in Mods & Merge may deploy, undeploy or delete a merge.
+    * Refuse to delete a same-name game PAK whose SHA-256 differs from the
+      library copy. PMM never treats a name alone as ownership proof.
+    * Commit transactionally enough that a filesystem/state failure restores
+      the library directory, game files and state/config snapshots.
+  #>
   $mod=Find-PMMLibraryMod $Name
   if(-not$mod){throw (Get-PMMText "Mod not found in PMM library: $Name" "No se encontro el mod en la biblioteca PMM: $Name")}
-  $dir=Split-Path -Parent ([string]$mod.Path)
-  Add-PMMPendingRemoval $Name ([string]$mod.Hash)
-  Remove-Item -LiteralPath $dir -Recurse -Force
-  [void](Get-PMMModPriorityOrder)
-  Clear-PMMLibraryHashCache;Clear-PakEntryCache;Clear-PMMAnalysisState
-  Write-PMMLog "Deleted source mod from PMM library: $Name"
+  if(-not(Test-PMMSafePakLeafName ([string]$mod.Name))){throw ('Unsafe source mod name: '+[string]$mod.Name)}
+
+  $cfg=Get-PMMConfig
+  if(-not$cfg -or [string]::IsNullOrWhiteSpace([string]$cfg.GamePath)){
+    throw (Get-PMMText 'Detect or configure Palworld before deleting an imported mod. Delete removes both the PMM-library copy and the game ~mods copy, so PMM must know the game folder first.' 'Detecta o configura Palworld antes de borrar un mod importado. Delete elimina tanto la copia de la biblioteca PMM como la copia de ~mods del juego, asi que PMM debe conocer primero la carpeta del juego.')
+  }
+  Ensure-GameModsFolder
+  $gameMods=Get-GameModsPath
+  if(-not$gameMods -or -not(Test-Path -LiteralPath $gameMods -PathType Container)){
+    throw (Get-PMMText 'Palworld ~mods could not be resolved. Nothing was deleted.' 'No se pudo resolver ~mods de Palworld. No se borro nada.')
+  }
+
+  $name=[string]$mod.Name
+  $hash=([string]$mod.Hash).ToLowerInvariant()
+  $libraryDir=Split-Path -Parent ([string]$mod.Path)
+  if(-not(Test-Path -LiteralPath $libraryDir -PathType Container)){throw ('PMM library directory is missing: '+$libraryDir)}
+
+  # Preflight the game source before touching the library. Delete is allowed
+  # when the source is not currently deployed, or when the deployed bytes are
+  # exactly the bytes PMM imported. A same-name foreign/changed file blocks the
+  # entire delete rather than risking data loss.
+  $gamePak=Join-Path $gameMods $name
+  $gameSourcePresent=Test-Path -LiteralPath $gamePak -PathType Leaf
+  if($gameSourcePresent){
+    $actual=(Get-Sha256 $gamePak).ToLowerInvariant()
+    if($actual -ne $hash){
+      throw ((Get-PMMText "Delete stopped: '{0}' exists in Palworld ~mods but its SHA-256 does not match the imported PMM copy. PMM will not delete either copy until that identity conflict is resolved. Existing SHA-256: {1}; expected: {2}." "Delete detenido: '{0}' existe en ~mods de Palworld pero su SHA-256 no coincide con la copia importada en PMM. PMM no borrara ninguna copia hasta resolver ese conflicto de identidad. SHA-256 existente: {1}; esperado: {2}.") -f $name,$actual,$hash)
+    }
+  }
+
+  # Delete owns only the selected source PAK. A deployed compatibility merge is
+  # intentionally outside this transaction even when the source set changes.
+  $gameTargets=[System.Collections.Generic.List[string]]::new()
+  if($gameSourcePresent){$gameTargets.Add($gamePak)}
+
+  $tx=Join-Path (Get-PMMPath 'Cache') ('DeleteMod_'+[guid]::NewGuid().ToString('N'))
+  $trash=Join-Path $tx 'trash'
+  $stateBackup=Join-Path $tx 'state'
+  New-Item -ItemType Directory -Force -Path $trash,$stateBackup|Out-Null
+  $movedGame=[System.Collections.Generic.List[object]]::new()
+  $libraryTrash=Join-Path $trash 'library-source'
+  $libraryMoved=$false
+
+  # Snapshot the small state files that this operation may rewrite so rollback
+  # can restore the exact pre-delete manager state.
+  $stateFiles=@(
+    (Get-PMMDeploymentStatePath),
+    (Get-PMMPendingRemovalPath),
+    (Get-PMMModPriorityPath),
+    (Join-PMMPath 'State' 'merge-plan.json'),
+    (Join-PMMPath 'State' 'last-scan.json'),
+    (Get-PMMConfigPath)
+  )|Select-Object -Unique
+  $stateRecords=[System.Collections.Generic.List[object]]::new()
+  $si=0
+  foreach($statePath in $stateFiles){
+    if(Test-Path -LiteralPath $statePath -PathType Leaf){
+      $si++
+      $backup=Join-Path $stateBackup (('{0:D2}_{1}' -f $si,[IO.Path]::GetFileName($statePath)))
+      Copy-Item -LiteralPath $statePath -Destination $backup -Force
+      $stateRecords.Add([pscustomobject]@{Original=$statePath;Backup=$backup;Existed=$true})
+    }else{
+      $stateRecords.Add([pscustomobject]@{Original=$statePath;Backup='';Existed=$false})
+    }
+  }
+
+  try{
+    # Move the entire PMM library directory first. It is still recoverable in
+    # the transaction trash until all game/state work has committed.
+    Move-Item -LiteralPath $libraryDir -Destination $libraryTrash -Force
+    $libraryMoved=$true
+
+    # Move game files into transaction trash rather than deleting them in place.
+    # This gives rollback exact bytes without relying on a second copy/hash pass.
+    $gi=0
+    foreach($target in @($gameTargets.ToArray()|Select-Object -Unique)){
+      if(-not(Test-Path -LiteralPath $target -PathType Leaf)){continue}
+      $gi++
+      $dst=Join-Path $trash (('game_{0:D3}_{1}' -f $gi,[IO.Path]::GetFileName($target)))
+      Move-Item -LiteralPath $target -Destination $dst -Force
+      $movedGame.Add([pscustomobject]@{Original=$target;Trash=$dst})
+    }
+
+    # Delete is immediate: there is no future pending-removal record for this
+    # source. Normalize priority now that the library directory is gone.
+    Remove-PMMPendingRemoval $name
+    [void](Get-PMMModPriorityOrder)
+
+    # The previous deployment record remains authoritative for the compatibility
+    # patch. Remove only the deleted source and clear source-set freshness; do
+    # not clear Patch, its deployment timestamp, or the selected saved merge.
+    $state=Read-PMMDeploymentState
+    if($state){
+      if($state.PSObject.Properties.Name -contains 'SourceMods'){
+        $remaining=@($state.SourceMods|Where-Object{[string]$_.Name -ine $name})
+        $state.SourceMods=$remaining
+      }
+      if($state.PSObject.Properties.Name -contains 'SourceSignature'){$state.SourceSignature=''}
+      Write-PMMDeploymentState $state
+    }
+
+    Clear-PMMLibraryHashCache;Clear-PakEntryCache;Clear-PMMAnalysisState
+
+    $overlayCount=0
+    Write-PMMLog ('Deleted source mod everywhere: '+$name+' | hash='+$hash+' | gameSourceRemoved='+$gameSourcePresent+' | deployedMergePreserved=true')
+
+    # Commit deletion by destroying transaction trash. Cleanup failure leaves
+    # only an internal temporary backup and must not resurrect already-deleted
+    # files or report a false rollback.
+    try{Remove-Item -LiteralPath $tx -Recurse -Force -ErrorAction Stop}catch{Write-PMMLog ('Delete Mod transaction cleanup warning: '+$_.Exception.Message)}
+    return [pscustomobject]@{Name=$name;Hash=$hash;DeletedFromLibrary=$true;DeletedFromGame=[bool]$gameSourcePresent;UndeployedMergeCount=[int]$overlayCount}
+  }catch{
+    $failure=$_.Exception.Message
+    $rollbackErrors=[System.Collections.Generic.List[string]]::new()
+
+    # Restore manager state first so a subsequent UI refresh cannot observe a
+    # half-updated deployment/config record.
+    foreach($r in @($stateRecords.ToArray())){
+      try{
+        if([bool]$r.Existed){
+          $parent=Split-Path -Parent ([string]$r.Original);if($parent){New-Item -ItemType Directory -Force -Path $parent|Out-Null}
+          Copy-Item -LiteralPath ([string]$r.Backup) -Destination ([string]$r.Original) -Force -ErrorAction Stop
+        }else{
+          Remove-Item -LiteralPath ([string]$r.Original) -Force -ErrorAction SilentlyContinue
+        }
+      }catch{$rollbackErrors.Add('restore state '+[string]$r.Original+': '+$_.Exception.Message)}
+    }
+
+    $gameRows=@($movedGame.ToArray())
+    for($i=$gameRows.Count-1;$i -ge 0;$i--){
+      $r=$gameRows[$i]
+      try{
+        if(Test-Path -LiteralPath ([string]$r.Trash) -PathType Leaf){
+          $parent=Split-Path -Parent ([string]$r.Original);if($parent){New-Item -ItemType Directory -Force -Path $parent|Out-Null}
+          Move-Item -LiteralPath ([string]$r.Trash) -Destination ([string]$r.Original) -Force -ErrorAction Stop
+        }
+      }catch{$rollbackErrors.Add('restore game file '+[string]$r.Original+': '+$_.Exception.Message)}
+    }
+
+    if($libraryMoved){
+      try{
+        if(Test-Path -LiteralPath $libraryTrash -PathType Container){
+          $parent=Split-Path -Parent $libraryDir;if($parent){New-Item -ItemType Directory -Force -Path $parent|Out-Null}
+          if(Test-Path -LiteralPath $libraryDir){Remove-Item -LiteralPath $libraryDir -Recurse -Force -ErrorAction Stop}
+          Move-Item -LiteralPath $libraryTrash -Destination $libraryDir -Force -ErrorAction Stop
+        }
+      }catch{$rollbackErrors.Add('restore PMM library directory '+$libraryDir+': '+$_.Exception.Message)}
+    }
+
+    Clear-PMMLibraryHashCache;Clear-PakEntryCache
+    if($rollbackErrors.Count -eq 0){
+      Remove-Item -LiteralPath $tx -Recurse -Force -ErrorAction SilentlyContinue
+      throw ((Get-PMMText 'Delete Mod failed before it could commit. PMM restored the library and game files. Details: ' 'Delete Mod fallo antes de completar el commit. PMM restauro la biblioteca y los archivos del juego. Detalles: ')+$failure)
+    }
+    $detail=$rollbackErrors.ToArray() -join "`n"
+    throw ((Get-PMMText 'Delete Mod failed and rollback was incomplete. Do not launch Palworld yet. Recovery files are preserved in: ' 'Delete Mod fallo y el rollback quedo incompleto. No inicies Palworld todavia. Los archivos de recuperacion se conservaron en: ')+$tx+"`n"+$failure+"`n"+$detail)
+  }
 }
 
 function Get-PMMManifestSourceSignature($Manifest) {
@@ -587,93 +1098,21 @@ function Get-PMMAllLocalPatches {
 
 function Sync-PMMDeployedPatchBackups {
   <#
-  The game folder is deployment, but a PMM overlay is valuable user data.
-  Keep an exact local master in Builds\Current. This is especially important
-  when the user opens a newer portable PMM folder: preview 25 could discover an
-  older deployed overlay but did not migrate the PAK itself into the new PMM.
-
-  Generated overlays are NEVER copied into Mods/, because Mods/ is the source
-  graph. Feeding a PMM output back as a source would recursively merge PMM's
-  own patch on the next Analyze.
+  PMM 1.3 lifecycle rule: the game ~mods folder is deployment state, not the
+  saved-build library. Merely discovering a deployed PMM merge MUST NOT recreate
+  a local build that the user deleted. External deployed merges are recognized
+  by Get-PMMDeployedPatches and shown as DEPLOYED / EXTERNAL ONLY until the user
+  explicitly imports or rebuilds them.
   #>
-  $gameMods = Get-GameModsPath
-  if (-not $gameMods -or -not (Test-Path -LiteralPath $gameMods -PathType Container)) { return 0 }
-
-  $current = Get-PMMLocalPatchBackupRoot
-  $previous = Join-PMMPath 'Builds' 'Previous'
-  New-Item -ItemType Directory -Force -Path $current,$previous | Out-Null
-  $synced = 0
-
-  # If a newer patch has already been built locally for the current active
-  # source set, the still-deployed older patch is deployment history, not the
-  # new Current artifact. Preserve it under Previous instead of re-copying it
-  # into Builds\Current while the user is waiting to press DEPLOY.
-  $activeSignature=''
-  try{$activeSignature=Get-PMMLibrarySignature @(Get-LibraryMods)}catch{}
-  $desiredLocal=$null
-  if($activeSignature){
-    foreach($candidate in @(Get-PMMLocalPatchBackups)){
-      if([string]$candidate.SourceSignature -eq [string]$activeSignature){$desiredLocal=$candidate;break}
-    }
-  }
-
-  foreach ($deployed in @(Get-ChildItem -LiteralPath $gameMods -Filter 'zzzzzzzzzz_PMM_Merge_*_P.pak' -File -ErrorAction SilentlyContinue)) {
-    if($desiredLocal -and [string]$desiredLocal.Name -ne [string]$deployed.Name){
-      $archive=Join-Path $previous $deployed.Name
-      if(-not(Test-Path -LiteralPath $archive -PathType Leaf)){Copy-Item -LiteralPath $deployed.FullName -Destination $archive -Force}
-      $manifestSource=Find-PMMManifestForDeployedPak $deployed
-      if($manifestSource -and (Test-Path -LiteralPath $manifestSource -PathType Leaf) -and -not(Test-Path -LiteralPath ($archive+'.manifest.json') -PathType Leaf)){
-        Copy-Item -LiteralPath $manifestSource -Destination ($archive+'.manifest.json') -Force
-      }
-      Write-PMMLog "Deployed PMM patch is older than the current locally built patch; preserved under Builds\Previous: $($deployed.Name)"
-      continue
-    }
-    $localPak = Join-Path $current $deployed.Name
-    $deployedHash = Get-Sha256 $deployed.FullName
-    $needCopy = $true
-
-    if (Test-Path -LiteralPath $localPak -PathType Leaf) {
-      $localHash = Get-Sha256 $localPak
-      if ($localHash -eq $deployedHash) {
-        $needCopy = $false
-      } else {
-        $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
-        $oldName = ([IO.Path]::GetFileNameWithoutExtension($deployed.Name)) + "_local_${stamp}.pak"
-        $oldPath = Join-Path $previous $oldName
-        Move-Item -LiteralPath $localPak -Destination $oldPath -Force
-        $oldManifest = $localPak + '.manifest.json'
-        if (Test-Path -LiteralPath $oldManifest -PathType Leaf) {
-          Move-Item -LiteralPath $oldManifest -Destination ($oldPath + '.manifest.json') -Force
-        }
-        Write-PMMLog "Archived mismatched local PMM patch before syncing deployed copy: $($deployed.Name)"
-      }
-    }
-
-    if ($needCopy) {
-      Copy-Item -LiteralPath $deployed.FullName -Destination $localPak -Force
-      $synced++
-      Write-PMMLog "Backed up deployed PMM patch into current portable library: $($deployed.Name)"
-    }
-
-    $manifestSource = Find-PMMManifestForDeployedPak $deployed
-    if ($manifestSource -and (Test-Path -LiteralPath $manifestSource -PathType Leaf)) {
-      $localManifest = $localPak + '.manifest.json'
-      $copyManifest = $true
-      if (Test-Path -LiteralPath $localManifest -PathType Leaf) {
-        try { $copyManifest = ((Get-Sha256 $localManifest) -ne (Get-Sha256 $manifestSource)) } catch { $copyManifest = $true }
-      }
-      if ($copyManifest) {
-        Copy-Item -LiteralPath $manifestSource -Destination $localManifest -Force
-        Write-PMMLog "Backed up PMM manifest into current portable library: $($deployed.Name)"
-      }
-    }
-  }
-  return $synced
+  return 0
 }
 
 function Get-PMMManagedPatches {
-  <# Return deployed + Current + Previous patches, de-duplicated by filename. #>
-  Sync-PMMDeployedPatchBackups | Out-Null
+  <#
+  Return deployed + saved Current/Previous patches, de-duplicated by filename.
+  IMPORTANT: this is discovery only. It never copies a deployed PAK back into
+  PMM's saved-build library.
+  #>
   $deployed = @(Get-PMMDeployedPatches)
   $locals = @(Get-PMMAllLocalPatches)
   $byName = @{}
@@ -734,19 +1173,11 @@ function Get-PMMCurrentDeployedPatch([array]$SourceMods) {
 
 
 function Test-PMMPatchCurrent($Patch,[array]$SourceMods) {
-  if (-not $Patch -or -not $Patch.Manifest -or -not $Patch.ManifestHashOk) { return $false }
+  if (-not(Test-PMMPatchRuntimeCompatible $Patch $SourceMods)) { return $false }
   $sourceSignature = Get-PMMLibrarySignature $SourceMods
-  if ([string]$Patch.SourceSignature -ne [string]$sourceSignature) { return $false }
-  if(-not($Patch.Manifest.PSObject.Properties.Name -contains 'VanillaSourceSignature')){return $false}
-  $vanillaSigCommand=Get-Command Get-PMMVanillaPakSetQuickSignature -ErrorAction SilentlyContinue
-  if(-not$vanillaSigCommand -or [string]$Patch.Manifest.VanillaSourceSignature -ne (Get-PMMVanillaPakSetQuickSignature)){return $false}
-  # Saved-patch compatibility is based on output-changing priority winners,
-  # not on unrelated positions in the full mod list.
-  if(-not(Test-PMMPatchEffectiveOrderCompatible $Patch $SourceMods)){return $false}
-  if ($Patch.Manifest.PSObject.Properties.Name -contains 'MappingsSha256') {
-    $map = Get-PMMMappingsPath
-    if (-not (Test-Path -LiteralPath $map -PathType Leaf)) { return $false }
-    if ([string]$Patch.Manifest.MappingsSha256 -ne (Get-Sha256 $map)) { return $false }
+  if ([string]$Patch.SourceSignature -cne [string]$sourceSignature) {
+    $currentPlan=Get-PMMCurrentPlanForPatchCompatibility $SourceMods
+    return ($null -ne $currentPlan -and (Test-PMMPatchPlanCompatible $Patch $currentPlan $SourceMods))
   }
 
   # A true-conflict choice is part of the output identity just like the source
@@ -808,10 +1239,146 @@ function Set-PMMSelectedPatchName([string]$Name) {
   Save-PMMConfig $cfg
 }
 
+
+function Test-PMMManifestOutputHash([string]$ManifestPath,[string]$ExpectedHash) {
+  if([string]::IsNullOrWhiteSpace($ManifestPath) -or -not(Test-Path -LiteralPath $ManifestPath -PathType Leaf)){return $false}
+  try{
+    $doc=Get-Content -LiteralPath $ManifestPath -Raw|ConvertFrom-Json
+    if($doc -and ($doc.PSObject.Properties.Name -contains 'OutputHash')){
+      return (([string]$doc.OutputHash).ToLowerInvariant() -eq ([string]$ExpectedHash).ToLowerInvariant())
+    }
+  }catch{}
+  return $false
+}
+
+function Move-PMMMergeFilesTransactional([array]$Paths,[string]$Purpose) {
+  $items=@($Paths|Where-Object{$_ -and (Test-Path -LiteralPath ([string]$_) -PathType Leaf)}|Select-Object -Unique)
+  if($items.Count -eq 0){return [pscustomobject]@{Count=0;Transaction=''}}
+  $tx=Join-Path (Get-PMMPath 'Cache') (('{0}_{1}' -f $Purpose,[guid]::NewGuid().ToString('N')))
+  New-Item -ItemType Directory -Force -Path $tx|Out-Null
+  $moved=[System.Collections.Generic.List[object]]::new()
+  try{
+    $i=0
+    foreach($src in $items){
+      $i++
+      $dst=Join-Path $tx (('{0:D3}_{1}' -f $i,[IO.Path]::GetFileName([string]$src)))
+      Move-Item -LiteralPath ([string]$src) -Destination $dst -Force
+      $moved.Add([pscustomobject]@{Original=[string]$src;Trash=$dst})
+    }
+    # Original paths are now clean. Trash cleanup is best-effort; a cleanup
+    # failure must not trigger a fake rollback after some trash files may have
+    # already been deleted by Windows.
+    try{Remove-Item -LiteralPath $tx -Recurse -Force -ErrorAction Stop}catch{Write-PMMLog ('Merge lifecycle trash cleanup warning: '+$_.Exception.Message)}
+    return [pscustomobject]@{Count=$moved.Count;Transaction=$tx}
+  }catch{
+    $failure=$_.Exception.Message
+    $rollbackRows=@($moved.ToArray())
+    for($ri=$rollbackRows.Count-1;$ri -ge 0;$ri--){
+      $row=$rollbackRows[$ri]
+      try{
+        if(Test-Path -LiteralPath ([string]$row.Trash) -PathType Leaf){
+          $parent=Split-Path -Parent ([string]$row.Original);if($parent){New-Item -ItemType Directory -Force -Path $parent|Out-Null}
+          Move-Item -LiteralPath ([string]$row.Trash) -Destination ([string]$row.Original) -Force
+        }
+      }catch{Write-PMMLog ('Merge lifecycle rollback warning: '+$_.Exception.Message)}
+    }
+    Remove-Item -LiteralPath $tx -Recurse -Force -ErrorAction SilentlyContinue
+    throw ((Get-PMMText 'Merge file operation failed and PMM rolled back the files it had already moved. Details: ' 'Fallo la operacion de archivos del merge y PMM revirtio los archivos que ya habia movido. Detalles: ')+$failure)
+  }
+}
+
+function Undeploy-PMMManagedPatch($Patch) {
+  if(-not$Patch){throw (Get-PMMText 'Select a merge first.' 'Selecciona primero un merge.')}
+  $name=[string]$Patch.Name
+  $hash=([string]$Patch.Hash).ToLowerInvariant()
+  if([string]::IsNullOrWhiteSpace($name) -or [string]::IsNullOrWhiteSpace($hash)){throw 'Selected merge has no stable name/hash identity.'}
+  $gameMods=Get-GameModsPath
+  if(-not$gameMods -or -not(Test-Path -LiteralPath $gameMods -PathType Container)){return [pscustomobject]@{Removed=$false;Name=$name;Reason='game-mods-unavailable'}}
+  $gamePak=Join-Path $gameMods $name
+  if(-not(Test-Path -LiteralPath $gamePak -PathType Leaf)){return [pscustomobject]@{Removed=$false;Name=$name;Reason='not-deployed'}}
+  $actual=(Get-Sha256 $gamePak).ToLowerInvariant()
+  if($actual -ne $hash){
+    throw ((Get-PMMText "PMM will not undeploy '{0}' because the file in ~mods is not the selected PMM-managed merge. Existing SHA-256: {1}; expected: {2}." "PMM no retirara '{0}' porque el archivo de ~mods no es el merge seleccionado gestionado por PMM. SHA-256 existente: {1}; esperado: {2}.") -f $name,$actual,$hash)
+  }
+  $targets=[System.Collections.Generic.List[string]]::new();$targets.Add($gamePak)
+  $sidecar=$gamePak+'.manifest.json'
+  if(Test-Path -LiteralPath $sidecar -PathType Leaf){
+    # The PAK identity is already exact and the sidecar lives in PMM's reserved
+    # namespace beside it, so it belongs to this deployment even if malformed.
+    $targets.Add($sidecar)
+  }
+  [void](Move-PMMMergeFilesTransactional @($targets.ToArray()) 'UndeployMerge')
+  Write-PMMLog ('Undeployed compatibility merge from Palworld ~mods only: '+$name+' | '+$hash)
+  return [pscustomobject]@{Removed=$true;Name=$name;Hash=$hash;Reason='undeployed'}
+}
+
+function Remove-PMMManagedPatch($Patch) {
+  <#
+  DELETE lifecycle contract:
+    * remove the exact deployed copy from Palworld ~mods when present;
+    * remove every exact saved copy from Builds\Current / Builds\Previous;
+    * remove matching sidecars, selection state and runtime-validation record;
+    * never touch a same-name PAK whose hash does not match the selected merge.
+  #>
+  if(-not$Patch){throw (Get-PMMText 'Select a merge first.' 'Selecciona primero un merge.')}
+  $name=[string]$Patch.Name
+  $hash=([string]$Patch.Hash).ToLowerInvariant()
+  if([string]::IsNullOrWhiteSpace($name) -or [string]::IsNullOrWhiteSpace($hash)){throw 'Selected merge has no stable name/hash identity.'}
+
+  $targets=[System.Collections.Generic.List[string]]::new()
+  $gameRemoved=$false;$localRemoved=0
+
+  # Preflight the game copy. If a same-name foreign file exists, abort before
+  # deleting the saved master: Delete promises to remove both managed states.
+  $gameMods=Get-GameModsPath
+  if($gameMods -and (Test-Path -LiteralPath $gameMods -PathType Container)){
+    $gamePak=Join-Path $gameMods $name
+    if(Test-Path -LiteralPath $gamePak -PathType Leaf){
+      $actual=(Get-Sha256 $gamePak).ToLowerInvariant()
+      if($actual -ne $hash){
+        throw ((Get-PMMText "Delete stopped: '{0}' exists in ~mods but its hash does not match the selected merge. PMM will not delete either copy until that identity conflict is resolved. Existing SHA-256: {1}; expected: {2}." "Delete detenido: '{0}' existe en ~mods pero su hash no coincide con el merge seleccionado. PMM no borrara ninguna copia hasta resolver ese conflicto de identidad. SHA-256 existente: {1}; esperado: {2}.") -f $name,$actual,$hash)
+      }
+      $targets.Add($gamePak);$gameRemoved=$true
+      $side=$gamePak+'.manifest.json';if(Test-Path -LiteralPath $side -PathType Leaf){$targets.Add($side)}
+    }
+  }
+
+  # Saved library copies. Same filename with a different hash is deliberately
+  # retained rather than silently deleting a different build.
+  foreach($area in @('Current','Previous')){
+    $root=Join-Path (Get-PMMPath 'Builds') $area
+    if(-not(Test-Path -LiteralPath $root -PathType Container)){continue}
+    $localPak=Join-Path $root $name
+    if(Test-Path -LiteralPath $localPak -PathType Leaf){
+      $actual=(Get-Sha256 $localPak).ToLowerInvariant()
+      if($actual -eq $hash){
+        $targets.Add($localPak);$localRemoved++
+        $side=$localPak+'.manifest.json';if(Test-Path -LiteralPath $side -PathType Leaf){$targets.Add($side)}
+      }else{
+        Write-PMMLog ('Delete merge kept same-name local build because hash differs: '+$localPak+' | '+$actual+' != '+$hash)
+      }
+    }else{
+      # Clean an orphan manifest only when it identifies this exact output hash.
+      $side=$localPak+'.manifest.json'
+      if(Test-PMMManifestOutputHash $side $hash){$targets.Add($side)}
+    }
+  }
+
+  [void](Move-PMMMergeFilesTransactional @($targets.ToArray()) 'DeleteMerge')
+
+  if([string](Get-PMMSelectedPatchName) -ieq $name){Set-PMMSelectedPatchName ''}
+  try{[void](Remove-PMMMergeValidationByHash $hash)}catch{Write-PMMLog ('Could not remove merge validation record after Delete: '+$_.Exception.Message)}
+  Write-PMMLog ('Deleted compatibility merge lifecycle: '+$name+' | hash='+$hash+' | gameRemoved='+$gameRemoved+' | localCopies='+$localRemoved)
+  return [pscustomobject]@{Deleted=$true;Name=$name;Hash=$hash;GameRemoved=[bool]$gameRemoved;LocalCopiesRemoved=[int]$localRemoved;FilesRemoved=@($targets.ToArray()).Count}
+}
+
 function Get-PMMSelectedManagedPatch([array]$SourceMods) {
   if(Test-PMMNoPatchSelected){return $null}
   $all=@(Get-PMMManagedPatches)
-  $compatible=@($all|Where-Object{Test-PMMPatchSourceSetCompatible $_ $SourceMods}|Sort-Object Modified -Descending)
+  $currentPlan=Get-PMMCurrentPlanForPatchCompatibility $SourceMods
+  $compatible=@($all|Where-Object{
+    (Test-PMMPatchSourceSetCompatible $_ $SourceMods) -or ($currentPlan -and (Test-PMMPatchPlanCompatible $_ $currentPlan $SourceMods))
+  }|Sort-Object Modified -Descending)
   if($compatible.Count -eq 0){return $null}
 
   $preferred=Get-PMMSelectedPatchName
@@ -1245,7 +1812,7 @@ function Remove-PMMOldDeploymentBackups([int]$Keep=3) {
   foreach($dir in @($dirs|Select-Object -Skip $Keep)){Remove-Item -LiteralPath $dir.FullName -Recurse -Force -ErrorAction SilentlyContinue}
 }
 
-function Invoke-PMMDeploymentTransaction($Context,$Operations,$State) {
+function Invoke-PMMDeploymentTransaction($Context,$Operations,$State,[scriptblock]$ProgressCallback=$null) {
   if(@($Operations.BlockingConflicts).Count -gt 0){throw (@($Operations.BlockingConflicts) -join "`n`n")}
   $id=(Get-Date -Format 'yyyyMMdd_HHmmss')+'_'+[guid]::NewGuid().ToString('N').Substring(0,8)
   $backupRoot=Join-Path (Join-PMMPath 'Builds' 'DeploymentBackups') $id
@@ -1265,23 +1832,35 @@ function Invoke-PMMDeploymentTransaction($Context,$Operations,$State) {
 
   try{
     # Phase 1: stage every desired file and verify hashes before touching ~mods.
-    foreach($action in @($Operations.CopyActions)){
+    $copyActions=@($Operations.CopyActions)
+    $copyIndex=0
+    foreach($action in $copyActions){
+      $copyIndex++
+      $stageBase=if($copyActions.Count -gt 0){0.15+(0.35*(($copyIndex-1)/[double]$copyActions.Count))}else{0.50}
+      $stageEnd=if($copyActions.Count -gt 0){0.15+(0.35*($copyIndex/[double]$copyActions.Count))}else{0.50}
+      Invoke-PMMProgressCallback $ProgressCallback $stageBase ((Get-PMMText 'Staging {0}...' 'Preparando {0}...') -f [string]$action.Name)
       $stageName=([IO.Path]::GetFileName([string]$action.Destination))+'.pmmstage'
       $stagePath=Join-Path $stageRoot $stageName
-      Copy-Item -LiteralPath ([string]$action.Source) -Destination $stagePath -Force
+      Copy-PMMFileWithProgress ([string]$action.Source) $stagePath $ProgressCallback $stageBase ([Math]::Max($stageBase,($stageEnd-0.01))) ((Get-PMMText 'Staging {0}...' 'Preparando {0}...') -f [string]$action.Name)
       $stageHash=Get-Sha256 $stagePath
       if($stageHash -ne [string]$action.ExpectedHash){throw "Deployment staging hash mismatch for $($action.Name): $stageHash != $($action.ExpectedHash)"}
       $stagedRecords.Add([pscustomobject]@{Destination=[string]$action.Destination;Stage=$stagePath;ExpectedHash=[string]$action.ExpectedHash;Name=[string]$action.Name})
+      Invoke-PMMProgressCallback $ProgressCallback $stageEnd ((Get-PMMText 'Staged and verified {0}' 'Preparado y verificado {0}') -f [string]$action.Name)
     }
+    Invoke-PMMProgressCallback $ProgressCallback 0.50 (Get-PMMText 'Staging complete. Creating rollback backups...' 'Preparacion terminada. Creando backups de rollback...')
 
     # Phase 2: back up every existing file that the commit may replace/remove.
-    foreach($path in @($touched)){
+    $touchedPaths=@($touched)
+    $touchIndex=0
+    foreach($path in $touchedPaths){
+      $touchIndex++
       if(Test-Path -LiteralPath $path -PathType Leaf){
         $backup=Join-Path $backupRoot (([IO.Path]::GetFileName($path))+'.before')
         Copy-Item -LiteralPath $path -Destination $backup -Force
         if((Get-Sha256 $backup) -ne (Get-Sha256 $path)){throw "Deployment backup verification failed for $path"}
         $backupRecords.Add([pscustomobject]@{Original=$path;Backup=$backup})
       }
+      if($touchedPaths.Count -gt 0){Invoke-PMMProgressCallback $ProgressCallback (0.50+(0.18*($touchIndex/[double]$touchedPaths.Count))) (Get-PMMText 'Creating verified rollback backup...' 'Creando backup de rollback verificado...')}
     }
     if($oldStateExists){Copy-Item -LiteralPath $statePath -Destination (Join-Path $backupRoot 'deployment-state.before.json') -Force}
     if($oldPendingExists){Copy-Item -LiteralPath $pendingPath -Destination (Join-Path $backupRoot 'pending-removals.before.json') -Force}
@@ -1292,21 +1871,30 @@ function Invoke-PMMDeploymentTransaction($Context,$Operations,$State) {
       DeploymentStateExisted=$oldStateExists;PendingRemovalsExisted=$oldPendingExists
     }|ConvertTo-Json -Depth 20|Set-Content -LiteralPath (Join-Path $backupRoot 'transaction.json') -Encoding UTF8
 
+    Invoke-PMMProgressCallback $ProgressCallback 0.68 (Get-PMMText 'Rollback backup ready. Committing deployment...' 'Backup de rollback listo. Aplicando despliegue...')
+
     # Phase 3: commit. Staged files live on the same volume as ~mods, so the
     # final Move-Item is a same-volume rename rather than a long copy window.
     $commitStarted=$true
     foreach($action in @($Operations.RemoveActions)){if(Test-Path -LiteralPath ([string]$action.Path) -PathType Leaf){Remove-Item -LiteralPath ([string]$action.Path) -Force}}
+    $commitIndex=0
     foreach($record in $stagedRecords){
+      $commitIndex++
       if(Test-Path -LiteralPath ([string]$record.Destination) -PathType Leaf){Remove-Item -LiteralPath ([string]$record.Destination) -Force}
       Move-Item -LiteralPath ([string]$record.Stage) -Destination ([string]$record.Destination) -Force
+      if($stagedRecords.Count -gt 0){Invoke-PMMProgressCallback $ProgressCallback (0.70+(0.12*($commitIndex/[double]$stagedRecords.Count))) ((Get-PMMText 'Committed {0}' 'Aplicado {0}') -f [string]$record.Name)}
     }
 
     # Phase 4: verify committed bytes before recording deployment state.
+    $verifyIndex=0
     foreach($record in $stagedRecords){
+      $verifyIndex++
       if(-not(Test-Path -LiteralPath ([string]$record.Destination) -PathType Leaf)){throw "Deploy verification missing file: $($record.Destination)"}
       $hash=Get-Sha256 ([string]$record.Destination)
       if($hash -ne [string]$record.ExpectedHash){throw "Deploy verification hash mismatch for $($record.Name): $hash != $($record.ExpectedHash)"}
+      if($stagedRecords.Count -gt 0){Invoke-PMMProgressCallback $ProgressCallback (0.82+(0.15*($verifyIndex/[double]$stagedRecords.Count))) ((Get-PMMText 'Verified {0}' 'Verificado {0}') -f [string]$record.Name)}
     }
+    Invoke-PMMProgressCallback $ProgressCallback 0.97 (Get-PMMText 'Recording deployment state...' 'Guardando estado del despliegue...')
     Write-PMMDeploymentState $State
     Write-PMMPendingRemovalRecords @()
     [pscustomobject]@{SchemaVersion=1;State='Committed';Completed=(Get-Date).ToString('o');GameMods=$Context.GameMods;Touched=[string[]]$touched;BackupCount=$backupRecords.Count}|ConvertTo-Json -Depth 10|Set-Content -LiteralPath (Join-Path $backupRoot 'transaction.json') -Encoding UTF8
@@ -1315,6 +1903,7 @@ function Invoke-PMMDeploymentTransaction($Context,$Operations,$State) {
     return $backupRoot
   }catch{
     $failure=$_.Exception.Message
+    $wasCancelled=($_.Exception -is [System.OperationCanceledException] -or $failure -eq 'PMM_OPERATION_CANCELLED')
     $rollbackErrors=[System.Collections.Generic.List[string]]::new()
     if($commitStarted){
       Write-PMMLog ('Deploy commit failed; rolling back managed game-folder changes: '+$failure)
@@ -1343,17 +1932,25 @@ function Invoke-PMMDeploymentTransaction($Context,$Operations,$State) {
       $detail=($rollbackErrors.ToArray() -join "`n")
       throw (Get-PMMText ("Deploy failed and automatic rollback was incomplete. Do not launch Palworld yet. Recovery data is preserved in: {0}`nOriginal error: {1}`nRollback errors:`n{2}" -f $backupRoot,$failure,$detail) ("Deploy fallo y el rollback automatico quedo incompleto. No inicies Palworld todavia. Los datos de recuperacion se conservaron en: {0}`nError original: {1}`nErrores de rollback:`n{2}" -f $backupRoot,$failure,$detail))
     }
+    if($wasCancelled){throw [System.OperationCanceledException]::new('PMM_OPERATION_CANCELLED')}
     $message=if($commitStarted){Get-PMMText 'Deploy failed after commit started, but PMM restored every managed game-folder file from its verified rollback backup.' 'Deploy fallo despues de iniciar el commit, pero PMM restauro todos los archivos gestionados de la carpeta del juego desde el backup verificado de rollback.'}else{Get-PMMText 'Deploy failed before any managed game-folder file was changed.' 'Deploy fallo antes de cambiar ningun archivo gestionado de la carpeta del juego.'}
     throw ("$message`n`n$failure")
   }
 }
 
-function Deploy-PMMManagedState {
+function Deploy-PMMManagedState([scriptblock]$ProgressCallback=$null) {
+  $journal=''
+  try{
+  Invoke-PMMProgressCallback $ProgressCallback 0.02 (Get-PMMText 'Checking deployment state...' 'Comprobando estado del despliegue...')
   $context=Get-PMMDeploymentContext
+  try{if(Get-Command Start-PMMJournalOperation -ErrorAction SilentlyContinue){$journal=Start-PMMJournalOperation -Kind Deploy -Target ([string]$context.GameMods) -Metadata ([ordered]@{ActiveMods=@($context.Active).Count;Patch=$(if($context.Patch){[string]$context.Patch.Name}else{''})})}}catch{Write-PMMLog ('Could not start common Deploy journal: '+$_.Exception.Message)}
+  Invoke-PMMProgressCallback $ProgressCallback 0.05 (Get-PMMText 'Stopping Palworld if needed...' 'Cerrando Palworld si es necesario...')
   Stop-PalworldForDeployment
+  if($journal){try{Write-PMMJournalStep -OperationId $journal -Kind Deploy -Step GameStopped -Status Complete}catch{Write-PMMLog ('Could not update common Deploy journal after game stop: '+$_.Exception.Message)}}
 
   # Recompute after Palworld is closed so hashes/collisions cannot change
   # between the user-facing preview and the actual commit.
+  Invoke-PMMProgressCallback $ProgressCallback 0.10 (Get-PMMText 'Revalidating hashes and deployment plan...' 'Revalidando hashes y plan de despliegue...')
   $context=Get-PMMDeploymentContext
   $ops=New-PMMDeploymentOperationPlan $context
   if(@($ops.BlockingConflicts).Count -gt 0){
@@ -1366,14 +1963,23 @@ function Deploy-PMMManagedState {
     SuppressedAlternatives=@($context.Suppressed);
     Patch=$(if($context.Patch){[pscustomobject]@{Name=$context.Patch.Name;Hash=$context.Patch.Hash}}else{$null})
   }
-  $backupRoot=Invoke-PMMDeploymentTransaction $context $ops $state
+  Invoke-PMMProgressCallback $ProgressCallback 0.14 (Get-PMMText 'Starting transactional deployment...' 'Iniciando despliegue transaccional...')
+  if($journal){try{Write-PMMJournalStep -OperationId $journal -Kind Deploy -Step PlanValidated -Status Complete -Metadata ([ordered]@{Copies=@($ops.CopyActions).Count;Removals=@($ops.RemoveActions).Count})}catch{Write-PMMLog ('Could not update common Deploy journal after validation: '+$_.Exception.Message)}}
+  $backupRoot=Invoke-PMMDeploymentTransaction $context $ops $state $ProgressCallback
+  if($journal){try{Write-PMMJournalStep -OperationId $journal -Kind Deploy -Step TransactionCommitted -Status Complete -Metadata ([ordered]@{BackupId=[IO.Path]::GetFileName([string]$backupRoot)})}catch{Write-PMMLog ('Could not update common Deploy journal after commit: '+$_.Exception.Message)}}
   if($context.Patch){
     try{Promote-PMMPatchToCurrent ([string]$context.Patch.Name)}catch{Write-PMMLog ('Deploy succeeded but local patch promotion failed: '+$_.Exception.Message)}
   }
+  Invoke-PMMProgressCallback $ProgressCallback 1.0 (Get-PMMText 'Deploy complete.' 'Deploy terminado.')
   Write-PMMLog ("Transactional Deploy synchronized {0} source mods; suppressed alternatives={1}; patch={2}; managerOnly={3}; backup={4}" -f $context.DeployActive.Count,$context.Suppressed.Count,$(if($context.Patch){$context.Patch.Name}else{'none'}),[bool]$context.NoPatchSelected,$backupRoot)
   $suppressedText=if($context.Suppressed.Count -gt 0){$context.Suppressed -join ', '}else{Get-PMMText 'none' 'ninguno'}
   $patchResult=if($context.Patch){[string]$context.Patch.Name}elseif($context.NoPatchSelected){Get-PMMText 'none - source mods only' 'ninguno - solo mods fuente'}else{Get-PMMText 'not required' 'no requerido'}
+  if($journal){try{Complete-PMMJournalOperation -OperationId $journal -Kind Deploy -Metadata ([ordered]@{SourceMods=$context.DeployActive.Count;Suppressed=$context.Suppressed.Count;Patch=$patchResult})}catch{Write-PMMLog ('Deploy committed but its journal completion failed: '+$_.Exception.Message)}}
   return (Get-PMMText ("Deploy complete. Source mods installed: {0}. Redundant byte-identical source PAKs kept only in PMM library: {1}. Compatibility patch: {2}. Managed changes were hash-verified and committed with rollback backup." -f $context.DeployActive.Count,$suppressedText,$patchResult) ("Deploy terminado. Mods fuente instalados: {0}. PAK fuente redundantes e identicos byte a byte conservados solo en la biblioteca PMM: {1}. Parche de compatibilidad: {2}. Los cambios gestionados se verificaron por hash y se aplicaron con backup para rollback." -f $context.DeployActive.Count,$suppressedText,$patchResult))
+  }catch{
+    if($journal){try{Fail-PMMJournalOperation -OperationId $journal -Kind Deploy -Message $_.Exception.Message}catch{}}
+    throw
+  }
 }
 
 function Import-PMMPatchBackup([string]$PakPath) {
@@ -1400,6 +2006,104 @@ function Import-PMMPatchBackup([string]$PakPath) {
   }
   Write-PMMLog "Imported PMM patch as managed backup (not a source mod): $($file.Name)"
   return $dst
+}
+
+function Test-PMMCancellationRequestedFromUI {
+  try{
+    $cmd=Get-Command Test-PMMOperationCancellationRequested -ErrorAction SilentlyContinue
+    if($cmd){return [bool](& $cmd)}
+  }catch{}
+  return $false
+}
+
+function Assert-PMMOperationNotCancelled {
+  if(Test-PMMCancellationRequestedFromUI){throw [System.OperationCanceledException]::new('PMM_OPERATION_CANCELLED')}
+}
+
+function Invoke-PMMProgressCallback($ProgressCallback,[double]$Fraction,[string]$Message) {
+  Assert-PMMOperationNotCancelled
+  if($ProgressCallback){
+    $value=[Math]::Max(0.0,[Math]::Min(1.0,$Fraction))
+    try{& $ProgressCallback $value $Message}catch{
+      if($_.Exception -is [System.OperationCanceledException]){throw}
+      Write-PMMLog ('Progress callback failed: '+$_.Exception.Message)
+    }
+  }
+  Assert-PMMOperationNotCancelled
+}
+
+function Quote-PMMProcessArgument([string]$Value) {
+  if($null -eq $Value){return '""'}
+  return ('"'+$Value.Replace('"','\\"')+'"')
+}
+
+function Invoke-PMMCancelableExternalProcess {
+  param(
+    [Parameter(Mandatory=$true)][string]$FilePath,
+    [Parameter(Mandatory=$true)][string[]]$Arguments,
+    [scriptblock]$ProgressCallback=$null,
+    [double]$Fraction=0.0,
+    [string]$Message='Working...'
+  )
+  Assert-PMMOperationNotCancelled
+  $psi=[System.Diagnostics.ProcessStartInfo]::new()
+  $psi.FileName=$FilePath
+  $psi.Arguments=(@($Arguments|ForEach-Object{Quote-PMMProcessArgument ([string]$_)}) -join ' ')
+  $psi.UseShellExecute=$false
+  $psi.CreateNoWindow=$true
+  $psi.WindowStyle=[System.Diagnostics.ProcessWindowStyle]::Hidden
+  $proc=[System.Diagnostics.Process]::new();$proc.StartInfo=$psi
+  try{
+    if(-not$proc.Start()){throw ('Could not start external process: '+$FilePath)}
+    while(-not$proc.WaitForExit(120)){
+      Invoke-PMMProgressCallback $ProgressCallback $Fraction $Message
+    }
+    Invoke-PMMProgressCallback $ProgressCallback $Fraction $Message
+    return [int]$proc.ExitCode
+  }catch{
+    try{if(-not$proc.HasExited){$proc.Kill()}}catch{}
+    throw
+  }finally{$proc.Dispose()}
+}
+
+function Copy-PMMFileWithProgress {
+  param(
+    [Parameter(Mandatory=$true)][string]$Source,
+    [Parameter(Mandatory=$true)][string]$Destination,
+    [scriptblock]$ProgressCallback=$null,
+    [double]$StartFraction=0.0,
+    [double]$EndFraction=1.0,
+    [string]$Message='Copying file...'
+  )
+  $sourceInfo=Get-Item -LiteralPath $Source -ErrorAction Stop
+  $destDir=Split-Path -Parent $Destination
+  if($destDir){New-Item -ItemType Directory -Force -Path $destDir|Out-Null}
+  [int64]$length=[int64]$sourceInfo.Length
+  [int64]$written=0
+  $input=$null;$output=$null
+  try{
+    $input=[IO.File]::Open($Source,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)
+    $output=[IO.File]::Open($Destination,[IO.FileMode]::Create,[IO.FileAccess]::Write,[IO.FileShare]::None)
+    $buffer=[byte[]]::new(4194304)
+    $reportClock=[System.Diagnostics.Stopwatch]::StartNew()
+    $lastReport=0L
+    while(($read=$input.Read($buffer,0,$buffer.Length)) -gt 0){
+      $output.Write($buffer,0,$read)
+      $written+=$read
+      $now=[int64]$reportClock.ElapsedMilliseconds
+      if(($now-$lastReport) -ge 150 -or $written -ge $length){
+        $local=if($length -gt 0){[double]$written/[double]$length}else{1.0}
+        $mapped=$StartFraction+(($EndFraction-$StartFraction)*$local)
+        Invoke-PMMProgressCallback $ProgressCallback $mapped $Message
+        $lastReport=$now
+      }
+    }
+    $output.Flush()
+  }finally{
+    if($output){$output.Dispose()}
+    if($input){$input.Dispose()}
+  }
+  if($length -eq 0){Invoke-PMMProgressCallback $ProgressCallback $EndFraction $Message}
 }
 
 function Assert-PMMZipImportWorkingSpace([string]$ZipPath,[string]$StagePath) {
@@ -1431,11 +2135,13 @@ function Assert-PMMZipImportWorkingSpace([string]$ZipPath,[string]$StagePath) {
   return [pscustomobject]@{ExpandedBytes=$expanded;RequiredWorkingBytes=$required;FreeBytes=$free}
 }
 
-function Import-PMMMod([string]$Path) {
+function Import-PMMMod([string]$Path,[scriptblock]$ProgressCallback=$null) {
   if (-not (Test-Path -LiteralPath $Path)) {
     throw (Get-PMMText "Source does not exist: $Path" "No existe: $Path")
   }
 
+  $displayName=[IO.Path]::GetFileName($Path)
+  Invoke-PMMProgressCallback $ProgressCallback 0.01 ((Get-PMMText 'Preparing import: {0}' 'Preparando importacion: {0}') -f $displayName)
   $ext = [IO.Path]::GetExtension($Path).ToLowerInvariant()
   $stage = Join-Path (Get-PMMPath 'Cache') ('Import_' + [guid]::NewGuid().ToString('N'))
   New-Item -ItemType Directory -Force -Path $stage | Out-Null
@@ -1443,22 +2149,28 @@ function Import-PMMMod([string]$Path) {
 
   try {
     if ($ext -eq '.pak') {
-      Copy-Item -LiteralPath $Path -Destination $stage
+      $stagePak=Join-Path $stage ([IO.Path]::GetFileName($Path))
+      Copy-PMMFileWithProgress $Path $stagePak $ProgressCallback 0.03 0.45 ((Get-PMMText 'Reading {0}...' 'Leyendo {0}...') -f $displayName)
     } elseif ($ext -eq '.zip') {
+      Invoke-PMMProgressCallback $ProgressCallback 0.05 (Get-PMMText 'Checking archive size and free space...' 'Comprobando tamano del archivo y espacio libre...')
       [void](Assert-PMMZipImportWorkingSpace $Path $stage)
       $runtime=Get-PMMRuntimePath
       if(-not(Test-Path -LiteralPath $runtime -PathType Leaf)){throw 'PMMRuntime.exe is required to import ZIP archives safely.'}
-      $output=@(& $runtime archive extract $Path $stage 2>&1|ForEach-Object{[string]$_})
-      if($LASTEXITCODE -ne 0){throw ('PMMRuntime archive extract failed while importing the mod. '+($output -join ' '))}
+      Invoke-PMMProgressCallback $ProgressCallback 0.12 ((Get-PMMText 'Extracting {0} safely...' 'Extrayendo {0} de forma segura...') -f $displayName)
+      $exit=Invoke-PMMCancelableExternalProcess -FilePath $runtime -Arguments @('archive','extract',$Path,$stage) -ProgressCallback $ProgressCallback -Fraction 0.30 -Message ((Get-PMMText 'Extracting {0} safely...' 'Extrayendo {0} de forma segura...') -f $displayName)
+      if($exit -ne 0){throw ('PMMRuntime archive extract failed while importing the mod. Exit code: '+$exit)}
+      Invoke-PMMProgressCallback $ProgressCallback 0.48 (Get-PMMText 'Archive extracted. Inspecting PAK files...' 'Archivo extraido. Revisando PAK...')
     } elseif ($ext -in @('.7z','.rar')) {
       $seven = Get-Command 7z.exe -ErrorAction SilentlyContinue
       if (-not $seven) {
         throw (Get-PMMText '7-Zip is required for .7z/.rar archives, or import the .pak directly.' 'Para .7z/.rar instala 7-Zip o importa el .pak directamente.')
       }
-      & $seven.Source x "-o$stage" -y $Path | Out-Null
-      if ($LASTEXITCODE -ne 0) {
+      Invoke-PMMProgressCallback $ProgressCallback 0.12 ((Get-PMMText 'Extracting {0} with 7-Zip...' 'Extrayendo {0} con 7-Zip...') -f $displayName)
+      $exit=Invoke-PMMCancelableExternalProcess -FilePath $seven.Source -Arguments @('x',('-o'+$stage),'-y',$Path) -ProgressCallback $ProgressCallback -Fraction 0.30 -Message ((Get-PMMText 'Extracting {0} with 7-Zip...' 'Extrayendo {0} con 7-Zip...') -f $displayName)
+      if ($exit -ne 0) {
         throw (Get-PMMText '7-Zip could not extract the archive.' '7-Zip no pudo extraer el archivo.')
       }
+      Invoke-PMMProgressCallback $ProgressCallback 0.48 (Get-PMMText 'Archive extracted. Inspecting PAK files...' 'Archivo extraido. Revisando PAK...')
     } else {
       throw (Get-PMMText 'Unsupported archive format.' 'Formato no compatible.')
     }
@@ -1468,12 +2180,19 @@ function Import-PMMMod([string]$Path) {
       throw (Get-PMMText 'The archive does not contain any .pak files.' 'El archivo no contiene ningun .pak.')
     }
 
+    $pakIndex=0
     foreach ($pak in $paks) {
+      $pakIndex++
+      $slotStart=0.50+(0.47*(($pakIndex-1)/[double]$paks.Count))
+      $slotEnd=0.50+(0.47*($pakIndex/[double]$paks.Count))
       if ($pak.Name -like 'zzzzzzzzzz_PMM_Merge_*_P.pak') {
+        Invoke-PMMProgressCallback $ProgressCallback $slotStart ((Get-PMMText 'Importing managed PMM patch {0}...' 'Importando parche PMM gestionado {0}...') -f $pak.Name)
         Import-PMMPatchBackup $pak.FullName | Out-Null
+        Invoke-PMMProgressCallback $ProgressCallback $slotEnd ((Get-PMMText 'Imported {0}' 'Importado {0}') -f $pak.Name)
         continue
       }
 
+      Invoke-PMMProgressCallback $ProgressCallback $slotStart ((Get-PMMText 'Hashing {0}...' 'Calculando hash de {0}...') -f $pak.Name)
       $hash = Get-Sha256 $pak.FullName
       Remove-PMMPendingRemoval $pak.Name
       $slug = ([IO.Path]::GetFileNameWithoutExtension($pak.Name) -replace '[^A-Za-z0-9_.-]','_')
@@ -1481,7 +2200,8 @@ function Import-PMMMod([string]$Path) {
       $disabledCopy=Join-Path (Get-PMMDisabledModRoot) $slug
       if(Test-Path -LiteralPath $disabledCopy -PathType Container){Remove-Item -LiteralPath $disabledCopy -Recurse -Force}
       New-Item -ItemType Directory -Force -Path $dst | Out-Null
-      Copy-Item -LiteralPath $pak.FullName -Destination (Join-Path $dst $pak.Name) -Force
+      $copyStart=$slotStart+(($slotEnd-$slotStart)*0.20)
+      Copy-PMMFileWithProgress $pak.FullName (Join-Path $dst $pak.Name) $ProgressCallback $copyStart $slotEnd ((Get-PMMText 'Adding {0} to the PMM library...' 'Anadiendo {0} a la biblioteca PMM...') -f $pak.Name)
 
       [pscustomobject]@{
         Name=$pak.Name
@@ -1497,28 +2217,44 @@ function Import-PMMMod([string]$Path) {
     Clear-PMMLibraryHashCache
     Clear-PakEntryCache
     Clear-PMMAnalysisState
+    Invoke-PMMProgressCallback $ProgressCallback 1.0 (Get-PMMText 'Import complete.' 'Importacion terminada.')
   } finally {
     Remove-Item -LiteralPath $stage -Recurse -Force -ErrorAction SilentlyContinue
     Remove-PMMTransientStageOwner $stage
   }
 }
 
-function Import-GameModsToLibrary {
+function Import-GameModsToLibrary([scriptblock]$ProgressCallback=$null) {
   $gp = Get-GameModsPath
   if (-not $gp) {
     throw (Get-PMMText 'Configure or detect Palworld before importing game ~mods.' 'Configura o detecta Palworld antes de importar los ~mods del juego.')
   }
   Ensure-GameModsFolder
 
-  $count = 0
-  foreach ($p in @(Get-ChildItem -LiteralPath $gp -Filter *.pak -File -ErrorAction SilentlyContinue)) {
-    # PMM overlays are imported as managed backups, never as source mods.
-    if ($p.Name -like 'zzzzzzzzzz_PMM_Merge_*_P.pak') {
-      Import-PMMPatchBackup $p.FullName | Out-Null
-      continue
-    }
-    Import-PMMMod $p.FullName
+  $all=@(Get-ChildItem -LiteralPath $gp -Filter *.pak -File -ErrorAction SilentlyContinue)
+  $sourcePaks=@($all|Where-Object{$_.Name -notlike 'zzzzzzzzzz_PMM_Merge_*_P.pak'})
+  $externalMerges=@($all|Where-Object{$_.Name -like 'zzzzzzzzzz_PMM_Merge_*_P.pak'})
+  if($externalMerges.Count -gt 0){
+    Write-PMMLog ('Import ~mods recognized '+$externalMerges.Count+' deployed PMM merge(s) but did not recreate saved builds. Deployment discovery is read-only in PMM 1.3.')
+  }
+  if($sourcePaks.Count -eq 0){
+    Invoke-PMMProgressCallback $ProgressCallback 1.0 (Get-PMMText 'No source PAKs found in game ~mods.' 'No se encontraron PAK fuente en ~mods.')
+    return 0
+  }
+
+  $count=0
+  for($i=0;$i -lt $sourcePaks.Count;$i++){
+    $pak=$sourcePaks[$i]
+    $base=[double]$i/[double]$sourcePaks.Count
+    $span=1.0/[double]$sourcePaks.Count
+    $outer=$ProgressCallback
+    $inner={
+      param([double]$fraction,[string]$message)
+      if($outer){& $outer ($base+($span*$fraction)) $message}
+    }.GetNewClosure()
+    Import-PMMMod $pak.FullName $inner
     $count++
   }
+  Invoke-PMMProgressCallback $ProgressCallback 1.0 (Get-PMMText 'Game ~mods import complete.' 'Importacion de ~mods terminada.')
   return $count
 }

@@ -99,3 +99,83 @@ QA2 professional hardening regression
     Create a tested Knowledge contribution for a validated manual solution.
     Expected: native PMMRuntime archive creation succeeds and no PowerShell Compress-Archive path is used.
 
+RC23 singleton / effective-patch acceptance
+===========================================
+
+24) Copy the captured RC22 Workspace into a clean RC23 folder and start PMM.
+    Expected: the schema-9 patch already in Builds\Current appears without a Count/PropertyNotFoundStrict error.
+
+25) Select/deploy that existing patch without rebuilding it.
+    Expected: PMM validates its manifest/output hash and Deploy synchronizes it normally.
+
+26) Disable only BigInventory.pak, then Analyze/AUTO.
+    Expected: the effective overlay is reused, Build remains skipped and Deploy is required only to remove the source PAK.
+
+27) Restore BigInventory, disable only AutoUnlockAllTechnology_V1_P.pak and repeat.
+    Expected: the same safe reuse/deployment behavior.
+
+28) With AUTO or Auto ON active, complete an intermediate step.
+    Expected: the selected Semiauto sound plays; None or a cleared Sound each AUTO step checkbox mutes it.
+
+29) Change a real conflict provider/hash, output-relevant priority, decision, mappings or Vanilla identity.
+    Expected: PMM rejects reuse and requires the appropriate new Analyze/Build path.
+
+RC24 UI / Fix Lab merge-ownership acceptance
+================================================
+
+30) Start RC24 with a copy of the supplied RC23 Workspace. Resize continuously down to the minimum width and, if possible, move the window between monitors with different Windows scaling.
+    Expected: logo, three-line title, tabs and workspace remain visible. The header never expands to fill nearly the entire window.
+
+31) Select Fix Lab after working in Mods & Merge.
+    Expected: the Fix Lab tab paints immediately. A stale dashboard refresh is queued after the visual transition rather than blocking SelectionChanged.
+
+32) Expand and collapse section 6 Advanced / AI repair handoff repeatedly.
+    Expected: expand/collapse is immediate. Advanced hydration occurs after expansion; collapse itself triggers no dashboard scan.
+
+33) Press Refresh Fix Lab in the Fix Lab header.
+    Expected: current candidates/backups/outputs/reference state update on demand. Reopening the tab within sixty seconds reuses the cached view.
+
+34) Deploy a known compatibility patch. Record SHA-256 for its zzzzzzzzzz_PMM_Merge_*_P.pak and .manifest.json in Palworld ~mods. Apply a built Gura Fix Lab repair.
+    Expected: both compatibility files remain present with exactly the same hashes. The Fix Lab transaction backs up only recognized legacy/repair source files.
+
+35) Restore the original Gura v5 source from Fix Lab.
+    Expected: the repaired Gura PAK is replaced by the original source, but the compatibility merge PAK/sidecar remain present and byte-identical.
+
+36) Delete an unrelated imported source mod while the merge remains deployed.
+    Expected: only the exact managed source is removed from PMM/~mods. The deployed merge and sidecar remain, Patch state/selection remain visible, and Analyze freshness is cleared.
+
+37) Explicitly choose No compatibility patch and press Deploy, then redeploy the saved patch; separately test UNDEPLOY and Delete merge.
+    Expected: these Compatibility patches actions remain the only paths that remove/replace the deployed merge, with existing hash/foreign-file protections intact.
+
+RC25 responsive / themes / bounded Analyze acceptance
+=====================================================
+
+38) On 1920x1080, test 100%, 125% and 150% Windows scaling; resize continuously to the 900x600 normal minimum and move between differently scaled monitors if available.
+    Expected: title, tabs, actions and working panes remain usable. The header never leaves only the logo visible.
+
+39) Activate two complete Gura Fix Lab outputs, including Hooded + Full Replacement, and run Analyze.
+    Expected: PMM pauses before asset enumeration with one package-choice item; it does not spend minutes traversing female-model families. Choose one output and run Analyze again.
+
+40) Exercise determinate progress with at least two worker target changes below 100.
+    Expected: each new proven interval advances in integer points, never exceeds worker progress, and catches up only to the previous proven target when a newer target arrives.
+
+RC26 official themes / completion / semantic compatibility acceptance
+=====================================================================
+
+41) Open Settings in a clean RC26 folder.
+    Expected: the eleven JSON schemes plus Night and Light appear under Official PMM schemes (13 choices). With no imports, User schemes says none are installed.
+
+42) Import one valid custom PMM_COLOR_SCHEME_V1 JSON, then restart.
+    Expected: it appears only under User schemes, persists, and cannot replace any official ID.
+
+43) Observe any operation whose worker reports 100% and then starts another task.
+    Expected: the prior bar jumps immediately to 100 and has no pending one-by-one animation while the next task runs. Intermediate targets below 100 remain smoothed.
+
+44) Enable FasterMounts4xAllWorkSuitabilitiesLevel10_P.pak and RushRoarLeatherDrop_v2_P.pak and run Analyze.
+    Expected: DT_PalMonsterParameter_Common is automatic. Resolution & Review does not ask between FasterMounts and RushRoar for Rows[Boar].WorkSuitability_MonsterFarm; the automatic evidence selects FasterMounts value 10 for that field.
+
+45) Build once if the older rule-pinned patch is invalidated, Deploy, test both mod behaviors in Palworld, then repeat Analyze.
+    Expected: current cooked families build/deploy successfully and a repeat may reuse the schema-9 patch without another Build.
+
+46) Development negative controls for the semantic rule: test a different path, a 9/1 or 10/2 value tuple, and an additional competing provider.
+    Expected: none is resolved by the FasterMounts/RushRoar rule; PMM exposes a normal decision or another independently proven adapter result.

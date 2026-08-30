@@ -1,0 +1,492 @@
+{
+  "schema": "PMM_FIXLAB_VARIANT_RECIPE_V2",
+  "id": "fixlab-case-001-gawr-gura-v5-hair2_panties-v2",
+  "name": "Hair 2 - Panties Version",
+  "version": 2,
+  "status": "runtime-proven",
+  "caseId": "FIXLAB-CASE-001-GAWR-GURA",
+  "variantId": "hair2_panties",
+  "coreRecipe": "recipe-core-r1.json",
+  "outputName": "GawrGura_hair2-panties-3skins_P.pak",
+  "requiredReferenceFamilies": [],
+  "base": {
+    "mode": "core-all",
+    "includeRegex": [
+      "^Pal/Content/Starfelll/GawrGura/Mat/"
+    ]
+  },
+  "operations": [
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Pal/Blueprint/Character/Player/Imp_Hair/ABP_Player_Hair002_Implementation.uasset",
+      "to": "Pal/Content/Pal/Blueprint/Character/Player/Imp_Hair/ABP_Player_Hair002_Implementation.uasset",
+      "acceptedSha256": [
+        "02adcee52d20e263360bc2cb2e1d852462efb2eacca1ce0724637d03adec5785"
+      ],
+      "expectedSha256": "02adcee52d20e263360bc2cb2e1d852462efb2eacca1ce0724637d03adec5785"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Pal/Blueprint/Character/Player/Imp_Hair/ABP_Player_Hair002_Implementation.uexp",
+      "to": "Pal/Content/Pal/Blueprint/Character/Player/Imp_Hair/ABP_Player_Hair002_Implementation.uexp",
+      "acceptedSha256": [
+        "b91addc7d4b711006cba72ec33da7507b447b919fa782e0ae56b377157e0b316"
+      ],
+      "expectedSha256": "b91addc7d4b711006cba72ec33da7507b447b919fa782e0ae56b377157e0b316"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Pal/Model/Weapon/Melee/SK_Weapon_Melee_005/SK_Weapon_Melee_005.uasset",
+      "to": "Pal/Content/Pal/Model/Weapon/Melee/SK_Weapon_Melee_005/SK_Weapon_Melee_005.uasset",
+      "acceptedSha256": [
+        "011b2e0ed2316ad084121eb505d34382cba9f427319b8722becb965a0a4fb125"
+      ],
+      "expectedSha256": "011b2e0ed2316ad084121eb505d34382cba9f427319b8722becb965a0a4fb125"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Pal/Model/Weapon/Melee/SK_Weapon_Melee_005/SK_Weapon_Melee_005.uexp",
+      "to": "Pal/Content/Pal/Model/Weapon/Melee/SK_Weapon_Melee_005/SK_Weapon_Melee_005.uexp",
+      "acceptedSha256": [
+        "954f2d3979626d2412bfee35d83feb65d0cb6600c275604b376dbaaeec4a546a"
+      ],
+      "expectedSha256": "954f2d3979626d2412bfee35d83feb65d0cb6600c275604b376dbaaeec4a546a"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Starfelll/GawrGura/Blueprint/ABP_Player_Hair.uasset",
+      "to": "Pal/Content/Starfelll/GawrGura/Blueprint/ABP_Player_Hair.uasset",
+      "acceptedSha256": [
+        "e5f801d339256636ab881d1a2a432050a96fb678191137553351f0db1da9f225"
+      ],
+      "expectedSha256": "e5f801d339256636ab881d1a2a432050a96fb678191137553351f0db1da9f225"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Starfelll/GawrGura/Blueprint/ABP_Player_Hair.uexp",
+      "to": "Pal/Content/Starfelll/GawrGura/Blueprint/ABP_Player_Hair.uexp",
+      "acceptedSha256": [
+        "451bdbc4468caafdf0051ebf626869c03a4ce9ab4cd873d26ba664e7568e5d5c"
+      ],
+      "expectedSha256": "451bdbc4468caafdf0051ebf626869c03a4ce9ab4cd873d26ba664e7568e5d5c"
+    },
+    {
+      "op": "patch",
+      "to": "Pal/Content/Starfelll/GawrGura/Blueprint/FunctionLibrary.uasset",
+      "expectedSha256": "d68538849d9e35dedb2333cb8b0b5490e7e0151063e0665a8bda9b7566145232",
+      "alternatives": [
+        {
+          "references": [
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Blueprint/FunctionLibrary.uasset",
+              "sha256": "713f9058f8ab0a3f92890019e261ad25a594b0ca6ca18eb5f9a766be7e0b8a4f"
+            }
+          ],
+          "patch": "payload-v2/d68538849d9e35de-a2dbadb8de9a.pmmdlt",
+          "patchSha256": "a2dbadb8de9a8e418da886cb1b540d1f5481bd9e290437ba3e8eac1d1aaa9f3e"
+        },
+        {
+          "references": [
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Blueprint/FunctionLibrary.uasset",
+              "sha256": "d68538849d9e35dedb2333cb8b0b5490e7e0151063e0665a8bda9b7566145232"
+            }
+          ],
+          "patch": "payload-v2/d68538849d9e35de-d4c6a762e85a.pmmdlt",
+          "patchSha256": "d4c6a762e85af27c404a628bc967f6cd825abad5e8f761a9167b368fda539e7f"
+        }
+      ]
+    },
+    {
+      "op": "patch",
+      "to": "Pal/Content/Starfelll/GawrGura/Blueprint/FunctionLibrary.uexp",
+      "expectedSha256": "a7d434210888cc1654b1b8180095cf5a106f80daa6b92b2a736796d95132a8b3",
+      "alternatives": [
+        {
+          "references": [
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Blueprint/FunctionLibrary.uexp",
+              "sha256": "a0caab4886f538545b2854a148457de03a42a7773eb69e2825e8900592fe4157"
+            }
+          ],
+          "patch": "payload-v2/a7d434210888cc16-a7440212576e.pmmdlt",
+          "patchSha256": "a7440212576ebe9a9acadc3b41e395924d386b3b73317ff4415aaf1abca9f546"
+        },
+        {
+          "references": [
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Blueprint/FunctionLibrary.uexp",
+              "sha256": "a7d434210888cc1654b1b8180095cf5a106f80daa6b92b2a736796d95132a8b3"
+            }
+          ],
+          "patch": "payload-v2/a7d434210888cc16-b23a3312f833.pmmdlt",
+          "patchSha256": "b23a3312f833938b62e06f67093949d0c680408439f006b5d5db128e9209c4e4"
+        }
+      ]
+    },
+    {
+      "op": "patch",
+      "to": "Pal/Content/Starfelll/GawrGura/Gura.uasset",
+      "expectedSha256": "80511798b237418c7a5a1b9f5b4d5e4b8d27db0dcda7f956a671a5d3dbd8ebe6",
+      "alternatives": [
+        {
+          "references": [
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura.uasset",
+              "sha256": "6e0881174d78a5da915153c6914e27d932aff5ebaecf11a7aaa332e9b6c34b62"
+            },
+            {
+              "scope": "core",
+              "path": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001.uasset",
+              "sha256": "a5501e743d57c2d7f4739868f8d2b7e8a30d17f159c92061e7fabb8fd335179e"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_1.uasset",
+              "sha256": "8985650c6340ec1006cac926833050962fc45e23e7469c372d92a194de79cf05"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_Hood.uasset",
+              "sha256": "1da2a311850311a7f0e4ac096246523d3daa2a55255b537618f772de9bbdbdb2"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_None.uasset",
+              "sha256": "1d37db0f1d1d3ed310bdb725f3952490e6cb1cb8e7e5ee6f2b048c91c64fa73c"
+            }
+          ],
+          "patch": "payload-v2/80511798b237418c-d82623a879f7.pmmdlt",
+          "patchSha256": "d82623a879f7f6966e4b696b1c58bdab30e10962f0db7f6c050f7d31328706e2"
+        }
+      ]
+    },
+    {
+      "op": "patch",
+      "to": "Pal/Content/Starfelll/GawrGura/Gura.uexp",
+      "expectedSha256": "e4b31f5dd7e442fd5ef892715ec3035dff3084d6d46976b9912e1fb6eb784bae",
+      "alternatives": [
+        {
+          "references": [
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura.uexp",
+              "sha256": "aa959eee5d18d3b9be52b16905172b68da3935c25bcba14abef1654a02766c2f"
+            },
+            {
+              "scope": "core",
+              "path": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001.uexp",
+              "sha256": "66b77a36e55639163733b5420b116101f1aef6ca51855e3577cb072eba3428a0"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_1.uexp",
+              "sha256": "413a4b9aa6b0ce0beb835d02f71bb56eab7ac4ba14d13d3b4f8c084ec36c8b13"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_Hood.uexp",
+              "sha256": "a7feb36630379fa77f3c224948ca53a1557c9908cef0411f52b22590c0d82c26"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_None.uexp",
+              "sha256": "7adcfc4e3fe687a6b1648d1fd47f6218a4353a98ab19cef950fdc239d2b1a7e8"
+            }
+          ],
+          "patch": "payload-v2/e4b31f5dd7e442fd-8d795a87b35c.pmmdlt",
+          "patchSha256": "8d795a87b35c58dee47725e223b75bfa1c47ce6808d71143ab627a82a29b6377"
+        }
+      ]
+    },
+    {
+      "op": "patch",
+      "to": "Pal/Content/Starfelll/GawrGura/Gura_1.uasset",
+      "expectedSha256": "1fc2303de8fefe075c7c20f39288c76bf7050da704e75a84a0bb145719db9769",
+      "alternatives": [
+        {
+          "references": [
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_1.uasset",
+              "sha256": "8985650c6340ec1006cac926833050962fc45e23e7469c372d92a194de79cf05"
+            },
+            {
+              "scope": "core",
+              "path": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001.uasset",
+              "sha256": "a5501e743d57c2d7f4739868f8d2b7e8a30d17f159c92061e7fabb8fd335179e"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura.uasset",
+              "sha256": "6e0881174d78a5da915153c6914e27d932aff5ebaecf11a7aaa332e9b6c34b62"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_Hood.uasset",
+              "sha256": "1da2a311850311a7f0e4ac096246523d3daa2a55255b537618f772de9bbdbdb2"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_None.uasset",
+              "sha256": "1d37db0f1d1d3ed310bdb725f3952490e6cb1cb8e7e5ee6f2b048c91c64fa73c"
+            }
+          ],
+          "patch": "payload-v2/1fc2303de8fefe07-4308d1fe7c35.pmmdlt",
+          "patchSha256": "4308d1fe7c353d238b713b3fe7241723215933f6edaac11325d580475f9d483c"
+        }
+      ]
+    },
+    {
+      "op": "patch",
+      "to": "Pal/Content/Starfelll/GawrGura/Gura_1.uexp",
+      "expectedSha256": "6e002eb0471b6e98ea262179b172db97ca20043e61e3ab5e7ebfd35ed702f6a8",
+      "alternatives": [
+        {
+          "references": [
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_1.uexp",
+              "sha256": "413a4b9aa6b0ce0beb835d02f71bb56eab7ac4ba14d13d3b4f8c084ec36c8b13"
+            },
+            {
+              "scope": "core",
+              "path": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001.uexp",
+              "sha256": "66b77a36e55639163733b5420b116101f1aef6ca51855e3577cb072eba3428a0"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura.uexp",
+              "sha256": "aa959eee5d18d3b9be52b16905172b68da3935c25bcba14abef1654a02766c2f"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_Hood.uexp",
+              "sha256": "a7feb36630379fa77f3c224948ca53a1557c9908cef0411f52b22590c0d82c26"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_None.uexp",
+              "sha256": "7adcfc4e3fe687a6b1648d1fd47f6218a4353a98ab19cef950fdc239d2b1a7e8"
+            }
+          ],
+          "patch": "payload-v2/6e002eb0471b6e98-e2bfd3dcec2f.pmmdlt",
+          "patchSha256": "e2bfd3dcec2fff18c45caa40c821376f8b779462db9c9233fc1574f58184e449"
+        }
+      ]
+    },
+    {
+      "op": "patch",
+      "to": "Pal/Content/Starfelll/GawrGura/Gura_Hood.uasset",
+      "expectedSha256": "4fe387c1a72157cc37fd88aa6926c5fe62d3843b75907cde8f31e9c0aab830f2",
+      "alternatives": [
+        {
+          "references": [
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_Hood.uasset",
+              "sha256": "1da2a311850311a7f0e4ac096246523d3daa2a55255b537618f772de9bbdbdb2"
+            },
+            {
+              "scope": "core",
+              "path": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001.uasset",
+              "sha256": "a5501e743d57c2d7f4739868f8d2b7e8a30d17f159c92061e7fabb8fd335179e"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura.uasset",
+              "sha256": "6e0881174d78a5da915153c6914e27d932aff5ebaecf11a7aaa332e9b6c34b62"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_1.uasset",
+              "sha256": "8985650c6340ec1006cac926833050962fc45e23e7469c372d92a194de79cf05"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_None.uasset",
+              "sha256": "1d37db0f1d1d3ed310bdb725f3952490e6cb1cb8e7e5ee6f2b048c91c64fa73c"
+            }
+          ],
+          "patch": "payload-v2/4fe387c1a72157cc-7624c004f9f0.pmmdlt",
+          "patchSha256": "7624c004f9f0e607f50cc1f1e701a43b8d2229ed74fd447b3c2c435b69118659"
+        }
+      ]
+    },
+    {
+      "op": "patch",
+      "to": "Pal/Content/Starfelll/GawrGura/Gura_Hood.uexp",
+      "expectedSha256": "7eab42e797ade223f7525e1db9068e86437f73e498f026e681e50bde31d0ed7f",
+      "alternatives": [
+        {
+          "references": [
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_Hood.uexp",
+              "sha256": "a7feb36630379fa77f3c224948ca53a1557c9908cef0411f52b22590c0d82c26"
+            },
+            {
+              "scope": "core",
+              "path": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001.uexp",
+              "sha256": "66b77a36e55639163733b5420b116101f1aef6ca51855e3577cb072eba3428a0"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura.uexp",
+              "sha256": "aa959eee5d18d3b9be52b16905172b68da3935c25bcba14abef1654a02766c2f"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_1.uexp",
+              "sha256": "413a4b9aa6b0ce0beb835d02f71bb56eab7ac4ba14d13d3b4f8c084ec36c8b13"
+            },
+            {
+              "scope": "source",
+              "path": "Pal/Content/Starfelll/GawrGura/Gura_None.uexp",
+              "sha256": "7adcfc4e3fe687a6b1648d1fd47f6218a4353a98ab19cef950fdc239d2b1a7e8"
+            }
+          ],
+          "patch": "payload-v2/7eab42e797ade223-4924d3dd0b3b.pmmdlt",
+          "patchSha256": "4924d3dd0b3b48f2222ebc927ac00b1f9d335ca53349b5f15636f1c5159b1f27"
+        }
+      ]
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Starfelll/GawrGura/Gura_None.uasset",
+      "to": "Pal/Content/Starfelll/GawrGura/Gura_None.uasset",
+      "acceptedSha256": [
+        "1d37db0f1d1d3ed310bdb725f3952490e6cb1cb8e7e5ee6f2b048c91c64fa73c"
+      ],
+      "expectedSha256": "1d37db0f1d1d3ed310bdb725f3952490e6cb1cb8e7e5ee6f2b048c91c64fa73c"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Starfelll/GawrGura/Gura_None.uexp",
+      "to": "Pal/Content/Starfelll/GawrGura/Gura_None.uexp",
+      "acceptedSha256": [
+        "7adcfc4e3fe687a6b1648d1fd47f6218a4353a98ab19cef950fdc239d2b1a7e8"
+      ],
+      "expectedSha256": "7adcfc4e3fe687a6b1648d1fd47f6218a4353a98ab19cef950fdc239d2b1a7e8"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Starfelll/GawrGura/Mat/MI_Spear.uasset",
+      "to": "Pal/Content/Starfelll/GawrGura/Mat/MI_Spear.uasset",
+      "acceptedSha256": [
+        "d9512f218e4fc17c9faa1542cfb314678ecdda58bd39718be89be5b9b33bff2b"
+      ],
+      "expectedSha256": "d9512f218e4fc17c9faa1542cfb314678ecdda58bd39718be89be5b9b33bff2b"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Starfelll/GawrGura/Mat/MI_Spear.uexp",
+      "to": "Pal/Content/Starfelll/GawrGura/Mat/MI_Spear.uexp",
+      "acceptedSha256": [
+        "227a38f79b64e6549f6e462e9bd6fff33a62fd33a06ad43ccac18caa5d1c0706"
+      ],
+      "expectedSha256": "227a38f79b64e6549f6e462e9bd6fff33a62fd33a06ad43ccac18caa5d1c0706"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Starfelll/GawrGura/Mat/Tex/weapon.uasset",
+      "to": "Pal/Content/Starfelll/GawrGura/Mat/Tex/weapon.uasset",
+      "acceptedSha256": [
+        "d68b3d38db9565ef35158edc06fd5fc30c74560b13f3c4eb284bc9bd51718916"
+      ],
+      "expectedSha256": "d68b3d38db9565ef35158edc06fd5fc30c74560b13f3c4eb284bc9bd51718916"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Starfelll/GawrGura/Mat/Tex/weapon.ubulk",
+      "to": "Pal/Content/Starfelll/GawrGura/Mat/Tex/weapon.ubulk",
+      "acceptedSha256": [
+        "178b9dc24e277c6362504b131092cb32114d2004851ec2af35681900c3d0e104"
+      ],
+      "expectedSha256": "178b9dc24e277c6362504b131092cb32114d2004851ec2af35681900c3d0e104"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Starfelll/GawrGura/Mat/Tex/weapon.uexp",
+      "to": "Pal/Content/Starfelll/GawrGura/Mat/Tex/weapon.uexp",
+      "acceptedSha256": [
+        "a1fda840c1fedd57479f378de37b872a36f1b69e030b3b53fd8add7ba3b0fcac"
+      ],
+      "expectedSha256": "a1fda840c1fedd57479f378de37b872a36f1b69e030b3b53fd8add7ba3b0fcac"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Starfelll/GawrGura/Phy/GuraSpear_PhysicsAsset.uasset",
+      "to": "Pal/Content/Starfelll/GawrGura/Phy/GuraSpear_PhysicsAsset.uasset",
+      "acceptedSha256": [
+        "4465a65693f8136fed2b66a433457b962f8ba5abd16ca3a25c004cd0fcbd225e"
+      ],
+      "expectedSha256": "4465a65693f8136fed2b66a433457b962f8ba5abd16ca3a25c004cd0fcbd225e"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Starfelll/GawrGura/Phy/GuraSpear_PhysicsAsset.uexp",
+      "to": "Pal/Content/Starfelll/GawrGura/Phy/GuraSpear_PhysicsAsset.uexp",
+      "acceptedSha256": [
+        "a0e7d4061d742aed3bd2f29d4e18338a434dfbd8372ccbdcafff94ff22e87455"
+      ],
+      "expectedSha256": "a0e7d4061d742aed3bd2f29d4e18338a434dfbd8372ccbdcafff94ff22e87455"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Starfelll/Shared/SubsurfaceProfile.uasset",
+      "to": "Pal/Content/Starfelll/Shared/SubsurfaceProfile.uasset",
+      "acceptedSha256": [
+        "cdd3d6c24e46c0173d79a06de55d09b05b4b8d8a327c70285ef12f1195e60706"
+      ],
+      "expectedSha256": "cdd3d6c24e46c0173d79a06de55d09b05b4b8d8a327c70285ef12f1195e60706"
+    },
+    {
+      "op": "copy",
+      "scope": "source",
+      "from": "Pal/Content/Starfelll/Shared/SubsurfaceProfile.uexp",
+      "to": "Pal/Content/Starfelll/Shared/SubsurfaceProfile.uexp",
+      "acceptedSha256": [
+        "fe4f917bcb2ba4859829c66109c605f538879e61b080f10444ad2f23deccd01f"
+      ],
+      "expectedSha256": "fe4f917bcb2ba4859829c66109c605f538879e61b080f10444ad2f23deccd01f"
+    }
+  ],
+  "mountPoint": "../../../",
+  "pathHashSeed": 0,
+  "validation": {
+    "expectedEntryCount": 58,
+    "knownOutputSha256": "adb05c936225082d199eda0a97b894ca10a7b06ce1bc92b1889ff3cd55a1d0f5",
+    "requiredPaths": [
+      "Pal/Content/Pal/Model/Weapon/Melee/SK_Weapon_Melee_005/SK_Weapon_Melee_005.uasset",
+      "Pal/Content/Starfelll/GawrGura/Mat/MI_Spear.uasset"
+    ],
+    "forbiddenRegex": [
+      "/Gura_Skeleton\\.(uasset|uexp)$"
+    ],
+    "deployAllowed": true,
+    "classification": "runtime-proven"
+  },
+  "mountPolicy": "unreal-patch-priority"
+}

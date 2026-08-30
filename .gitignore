@@ -70,5 +70,7 @@ Development/Temp/
 Development/TestResults/
 
 # Unreal / Palworld payloads must not be committed
+*.pak
 *.ucas
 *.utoc
+oo2core_9_win64.dll

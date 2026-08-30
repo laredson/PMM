@@ -1,0 +1,236 @@
+{
+  "schema": "PMM_FIXLAB_RECIPES_V1",
+  "safety": "Fix Lab repair recipes are separate from merge production recipes. Exact source signatures may identify a documented repair plan, but automatic output is allowed only when the recipe executor is present, the current Game Reference satisfies the recipe policy, static validation passes, and the repaired output remains explicitly runtime-testable. Source files are never modified in place.",
+  "recipes": [
+    {
+      "id": "fixlab-case-001-gawr-gura-v5",
+      "caseId": "FIXLAB-CASE-001-GAWR-GURA",
+      "name": "Gawr Gura v5 -> Palworld 1.0.3 reconstruction",
+      "description": "Cookless reconstruction of the 2024 Gawr Gura replacement using current Palworld package identities while preserving reusable donor art and excluding obsolete legacy integration where possible.",
+      "target": {
+        "game": "Palworld",
+        "knownBuild": "1.0.3.101283",
+        "engineProfile": "UE5_1",
+        "knownMappingsSha256": "604550ba90faab1e394c2789f38eeff625493d3729c2d7f6a6058bfedb90a67b",
+        "knownPakIndexSha256": "8807c4a053e72c41c32a569289ea7374ebf99ed792519e72ee1839a18a9957ae"
+      },
+      "match": {
+        "signatures": [
+          {
+            "kind": "source-sha256",
+            "label": "GawrGura v5 Normal Nexus archive",
+            "sha256": "8f2d16d7d807a65dec028cc37500dcc91efca44191e57ca07b5eebeb76ed9c8c"
+          },
+          {
+            "kind": "source-sha256",
+            "label": "GawrGura v5 FullReplacement Nexus archive",
+            "sha256": "42e9932da92584829e3ee02fc25b0f243fad846d4337c1e12e9cda032b899ed0"
+          },
+          {
+            "kind": "pak-sha256",
+            "label": "GawrGura v5 FullReplacement source PAK",
+            "sha256": "ca3919ff0b9980c58189a4511401678064516e2471c374b55b0cd9900569a872"
+          },
+          {
+            "kind": "pak-sha256",
+            "label": "GawrGura v5 Normal source PAK",
+            "sha256": "33a200edbe2f1f08c9666431040c98772321d13a3272f1b93da1fb1f90722c02"
+          }
+        ],
+        "filenameHints": [
+          "GawrGura_v5",
+          "GawrGura_v5_FullReplacement",
+          "GawrGura"
+        ],
+        "exactRequiredForAutomaticBuild": true
+      },
+      "referencePolicy": {
+        "currentRequired": true,
+        "historicalGameReferenceRequired": false,
+        "reason": "Case 001 proved that current target package identities plus reusable donor art are sufficient for this reconstruction family; historical vanilla extraction is useful evidence but is not required for the validated method."
+      },
+      "repairStrategies": [
+        "RECONSTRUCT_CURRENT_PROVIDER",
+        "CURRENT_PACKAGE_RELOCATION",
+        "POSTPROCESS_NEUTRALIZE",
+        "SKELETON_RELINK",
+        "MULTI_COMPONENT_COMPOSITE",
+        "STATIC_VARIANT_BAKE",
+        "RENDER_SECTION_EXCLUDE",
+        "MATERIAL_SLOT_ISOLATION",
+        "WEAPON_PROVIDER_RESTORE"
+      ],
+      "learnedRules": [
+        "Do not ship obsolete 2024 FullReplacement player AnimBlueprint override stubs unchanged into Palworld 1.0.3.",
+        "Preserve cooked dependency/preload topology when patching package headers; never delete preload dependencies blindly.",
+        "A donor SkeletalMesh may be BASE_BODY, AUX_OVERLAY or HIDE_PLACEHOLDER. Do not assume every donor mesh is a complete character.",
+        "Relinking only the Skeleton import is not equivalent to rebuilding a ReferenceSkeleton; validate runtime attachments and current component behavior.",
+        "Gura_1 contains the pelvis/upper-thigh continuation required to close the base leg seam and must participate in the repaired full composite.",
+        "The flat Chinese author notice is an auxiliary render section, not the real shark tail. The validated repair omits that render section while retaining author attribution in metadata.",
+        "Hair2 selective mode must preserve the original conditional component architecture; baking a >65k-vertex composite into the wrong component caused T-pose/flicker.",
+        "Material slot inheritance can differ by vanilla component. The validated Hair2/Panties build isolates the Gura_1/Hood Body render section from slot-0 overrides by using the Body slot position proven by the full composite."
+      ],
+      "variants": [
+        {
+          "id": "original_fullreplacement",
+          "label": "Original Full Replacement",
+          "description": "Recreates the original behavior on current Palworld: normal base appearance, summer armor selects the red/Evil appearance, and winter armor selects the shark/X hood appearance.",
+          "runtimeStatus": "proven-2026-08-24",
+          "buildStatus": "validated-research-output",
+          "knownOutputSha256": "a41ee585940eb441380c9f279ad0d1f552d706eb4b2786cd8e49086a5cdd5691",
+          "deployAllowed": true,
+          "outputClass": "runtime-proven-repair"
+        },
+        {
+          "id": "normal_locked",
+          "label": "Normal - Locked",
+          "description": "Keeps the blue normal Gura appearance across armor changes so gameplay equipment does not force a cosmetic variant.",
+          "runtimeStatus": "proven-2026-08-27",
+          "buildStatus": "validated-research-output",
+          "knownOutputSha256": "221b48e908b22938b684420ccc914932bd0ba7acf59d7908929056fadee6885e",
+          "deployAllowed": true,
+          "outputClass": "runtime-proven-repair"
+        },
+        {
+          "id": "red_locked",
+          "label": "Red / Evil - Locked",
+          "description": "Keeps the red/Evil appearance across armor changes.",
+          "runtimeStatus": "pending-user-validation",
+          "buildStatus": "validated-structural-output",
+          "knownOutputSha256": "03f0098d9eb06303fe2c9607fd1bac43ee1e5d43c5720f2b2e38cc63fe5ed2e5",
+          "deployAllowed": true,
+          "outputClass": "experimental-repair"
+        },
+        {
+          "id": "hooded_locked",
+          "label": "Hooded - Locked",
+          "description": "Keeps the shark/X hood appearance across armor changes.",
+          "runtimeStatus": "pending-user-validation",
+          "buildStatus": "validated-structural-output",
+          "knownOutputSha256": "1319fb5cbb26d147a86d54f4f419305811533291920cbe9ae450ef5a69acd07d",
+          "deployAllowed": true,
+          "outputClass": "experimental-repair"
+        },
+        {
+          "id": "hair2_panties",
+          "label": "Hair 2 - Panties Version",
+          "description": "Selective version. Gura activates only when Hair 2 is chosen; other hairstyles remain vanilla. Summer and winter armor appearance changes work. This validated build retains visible panties, which is documented as a feature of this output variant.",
+          "runtimeStatus": "proven-2026-08-24",
+          "buildStatus": "validated-research-output",
+          "knownOutputSha256": "adb05c936225082d199eda0a97b894ca10a7b06ce1bc92b1889ff3cd55a1d0f5",
+          "deployAllowed": true,
+          "outputClass": "runtime-proven-repair"
+        }
+      ],
+      "implementation": {
+        "mode": "native-recipe-engine",
+        "status": "ready-exact-case-v2",
+        "engine": "Engine/PMMFixLab.exe",
+        "variantExecutors": {
+          "original_fullreplacement": {
+            "recipe": "CKL/FixLab/Cases/FIXLAB-CASE-001-GAWR-GURA/recipe-original_fullreplacement-v2.json",
+            "output": "GawrGura_fullreplacement-3skins_P.pak",
+            "validation": "Native Case 001 recipe V2; exact source + Current Game Reference + transformation bytecode; PAK v11 readback PASS."
+          },
+          "normal_locked": {
+            "recipe": "CKL/FixLab/Cases/FIXLAB-CASE-001-GAWR-GURA/recipe-normal_locked-v2.json",
+            "output": "GawrGura_gura_P.pak",
+            "validation": "Native Case 001 recipe V2; structurally validated output; runtime user validation remains recommended."
+          },
+          "red_locked": {
+            "recipe": "CKL/FixLab/Cases/FIXLAB-CASE-001-GAWR-GURA/recipe-red_locked-v2.json",
+            "output": "GawrGura_red-gura_P.pak",
+            "validation": "Native Case 001 recipe V2; structurally validated output; runtime user validation remains recommended."
+          },
+          "hooded_locked": {
+            "recipe": "CKL/FixLab/Cases/FIXLAB-CASE-001-GAWR-GURA/recipe-hooded_locked-v2.json",
+            "output": "GawrGura_hooded-gura_P.pak",
+            "validation": "Native Case 001 recipe V2; structurally validated output; runtime user validation remains recommended."
+          },
+          "hair2_panties": {
+            "recipe": "CKL/FixLab/Cases/FIXLAB-CASE-001-GAWR-GURA/recipe-hair2_panties-v2.json",
+            "output": "GawrGura_hair2-panties-3skins_P.pak",
+            "validation": "Native Case 001 recipe V2; runtime-proven selective Hair2/Panties output; PAK v11 readback PASS."
+          }
+        },
+        "researchState": "All five Case 001 outputs are generated locally from either exact v5 donor PAK plus Current Game Reference. The recipes contain under 1 MiB of validated transformation bytecode, not repaired PAKs or third-party bulk assets. Deployable repair outputs end in _P.pak so Unreal mounts them with patch priority over the vanilla provider.",
+        "mountPolicy": "unreal-patch-priority-_P.pak"
+      },
+      "proof": {
+        "caseClass": "first documented Fix Lab reconstruction case",
+        "sourceEra": "2024 Palworld mod",
+        "targetEra": "Palworld 1.0.3.101283",
+        "fullReplacementRuntime": "PASS",
+        "hair2PantiesRuntime": "PASS",
+        "weaponAttachment": "PASS after current PalHuman skeleton routing",
+        "pelvis": "PASS after baking/retaining Gura_1 pelvis continuation",
+        "authorNotice": "Auxiliary Chinese free-mod geometry identified and excluded from rendering; attribution remains in repair metadata."
+      },
+      "sourcePolicy": {
+        "automaticDetection": {
+          "requiredPakSha256": [
+            "ca3919ff0b9980c58189a4511401678064516e2471c374b55b0cd9900569a872",
+            "33a200edbe2f1f08c9666431040c98772321d13a3272f1b93da1fb1f90722c02"
+          ],
+          "note": "The runtime-proven reconstruction provider was extracted from the FullReplacement PAK. Matching this PAK is sufficient to identify Case 001 for Fix Lab routing."
+        },
+        "buildProvider": {
+          "required": true,
+          "acceptedSignatures": [
+            {
+              "kind": "source-sha256",
+              "label": "GawrGura v5 FullReplacement Nexus archive",
+              "sha256": "42e9932da92584829e3ee02fc25b0f243fad846d4337c1e12e9cda032b899ed0"
+            },
+            {
+              "kind": "pak-sha256",
+              "label": "GawrGura v5 FullReplacement source PAK",
+              "sha256": "ca3919ff0b9980c58189a4511401678064516e2471c374b55b0cd9900569a872"
+            },
+            {
+              "kind": "source-sha256",
+              "label": "GawrGura v5 Normal Nexus archive",
+              "sha256": "8f2d16d7d807a65dec028cc37500dcc91efca44191e57ca07b5eebeb76ed9c8c"
+            },
+            {
+              "kind": "pak-sha256",
+              "label": "GawrGura v5 Normal source PAK",
+              "sha256": "33a200edbe2f1f08c9666431040c98772321d13a3272f1b93da1fb1f90722c02"
+            }
+          ],
+          "reason": "The FullReplacement and Normal v5 PAK indexes both contain the complete donor meshes, materials/textures, Hair2 bridge assets and spear family used by Case 001. FullReplacement additionally contains many legacy HeadEquip/Imp_Hair override stubs, but the repaired outputs deliberately do not depend on those obsolete broad overrides. Either exact known v5 PAK can therefore serve as the donor cooked provider; output equivalence from Normal-only remains to be confirmed when the standalone executor is ported."
+        },
+        "optionalEvidence": [
+          {
+            "kind": "source-sha256",
+            "label": "GawrGura v5 Normal Nexus archive",
+            "sha256": "8f2d16d7d807a65dec028cc37500dcc91efca44191e57ca07b5eebeb76ed9c8c",
+            "status": "research-evidence-only"
+          }
+        ],
+        "normalOnlyCapability": "validated-equivalent-output-provider",
+        "normalOnlyNote": "The native V2 recipe engine was validated to reproduce all five known Case 001 outputs from the exact v5 Normal PAK and independently from the exact v5 FullReplacement PAK.",
+        "providerMatrix": {
+          "fullReplacementPak": {
+            "sha256": "ca3919ff0b9980c58189a4511401678064516e2471c374b55b0cd9900569a872",
+            "donorCookedSet": "complete",
+            "legacyBroadOverrides": "present",
+            "automaticBuildProvider": "accepted",
+            "outputEquivalence": "all-five-known-output-hashes-reproduced"
+          },
+          "normalPak": {
+            "sha256": "33a200edbe2f1f08c9666431040c98772321d13a3272f1b93da1fb1f90722c02",
+            "donorCookedSet": "complete by indexed family coverage",
+            "legacyBroadOverrides": "minimal Hair2/HeadEquip trigger only",
+            "automaticBuildProvider": "validated",
+            "outputEquivalence": "all-five-known-output-hashes-reproduced"
+          },
+          "bothTogether": {
+            "required": false,
+            "role": "Optional extra evidence only. The recipe should not require both."
+          }
+        }
+      }
+    }
+  ]
+}

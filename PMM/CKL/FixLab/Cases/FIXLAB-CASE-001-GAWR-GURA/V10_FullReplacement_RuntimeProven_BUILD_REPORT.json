@@ -1,0 +1,504 @@
+{
+  "schema": "PMMFL_FIXLAB_CASE_GURA_V10_PELVISFIX_V1",
+  "target": "Palworld 1.0.3.101283",
+  "status": "runtime-validation-required",
+  "base": "R1 runtime-proven FullReplacement architecture",
+  "base_r1_sha256": "70e7ccde18c9fe531ae1fb6cd8756d72cd596f7e913c8b06fa15b6e28aba1ef2",
+  "source_inputs": {
+    "v5_fullreplacement_7z_sha256": "42e9932da92584829e3ee02fc25b0f243fad846d4337c1e12e9cda032b899ed0",
+    "v5_normal_7z_sha256": "8f2d16d7d807a65dec028cc37500dcc91efca44191e57ca07b5eebeb76ed9c8c",
+    "legacy_provider_zip_sha256": "b02a21035badf2ae31a1e89e62c0119bd1a0cc58fd4f2c49ab602d09b23746cf"
+  },
+  "architecture": {
+    "head": "unchanged R1 Gura_None",
+    "hair": "unchanged R1 Gura_None",
+    "normal_outfit": "single complete Outfit SkeletalMesh = full Gura + baked Gura_1 Body/pelvis continuation; current SK_PalHuman_Skeleton; watermark render section omitted",
+    "v02_summer": "single complete Outfit SkeletalMesh = full Gura + baked Gura_1 Body overlay; all EvilGura-capable materials statically routed to their _r texture variants",
+    "v03_winter": "single complete Outfit SkeletalMesh = full Gura + baked Gura_1 Body/pelvis continuation + baked Gura_Hood overlay",
+    "weapon_fix": "R3 current-skeleton relink retained on every full Outfit; spear files restored unchanged",
+    "old_logic": "no old FunctionLibrary/ABP_Player_Hair/HeadEquip/Kawaii player logic",
+    "pelvis_fix": "Gura_1 is baked into ALL 30 outfits. Its two upper-thigh/pelvis components share the exact Gura leg seam at Z=74.7307 (22 exact seam vertices per side), matching the legacy FunctionLibrary behavior Cloth.SetSkeletalMeshAsset(Gura_1)."
+  },
+  "counts": {
+    "normal": 14,
+    "v02_evil": 8,
+    "v03_hood": 8
+  },
+  "source_meta": {
+    "gura_current_skeleton": {
+      "old_skeleton_package": "/Game/Starfelll/GawrGura/Gura_Skeleton",
+      "new_skeleton_package": "/Game/Pal/Model/Character/Skeleton/Human/SK_PalHuman_Skeleton",
+      "old_skeleton_object": "Gura_Skeleton",
+      "new_skeleton_object": "SK_PalHuman_Skeleton",
+      "header_delta": 99,
+      "postprocess_patch": {
+        "stale_index": -2,
+        "safe_index": -4,
+        "preload_offset": 4447
+      },
+      "uexp_sha256": "66b77a36e55639163733b5420b116101f1aef6ca51855e3577cb072eba3428a0"
+    },
+    "hood_current_skeleton": {
+      "old_skeleton_package": "/Game/Starfelll/GawrGura/Gura_Skeleton",
+      "new_skeleton_package": "/Game/Pal/Model/Character/Skeleton/Human/SK_PalHuman_Skeleton",
+      "old_skeleton_object": "Gura_Skeleton",
+      "new_skeleton_object": "SK_PalHuman_Skeleton",
+      "header_delta": 99,
+      "postprocess_patch": {
+        "stale_index": -2,
+        "safe_index": -4,
+        "preload_offset": 3957
+      },
+      "uexp_sha256": "d2343c620ed9da8674a8b94d80d53718538b6c9e6cec4ced8a743e9c34173b44"
+    },
+    "gura1_postprocess": {
+      "stale_index": -2,
+      "safe_index": -4,
+      "preload_offset": 3963
+    },
+    "normal_composite": {
+      "label": "NORMAL_FULL_PLUS_GURA1_PELVIS",
+      "base_sections": 7,
+      "rendered_sections": 7,
+      "watermark_section_removed": true,
+      "watermark_slot": "Tail",
+      "watermark_triangles": 458,
+      "watermark_vertices": 503,
+      "base_vertices": 52176,
+      "total_vertices": 67443,
+      "total_indices": 327891,
+      "index_width": 32,
+      "active_bones": 131,
+      "overlays": [
+        {
+          "name": "Gura_1_current",
+          "vertices": 15267,
+          "indices": 74097,
+          "triangles": 24699,
+          "bones": [
+            43,
+            44,
+            41,
+            52,
+            1,
+            128,
+            132,
+            105,
+            130,
+            131,
+            129,
+            134,
+            135,
+            133,
+            23,
+            20,
+            51,
+            47,
+            46,
+            45
+          ],
+          "base_index": 253794,
+          "base_vertex": 52176
+        }
+      ]
+    },
+    "evil_composite": {
+      "label": "V02_FULL_PLUS_GURA1",
+      "base_sections": 7,
+      "rendered_sections": 7,
+      "watermark_section_removed": true,
+      "watermark_slot": "Tail",
+      "watermark_triangles": 458,
+      "watermark_vertices": 503,
+      "base_vertices": 52176,
+      "total_vertices": 67443,
+      "total_indices": 327891,
+      "index_width": 32,
+      "active_bones": 131,
+      "overlays": [
+        {
+          "name": "Gura_1_current",
+          "vertices": 15267,
+          "indices": 74097,
+          "triangles": 24699,
+          "bones": [
+            43,
+            44,
+            41,
+            52,
+            1,
+            128,
+            132,
+            105,
+            130,
+            131,
+            129,
+            134,
+            135,
+            133,
+            23,
+            20,
+            51,
+            47,
+            46,
+            45
+          ],
+          "base_index": 253794,
+          "base_vertex": 52176
+        }
+      ]
+    },
+    "hood_composite": {
+      "label": "V03_FULL_PLUS_GURA1_PLUS_HOOD",
+      "base_sections": 7,
+      "rendered_sections": 8,
+      "watermark_section_removed": true,
+      "watermark_slot": "Tail",
+      "watermark_triangles": 458,
+      "watermark_vertices": 503,
+      "base_vertices": 52176,
+      "total_vertices": 73326,
+      "total_indices": 360252,
+      "index_width": 32,
+      "active_bones": 133,
+      "overlays": [
+        {
+          "name": "Gura_1_current",
+          "vertices": 15267,
+          "indices": 74097,
+          "triangles": 24699,
+          "bones": [
+            43,
+            44,
+            41,
+            52,
+            1,
+            128,
+            132,
+            105,
+            130,
+            131,
+            129,
+            134,
+            135,
+            133,
+            23,
+            20,
+            51,
+            47,
+            46,
+            45
+          ],
+          "base_index": 253794,
+          "base_vertex": 52176
+        },
+        {
+          "name": "Gura_Hood_current_skeleton",
+          "vertices": 5883,
+          "indices": 32361,
+          "triangles": 10787,
+          "bones": [
+            76,
+            44,
+            91,
+            92
+          ],
+          "base_index": 327891,
+          "base_vertex": 67443
+        }
+      ]
+    },
+    "watermark_finding": "Gura SkeletalMaterial slot Tail is a flat 503-vertex/458-triangle two-line mesh spelling 此为免费mod and @Starfelll, weighted only to F_OldCloth001_01. Actual shark-tail geometry is in Body on 尻尾 bones. RC9 omits only this render section, reproducing the original hidden behavior without deleting author source files."
+  },
+  "validation": [
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001.uasset",
+      "kind": "normal",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001_v02.uasset",
+      "kind": "evil",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001_v03.uasset",
+      "kind": "hood",
+      "sections": 8,
+      "vertices": 73326,
+      "indices": 360252,
+      "index_bits": 32,
+      "active_bones": 133
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001_v04.uasset",
+      "kind": "normal",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Bronze001/SK_Player_Female_Outfit_Bronze001.uasset",
+      "kind": "normal",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Bronze001/SK_Player_Female_Outfit_Bronze001_v02.uasset",
+      "kind": "evil",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Bronze001/SK_Player_Female_Outfit_Bronze001_v03.uasset",
+      "kind": "hood",
+      "sections": 8,
+      "vertices": 73326,
+      "indices": 360252,
+      "index_bits": 32,
+      "active_bones": 133
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Cloth001/SK_Player_Female_Outfit_Cloth001.uasset",
+      "kind": "normal",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Cloth001/SK_Player_Female_Outfit_Cloth001_v02.uasset",
+      "kind": "evil",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Cloth001/SK_Player_Female_Outfit_Cloth001_v03.uasset",
+      "kind": "hood",
+      "sections": 8,
+      "vertices": 73326,
+      "indices": 360252,
+      "index_bits": 32,
+      "active_bones": 133
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Hunter001/SK_Player_Female_Outfit_Hunter001.uasset",
+      "kind": "normal",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Hunter001/SK_Player_Female_Outfit_Hunter001_v02.uasset",
+      "kind": "evil",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Hunter001/SK_Player_Female_Outfit_Hunter001_v03.uasset",
+      "kind": "hood",
+      "sections": 8,
+      "vertices": 73326,
+      "indices": 360252,
+      "index_bits": 32,
+      "active_bones": 133
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Iron001/SK_Player_Female_Outfit_Iron001.uasset",
+      "kind": "normal",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Iron001/SK_Player_Female_Outfit_Iron001_v02_2.uasset",
+      "kind": "evil",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Iron001/SK_Player_Female_Outfit_Iron001_v03.uasset",
+      "kind": "hood",
+      "sections": 8,
+      "vertices": 73326,
+      "indices": 360252,
+      "index_bits": 32,
+      "active_bones": 133
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Kigurumi001/SK_Player_Female_Outfit_Kigurumi001.uasset",
+      "kind": "normal",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_OldCloth001/SK_Player_Female_Outfit_OldCloth001.uasset",
+      "kind": "normal",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v01.uasset",
+      "kind": "normal",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v02.uasset",
+      "kind": "evil",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v03.uasset",
+      "kind": "hood",
+      "sections": 8,
+      "vertices": 73326,
+      "indices": 360252,
+      "index_bits": 32,
+      "active_bones": 133
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v04.uasset",
+      "kind": "normal",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v01.uasset",
+      "kind": "normal",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v02.uasset",
+      "kind": "evil",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v03.uasset",
+      "kind": "hood",
+      "sections": 8,
+      "vertices": 73326,
+      "indices": 360252,
+      "index_bits": 32,
+      "active_bones": 133
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v04.uasset",
+      "kind": "normal",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Platinum001/SK_Player_Female_Outfit_Platinum001.uasset",
+      "kind": "normal",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Platinum001/SK_Player_Female_Outfit_Platinum001_v02.uasset",
+      "kind": "evil",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Platinum001/SK_Player_Female_Outfit_Platinum001_v03.uasset",
+      "kind": "hood",
+      "sections": 8,
+      "vertices": 73326,
+      "indices": 360252,
+      "index_bits": 32,
+      "active_bones": 133
+    },
+    {
+      "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Yakushima001/SK_Player_Female_Outfit_Yakushima001.uasset",
+      "kind": "normal",
+      "sections": 7,
+      "vertices": 67443,
+      "indices": 327891,
+      "index_bits": 32,
+      "active_bones": 131
+    }
+  ],
+  "pak": {
+    "version": 11,
+    "mount_point": "../../../",
+    "entry_count": 238,
+    "index_offset": 200319482,
+    "index_size": 2970,
+    "phi_size": 2864,
+    "fdi_size": 14215,
+    "size": 200339752,
+    "sha256": "a41ee585940eb441380c9f279ad0d1f552d706eb4b2786cd8e49086a5cdd5691"
+  },
+  "runtime_checks": [
+    "no armor: full Gura visible in world with pelvis/upper-leg seam closed",
+    "Stone pickaxe/axe/spear visually stay in hands",
+    "creator/inventory: no Chinese free-mod mesh",
+    "summer/v02: complete red variant",
+    "winter/v03: complete Gura plus shark/X hood",
+    "equip/unequip returns cleanly"
+  ]
+}

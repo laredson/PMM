@@ -1,0 +1,42 @@
+{
+  "schema": "PMM_FIXLAB_CASE_V1",
+  "caseId": "FIXLAB-CASE-001-GAWR-GURA",
+  "name": "Gawr Gura v5 -> Palworld 1.0.3 reconstruction",
+  "targetBuild": "1.0.3.101283",
+  "recipeId": "fixlab-case-001-gawr-gura-v5",
+  "sourceSignatures": {
+    "normalArchiveSha256": "8f2d16d7d807a65dec028cc37500dcc91efca44191e57ca07b5eebeb76ed9c8c",
+    "fullReplacementArchiveSha256": "42e9932da92584829e3ee02fc25b0f243fad846d4337c1e12e9cda032b899ed0",
+    "fullReplacementPakSha256": "ca3919ff0b9980c58189a4511401678064516e2471c374b55b0cd9900569a872",
+    "normalPakSha256": "33a200edbe2f1f08c9666431040c98772321d13a3272f1b93da1fb1f90722c02"
+  },
+  "referenceIdentity": {
+    "mappingsSha256": "604550ba90faab1e394c2789f38eeff625493d3729c2d7f6a6058bfedb90a67b",
+    "pakIndexSha256": "8807c4a053e72c41c32a569289ea7374ebf99ed792519e72ee1839a18a9957ae"
+  },
+  "runtimeProvenVariants": [
+    "original_fullreplacement",
+    "normal_locked",
+    "hair2_panties"
+  ],
+  "structuralOnlyVariants": [
+    "red_locked",
+    "hooded_locked"
+  ],
+  "executorStatus": "ready-exact-case-v2",
+  "sourceProviderPolicy": {
+    "bothRequired": false,
+    "fullReplacementPak": "accepted and output-equivalent in native V2 engine validation",
+    "normalPak": "accepted and output-equivalent in native V2 engine validation",
+    "note": "Either exact v5 PAK independently produces all five validated outputs. No repaired PAK fixture is downloaded or embedded."
+  },
+  "nativeRecipeEngine": {
+    "version": "0.2.0-variant-recipes",
+    "schema": "PMM_FIXLAB_VARIANT_RECIPE_V2",
+    "payload": "PMMDLT1 transformation bytecode",
+    "payloadBytes": 777577,
+    "normalProviderValidation": "PASS: all five known PAK hashes reproduced",
+    "fullReplacementProviderValidation": "PASS: all five known PAK hashes reproduced"
+  },
+  "runtimeEvidenceNote": "normal_locked accepted in-game 2026-08-27 using _P.pak; repaired pelvis present."
+}

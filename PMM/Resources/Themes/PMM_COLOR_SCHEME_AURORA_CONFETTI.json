@@ -1,0 +1,76 @@
+{
+  "schema": "PMM_COLOR_SCHEME_V1",
+  "id": "aurora-confetti",
+  "name": "Aurora Confetti",
+  "base": "Light",
+  "palette": {
+    "AppBackground": "#F6F2FF",
+    "HeaderBackground": "#FFF3D8",
+    "CardBackground": "#FFFFFF",
+    "CardAltBackground": "#EDF8FF",
+    "InputBackground": "#FFFCF7",
+    "CardBorder": "#D5C9F2",
+    "InputBorder": "#B9C7E7",
+    "PrimaryText": "#29233F",
+    "MutedText": "#655E78",
+    "SelectionBackground": "#CFF5E9",
+    "SelectionText": "#173B33",
+    "GridLine": "#E4DCF2",
+    "Splitter": "#CBBDEB",
+    "StatusBackground": "#E9F8FF",
+    "SoftBlue": "#E4F3FF",
+    "SoftGreen": "#E5F8E9",
+    "SoftAmber": "#FFF1BD",
+    "SoftRed": "#FFE4EC",
+    "SoftGray": "#F2EEFA",
+    "FixHeaderBackground": "#E9EDFF",
+    "FixHeaderBorder": "#8EA4F2",
+    "NoticeBackground": "#FFF0D2",
+    "NoticeBorder": "#E99A25",
+    "DecisionNoticeBackground": "#EAE3FF",
+    "DecisionNoticeBorder": "#7C4DFF",
+    "DecisionNoticeHeading": "#5B2DBD",
+    "SourceBackground": "#E2F8F5",
+    "SourceBorder": "#48BFAE",
+    "ConfigureBackground": "#FFE8F0",
+    "ConfigureBorder": "#E86A98",
+    "BuildBackground": "#EFE5FF",
+    "BuildBorder": "#9967E8",
+    "OutputBackground": "#E2F7E9",
+    "OutputBorder": "#4BB878",
+    "BackupBackground": "#FFF0E2",
+    "BackupBorder": "#D98B55",
+    "AdvancedBackground": "#E8F1FF",
+    "AccentHeadingBlue": "#155E9A",
+    "AccentHeadingAmber": "#875005",
+    "AccentHeadingPurple": "#673AB7",
+    "AccentHeadingGreen": "#236A49",
+    "WarmHeading": "#7B4637",
+    "ButtonBackground": "#6848D8",
+    "ButtonHover": "#5538BB",
+    "ButtonForeground": "#FFFFFF",
+    "ButtonBorder": "#4930A5"
+  },
+  "colorFlow": {
+    "Import": {
+      "Progress": "#FFB6D9",
+      "Border": "#B61F6A"
+    },
+    "Analyze": {
+      "Progress": "#B9E0FF",
+      "Border": "#126BB2"
+    },
+    "Build": {
+      "Progress": "#FFE08A",
+      "Border": "#9B5C00"
+    },
+    "Deploy": {
+      "Progress": "#A9EABF",
+      "Border": "#23784B"
+    },
+    "Play": {
+      "Progress": "#9BEADB",
+      "Border": "#00796B"
+    }
+  }
+}

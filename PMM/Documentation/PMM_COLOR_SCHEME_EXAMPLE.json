@@ -1,0 +1,25 @@
+{
+  "schema": "PMM_COLOR_SCHEME_V1",
+  "id": "midnight-violet",
+  "name": "Midnight Violet",
+  "base": "Night",
+  "palette": {
+    "AppBackground": "#0A0D14",
+    "HeaderBackground": "#121624",
+    "CardBackground": "#171B28",
+    "CardAltBackground": "#1D2232",
+    "SelectionBackground": "#443B68",
+    "SelectionText": "#FFFFFF",
+    "ButtonBackground": "#2A3042",
+    "ButtonHover": "#363E54",
+    "ButtonForeground": "#F0F3F9",
+    "ButtonBorder": "#4A5570"
+  },
+  "colorFlow": {
+    "Import":  { "Progress": "#D7C4FF", "Border": "#7C3AED" },
+    "Analyze": { "Progress": "#9CCBFF", "Border": "#2563EB" },
+    "Build":   { "Progress": "#FFD782", "Border": "#C26A05" },
+    "Deploy":  { "Progress": "#8EE8AE", "Border": "#2E9D50" },
+    "Play":    { "Progress": "#6FE7D3", "Border": "#0F8D7E" }
+  }
+}

@@ -1,33 +1,34 @@
 # Palworld Manager Merger (PMM)
 
-**Current release candidate: PMM 1.3.0 RC20.**
+**Current release candidate: PMM 1.3.0 RC27 — AIIO local-first.**
 
-Palworld Manager Merger is a local Palworld mod manager, compatibility analyzer/overlay builder and legacy-mod repair platform. It preserves normal source mods and creates a compatibility overlay only for shared assets that actually require reconciliation.
+Palworld Manager Merger is a local Palworld mod manager, compatibility analyzer/overlay builder and legacy-mod repair platform. It preserves source mods and creates only the compatibility overlay required by shared assets.
 
 ## Repository layout
 
-- `PMM/` — complete portable application. Release ZIPs are built from this folder only.
-- `Development/` — engineering source, tests, architecture and AI/developer handoffs.
-- `.github/` — GitHub workflows/community files.
-- `.gitignore` / `.gitattributes` — repository policy.
+- `PMM/` — complete portable application.
+- `Development/` — engineering source, tests, architecture and continuation handoffs.
+- `.github/` — contribution and project-policy files.
 - `LICENSE` — MIT project license.
+
+Runtime-created `PMM/Workspace/` is private local state and must never be committed or shipped.
 
 ## Start PMM
 
-Extract the release ZIP and run `PMM.exe`.
+Extract the portable package and run `PMM.exe`.
 
-The normal guided workflow is:
+The guided workflow is:
 
-`Detect (if needed) -> Import -> Fix Lab when required -> Analyze -> Build Merge -> Deploy -> Play optional`
+`Detect if needed -> Import -> Fix Lab when required -> Analyze -> Build only when required -> Deploy -> Play ready`
 
-PMM 1.3.0 includes Fix Lab for supported exact legacy cases, a portable current Game Reference, background processing, AUTO/ColorFlow guidance, backups/restores, Night/Light/custom themes and event sound profiles.
+RC27 retains every RC22–RC26 merge, Fix Lab, singleton, responsive-layout, progress, Gura-preflight and exact FasterMounts/RushRoar correction. Settings now exposes eleven signed release JSON schemes plus Night/Light as official choices, with user schemes in a separate collection matching the sound architecture. Confirmed 100% progress is immediate.
 
-## 1.3.0 engineering notes
+## AI & Help / AIIO
 
-The `1.3.0final` branch is the canonical 1.3.0 stabilization branch. The runnable `PMM/` tree is authoritative for the release candidate. RC20 is based directly on the user-tested RC19 and adds final header/detection/settings UX, terminal Ready-to-play guidance and conservative persistent caches to make repeat Analyze passes lighter.
+RC27 introduces a visible **AI & Help** workspace backed by persistent local AIIO sessions, diagnostics, Knowledge, save activity, a recoverable operation journal, deterministic build validation and a color-scheme editor with image-backed V2 packs.
 
-Future AIIO / **AI & Help** work should begin with `Development/AI/AIIO_1_3_0_HANDOFF.md` and reuse the existing `Modules/AIIO`, CKL, Game Reference and Fix Lab services rather than replacing them.
+The current AI transport is deliberately manual and local: PMM prepares bounded ZIPs and validates returned ZIPs as untrusted data. It does not log into a provider, upload automatically, execute returned code, apply a fix, build, deploy or publish without an explicit user action. Returned solutions remain staged until they satisfy an exact current case contract; accepting an eligible candidate forces Analyze and never triggers Build or Deploy.
 
-Runtime-created `PMM/Workspace/` is local state and must never be committed or shipped in a clean public package.
+Continue development from `Development/AI/AI_CONTINUE_HERE.md` and `Development/AI/AIIO_1_3_0_HANDOFF.md`. The runnable `PMM/` tree and packaged binaries are the release authority. Do not rebuild the older native-source snapshot over those binaries until parity is proven.
 
 Created by **laredson**.

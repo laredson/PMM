@@ -64,24 +64,70 @@ function Get-PakEntries([string]$Pak) {
   return @($out | Where-Object { $_ -and $_ -notmatch '^\s*$' })
 }
 
+function Get-PMMPakIndexCacheId([string]$Text) {
+  $sha = [Security.Cryptography.SHA256]::Create()
+  try {
+    $bytes = [Text.Encoding]::UTF8.GetBytes($Text)
+    return ([BitConverter]::ToString($sha.ComputeHash($bytes)).Replace('-','').ToLowerInvariant())
+  } finally {
+    $sha.Dispose()
+  }
+}
+
 function Get-PakEntriesCached([string]$Pak) {
   <#
-  Cache an index for the lifetime of the PMM process.  The key includes length
-  and LastWriteTimeUtc so replacing a PAK invalidates the entry automatically.
+  Cache only the entry-name list returned by `repak list`; cooked bytes are
+  never cached. The fingerprint includes canonical path, length and UTC write
+  time, so replacing or updating a PAK invalidates its index automatically.
 
-  This matters especially for Pal-Windows.pak: listing the large vanilla PAK
-  once is much faster than listing it again for every shared mod asset.
+  The in-process cache avoids duplicate work during one run. The persistent V1
+  cache avoids listing every unchanged source PAK and Pal-Windows.pak again
+  after PMM restarts, which is the largest safe reduction in Analyze startup
+  cost for an unchanged library.
   #>
   if (-not (Test-Path -LiteralPath $Pak -PathType Leaf)) {
     throw "PAK not found:`n$Pak"
   }
+
   $item = Get-Item -LiteralPath $Pak
-  $key = ('{0}|{1}|{2}' -f $item.FullName.ToLowerInvariant(),$item.Length,$item.LastWriteTimeUtc.Ticks)
-  if ($Script:PakEntryCache.ContainsKey($key)) {
-    return @($Script:PakEntryCache[$key])
+  $fingerprint = ('{0}|{1}|{2}' -f $item.FullName.ToLowerInvariant(),$item.Length,$item.LastWriteTimeUtc.Ticks)
+  if ($Script:PakEntryCache.ContainsKey($fingerprint)) {
+    return @($Script:PakEntryCache[$fingerprint])
   }
+
+  $diskRoot = Join-PMMPath 'Cache' 'PakIndexesV1'
+  if (-not (Test-Path -LiteralPath $diskRoot -PathType Container)) {
+    New-Item -ItemType Directory -Force -Path $diskRoot | Out-Null
+  }
+  $diskPath = Join-Path $diskRoot ((Get-PMMPakIndexCacheId $fingerprint) + '.json')
+  if (Test-Path -LiteralPath $diskPath -PathType Leaf) {
+    try {
+      $document = Get-Content -LiteralPath $diskPath -Raw -Encoding UTF8 | ConvertFrom-Json
+      if ($document -and [string]$document.Schema -ceq 'PMM_PAK_INDEX_V1' -and [string]$document.Fingerprint -ceq $fingerprint) {
+        $entries = @($document.Entries | ForEach-Object { [string]$_ })
+        if ($entries.Count -gt 0) {
+          $Script:PakEntryCache[$fingerprint] = $entries
+          return $entries
+        }
+      }
+    } catch {
+      Write-PMMLog ('Ignoring invalid persistent PAK index: ' + $diskPath)
+    }
+    Remove-Item -LiteralPath $diskPath -Force -ErrorAction SilentlyContinue
+  }
+
   $entries = @(Get-PakEntries $Pak)
-  $Script:PakEntryCache[$key] = $entries
+  $Script:PakEntryCache[$fingerprint] = $entries
+  try {
+    [pscustomobject]@{
+      Schema='PMM_PAK_INDEX_V1'
+      Fingerprint=$fingerprint
+      CreatedUtc=[DateTime]::UtcNow.ToString('o')
+      Entries=$entries
+    } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $diskPath -Encoding UTF8
+  } catch {
+    Write-PMMLog ('Could not persist PAK index cache; continuing with the in-process index. ' + $_.Exception.Message)
+  }
   return $entries
 }
 

@@ -1,5 +1,5 @@
 <#
-Palworld Manager Merger v1.2.1 - runtime-proven CKL production recipes
+Palworld Manager Merger v1.3.0 - runtime-proven CKL production recipes
 ================================================================
 
 Knowledge remains explanatory by default. This service is the narrow exception for
@@ -15,12 +15,15 @@ promoting a completed AI_HANDOFF/manual solution into production behavior:
 
 No cooked game/mod files are distributed in Knowledge. Recipes contain hashes and
 proof metadata only. A changed mod/game version falls back to normal adapters or
-Unsupported/AI_HANDOFF.
+Unsupported/AI_HANDOFF unless a separately declared runtime-proven semantic rule
+matches the exact current asset path, conflicting providers and canonical values.
+That rule still uses the normal current-family adapter and never reuses stale bytes.
 #>
 
 
 $Script:PMMCKLIndexCache=$null
 $Script:PMMProductionRecipeCache=$null
+$Script:PMMProductionRecipeCacheIdentity=''
 
 function Get-PMMCKLCaseIndexDocument {
   if($Script:PMMCKLIndexCache){return $Script:PMMCKLIndexCache}
@@ -115,10 +118,18 @@ function Get-PMMCKLContextForPlanItem($Item) {
 }
 
 function Get-PMMProductionRecipeDocument {
-  if($Script:PMMProductionRecipeCache){return $Script:PMMProductionRecipeCache}
   $path=Get-PMMCKLStablePath 'production-recipes.json'
   if(-not(Test-Path -LiteralPath $path -PathType Leaf)){return $null}
-  try{$Script:PMMProductionRecipeCache=(Get-Content -LiteralPath $path -Raw|ConvertFrom-Json);return $Script:PMMProductionRecipeCache}catch{
+  $identity=''
+  try{$identity=Get-Sha256 $path}catch{return $null}
+  if($Script:PMMProductionRecipeCache -and [string]$Script:PMMProductionRecipeCacheIdentity -cne '' -and [string]$Script:PMMProductionRecipeCacheIdentity -ceq $identity){return $Script:PMMProductionRecipeCache}
+  try{
+    $Script:PMMProductionRecipeCache=(Get-Content -LiteralPath $path -Raw|ConvertFrom-Json)
+    $Script:PMMProductionRecipeCacheIdentity=$identity
+    return $Script:PMMProductionRecipeCache
+  }catch{
+    $Script:PMMProductionRecipeCache=$null
+    $Script:PMMProductionRecipeCacheIdentity=''
     Write-PMMLog ('Production recipe library could not be read: '+$_.Exception.Message)
     return $null
   }
@@ -131,6 +142,77 @@ function Get-PMMProductionRecipeCount {
     $_ -and ($_.PSObject.Properties.Name -contains 'production') -and $_.production -and
     ($_.production.PSObject.Properties.Name -contains 'enabled') -and [bool]$_.production.enabled
   }).Count
+}
+
+function Get-PMMConflictCanonicalValue($ConflictValue) {
+  if(-not$ConflictValue){return ''}
+  if($ConflictValue.PSObject.Properties.Name -contains 'Canonical'){
+    return [string]$ConflictValue.Canonical
+  }
+  if($ConflictValue.PSObject.Properties.Name -contains 'Value'){
+    try{return ($ConflictValue.Value|ConvertTo-Json -Compress -Depth 20)}catch{}
+  }
+  return ''
+}
+
+function Get-PMMDataTableCompatibilityResolution($Group,$Conflict,[array]$ProviderRecords) {
+  <#
+  Exact cooked-family recipes remain hash-pinned. This narrower fallback is
+  different: PMMCore has already mapped the current DataTable and exposed one
+  exact scalar conflict. A stable rule may resolve only that path, provider set
+  and canonical value tuple. The current Vanilla/provider families are still
+  merged by DataTableScalarTransfer; no stale cooked output is reused.
+  #>
+  if(-not$Group -or -not$Conflict -or -not($Conflict.PSObject.Properties.Name -contains 'Providers') -or -not$Conflict.Providers){return $null}
+  $doc=Get-PMMProductionRecipeDocument
+  if(-not$doc){return $null}
+
+  $available=[System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+  foreach($record in @($ProviderRecords)){
+    if($record -and $record.Mod -and -not[string]::IsNullOrWhiteSpace([string]$record.Mod.Name)){[void]$available.Add([string]$record.Mod.Name)}
+  }
+  $actualConflictNames=@($Conflict.Providers.PSObject.Properties.Name|ForEach-Object{[string]$_}|Sort-Object)
+
+  foreach($recipe in @($doc.recipes)){
+    if(-not$recipe -or [string]$recipe.asset -ine [string]$Group.Asset){continue}
+    if(-not($recipe.PSObject.Properties.Name -contains 'production') -or -not$recipe.production -or -not[bool]$recipe.production.enabled){continue}
+    if(-not($recipe.PSObject.Properties.Name -contains 'semanticFallback') -or -not$recipe.semanticFallback -or -not[bool]$recipe.semanticFallback.enabled){continue}
+    if([string]$recipe.semanticFallback.class -cne 'datatable-proven-dominance'){continue}
+
+    foreach($rule in @($recipe.semanticFallback.conflicts)){
+      if(-not$rule -or [string]$rule.path -cne [string]$Conflict.Path){continue}
+      if([string]$rule.runtime -notmatch '(?i)^proven'){continue}
+      if(-not[bool]$rule.requireExactConflictProviders){continue}
+      $expected=@($rule.providers)
+      if($expected.Count -lt 2){continue}
+      $expectedNames=@($expected|ForEach-Object{[string]$_.name}|Sort-Object)
+      if(($expectedNames -join '|') -cne ($actualConflictNames -join '|')){continue}
+
+      $matches=$true
+      foreach($provider in $expected){
+        $name=[string]$provider.name
+        if([string]::IsNullOrWhiteSpace($name) -or -not$available.Contains($name)){$matches=$false;break}
+        $property=$Conflict.Providers.PSObject.Properties[$name]
+        if(-not$property){$matches=$false;break}
+        $actual=Get-PMMConflictCanonicalValue $property.Value
+        if($actual -cne [string]$provider.canonicalValue){$matches=$false;break}
+      }
+      if(-not$matches){continue}
+
+      $selected=[string]$rule.selectProvider
+      if([string]::IsNullOrWhiteSpace($selected) -or -not$available.Contains($selected) -or -not$Conflict.Providers.PSObject.Properties[$selected]){continue}
+      return [pscustomobject]@{
+        RuleId=([string]$recipe.id+'/'+[string]$rule.id)
+        RecipeId=[string]$recipe.id
+        Property=[string]$Conflict.Path
+        SelectedChoice=$selected
+        ExpectedProviders=@($expected|ForEach-Object{[pscustomobject]@{Name=[string]$_.name;CanonicalValue=[string]$_.canonicalValue}})
+        Reason=[string]$rule.semanticReason
+        RuntimeStatus=[string]$rule.runtime
+      }
+    }
+  }
+  return $null
 }
 
 function Test-PMMRecipeFamilyExact($Family,$ExpectedFamily,[ref]$FailureReason) {

@@ -1,0 +1,601 @@
+{
+  "schema": "PMMFL_GURA_V10_LOCKED_VARIANTS_V1",
+  "target": "Palworld 1.0.3.101283",
+  "base_runtime_validated_pak": "/mnt/data/gura_v10_full_pelvisfix/GawrGura_v10_PMMFL_FullReplacement_PelvisFix_P.pak",
+  "base_sha256": "a41ee585940eb441380c9f279ad0d1f552d706eb4b2786cd8e49086a5cdd5691",
+  "reason": "Freeze one validated Gura body style across every current outfit identity, so armor stats can change without changing the cosmetic Gura body.",
+  "variants": {
+    "Normal": {
+      "pak": "GawrGura_v10_FullReplacement_NormalLocked_P.pak",
+      "sha256": "221b48e908b22938b684420ccc914932bd0ba7acf59d7908929056fadee6885e",
+      "pak_bytes": 196706418,
+      "payload_bytes": 196674569,
+      "entries": 228,
+      "outfits_locked": 30,
+      "description": "Full Gura + Gura_1 pelvis/body composite, blue/normal appearance on every armor.",
+      "expected_sections": 7,
+      "expected_vertices": 67443,
+      "current_skeleton_all_outfits": true,
+      "watermark_render_section_absent": true,
+      "weapon_spear_and_R3_attachment_fix_preserved_from_validated_v10": true,
+      "routes": [
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "de3a13b5a04613bf05c5b26966be4ea9a61a8578d0c9b9172e2e7492adbcfedf",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001_v02.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "ee2d5f6bdee3e730accd19300eca2a7f4e704422dd0bbe1a7196a16671017fd2",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001_v03.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "f7442187ea0cb1f1b6ec28f27d03b02f55137ed1aaf25227f798e14a8a14f35c",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001_v04.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "28677ed923358d22dedc8b1565bdb87650ad99b3c0a7275e3994d4792b19f6e6",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Bronze001/SK_Player_Female_Outfit_Bronze001.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "7f0cd1580fddadebc1e7fe1f5ea14267ad3593467d9f3bf86a84ca07ee373e2f",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Bronze001/SK_Player_Female_Outfit_Bronze001_v02.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "fa0ca90bf5a714a1d7be8c30dfc52fb6d4b61a78e43437a54d444feacf6acb6d",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Bronze001/SK_Player_Female_Outfit_Bronze001_v03.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "d2f54607ba28d6033d7ddbbae48a9bb5098ff5a373acc1d934e3889fda44ba54",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Cloth001/SK_Player_Female_Outfit_Cloth001.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "d132d42d9e26500b1941321dcd6eaf0f6b64ebfcb0ea9a060fb3e9493ae78973",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Cloth001/SK_Player_Female_Outfit_Cloth001_v02.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "de0ea1c79849e7ad3f6579ddfc6a0fe4b9ab5b4b9e47b945a70a04be92430c65",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Cloth001/SK_Player_Female_Outfit_Cloth001_v03.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "890394af46c1fc3794176c642e14259094b25082aa504d4bc75b85a2aed9ea08",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Hunter001/SK_Player_Female_Outfit_Hunter001.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "d499009a8629c53bc69c1025148f592d75fa2599097e5527c714e6188838f0cb",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Hunter001/SK_Player_Female_Outfit_Hunter001_v02.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "a005ef0e4d7481e8efcfd582e5203c85d8194ee5eedfbb642a547468969170a6",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Hunter001/SK_Player_Female_Outfit_Hunter001_v03.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "d53cf5db8aa237f2cec40f82fa0bbf69301840dc4bcd766eaeea16474247bfe1",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Iron001/SK_Player_Female_Outfit_Iron001.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "010ed42207ce579e2ca77906084911e7eff1eecb793883e36063c77f5309a64b",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Iron001/SK_Player_Female_Outfit_Iron001_v02_2.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "160d05ef217964b45f3adc2410f6285ac6ac36879d3623d2c28210b870b8a085",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Iron001/SK_Player_Female_Outfit_Iron001_v03.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "4fc905a15faf5c036896840fcfd48613af0de900af823439b68230c7ed0a447b",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Kigurumi001/SK_Player_Female_Outfit_Kigurumi001.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "8d022074dfc6593b2865744098dd6f44c3488b4813c50ebe4c9f5c65f35b4d71",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_OldCloth001/SK_Player_Female_Outfit_OldCloth001.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "34e228829c7428ad1ea2d4a8a30ff3b170b7729e622ad2104597debb43c8e22b",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v01.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "3dd4d26818bb1adb93854690dd4d603d5b8a7ca0044ad5aab0ac6163aad4d722",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v02.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "de67583782fc7614be35a3437c6a3906c0abd4ffa194fed79377d6e4e894f51b",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v03.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "c2ca92bc9783aad144db0ecdb1101eb73301f0e6588a713b2d10e295ceaafb1a",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v04.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "269f93d24a05c1d93b92bd6ef033fd95534779a689ed9c12453e5ad8e33872fc",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v01.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "b6c9e2110f4ba6f59d14c968c8e409536215f20f88981b1e04df9dba1c5d05a6",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v02.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "b46dec3086cbcb9709acd35b2fa7124e3ba65adac715964c5b6406d67903dad5",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v03.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "f8f1c644d549c9e640e4074d40fe4747b30a18c1aa8ab31925a271cadc497aaa",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v04.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "6c0315eb23089fc2621a60e82df212fe2b4f5d05a4b43488aa09ed8d7da9b185",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Platinum001/SK_Player_Female_Outfit_Platinum001.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "a1e22af0fed74842add9852a022165c657da2fc3c127757466e351d4623a1587",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Platinum001/SK_Player_Female_Outfit_Platinum001_v02.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "e0f00ed7a8011d62e15c55709cfcb294ad0d8b36e7d9800857720ade15160ba7",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Platinum001/SK_Player_Female_Outfit_Platinum001_v03.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "5cc4fc54fd8a967da15d05b7629025782c627adc763304d8bb9872d1ac853da8",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Yakushima001/SK_Player_Female_Outfit_Yakushima001.uasset",
+          "source_style": "Normal",
+          "uasset_sha256": "ac3e34d7287f9b1255c63eddc037381a42f2cb2e4d6969dea2294bdcf6866722",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        }
+      ]
+    },
+    "Red": {
+      "pak": "GawrGura_v10_FullReplacement_RedLocked_P.pak",
+      "sha256": "03f0098d9eb06303fe2c9607fd1bac43ee1e5d43c5720f2b2e38cc63fe5ed2e5",
+      "pak_bytes": 197401876,
+      "payload_bytes": 197368992,
+      "entries": 238,
+      "outfits_locked": 30,
+      "description": "Full Gura + Gura_1 pelvis/body composite with static Evil/red materials on every armor.",
+      "expected_sections": 7,
+      "expected_vertices": 67443,
+      "current_skeleton_all_outfits": true,
+      "watermark_render_section_absent": true,
+      "weapon_spear_and_R3_attachment_fix_preserved_from_validated_v10": true,
+      "routes": [
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "99cd24f03bb2e5783706f530d2bffd96f59f8fa6b0a0e35328e8e9c963f9c00e",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001_v02.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "21ab9a791f8d600684b7c08328400ab63d0766dac2427c241b0505c2427846c0",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001_v03.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "51f935bd5404bc63593f369a5389a331bbd3b796491c66a626e342eb90d55837",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001_v04.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "5ad23ba3bbd03068149985ed238ae819e8e10bb7ddb9e328d995da79b1d61546",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Bronze001/SK_Player_Female_Outfit_Bronze001.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "513012bddbe07326fdadff7e44df29543f671f74e5da27f6d7f198fc471b2cd1",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Bronze001/SK_Player_Female_Outfit_Bronze001_v02.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "b50f6e0c2ce80d8d52c9b68d859a2d98790df1804959ab6e92132cf3bb1a2a8d",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Bronze001/SK_Player_Female_Outfit_Bronze001_v03.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "a152c80453dc6a6a2dab29db3832d3508b34f8764579a3cbf5fe33079bd8e93a",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Cloth001/SK_Player_Female_Outfit_Cloth001.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "291efdedef2914666c1bef943bbd86fccdcb24fa353ad9fdfc1a9325c91b65f2",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Cloth001/SK_Player_Female_Outfit_Cloth001_v02.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "300700ab405ba0e4844382b835542685684e65d8c4ec637707b2a0d7c80fd1c8",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Cloth001/SK_Player_Female_Outfit_Cloth001_v03.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "cf4c24fcbc93989017f23a4b3bab9b9b2736008c650bef419ea1b98047ad6c86",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Hunter001/SK_Player_Female_Outfit_Hunter001.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "2ca12f961aa6d5a5acdca0c0dd2ac1475f3078e2388469655fbdcc007076559c",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Hunter001/SK_Player_Female_Outfit_Hunter001_v02.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "3cc2b6faa79efab9e8a902dc774844ce4d0e119594823caf80d1a15dbefafddc",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Hunter001/SK_Player_Female_Outfit_Hunter001_v03.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "1d1db4e94d223396a4a5f23fc1c5ba242798236f3c5e52658ac7a5dca6c98262",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Iron001/SK_Player_Female_Outfit_Iron001.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "1d40268f1270ede41d8e83cdd1e055842796f968e257a4cdd4428a1934174a02",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Iron001/SK_Player_Female_Outfit_Iron001_v02_2.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "7116fa791164d670b14fe894f13099d7bec5b3202fa87131a166767e75423c94",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Iron001/SK_Player_Female_Outfit_Iron001_v03.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "54f668b2bcc72a7a299c5745c9e9f0dbc25b7d8006f4b9231eea31a9d77a6cc2",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Kigurumi001/SK_Player_Female_Outfit_Kigurumi001.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "e51b8a6de3bdf36daa08953482bdcb64494ee97adcde217f226e4f71b2ed5784",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_OldCloth001/SK_Player_Female_Outfit_OldCloth001.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "ae51fa069d1e6b119d967578859e6e2d2d13d5870c01815f5c7914a1efa4606b",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v01.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "1f4df6cedaf58a88224582a17855c591790009f66ddb01357750228e9328c6f7",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v02.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "8b91ce4b09489b2ddddc200bcda4eeebb56139b98b59c4901ebc466747c51747",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v03.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "ca2d5f1e8b480cf0043d77995a3a2b52ef790cb25633bac3c3cc390232701e19",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v04.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "3b767b3bfb7ad10ff8391734287b1c56de46b8eb65b743b0373c8776c828a15f",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v01.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "e93d553e2e92e2692b8a67e2425dd72685e250763dc7cae25ea40fd82a5e104e",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v02.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "6a11c36200391818add2ee54e8c1d959bb7bf5a216a4946b459116b0f5fd22ed",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v03.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "acd60b4b93778c890142e7c399fd184960fc1c55fa2dc47035302099040ad102",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v04.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "e45887be27f8bf29d8c8e8857bb0641f04d7b79e797e93b70802070e2689db2b",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Platinum001/SK_Player_Female_Outfit_Platinum001.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "981697d23d3bbaa486c2720ec59420ab36baebe0664854757e3915b535046c03",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Platinum001/SK_Player_Female_Outfit_Platinum001_v02.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "722081c03e30821a14d6ec6f32ef633984a20ec70089953c94832ad1fc969e33",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Platinum001/SK_Player_Female_Outfit_Platinum001_v03.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "d467dda1e2478b48bb27a763f07ffd2aed7e286cb0be81d6b6e373daad8f01e1",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Yakushima001/SK_Player_Female_Outfit_Yakushima001.uasset",
+          "source_style": "Red",
+          "uasset_sha256": "44d7f4fb662f750b798ad5f3b84677c528f226ec2c092c3c1e03f69bf9fffabb",
+          "uexp_sha256": "1eed666a578d818c933acf81ccdeda78ab409a29aa86a37fbf8de5ef8f84b2f9"
+        }
+      ]
+    },
+    "Hooded": {
+      "pak": "GawrGura_v10_FullReplacement_HoodedLocked_P.pak",
+      "sha256": "1319fb5cbb26d147a86d54f4f419305811533291920cbe9ae450ef5a69acd07d",
+      "pak_bytes": 207751548,
+      "payload_bytes": 207719699,
+      "entries": 228,
+      "outfits_locked": 30,
+      "description": "Full Gura + Gura_1 pelvis/body + Gura_Hood composite on every armor.",
+      "expected_sections": 8,
+      "expected_vertices": 73326,
+      "current_skeleton_all_outfits": true,
+      "watermark_render_section_absent": true,
+      "weapon_spear_and_R3_attachment_fix_preserved_from_validated_v10": true,
+      "routes": [
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "fe017f68d74f143ddf4a7467d6ba0b598dd76aa74d8cc46a20745a584e98e155",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001_v02.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "2c79539919184c0942b1441dcd6b7bcc32c704d49f1841e4b47c8a9c348b7135",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001_v03.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "42fed488810de78102d050c00e8c24b68c4d06f5d3efa4b6a86350c960a134da",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Ancient001/SK_Player_Female_Outfit_Ancient001_v04.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "80d3a02a2782ad2369caec7b35a4d2e3be3eefdcb052f74afbe909f79893cad1",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Bronze001/SK_Player_Female_Outfit_Bronze001.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "762d5005d5a1949c011062598b72a3e2a0234df16d2879228391851f107f6303",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Bronze001/SK_Player_Female_Outfit_Bronze001_v02.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "55dbe3391ab858c154d0ebe07d756d497fad75bcd3a38cd838e2297367c35a9a",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Bronze001/SK_Player_Female_Outfit_Bronze001_v03.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "2d9af8035a3c7716c9223c9c7b6024546ca2789076690b6187d07da977e191b6",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Cloth001/SK_Player_Female_Outfit_Cloth001.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "19da8a1404eee2779acfe002806d0c76bf25b38b2f2ae1276780f564c947d189",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Cloth001/SK_Player_Female_Outfit_Cloth001_v02.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "09171c96c10f9e2b20287b22f0b40a8dc631c071551dff9ce282ae87984158e2",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Cloth001/SK_Player_Female_Outfit_Cloth001_v03.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "fb8c8bdb14a6027c8ad3912a438eb7cbcf0e7d2fefbca67a75468f2355092060",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Hunter001/SK_Player_Female_Outfit_Hunter001.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "e6766bf2234c801b63030d875627489af04500031d37f0b0b3ab9ef531d9e214",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Hunter001/SK_Player_Female_Outfit_Hunter001_v02.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "3462dc1908594e28790785254f53624e51e334e4669892b0b8d476901a4f9332",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Hunter001/SK_Player_Female_Outfit_Hunter001_v03.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "06cf23efbeb29eb27dbb0891623ce0600e329c9983b6f5116cbebb20f580fb05",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Iron001/SK_Player_Female_Outfit_Iron001.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "42cfde0aee3b27a57ddac63bace7d6ca35d924e42fd4338961bc86ad460ce25c",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Iron001/SK_Player_Female_Outfit_Iron001_v02_2.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "844339d3bbd007a38e2cdf3e4e8fa359631f27cb96ca8047aeaf7ac0a1b59d85",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Iron001/SK_Player_Female_Outfit_Iron001_v03.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "45b4f6a3ea381794e48262634897b0e819d5c368e3845faa35a0f01286493621",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Kigurumi001/SK_Player_Female_Outfit_Kigurumi001.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "bc6e34071cc0cdd137bc122f60bea2e085de98f6283c8637fc966c95f3e159c8",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_OldCloth001/SK_Player_Female_Outfit_OldCloth001.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "b97f4d14467b2f0be1fc53628644783280de9f87cc5ab59a3c65137fd895f416",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v01.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "79dd27504b748108c4cde0757cff43e879913f00e7cd08f5c5e202ba86087eeb",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v02.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "5a95f24c0791e6eda8799b3f65ae093d6b3980f8e3a9c3d7e6c9b6ec9bda64bf",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v03.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "d9cd0d7c214506627adc39589aba4a55eed42832f0d09b65e9222f4bddfe7cab",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic001/SK_Player_Female_Outfit_Plastic001_v04.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "c4776fa1d5d891c90c2a79f2545a76ef5bdd8a233cedda229a157f3edc59847c",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v01.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "9576293db15072e9173ef9285a7b981425dda6827006f0592b633b7ecb681749",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v02.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "d41c494257fbc9452e36fa0ad8f599bbba63c68ef2ab8289f104b6e7750754cf",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v03.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "6d32735aabadf502e129297199628aa11b66c1ad1825fff7cb2f1461d4349794",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Plastic002/SK_Player_Female_Outfit_Plastic002_v04.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "1bd2a1e016d0cc80b5b06220e6ca60a11d7f1b499462502b514ef7a61441d2a5",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Platinum001/SK_Player_Female_Outfit_Platinum001.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "6ec518de001b5c777b121cb1137164c0e7bd253b4280d35360a9221472a84ff4",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Platinum001/SK_Player_Female_Outfit_Platinum001_v02.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "afca5825c50a0ce59b518bd5783114d89e17a1e48a7f9ed50644d55ab7b6b32b",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Platinum001/SK_Player_Female_Outfit_Platinum001_v03.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "2642ac1302b87159e8fbd0e2bd826d876ac8c06c9b395a8c25a1e5a1f4985d55",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        },
+        {
+          "target": "Pal/Content/Pal/Model/Character/Player/Outfit/SK_Player_Female_Outfit_Yakushima001/SK_Player_Female_Outfit_Yakushima001.uasset",
+          "source_style": "Hooded",
+          "uasset_sha256": "80c416996277d552fea534faed0ce53b9664150f088f7dd7880ec1b06ce1337b",
+          "uexp_sha256": "f7b82a1cf42b9bf0a720f18fcb1ad07fb436ea4aa6b2a3017f9420032ade7665"
+        }
+      ]
+    }
+  },
+  "size_analysis": {
+    "note": "The current PMMFL PAK writer stores entries uncompressed. The large installed size is dominated by 30 current outfit package identities, each containing a full baked composite mesh, plus the original Gura textures. This is intentional static compatibility duplication, not 200 MB of unrelated files.",
+    "pak_compression_future": "Safe PAK-level compression can reduce disk/download size substantially without changing the reconstructed assets, but should be separately runtime-validated before becoming the default writer."
+  }
+}

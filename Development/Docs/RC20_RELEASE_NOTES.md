@@ -1,5 +1,7 @@
 # Palworld Manager Merger 1.3.0 RC20
 
+> Historical reference only. RC20 was not accepted as the final runtime baseline; use `RC24_RELEASE_NOTES.md` and the RC24 `PMM/` tree.
+
 RC20 is a release-candidate polish pass built directly from the user-tested RC19 baseline.
 
 ## User experience
