@@ -1,4 +1,4 @@
-PMM v1.2.1 — QUICK START
+PMM v1.3.0 — QUICK START
 
 Normal use:
   Double-click PMM.exe
@@ -7,19 +7,64 @@ The portable application is intentionally clean:
   Engine/        native/runtime executables and managed dependencies
   Modules/       editable PMM PowerShell modules
   Resources/     UI, mappings and release metadata
-  CKL/           Community Knowledge Library (stable, experimental and catalog)
+  CKL/           Community Knowledge Library and compact Fix Lab recipes
   Documentation/ user documentation
-  Workspace/     created automatically; all mods, builds, saves, logs, reviews and handoffs live here
+  Workspace/     created automatically; all user/generated state lives here
 
 No CMD/PowerShell console should flash during normal startup.
 
-Workflow guidance:
-  PMM highlights only the next useful stage: Import -> Analyze -> Build -> Deploy.
-  Buttons return to the normal neutral style as soon as that step is already current.
+WINDOW SIZE AND DPI
+-------------------
+Fresh size is 1460x900 DIPs and the normal minimum is 900x600. PMM clamps the
+saved/default window to the current Windows work area, so a 1920x1080 screen is
+supported. At high scaling, the header actions reflow and the two main work
+columns relax instead of leaving only the logo visible. On a wide window the
+larger logo/title and the complete action area occupy equal header halves.
+
+MAIN HEADER
+-----------
+The header status is also the Detect button. PMM searches automatically at startup. If unresolved, the button is enabled and a click searches again before offering one dialog to choose either a Steam folder or a Palworld folder. Once validated, it remains visible and disabled. Manual paths and diagnostics remain available in Settings.
+
+Open game folder opens the Palworld root. Open mods folder opens or creates Pal\Content\Paks\~mods. Start Palworld launches the detected game.
+
+GUIDED WORKFLOW
+---------------
+PMM highlights only the next useful action:
+  Import -> Fix Lab when required -> Analyze -> [Build only when needed] -> Deploy -> Play ready
+
+After a current deployment, Start Palworld is illuminated and the ready-to-play hint is shown. Run Palworld after Deploy controls only automatic launch.
+
+Repeat Analyze runs use conservative persistent indexes and decision-free automatic-result caches. Force Analyze bypasses plan/group reuse. Unsupported, package-choice, Knowledge-recipe, experimental/manual and decision-bearing results are never cached.
+
+The five complete Gawr Gura Fix Lab outputs are mutually exclusive. If two are
+active, Analyze stops before expensive asset extraction and asks which output
+to keep. Choose the intended package variant in Resolution & Review, then run
+Analyze again. The unselected output stays in the local library but is excluded
+from analysis and the next deployment.
+
+Enabling or disabling a unique/non-conflicting source mod still requires a quick Analyze topology check. If the effective conflict participants, hashes, adapters, decisions, mappings, Vanilla identity and relevant priority winners are unchanged, PMM reuses the saved compatibility patch and skips Build. Deploy then only synchronizes the changed source PAKs.
+
+Fix Lab recognizes exact supported legacy sources, requests Current Game Reference families when needed, lets the user choose a repair variant, builds the PAK locally in a background worker, validates it, and then offers Apply Fix. The public package contains compact recipes, not repaired third-party PAKs.
+
+For Gawr Gura Case 001, either exact v5 Normal or exact v5 FullReplacement can generate all five documented variants. Runtime-proven and experimental outputs are labeled separately.
+
+During long operations the UI remains available for navigation, resizing, progress review and cancellation. Determinate bars animate each newly proven range one percentage point at a time over roughly three seconds; they may lag the worker but never display progress the worker has not reported. A confirmed 100% jumps immediately to completion before the next task. Workspace-mutating jobs share one processing slot.
+
+AI & HELP / AIIO
+----------------
+AI & Help keeps local diagnostic cases, persistent AIIO sessions, Knowledge,
+operation recovery, exact-build validation and the color-scheme editor. Prepare
+for AI creates a bounded ZIP that you send manually; PMM has no provider login
+and uploads nothing. Imported responses are untrusted data. They stay staged,
+cannot run code and never Apply Fix, Build or Deploy automatically.
+
+Settings lists 11 release JSON themes plus Night/Light as official schemes.
+Schemes added by the user stay in a separate bordered Workspace\Themes list,
+matching the built-in/custom ownership model used by sound events.
 
 Advanced runtime commands:
   Engine\PMMRuntime.exe self-test
   Engine\PMMRuntime.exe ui-native
   PMM.exe runtime-self-test
 
-CKL is external data, not compiled into PMM. Stable knowledge can therefore be updated independently.
+CKL is external data, not compiled into PMM. Stable knowledge can therefore be inspected and updated independently.

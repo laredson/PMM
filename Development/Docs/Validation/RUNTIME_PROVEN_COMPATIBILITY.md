@@ -83,8 +83,12 @@ Providers:
 
 The shared `DT_PalMonsterParameter_Common` family was Unsupported in v1.0 because the old DataTable semantic map rejected duplicate row ID `RAID_NightLady_Dark`. PMM generated AI_HANDOFF case `73bb3d0635170dad4cb3f7a8`. The returned manual solution reused the exact FasterMounts cooked family for that asset; PMM validated/imported it, and the user confirmed the resulting complete merged setup works in Palworld.
 
-The manual/AI solution is therefore runtime-proven for the pinned hashes. v1.1 promotes those exact hashes to a production recipe. The new automatic recipe route still requires its own final integration test before publication.
+The manual/AI solution is therefore runtime-proven for the pinned hashes. v1.1 promoted those exact hashes to a production recipe.
+
+RC26 also records the narrow semantic reason already established by that evidence. RushRoar changes `Rows[Boar].WorkSuitability_MonsterFarm` from 0 to 1, enabling ranch work. FasterMounts sets that same field to 10 as part of the full suitability block, so its value preserves RushRoar's enablement requirement. RushRoar's separate `BP_Boar` and spawn-action assets remain deployed as normal source content.
+
+The RC26 semantic fallback is not a generic numeric policy. It is eligible only after the current DataTable adapter reports the exact asset/path, the exact two competing providers and canonical values 10/1. It selects FasterMounts only for that field and rebuilds from the current cooked families. Any changed path, provider set or value tuple remains a normal decision. Windows/in-game acceptance of the RC26 implementation is still required before publication.
 
 ## Why exact versions matter
 
-PMM knowledge stores exact hashes where available. If a mod or Palworld update changes a provider, old runtime evidence becomes historical evidence. The new bytes must still pass current Analyze/proof rules.
+PMM knowledge stores exact hashes where available. If a mod or Palworld update changes a provider, old cooked-output evidence becomes historical evidence. New bytes must still pass current Analyze/proof rules. A separately declared semantic rule may survive a byte/hash change only when its exact current path/provider/value contract is independently reproduced by the normal adapter; it never authorizes unrelated changes.

@@ -1,0 +1,124 @@
+{
+  "schema": "PMMFL_GURA_HAIR2_V13_MATERIAL_SLOT_FIX",
+  "target": "Palworld 1.0.3.101283",
+  "status": "runtime-validated",
+  "architecture": {
+    "base": "RC10 working Hair2 animation architecture restored; Gura is NOT merged with Gura_1.",
+    "pelvis_and_leg_fix": "Gura_1 stays a separate Cloth mesh as the original FunctionLibrary expects, preserving its pelvis/upper-thigh geometry. Its Body render section is moved from material index 0 to index 4 by duplicating the valid Body material record into 5 slots. This isolates it from inherited OverrideMaterials[0] on the vanilla component, the strongest explanation for hair/body-type colors and masked pelvis geometry.",
+    "hood_fix": "Same material-slot isolation applied to Gura_Hood.",
+    "watermark": "Gura flat Tail-slot author notice render section remains omitted exactly as in runtime-proven RC9/v10.",
+    "skeleton": "current SK_PalHuman_Skeleton routing retained; no legacy Gura_Skeleton.",
+    "scope": "Hair002 implementation only; non-Hair2 remains vanilla."
+  },
+  "gura1_slotfix": {
+    "old_slots": [
+      "Body"
+    ],
+    "new_slots": [
+      "Body",
+      "Body",
+      "Body",
+      "Body",
+      "Body"
+    ],
+    "section_material_before": 0,
+    "section_material_after": 4,
+    "geometry_unchanged": true,
+    "vertices": 15267,
+    "triangles": 24699
+  },
+  "hood_slotfix": {
+    "old_slots": [
+      "Body"
+    ],
+    "new_slots": [
+      "Body",
+      "Body",
+      "Body",
+      "Body",
+      "Body"
+    ],
+    "section_material_before": 0,
+    "section_material_after": 4,
+    "geometry_unchanged": true,
+    "vertices": 5883,
+    "triangles": 10787
+  },
+  "gura_current": {
+    "old_skeleton_package": "/Game/Starfelll/GawrGura/Gura_Skeleton",
+    "new_skeleton_package": "/Game/Pal/Model/Character/Skeleton/Human/SK_PalHuman_Skeleton",
+    "old_skeleton_object": "Gura_Skeleton",
+    "new_skeleton_object": "SK_PalHuman_Skeleton",
+    "header_delta": 99,
+    "postprocess_patch": {
+      "stale_index": -2,
+      "safe_index": -4,
+      "preload_offset": 4447
+    },
+    "uexp_sha256": "66b77a36e55639163733b5420b116101f1aef6ca51855e3577cb072eba3428a0"
+  },
+  "watermark": {
+    "label": "GURA_CURRENT_NO_WATERMARK",
+    "base_sections": 7,
+    "rendered_sections": 6,
+    "watermark_section_removed": true,
+    "watermark_slot": "Tail",
+    "watermark_triangles": 458,
+    "watermark_vertices": 503,
+    "base_vertices": 52176,
+    "total_vertices": 52176,
+    "total_indices": 253794,
+    "index_width": 16,
+    "active_bones": 131,
+    "overlay": null
+  },
+  "hood_current": {
+    "old_skeleton_package": "/Game/Starfelll/GawrGura/Gura_Skeleton",
+    "new_skeleton_package": "/Game/Pal/Model/Character/Skeleton/Human/SK_PalHuman_Skeleton",
+    "old_skeleton_object": "Gura_Skeleton",
+    "new_skeleton_object": "SK_PalHuman_Skeleton",
+    "header_delta": 99,
+    "postprocess_patch": {
+      "stale_index": -2,
+      "safe_index": -4,
+      "preload_offset": 3957
+    },
+    "uexp_sha256": "d2343c620ed9da8674a8b94d80d53718538b6c9e6cec4ced8a743e9c34173b44"
+  },
+  "pak": {
+    "version": 11,
+    "mount_point": "../../../",
+    "entry_count": 58,
+    "index_offset": 75001584,
+    "index_size": 810,
+    "phi_size": 704,
+    "fdi_size": 2126,
+    "size": 75005445,
+    "sha256": "adb05c936225082d199eda0a97b894ca10a7b06ce1bc92b1889ff3cd55a1d0f5"
+  },
+  "runtime_checks": [
+    "Hair2: normal animation works",
+    "Hair2: pelvis/upper thighs connect",
+    "Hair2: panties present",
+    "Hair2 + summer: variant change works",
+    "Hair2 + winter: variant change works",
+    "non-Hair2: fully vanilla",
+    "weapons stay in hands"
+  ],
+  "variant_name": "Panties Version",
+  "user_confirmed": "Build works in current game build; pelvis present; panties present; Hair2 works.",
+  "usage": {
+    "mode": "Hair2-only",
+    "requires": "Select Hair 2",
+    "base_behavior": "Hair2 activates the Gura normal version",
+    "armor_behavior": {
+      "summer": "changes appearance variant as intended",
+      "winter": "changes appearance variant as intended",
+      "non_hair2": "vanilla behavior / appearance"
+    },
+    "notes": [
+      "Includes pelvis geometry",
+      "Includes panties geometry"
+    ]
+  }
+}

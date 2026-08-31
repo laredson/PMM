@@ -1,0 +1,130 @@
+{
+  "schema": "PMM_THEME_RELEASE_HANDOFF_V1",
+  "project": "Palworld Manager Merger",
+  "creator": "laredson",
+  "baseline": "1.3.0 RC27",
+  "decisionDate": "2026-08-30",
+  "defaultThemeId": "pmm-crystal",
+  "officialThemeCount": 11,
+  "productRequirements": {
+    "preserveExistingUserTheme": true,
+    "restoreDefaultsThemeId": "pmm-crystal",
+    "themeImportInputs": [
+      "single-json",
+      "multi-select-json",
+      "zip-pack"
+    ],
+    "editorLocation": "AI & Help / IA y ayuda > Color scheme editor",
+    "duplicateEditorInSettings": false,
+    "everyEditableBrushHasColorSelector": true,
+    "everyEditableBrushHasUploadImage": true,
+    "imageColorFallbackRequired": true,
+    "manualOfflineAIHandoffFirst": true,
+    "futureAIIOUsesSameValidatedContracts": true
+  },
+  "documents": [
+    {
+      "path": "Documentation/PMM_THEME_RELEASE_AIIO_HANDOFF_2026-08-30.md",
+      "sha256": "63672f8ab1da0ac2977d8ecca078ffaf04883067b7b4319afd105b6bfcd54356"
+    },
+    {
+      "path": "Documentation/PMM_COLOR_SCHEME_CREATION_GUIDE.md",
+      "sha256": "3e7e5e583886c5f7a518f0fcf08cb04b7ec4c297e0fe85eca306019f703349c8"
+    },
+    {
+      "path": "Documentation/RC27_AIIO_RELEASE_CANDIDATE.md",
+      "sha256": "88f6858df4b6029db25a7312b11c7c253fd7dea0083a04a157b1ede2d6f2e33f"
+    }
+  ],
+  "themes": [
+    {
+      "id": "pmm-crystal",
+      "name": "PMM Crystal",
+      "base": "Night",
+      "default": true,
+      "path": "Resources/Themes/PMM_COLOR_SCHEME_PMM_CRYSTAL.json",
+      "sha256": "4e93c2a892a6c99922d9f3ac6c98f0fbafec49757cfd6f9c2b80584977f30618"
+    },
+    {
+      "id": "olive-grove",
+      "name": "Olive Grove",
+      "base": "Light",
+      "default": false,
+      "path": "Resources/Themes/PMM_COLOR_SCHEME_OLIVE_GROVE.json",
+      "sha256": "f10ca565e9669cbdf6dc06e35be7be59f32fa5e3d0f82444e2c1b2fd84731396"
+    },
+    {
+      "id": "mushroom-kingdom",
+      "name": "Mushroom Kingdom",
+      "base": "Light",
+      "default": false,
+      "path": "Resources/Themes/PMM_COLOR_SCHEME_MUSHROOM_KINGDOM.json",
+      "sha256": "f6f832d8535fb1a0da98162fd4d99d0fc82b379260e8dd59ac66c74a986471da"
+    },
+    {
+      "id": "web-slinger",
+      "name": "Web Slinger",
+      "base": "Night",
+      "default": false,
+      "path": "Resources/Themes/PMM_COLOR_SCHEME_WEB_SLINGER.json",
+      "sha256": "ac83cbced40258b1c1e57eaa6b91e83a2654b30e0d139bc31eb3cef6ec6376b6"
+    },
+    {
+      "id": "minecraft-overworld",
+      "name": "Minecraft Overworld",
+      "base": "Light",
+      "default": false,
+      "path": "Resources/Themes/PMM_COLOR_SCHEME_MINECRAFT_OVERWORLD.json",
+      "sha256": "eeab838b09157ea006eb609c52ab8b1b9e9402177696d0bd50df43da728ae3f6"
+    },
+    {
+      "id": "neon-synthwave",
+      "name": "Neon Synthwave",
+      "base": "Night",
+      "default": false,
+      "path": "Resources/Themes/PMM_COLOR_SCHEME_NEON_SYNTHWAVE.json",
+      "sha256": "974340d37cdbb4e88d624a392602fb545d57a597f8df20b8bec3807c0e8424ce"
+    },
+    {
+      "id": "coral-reef",
+      "name": "Coral Reef",
+      "base": "Light",
+      "default": false,
+      "path": "Resources/Themes/PMM_COLOR_SCHEME_CORAL_REEF.json",
+      "sha256": "1a806ed56147e36f574acff01004fbc294165b2ec3be62c8e1d950d2407bac17"
+    },
+    {
+      "id": "sakura-matcha",
+      "name": "Sakura Matcha",
+      "base": "Light",
+      "default": false,
+      "path": "Resources/Themes/PMM_COLOR_SCHEME_SAKURA_MATCHA.json",
+      "sha256": "f2c748c374269d836e42fe385482c021614576031ca9dc787b8dc6846e982761"
+    },
+    {
+      "id": "nocturne-castle",
+      "name": "Nocturne Castle",
+      "base": "Night",
+      "default": false,
+      "path": "Resources/Themes/PMM_COLOR_SCHEME_NOCTURNE_CASTLE.json",
+      "sha256": "0faca117ddfe33dd367ba65cc1b2f2e7859e889c13e6687e0c7e6c6c5ddbbed4"
+    },
+    {
+      "id": "desert-sunset",
+      "name": "Desert Sunset",
+      "base": "Light",
+      "default": false,
+      "path": "Resources/Themes/PMM_COLOR_SCHEME_DESERT_SUNSET.json",
+      "sha256": "de7d48e7f01d588cd7165ae5e8442395b9fddd8371d25df8ff9cd8b140909c2f"
+    },
+    {
+      "id": "aurora-confetti",
+      "name": "Aurora Confetti",
+      "base": "Night",
+      "default": false,
+      "path": "Resources/Themes/PMM_COLOR_SCHEME_AURORA_CONFETTI.json",
+      "sha256": "ae6f79f0293de9c76ed660a98ed7511f2f54baa005aa913e1494cd6468f86325"
+    }
+  ],
+  "excludedExperiments": []
+}

@@ -1,9 +1,9 @@
-<#
-Palworld Manager Merger v1.2.1 merge engine
+﻿<#
+Palworld Manager Merger v1.3.0 merge engine
 ====================================
 
 The writer used by preview 14-16 has been removed from the build path.
-Palworld Manager Merger v1.2.1 preserves the proven conservative composition adapters and adds exact runtime-proven Knowledge recipes as a strict hash-pinned fallback:
+Palworld Manager Merger v1.3.0 preserves the proven conservative composition adapters and adds exact runtime-proven Knowledge recipes as a strict hash-pinned fallback:
 
   1. BinaryRangeMergeAdapter for N providers on the current cooked layout.
      Independent byte deltas are combined; only overlapping different values
@@ -26,7 +26,7 @@ A shared Unreal asset is never silently degraded to a whole-asset winner when an
 function Get-PMMCorePath { return (Join-PMMPath 'Engine' 'PMMCore\pmmcore.dll') }
 function Get-PMMExpectedCoreVersion { return '0.9.0' }
 function Get-PMMEngineId { return 'PMMCore-v0.9.0' }
-function Get-PMMPlanSchemaVersion { return 15 }
+function Get-PMMPlanSchemaVersion { return 18 }
 function Get-PMMAssetReaderPath { return (Join-PMMPath 'Engine' 'AssetReader\PMM.AssetReader.dll') }
 function Get-PMMMergePlanPath { return (Join-PMMPath 'State' 'merge-plan.json') }
 function Get-PMMLastScanPath { return (Join-PMMPath 'State' 'last-scan.json') }
@@ -140,10 +140,18 @@ function Get-PMMPackageChoiceAnalyses([array]$Mods,$PreviousMap) {
     if($members.Count -lt 2){continue}
     $present=@($Mods|Where-Object{[string]$_.Name -in $members}|Sort-Object Priority,Name)
 
-    # Package rules are deliberately conservative.  This first rule only
-    # activates when every declared alternative/component is simultaneously
-    # active, which is an installation state the package author says not to use.
-    if([string]$rule.trigger -eq 'allMembersActive' -and $present.Count -ne $members.Count){continue}
+    # Package rules are deliberately conservative and use an explicit trigger.
+    # allMembersActive models component packs; anyTwoActive models mutually
+    # exclusive complete variants such as Fix Lab cosmetic outputs. Recognizing
+    # those variants before asset enumeration avoids spending many minutes
+    # attempting structural merges that can never preserve both alternatives.
+    $triggerAccepted=$false
+    switch([string]$rule.trigger){
+      'allMembersActive' {$triggerAccepted=($present.Count -eq $members.Count)}
+      'anyTwoActive' {$triggerAccepted=($present.Count -ge 2)}
+      default {Write-PMMLog ('Ignored package rule with unsupported trigger: '+[string]$rule.id)}
+    }
+    if(-not$triggerAccepted){continue}
     if($present.Count -lt 2){continue}
 
     $packageChoices=[System.Collections.Generic.List[object]]::new()
@@ -364,7 +372,7 @@ function Invoke-PMMBuildProgress([int]$Current,[int]$Total,[string]$Message,[swi
     try { Set-PMMBuildProgress -Current $Current -Total $Total -Message $Message -Indeterminate:$Indeterminate } catch {}
   }
 }
-function Get-PMMPreviousDecisionMap {
+function Get-PMMPreviousDecisionMap([array]$CurrentMods=@()) {
   $map = @{}
   $previous = Read-PMMMergePlan
   if ($previous) {
@@ -372,6 +380,35 @@ function Get-PMMPreviousDecisionMap {
       if ($row.DecisionId) { $map[[string]$row.DecisionId] = $row }
     }
   }
+  # Enable/disable intentionally invalidates the old Analyze plan, but it must
+  # not erase the user's proven conflict/package choices. Seed any missing
+  # decision IDs from the explicitly selected saved patch (or the deployed
+  # patch as fallback). Re-analysis still recomputes every asset and accepts a
+  # stored choice only when the newly generated DecisionId is identical.
+  try{
+    $patches=@(Get-PMMManagedPatches)
+    $selected=[string](Get-PMMSelectedPatchName)
+    $ordered=@()
+    if(-not[string]::IsNullOrWhiteSpace($selected) -and $selected -ne (Get-PMMNoPatchSelectionName)){
+      $ordered+=@($patches|Where-Object{[string]$_.Name -ieq $selected})
+    }
+    $ordered+=@($patches|Where-Object{$_.PSObject.Properties.Name -contains 'Deployed' -and [bool]$_.Deployed}|Sort-Object Modified -Descending)
+    $ordered+=@($patches|Sort-Object Modified -Descending)
+    $seenPatches=[System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+    foreach($patch in @($ordered)){
+      if(-not$patch -or -not$patch.ManifestHashOk -or -not$patch.Manifest -or -not($patch.Manifest.PSObject.Properties.Name -contains 'Decisions')){continue}
+      $patchIdentity=([string]$patch.Name+'|'+[string]$patch.Hash)
+      if(-not$seenPatches.Add($patchIdentity)){continue}
+      # Decision IDs already pin the asset, providers and provider hashes. Also
+      # require the current engine/mappings/Vanilla/order contract so a patch
+      # from another runtime cannot silently seed a superficially similar row.
+      if($CurrentMods.Count -gt 0 -and -not(Test-PMMPatchRuntimeCompatible $patch $CurrentMods)){continue}
+      foreach($row in @($patch.Manifest.Decisions)){
+        $id=[string]$row.DecisionId
+        if(-not[string]::IsNullOrWhiteSpace($id) -and -not$map.ContainsKey($id)){$map[$id]=$row}
+      }
+    }
+  }catch{}
   return $map
 }
 
@@ -723,8 +760,22 @@ function New-PMMRelocatableConflictAnalysis($Group,[array]$ProviderRecords,$Relo
 function New-PMMDataTableConflictAnalysis($Group,[array]$ProviderRecords,$Vanilla,$DataTableResult,$PreviousMap,[string]$ReviewFolder) {
   $providerSignature=Get-PMMProviderSignature @($ProviderRecords|ForEach-Object{$_.Mod})
   $rows=New-Object System.Collections.Generic.List[object]
+  $automatic=New-Object System.Collections.Generic.List[object]
   foreach($conflict in @($DataTableResult.Report.conflicts)){
     $path=[string]$conflict.Path
+    $compatibility=$null
+    if(Get-Command Get-PMMDataTableCompatibilityResolution -ErrorAction SilentlyContinue){
+      try{$compatibility=Get-PMMDataTableCompatibilityResolution $Group $conflict $ProviderRecords}catch{Write-PMMLog ('DataTable compatibility-rule probe failed for '+$path+': '+$_.Exception.Message)}
+    }
+    if($compatibility){
+      $automatic.Add([pscustomobject]@{
+        DecisionKind='AutomaticCompatibility';RuleId=[string]$compatibility.RuleId;RecipeId=[string]$compatibility.RecipeId;
+        AssetKey=[string]$Group.Key;Asset=[string]$Group.Asset;Property=$path;SelectedChoice=[string]$compatibility.SelectedChoice;CustomValue='';
+        ResolutionOrigin='CompatibilityRule';ExpectedProviders=@($compatibility.ExpectedProviders);Reason=[string]$compatibility.Reason;RuntimeStatus=[string]$compatibility.RuntimeStatus
+      })
+      Write-PMMLog ("DataTable compatibility rule resolved {0}: {1} -> {2}" -f $path,[string]$compatibility.RuleId,[string]$compatibility.SelectedChoice)
+      continue
+    }
     $decisionId=New-PMMDecisionId ([string]$Group.Key) $path $providerSignature
     $previous=if($PreviousMap.ContainsKey($decisionId)){$PreviousMap[$decisionId]}else{$null}
     $choices=New-Object System.Collections.Generic.List[string];$choices.Add('Vanilla')
@@ -745,7 +796,28 @@ function New-PMMDataTableConflictAnalysis($Group,[array]$ProviderRecords,$Vanill
       SelectedChoice=[string]$initial.Choice;CustomValue=[string]$initial.Custom;ResolutionOrigin=[string]$initial.Origin;Status=[string]$initial.Status
     })
   }
-  $asset=[pscustomobject]@{AssetKey=[string]$Group.Key;Asset=[string]$Group.Asset;Providers=@($ProviderRecords|ForEach-Object{$_.Mod.Name});Mode='DataTableConflict';ConflictCount=$rows.Count;ChangedPathCount=$rows.Count;Reason='Mods change the same DataTable property to different values; choose only those true conflicts.';ReviewFolder=$ReviewFolder}
+  $mode=if($rows.Count -eq 0){'DataTableAuto'}else{'DataTableConflict'}
+  $reason=if($automatic.Count -gt 0 -and $rows.Count -eq 0){
+    'DataTable property merge succeeded with a runtime-proven semantic compatibility rule. Only the exact recognized overlapping field was resolved automatically; all independent changes remain merged.'
+  }elseif($automatic.Count -gt 0){
+    'A runtime-proven compatibility rule resolved the recognized overlapping field(s). Choose only the remaining true DataTable conflicts.'
+  }else{
+    'Mods change the same DataTable property to different values; choose only those true conflicts.'
+  }
+  $asset=[pscustomobject]@{
+    AssetKey=[string]$Group.Key;Asset=[string]$Group.Asset;Providers=@($ProviderRecords|ForEach-Object{$_.Mod.Name});Mode=$mode;
+    ConflictCount=$rows.Count;ChangedPathCount=([int](@($DataTableResult.Report.patches).Count+$automatic.Count));Reason=$reason;ReviewFolder=$ReviewFolder;
+    AutomaticResolutions=$automatic.ToArray();CompatibilityRuleCount=$automatic.Count
+  }
+  if($automatic.Count -gt 0 -and $ReviewFolder -and (Test-Path -LiteralPath $ReviewFolder -PathType Container)){
+    try{
+      [pscustomobject]@{
+        Schema='PMM_DATATABLE_AUTOMATIC_RESOLUTIONS_V1';Asset=[string]$Group.Asset;CreatedUtc=[DateTime]::UtcNow.ToString('o');
+        Safety='Each entry matched the exact DataTable property, exact competing provider names and exact canonical values declared by a runtime-proven stable rule. Current cooked families are merged normally; no historical cooked output is reused.';
+        Resolutions=$automatic.ToArray()
+      }|ConvertTo-Json -Depth 30|Set-Content -LiteralPath (Join-Path $ReviewFolder 'automatic-compatibility-resolutions.json') -Encoding UTF8
+    }catch{Write-PMMLog ('Could not write automatic DataTable compatibility evidence: '+$_.Exception.Message)}
+  }
   return [pscustomobject]@{Asset=$asset;Rows=$rows.ToArray()}
 }
 
@@ -1570,6 +1642,274 @@ function Invoke-PMMSharedPlainFileAnalysis($Group,[array]$ProviderMods,[string]$
   return [pscustomobject]@{Asset=$asset;Rows=@()}
 }
 
+function Get-PMMAnalyzeCacheTextHash([string]$Text) {
+  $sha = [Security.Cryptography.SHA256]::Create()
+  try {
+    $bytes = [Text.Encoding]::UTF8.GetBytes($Text)
+    return ([BitConverter]::ToString($sha.ComputeHash($bytes)).Replace('-','').ToLowerInvariant())
+  } finally {
+    $sha.Dispose()
+  }
+}
+
+function Test-PMMSafeAnalyzeCacheMode([string]$Mode) {
+  return ($Mode -in @(
+    'Identical',
+    'BinaryAuto',
+    'StaticItemAuto',
+    'DataTableAuto',
+    'SupersetAuto',
+    'ContainedSupersetAuto',
+    'RelocatableAuto'
+  ))
+}
+
+function Get-PMMAnalyzeGroupCacheRoot {
+  $path = Join-PMMPath 'Cache' 'AnalyzeGroupsV2'
+  if (-not (Test-Path -LiteralPath $path -PathType Container)) {
+    New-Item -ItemType Directory -Force -Path $path | Out-Null
+  }
+  return $path
+}
+
+function Get-PMMAnalyzeGroupCachePath($Group,[array]$ProviderMods) {
+  $providerParts = New-Object System.Collections.Generic.List[string]
+  # Invoke-PMMScan supplies ProviderMods in normalized Priority/Name order.
+  foreach ($provider in @($ProviderMods)) {
+    $providerParts.Add(('{0}:{1}:{2}' -f [string]$provider.Name,[string]$provider.Hash,[int]$provider.Priority))
+  }
+  $providerKey = @($providerParts.ToArray()) -join '|'
+  $key = ('schema={0}|engine={1}|mapping={2}|vanilla={3}|rules={4}|kind={5}|asset={6}|providers={7}' -f
+    (Get-PMMPlanSchemaVersion),
+    (Get-PMMEngineId),
+    (Get-Sha256 (Get-PMMMappingsPath)),
+    (Get-PMMVanillaPakSetQuickSignature),
+    (Get-PMMProductionRecipeLibrarySha256),
+    [string]$Group.Kind,
+    [string]$Group.Key,
+    $providerKey)
+  return (Join-Path (Get-PMMAnalyzeGroupCacheRoot) ((Get-PMMAnalyzeCacheTextHash $key) + '.json'))
+}
+
+function Read-PMMAnalyzeGroupCache($Group,[array]$ProviderMods) {
+  $path = Get-PMMAnalyzeGroupCachePath $Group $ProviderMods
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { return $null }
+  try {
+    $document = Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json
+    if (-not $document -or [string]$document.Schema -cne 'PMM_ANALYZE_GROUP_CACHE_V2' -or -not $document.Asset) {
+      return $null
+    }
+    if (-not (Test-PMMSafeAnalyzeCacheMode ([string]$document.Asset.Mode))) { return $null }
+    if (@($document.Rows).Count -gt 0) { return $null }
+    return [pscustomobject]@{Asset=$document.Asset;Rows=@()}
+  } catch {
+    Write-PMMLog ('Ignoring invalid Analyze group cache: ' + $path)
+    Remove-Item -LiteralPath $path -Force -ErrorAction SilentlyContinue
+    return $null
+  }
+}
+
+function Write-PMMAnalyzeGroupCache($Group,[array]$ProviderMods,$Analysis) {
+  if (-not $Analysis -or -not $Analysis.Asset -or @($Analysis.Rows).Count -gt 0) { return }
+  if (-not (Test-PMMSafeAnalyzeCacheMode ([string]$Analysis.Asset.Mode))) { return }
+  try {
+    $path = Get-PMMAnalyzeGroupCachePath $Group $ProviderMods
+    [pscustomobject]@{
+      Schema='PMM_ANALYZE_GROUP_CACHE_V2'
+      CreatedUtc=[DateTime]::UtcNow.ToString('o')
+      Asset=$Analysis.Asset
+      Rows=@()
+    } | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $path -Encoding UTF8
+  } catch {
+    Write-PMMLog ('Could not persist safe Analyze group cache; continuing without it. ' + $_.Exception.Message)
+  }
+}
+
+function Try-PMMReuseCurrentAnalyzePlan([array]$Mods) {
+  $plan = Read-PMMMergePlan
+  if (-not $plan) { return $null }
+  try {
+    if ([int]$plan.SchemaVersion -ne (Get-PMMPlanSchemaVersion)) { return $null }
+    if ([string]$plan.Engine -cne (Get-PMMEngineId)) { return $null }
+    if ([bool]$plan.PackageChoicePendingReanalysis -or [bool]$plan.AlreadyPatched) { return $null }
+    if (($plan.PSObject.Properties.Name -notcontains 'Assets') -or ($plan.PSObject.Properties.Name -notcontains 'Rows')) { return $null }
+    if (@($plan.Rows).Count -gt 0) { return $null }
+    foreach ($asset in @($plan.Assets)) {
+      if (-not $asset -or -not (Test-PMMSafeAnalyzeCacheMode ([string]$asset.Mode))) { return $null }
+    }
+    if ([string]$plan.SourceSignature -cne (Get-PMMLibrarySignature $Mods)) { return $null }
+    if ([string]$plan.VanillaSourceSignature -cne (Get-PMMVanillaPakSetQuickSignature)) { return $null }
+    if ([string]$plan.MergeOrderSignature -cne (Get-PMMMergeOrderSignature $Mods)) { return $null }
+    if ([string]$plan.MappingsSha256 -cne (Get-Sha256 (Get-PMMMappingsPath))) { return $null }
+    if (($plan.PSObject.Properties.Name -notcontains 'KnowledgeRulesSha256') -or [string]$plan.KnowledgeRulesSha256 -cne (Get-PMMProductionRecipeLibrarySha256)) { return $null }
+    return $plan
+  } catch {
+    return $null
+  }
+}
+
+function Get-PMMOrderedManagedPatchCandidates {
+  $preferred=''
+  try{$preferred=[string](Get-PMMSelectedPatchName)}catch{}
+  return @(Get-PMMManagedPatches|Sort-Object `
+    @{Expression={if(-not[string]::IsNullOrWhiteSpace($preferred) -and [string]$_.Name -ieq $preferred){0}else{1}}}, `
+    @{Expression={if($_.PSObject.Properties.Name -contains 'Deployed' -and [bool]$_.Deployed){0}else{1}}}, `
+    @{Expression={if($_.PSObject.Properties.Name -contains 'CurrentLocal' -and [bool]$_.CurrentLocal){0}else{1}}}, `
+    @{Expression={$_.Modified};Descending=$true})
+}
+
+function Set-PMMPlanEquivalentPatch($Plan,$Patch,[array]$Mods) {
+  if(-not$Plan -or -not$Patch){return $Plan}
+  $patchedMods=@($Patch.PatchedMods|ForEach-Object{[string]$_}|Where-Object{$_}|Sort-Object -Unique)
+  $values=[ordered]@{
+    AlreadyPatched=$true
+    ActivePatch=[string]$Patch.Name
+    ActivePatchHash=[string]$Patch.Hash
+    PatchDeployed=$(if($Patch.PSObject.Properties.Name -contains 'Deployed'){[bool]$Patch.Deployed}else{$false})
+    PatchedMods=$patchedMods
+    PatchReuseKind='EffectiveConflictSet'
+    PatchSourceSetChanged=([string]$Patch.SourceSignature -cne [string](Get-PMMLibrarySignature $Mods))
+    PatchContentSignature=(Get-PMMPatchContentSignature $Patch)
+  }
+  foreach($kv in $values.GetEnumerator()){
+    if($Plan.PSObject.Properties.Name -contains $kv.Key){$Plan.($kv.Key)=$kv.Value}else{$Plan|Add-Member -NotePropertyName $kv.Key -NotePropertyValue $kv.Value}
+  }
+  $Plan.DeploymentSuppressions=@(Get-PMMPatchDeploymentSuppressions $Mods $Patch $Plan)
+  try{Set-PMMSelectedPatchName ([string]$Patch.Name)}catch{}
+  return $Plan
+}
+
+function Get-PMMPlanCompatibleManagedPatch($Plan,[array]$Mods) {
+  foreach($patch in @(Get-PMMOrderedManagedPatchCandidates)){
+    if(Test-PMMPatchPlanCompatible $patch $Plan $Mods){return $patch}
+  }
+  return $null
+}
+
+function Get-PMMSharedGroupIdentity($Group) {
+  if(-not$Group){return ''}
+  $key=if($Group.PSObject.Properties.Name -contains 'Key'){[string]$Group.Key}else{Get-PMMPatchAssetIdentity $Group}
+  return $key.Replace([char]92,[char]47).ToLowerInvariant()
+}
+
+function ConvertTo-PMMReusePlanAsset($Asset) {
+  if(-not$Asset){return $null}
+  return [pscustomobject]@{
+    AssetKey=$(if($Asset.PSObject.Properties.Name -contains 'AssetKey'){[string]$Asset.AssetKey}else{Get-PMMPatchAssetIdentity $Asset})
+    Asset=$(if($Asset.PSObject.Properties.Name -contains 'Asset'){[string]$Asset.Asset}else{[string]$Asset.AssetKey})
+    Providers=@($Asset.Providers|ForEach-Object{[string]$_})
+    Mode=[string]$Asset.Mode
+    ConflictCount=$(if($Asset.PSObject.Properties.Name -contains 'ConflictCount'){[int]$Asset.ConflictCount}else{0})
+    ChangedPathCount=$(if($Asset.PSObject.Properties.Name -contains 'ChangedPathCount'){[int]$Asset.ChangedPathCount}else{0})
+    Reason=$(if($Asset.PSObject.Properties.Name -contains 'Reason'){[string]$Asset.Reason}else{Get-PMMText 'Reused from the proven compatibility-patch manifest.' 'Reutilizado desde el manifest del parche de compatibilidad probado.'})
+    ReviewFolder=$(if($Asset.PSObject.Properties.Name -contains 'ReviewFolder'){[string]$Asset.ReviewFolder}else{''})
+    RecipeId=$(if($Asset.PSObject.Properties.Name -contains 'RecipeId'){[string]$Asset.RecipeId}else{''})
+    RecipeCaseId=$(if($Asset.PSObject.Properties.Name -contains 'RecipeCaseId'){[string]$Asset.RecipeCaseId}else{''})
+    RecipeOutputProvider=$(if($Asset.PSObject.Properties.Name -contains 'RecipeOutputProvider'){[string]$Asset.RecipeOutputProvider}else{''})
+    AutomaticResolutions=$(if($Asset.PSObject.Properties.Name -contains 'AutomaticResolutions'){@($Asset.AutomaticResolutions)}else{@()})
+    CompatibilityRuleCount=$(if($Asset.PSObject.Properties.Name -contains 'CompatibilityRuleCount'){[int]$Asset.CompatibilityRuleCount}else{0})
+  }
+}
+
+function Get-PMMFastPatchReuseCandidate([array]$Mods,[array]$AnalysisMods,[array]$SharedGroups) {
+  <#
+  Conservative pre-adapter reuse for automatic patches. A manifest proves every
+  patched shared group; any remaining current group must either be covered by a
+  schema-9 analyzed-shared proof or by the exact safe Identical group cache.
+  A new/changed shared group therefore falls through to normal Analyze.
+  #>
+  $allowed=@('BinaryAuto','StaticItemAuto','DataTableAuto','SupersetAuto','ContainedSupersetAuto','RelocatableAuto','KnownRecipeAuto')
+  $groupById=@{}
+  foreach($group in @($SharedGroups)){
+    $id=Get-PMMSharedGroupIdentity $group
+    if([string]::IsNullOrWhiteSpace($id) -or $groupById.ContainsKey($id)){return $null}
+    $groupById[$id]=$group
+  }
+
+  foreach($patch in @(Get-PMMOrderedManagedPatchCandidates)){
+    if(-not(Test-PMMPatchRuntimeCompatible $patch $Mods)){continue}
+    $manifest=$patch.Manifest
+    $decisions=@()
+    if($manifest.PSObject.Properties.Name -contains 'Decisions'){$decisions=@($manifest.Decisions)}
+    if($decisions.Count -gt 0){continue}
+    $patchAssets=@()
+    if($manifest.PSObject.Properties.Name -contains 'Assets'){$patchAssets=@($manifest.Assets)}
+    if($patchAssets.Count -eq 0 -or @($patchAssets|Where-Object{[string]$_.Mode -notin $allowed}).Count -gt 0){continue}
+    $knowledgeAuthorizedAssets=@($patchAssets|Where-Object{
+      [string]$_.Mode -eq 'KnownRecipeAuto' -or
+      (($_.PSObject.Properties.Name -contains 'AutomaticResolutions') -and @($_.AutomaticResolutions).Count -gt 0)
+    })
+    if($knowledgeAuthorizedAssets.Count -gt 0){
+      if(-not($manifest.PSObject.Properties.Name -contains 'ProductionRecipesSha256')){continue}
+      $currentRecipeLibraryHash=Get-PMMProductionRecipeLibrarySha256
+      if([string]::IsNullOrWhiteSpace($currentRecipeLibraryHash) -or [string]$manifest.ProductionRecipesSha256 -cne $currentRecipeLibraryHash){continue}
+    }
+    $knownRecipeAssets=@($knowledgeAuthorizedAssets|Where-Object{[string]$_.Mode -eq 'KnownRecipeAuto'})
+    if($knownRecipeAssets.Count -gt 0){
+      if(@($knownRecipeAssets|Where-Object{
+        -not($_.PSObject.Properties.Name -contains 'RecipeId') -or [string]::IsNullOrWhiteSpace([string]$_.RecipeId) -or
+        -not($_.PSObject.Properties.Name -contains 'RecipeOutputProvider') -or [string]::IsNullOrWhiteSpace([string]$_.RecipeOutputProvider)
+      }).Count -gt 0){continue}
+    }
+
+    $patchIds=[System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+    $topologyOk=$true
+    foreach($asset in $patchAssets){
+      $id=Get-PMMPatchAssetIdentity $asset
+      if([string]::IsNullOrWhiteSpace($id) -or -not$patchIds.Add($id) -or -not$groupById.ContainsKey($id)){$topologyOk=$false;break}
+      if(-not(Test-PMMStringSetEqual @($asset.Providers) @($groupById[$id].Providers))){$topologyOk=$false;break}
+    }
+    if(-not$topologyOk){continue}
+
+    $proofAssets=[System.Collections.Generic.List[object]]::new()
+    if(($manifest.PSObject.Properties.Name -contains 'AnalyzedSharedAssets') -and @($manifest.AnalyzedSharedAssets).Count -gt 0){
+      $storedProofs=@($manifest.AnalyzedSharedAssets)
+      if($storedProofs.Count -ne $SharedGroups.Count){continue}
+      $manifestHashes=Get-PMMManifestSourceHashMap $manifest
+      $currentHashes=[System.Collections.Generic.Dictionary[string,string]]::new([StringComparer]::OrdinalIgnoreCase)
+      foreach($mod in @($Mods)){$currentHashes[[string]$mod.Name]=([string]$mod.Hash).ToLowerInvariant()}
+      $seenProofs=[System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+      foreach($proof in $storedProofs){
+        $id=Get-PMMPatchAssetIdentity $proof
+        if(-not$seenProofs.Add($id) -or -not$groupById.ContainsKey($id) -or -not(Test-PMMStringSetEqual @($proof.Providers) @($groupById[$id].Providers))){$topologyOk=$false;break}
+        $mode=[string]$proof.Mode
+        if($mode -ne 'Identical' -and $mode -notin $allowed){$topologyOk=$false;break}
+        foreach($name in @($proof.Providers|ForEach-Object{[string]$_})){
+          if(-not$currentHashes.ContainsKey($name) -or -not$manifestHashes.ContainsKey($name) -or [string]$currentHashes[$name] -cne [string]$manifestHashes[$name]){$topologyOk=$false;break}
+        }
+        if(-not$topologyOk){break}
+        $proofAssets.Add((ConvertTo-PMMReusePlanAsset $proof))
+      }
+      if($seenProofs.Count -ne $groupById.Count){$topologyOk=$false}
+    }else{
+      foreach($asset in $patchAssets){$proofAssets.Add((ConvertTo-PMMReusePlanAsset $asset))}
+      foreach($group in @($SharedGroups)){
+        $id=Get-PMMSharedGroupIdentity $group
+        if($patchIds.Contains($id)){continue}
+        $providerMods=@($AnalysisMods|Where-Object{[string]$_.Name -in @($group.Providers)}|Sort-Object Priority,Name)
+        $cached=Read-PMMAnalyzeGroupCache $group $providerMods
+        if(-not$cached -or [string]$cached.Asset.Mode -ne 'Identical'){$topologyOk=$false;break}
+        $proofAssets.Add((ConvertTo-PMMReusePlanAsset $cached.Asset))
+      }
+      if($proofAssets.Count -ne $SharedGroups.Count){$topologyOk=$false}
+    }
+    if(-not$topologyOk){continue}
+
+    $plan=[pscustomobject]@{
+      SchemaVersion=(Get-PMMPlanSchemaVersion);Engine=(Get-PMMEngineId);EngineProfile='UE5_1';MappingsSha256=(Get-Sha256 (Get-PMMMappingsPath));KnowledgeRulesSha256=(Get-PMMProductionRecipeLibrarySha256);Created=(Get-Date).ToString('o');
+      SourceSignature=(Get-PMMLibrarySignature $Mods);VanillaSourceSignature=(Get-PMMVanillaPakSetQuickSignature);MergeOrderSignature=(Get-PMMMergeOrderSignature $Mods);
+      EffectiveMergeOrderSignature=(Get-PMMEffectivePatchOrderSignature @($proofAssets.ToArray()) $Mods @());MergeOrder=@($Mods|Sort-Object Priority,Name|ForEach-Object{[string]$_.Name});
+      SourceMods=@($Mods|Sort-Object Priority,Name|ForEach-Object{[pscustomobject]@{Name=$_.Name;Hash=$_.Hash;Size=$_.Size;Priority=$_.Priority}});EffectiveSourceMods=@($AnalysisMods|Sort-Object Priority,Name|ForEach-Object{[string]$_.Name});
+      AlreadyPatched=$false;ActivePatch='';PatchedMods=@();PackageChoicePendingReanalysis=$false;DeploymentSuppressions=@();Assets=$proofAssets.ToArray();Rows=@()
+    }
+    if(Test-PMMPatchPlanCompatible $patch $plan $Mods){
+      $plan=Set-PMMPlanEquivalentPatch $plan $patch $Mods
+      return [pscustomobject]@{Patch=$patch;Plan=$plan}
+    }
+  }
+  return $null
+}
+
 function Invoke-PMMScan {
   param([switch]$Force)
   Assert-Repak
@@ -1582,7 +1922,7 @@ function Invoke-PMMScan {
   # alternatives declared by a mod package (not byte-level merge semantics).
   # An unresolved package choice must stop here so PMM never attempts to merge
   # mutually exclusive variants as if they were independent mods.
-  $previous = Get-PMMPreviousDecisionMap
+  $previous = Get-PMMPreviousDecisionMap $mods
   $packageAnalyses=@(Get-PMMPackageChoiceAnalyses $mods $previous)
   $packageAssets=@($packageAnalyses|ForEach-Object{$_.Asset})
   $packageRows=@($packageAnalyses|ForEach-Object{$_.Row})
@@ -1594,6 +1934,7 @@ function Invoke-PMMScan {
       Engine=(Get-PMMEngineId)
       EngineProfile='UE5_1'
       MappingsSha256=(Get-Sha256 (Get-PMMMappingsPath))
+      KnowledgeRulesSha256=(Get-PMMProductionRecipeLibrarySha256)
       Created=(Get-Date).ToString('o')
       SourceSignature=(Get-PMMLibrarySignature $mods)
       VanillaSourceSignature=(Get-PMMVanillaPakSetQuickSignature)
@@ -1623,7 +1964,12 @@ function Invoke-PMMScan {
   $analysisMods=@($mods|Where-Object{[string]$_.Name -notin $packageSuppressions})
 
   if (-not $Force) {
-    $currentPatch = Get-PMMCurrentManagedPatch $mods
+    # This legacy zero-scan short circuit is reserved for an exact complete
+    # source set. Effective-conflict-set reuse keeps its analyzed asset proofs
+    # and is handled below after current shared topology has been enumerated.
+    $currentPatch = @(Get-PMMManagedPatches|Where-Object{
+      (Test-PMMPatchSourceSetCompatible $_ $mods) -and (Test-PMMPatchCurrent $_ $mods)
+    }|Sort-Object Modified -Descending|Select-Object -First 1)[0]
     if ($currentPatch) {
       Invoke-PMMProgress 1 2 (Get-PMMText 'Validating current PMM compatibility patch...' 'Validando el parche de compatibilidad PMM actual...')
       $patchedMods = @($currentPatch.PatchedMods | Sort-Object -Unique)
@@ -1640,7 +1986,8 @@ function Invoke-PMMScan {
       foreach($name in $packageSuppressions){if($name -notin $patchSuppressions){$patchSuppressions+=,$name}}
       $patchSuppressions=@($patchSuppressions|Sort-Object -Unique)
       $patchState=if($currentPatch.PSObject.Properties.Name -contains 'Deployed' -and [bool]$currentPatch.Deployed){Get-PMMText 'deployed' 'desplegado'}else{Get-PMMText 'built locally; Deploy pending' 'creado localmente; Deploy pendiente'}
-      $patchDecisions=if($currentPatch.Manifest -and ($currentPatch.Manifest.PSObject.Properties.Name -contains 'Decisions')){@($currentPatch.Manifest.Decisions)}else{@()}
+      $patchDecisions=@()
+      if($currentPatch.Manifest -and ($currentPatch.Manifest.PSObject.Properties.Name -contains 'Decisions')){$patchDecisions=@($currentPatch.Manifest.Decisions)}
       $summary = (Get-PMMText "Up to date: {0} already reconciles {1} shared asset(s) for this exact source-mod set ({2}). No unresolved compatibility work is pending. Patched mods: {3}" "Al dia: {0} ya reconcilia {1} asset(s) compartidos para este conjunto exacto de mods fuente ({2}). No hay trabajo de compatibilidad pendiente. Mods parcheados: {3}") -f $currentPatch.Name,$assetCount,$patchState,$(if($patchedMods.Count -gt 0){$patchedMods -join ', '}else{'metadata unavailable'})
 
       $plan = [pscustomobject]@{
@@ -1648,6 +1995,7 @@ function Invoke-PMMScan {
         Engine=(Get-PMMEngineId)
         EngineProfile='UE5_1'
         MappingsSha256=(Get-Sha256 (Get-PMMMappingsPath))
+        KnowledgeRulesSha256=(Get-PMMProductionRecipeLibrarySha256)
         Created=(Get-Date).ToString('o')
         SourceSignature=(Get-PMMLibrarySignature $mods)
         VanillaSourceSignature=(Get-PMMVanillaPakSetQuickSignature)
@@ -1675,8 +2023,60 @@ function Invoke-PMMScan {
     }
   }
 
+  if (-not $Force) {
+    $reusedPlan = Try-PMMReuseCurrentAnalyzePlan $mods
+    if ($reusedPlan) {
+      $cachedAssets = @($reusedPlan.Assets)
+      $binary = @($cachedAssets | Where-Object {$_.Mode -eq 'BinaryAuto'}).Count
+      $semantic = @($cachedAssets | Where-Object {$_.Mode -in @('StaticItemAuto','DataTableAuto','SupersetAuto','ContainedSupersetAuto')}).Count
+      $relocatable = @($cachedAssets | Where-Object {$_.Mode -eq 'RelocatableAuto'}).Count
+      $identical = @($cachedAssets | Where-Object {$_.Mode -eq 'Identical'}).Count
+      $summary = Get-PMMText 'Analyze cache hit: source mods, priority, mappings and game identity are unchanged. Reused the current safe compatibility plan.' 'Cache de Analizar: los mods fuente, la prioridad, los mappings y la identidad del juego no han cambiado. Se reutilizó el plan de compatibilidad seguro actual.'
+      Write-PMMLog 'Analyze exact-plan cache hit; expensive adapters skipped.'
+      Invoke-PMMProgress 1 1 $summary
+      return [pscustomobject]@{
+        Summary=$summary
+        Shared=$cachedAssets.Count
+        Binary=$binary
+        Semantic=$semantic
+        Relocatable=$relocatable
+        Experimental=0
+        Decisions=0
+        Unsupported=0
+        Identical=$identical
+        AlreadyPatched=$false
+        ActivePatch=''
+        PackageChoicePendingReanalysis=$false
+        CacheHit=$true
+      }
+    }
+  }
+
   $groups = @(Get-PMMAssetGroups $analysisMods)
   $shared = @($groups | Where-Object { @($_.Providers).Count -gt 1 })
+
+  if(-not$Force -and $packageAssets.Count -eq 0 -and $packageRows.Count -eq 0){
+    Invoke-PMMProgress 1 2 (Get-PMMText 'Checking whether the saved compatibility patch still covers the effective conflict set...' 'Comprobando si el parche guardado aun cubre el conjunto efectivo de conflictos...')
+    $fastReuse=Get-PMMFastPatchReuseCandidate $mods $analysisMods $shared
+    if($fastReuse){
+      $plan=$fastReuse.Plan
+      $patch=$fastReuse.Patch
+      Write-PMMMergePlan $plan
+      $report=[pscustomobject]@{SchemaVersion=(Get-PMMPlanSchemaVersion);Created=(Get-Date).ToString('o');Groups=$groups;SharedAssetGroups=$shared.Count;Assets=@($plan.Assets);AlreadyPatched=$true;ActivePatch=[string]$patch.Name;PatchedMods=@($patch.PatchedMods);EffectiveConflictSetReuse=$true}
+      $report|ConvertTo-Json -Depth 40|Set-Content -LiteralPath (Get-PMMLastScanPath) -Encoding UTF8
+      $assets=@($plan.Assets)
+      $binary=@($assets|Where-Object{[string]$_.Mode -eq 'BinaryAuto'}).Count
+      $semantic=@($assets|Where-Object{[string]$_.Mode -in @('StaticItemAuto','DataTableAuto','SupersetAuto','ContainedSupersetAuto','KnownRecipeAuto')}).Count
+      $relocatable=@($assets|Where-Object{[string]$_.Mode -eq 'RelocatableAuto'}).Count
+      $identical=@($assets|Where-Object{[string]$_.Mode -eq 'Identical'}).Count
+      $state=if($patch.PSObject.Properties.Name -contains 'Deployed' -and [bool]$patch.Deployed){Get-PMMText 'the overlay is already deployed; source synchronization may still be pending' 'el overlay ya esta desplegado; puede quedar pendiente sincronizar los mods fuente'}else{Get-PMMText 'the overlay is built locally and ready to deploy' 'el overlay esta creado localmente y listo para desplegar'}
+      $summary=(Get-PMMText 'Reused {0}: the effective conflict participants and output recipe are unchanged ({1}). No new Build is needed.' 'Reutilizado {0}: los participantes efectivos de conflicto y la receta de salida no han cambiado ({1}). No hace falta otro Build.') -f [string]$patch.Name,$state
+      Write-PMMLog ('Analyze effective-conflict-set patch reuse; expensive adapters skipped. '+[string]$patch.Name)
+      Invoke-PMMProgress 2 2 (Get-PMMText 'Analyze complete - existing compatibility patch reused.' 'Analisis terminado - se reutilizo el parche de compatibilidad existente.')
+      return [pscustomobject]@{Summary=$summary;Shared=$shared.Count;Binary=$binary;Semantic=$semantic;Relocatable=$relocatable;Experimental=0;Decisions=0;Unsupported=0;Identical=$identical;AlreadyPatched=$true;ActivePatch=[string]$patch.Name;PackageChoicePendingReanalysis=$false;EffectiveConflictSetReuse=$true}
+    }
+  }
+
   $transaction = Join-Path (Get-PMMPath 'Cache') ('Analyze_' + [guid]::NewGuid().ToString('N'))
   New-Item -ItemType Directory -Force -Path $transaction | Out-Null
   $processStart=$(try{(Get-Process -Id $PID -ErrorAction Stop).StartTime.ToUniversalTime().ToString('o')}catch{''})
@@ -1691,9 +2091,11 @@ function Invoke-PMMScan {
     $totalSteps = [Math]::Max(1,($shared.Count + 1))
     foreach ($group in $shared) {
       $index++
-      Invoke-PMMProgress $index $totalSteps ((Get-PMMText 'Analyzing {0}' 'Analizando {0}') -f [string]$group.Asset)
+      $assetLabel=[IO.Path]::GetFileName([string]$group.Asset)
+      Invoke-PMMProgress $index $totalSteps ((Get-PMMText 'Analyzing {0}/{1}: {2}' 'Analizando {0}/{1}: {2}') -f $index,$shared.Count,$assetLabel)
       $providerMods = @($analysisMods | Where-Object { [string]$_.Name -in @($group.Providers) } | Sort-Object Priority,Name)
-      Write-PMMLog ("PMM v1.2.1 analyzing shared {0}: {1} ({2})" -f $group.Kind,$group.Asset,($providerMods.Name -join ', '))
+      Write-PMMLog ("PMM v1.3.0 analyzing shared {0}: {1} ({2})" -f $group.Kind,$group.Asset,($providerMods.Name -join ', '))
+      $groupWatch=[System.Diagnostics.Stopwatch]::StartNew()
 
       # Keep Analyze disk usage bounded by one shared asset at a time. Older
       # builds passed the session transaction root to every analysis, so exact
@@ -1703,10 +2105,19 @@ function Invoke-PMMScan {
       $groupTransaction=Join-Path $transaction ('Group_'+(Get-PMMStableTextId ([string]$group.Key)))
       New-Item -ItemType Directory -Force -Path $groupTransaction|Out-Null
       try{
-        if ([string]$group.Kind -eq 'AssetFamily') {
-          $analysis = Invoke-PMMSharedAssetAnalysis $group $providerMods $groupTransaction $previous
+        $analysis = $null
+        if (-not $Force) {
+          $analysis = Read-PMMAnalyzeGroupCache $group $providerMods
+        }
+        if ($analysis) {
+          Write-PMMLog ('Analyze safe-group cache hit: ' + [string]$group.Asset)
         } else {
-          $analysis = Invoke-PMMSharedPlainFileAnalysis $group $providerMods $groupTransaction $previous
+          if ([string]$group.Kind -eq 'AssetFamily') {
+            $analysis = Invoke-PMMSharedAssetAnalysis $group $providerMods $groupTransaction $previous
+          } else {
+            $analysis = Invoke-PMMSharedPlainFileAnalysis $group $providerMods $groupTransaction $previous
+          }
+          Write-PMMAnalyzeGroupCache $group $providerMods $analysis
         }
         $assets.Add($analysis.Asset)
         foreach ($row in @($analysis.Rows)) { $rows.Add($row) }
@@ -1715,6 +2126,8 @@ function Invoke-PMMScan {
         # analysis result returns. The cooked scratch is never needed by the next
         # group and must be reclaimed immediately.
         Remove-Item -LiteralPath $groupTransaction -Recurse -Force -ErrorAction SilentlyContinue
+        $groupWatch.Stop()
+        if($groupWatch.Elapsed.TotalSeconds -ge 5){Write-PMMLog (("Analyze slow-group complete: {0:N1}s | {1}" -f $groupWatch.Elapsed.TotalSeconds,[string]$group.Asset))}
       }
     }
 
@@ -1723,6 +2136,7 @@ function Invoke-PMMScan {
       Engine=(Get-PMMEngineId)
       EngineProfile='UE5_1'
       MappingsSha256=(Get-Sha256 (Get-PMMMappingsPath))
+      KnowledgeRulesSha256=(Get-PMMProductionRecipeLibrarySha256)
       Created=(Get-Date).ToString('o')
       SourceSignature=(Get-PMMLibrarySignature $mods)
       VanillaSourceSignature=(Get-PMMVanillaPakSetQuickSignature)
@@ -1739,10 +2153,15 @@ function Invoke-PMMScan {
       Rows=$rows.ToArray()
       DeploymentSuppressions=$packageSuppressions
     }
+    $equivalentPatch=$null
+    if(-not$Force){
+      $equivalentPatch=Get-PMMPlanCompatibleManagedPatch $plan $mods
+      if($equivalentPatch){$plan=Set-PMMPlanEquivalentPatch $plan $equivalentPatch $mods}
+    }
     Write-PMMMergePlan $plan
 
     $sharedTotal=$shared.Count+$packageAssets.Count
-    $report = [pscustomobject]@{SchemaVersion=(Get-PMMPlanSchemaVersion);Created=(Get-Date).ToString('o');Groups=$groups;SharedAssetGroups=$sharedTotal;Assets=$assets.ToArray();AlreadyPatched=$false;ActivePatch='';DeploymentSuppressions=$packageSuppressions}
+    $report = [pscustomobject]@{SchemaVersion=(Get-PMMPlanSchemaVersion);Created=(Get-Date).ToString('o');Groups=$groups;SharedAssetGroups=$sharedTotal;Assets=$assets.ToArray();AlreadyPatched=[bool]$plan.AlreadyPatched;ActivePatch=[string]$plan.ActivePatch;DeploymentSuppressions=@($plan.DeploymentSuppressions);EffectiveConflictSetReuse=($null -ne $equivalentPatch)}
     $report | ConvertTo-Json -Depth 40 | Set-Content -LiteralPath (Get-PMMLastScanPath) -Encoding UTF8
 
     $binary = @($assets | Where-Object {$_.Mode -eq 'BinaryAuto'}).Count
@@ -1754,9 +2173,15 @@ function Invoke-PMMScan {
     $identical = @($assets | Where-Object {$_.Mode -eq 'Identical'}).Count
     $summary = (Get-PMMText "Shared/package items: {0} | merged automatically: {1} | decisions: {2} | unsupported: {3} | identical: {4}" "Elementos compartidos/paquete: {0} | fusionados automaticamente: {1} | decisiones: {2} | no soportados: {3} | identicos: {4}") -f $sharedTotal,($binary+$semantic+$relocatable),$decisions,$unsupported,$identical
     if($experimental -gt 0){$summary += (Get-PMMText " | experimental manual solutions: $experimental" " | soluciones manuales experimentales: $experimental")}
-    Write-PMMLog "Analyze complete. $summary"
-    Invoke-PMMProgress $totalSteps $totalSteps (Get-PMMText 'Analyze complete.' 'Analisis terminado.')
-    return [pscustomobject]@{Summary=$summary;Shared=$sharedTotal;Binary=$binary;Semantic=$semantic;Relocatable=$relocatable;Experimental=$experimental;Decisions=$decisions;Unsupported=$unsupported;Identical=$identical;AlreadyPatched=$false;ActivePatch='';PackageChoicePendingReanalysis=$false}
+    if($equivalentPatch){
+      $summary += ((Get-PMMText ' | existing patch reused: {0}; Build skipped' ' | parche existente reutilizado: {0}; se omite Build') -f [string]$equivalentPatch.Name)
+      Write-PMMLog ('Analyze complete; effective conflict set matches existing patch. Build skipped. '+[string]$equivalentPatch.Name+' | '+$summary)
+      Invoke-PMMProgress $totalSteps $totalSteps (Get-PMMText 'Analyze complete - existing patch reused.' 'Analisis terminado - se reutilizo el parche existente.')
+    }else{
+      Write-PMMLog "Analyze complete. $summary"
+      Invoke-PMMProgress $totalSteps $totalSteps (Get-PMMText 'Analyze complete.' 'Analisis terminado.')
+    }
+    return [pscustomobject]@{Summary=$summary;Shared=$sharedTotal;Binary=$binary;Semantic=$semantic;Relocatable=$relocatable;Experimental=$experimental;Decisions=$decisions;Unsupported=$unsupported;Identical=$identical;AlreadyPatched=($null -ne $equivalentPatch);ActivePatch=$(if($equivalentPatch){[string]$equivalentPatch.Name}else{''});PackageChoicePendingReanalysis=$false;EffectiveConflictSetReuse=($null -ne $equivalentPatch)}
   } finally {
     Remove-Item -LiteralPath $transaction -Recurse -Force -ErrorAction SilentlyContinue
   }
@@ -1778,6 +2203,7 @@ function Test-PMMMergePlanCurrent {
   if ([string]$plan.SourceSignature -ne (Get-PMMLibrarySignature $currentMods)) { return $false }
   if(-not($plan.PSObject.Properties.Name -contains 'VanillaSourceSignature') -or [string]$plan.VanillaSourceSignature -ne (Get-PMMVanillaPakSetQuickSignature)){return $false}
   if(-not($plan.PSObject.Properties.Name -contains 'MergeOrderSignature') -or [string]$plan.MergeOrderSignature -ne (Get-PMMMergeOrderSignature $currentMods)){return $false}
+  if(-not($plan.PSObject.Properties.Name -contains 'KnowledgeRulesSha256') -or [string]$plan.KnowledgeRulesSha256 -cne (Get-PMMProductionRecipeLibrarySha256)){return $false}
   $mappings = Get-PMMMappingsPath
   if (-not (Test-Path -LiteralPath $mappings -PathType Leaf)) { return $false }
   return ([string]$plan.MappingsSha256 -eq (Get-Sha256 $mappings))
@@ -1848,7 +2274,8 @@ function Assert-PMMPlanMatchesLibrary([array]$Mods) {
   if([string]$plan.SourceSignature -ne (Get-PMMLibrarySignature $Mods)){throw (Get-PMMText 'The mod library changed after Analyze. Run Analyze again.' 'La biblioteca cambio despues de Analizar. Ejecuta Analizar de nuevo.')}
   if(-not($plan.PSObject.Properties.Name -contains 'VanillaSourceSignature') -or [string]$plan.VanillaSourceSignature -ne (Get-PMMVanillaPakSetQuickSignature)){throw (Get-PMMText 'Palworld game PAKs changed after Analyze. Run Analyze again.' 'Los PAK de Palworld cambiaron despues de Analizar. Ejecuta Analizar de nuevo.')}
   if(-not($plan.PSObject.Properties.Name -contains 'MergeOrderSignature') -or [string]$plan.MergeOrderSignature -ne (Get-PMMMergeOrderSignature $Mods)){throw (Get-PMMText 'The mod priority order changed after Analyze. Run Analyze again.' 'El orden de prioridad de mods cambio despues de Analizar. Ejecuta Analizar de nuevo.')}
-  if($plan.PSObject.Properties.Name -contains 'AlreadyPatched' -and [bool]$plan.AlreadyPatched){throw (Get-PMMText 'The current PMM compatibility patch already matches this exact source set; no rebuild is needed.' 'El parche de compatibilidad PMM actual ya coincide exactamente con este conjunto de fuentes; no hace falta reconstruirlo.')}
+  if(-not($plan.PSObject.Properties.Name -contains 'KnowledgeRulesSha256') -or [string]$plan.KnowledgeRulesSha256 -cne (Get-PMMProductionRecipeLibrarySha256)){throw (Get-PMMText 'The compatibility rule library changed after Analyze. Run Analyze again.' 'La biblioteca de reglas de compatibilidad cambio despues de Analizar. Ejecuta Analizar de nuevo.')}
+  if($plan.PSObject.Properties.Name -contains 'AlreadyPatched' -and [bool]$plan.AlreadyPatched){throw (Get-PMMText 'The current PMM compatibility patch already matches the effective conflict set; no rebuild is needed.' 'El parche de compatibilidad PMM actual ya coincide con el conjunto efectivo de conflictos; no hace falta reconstruirlo.')}
   if([string]$plan.EngineProfile -ne 'UE5_1'){throw (Get-PMMText 'The Analyze plan uses a different engine profile. Run Analyze again.' 'El plan de Analizar usa otro perfil de engine. Ejecuta Analizar de nuevo.')}
   $mappings=Get-PMMMappingsPath
   if(-not(Test-Path -LiteralPath $mappings -PathType Leaf)){throw (Get-PMMText 'Mappings.usmap is missing.' 'Falta Mappings.usmap.')}
@@ -1915,7 +2342,12 @@ function Build-PMMAutoAsset($AssetPlan,[array]$Mods,[string]$Transaction,[string
     return
   }
   if($AssetPlan.Mode -in @('DataTableAuto','DataTableConflict')){
-    $dt=Invoke-PMMDataTableMerge $group $vanilla $records $Transaction $OutDir $ResolutionRows
+    $dataTableRows=[System.Collections.Generic.List[object]]::new()
+    if($AssetPlan.PSObject.Properties.Name -contains 'AutomaticResolutions'){
+      foreach($row in @($AssetPlan.AutomaticResolutions)){if($row){$dataTableRows.Add($row)}}
+    }
+    foreach($row in @($ResolutionRows)){if($row){$dataTableRows.Add($row)}}
+    $dt=Invoke-PMMDataTableMerge $group $vanilla $records $Transaction $OutDir ($dataTableRows.ToArray())
     if($dt.Run.ExitCode -ne 0){
       $detail=if($dt.Report){$dt.Report|ConvertTo-Json -Depth 30 -Compress}else{($dt.Run.Output -join "`n")}
       throw "DataTable merge no longer validates for $($AssetPlan.Asset). Run Analyze again.`n$detail"
@@ -1965,6 +2397,16 @@ function Get-PMMBuildAssetEvidence($Plan,[string]$OutDir) {
   return $evidence.ToArray()
 }
 
+function ConvertTo-PMMPatchManifestAssetProof($Asset) {
+  $proof=[ordered]@{AssetKey=$Asset.AssetKey;Asset=$Asset.Asset;Mode=$Asset.Mode;Providers=@($Asset.Providers)}
+  foreach($name in @('RecipeId','RecipeCaseId','RecipeOutputProvider')){
+    if($Asset.PSObject.Properties.Name -contains $name){$proof[$name]=[string]$Asset.PSObject.Properties[$name].Value}
+  }
+  if($Asset.PSObject.Properties.Name -contains 'AutomaticResolutions'){$proof['AutomaticResolutions']=@($Asset.AutomaticResolutions)}
+  if($Asset.PSObject.Properties.Name -contains 'CompatibilityRuleCount'){$proof['CompatibilityRuleCount']=[int]$Asset.CompatibilityRuleCount}
+  return [pscustomobject]$proof
+}
+
 function Build-PMMMerge {
   param([ValidateSet('ConflictGroups')][string]$Mode='ConflictGroups')
   Assert-PMMEngineReady;Assert-Repak
@@ -2002,7 +2444,7 @@ function Build-PMMMerge {
     })
     $buildEvidence=@(Get-PMMBuildAssetEvidence $plan $outDir)
     $manifest=[pscustomobject]@{
-      SchemaVersion=8
+      SchemaVersion=9
       Engine='PMMCore-v0.9.0'
       Created=(Get-Date).ToString('o')
       Mode=$Mode
@@ -2016,12 +2458,14 @@ function Build-PMMMerge {
       EffectiveMergeOrderSignature=(Get-PMMEffectivePatchOrderSignature $patchedAssets $mods @($plan.Rows))
       MergeOrder=@($mods|Sort-Object Priority,Name|ForEach-Object{[string]$_.Name})
       MappingsSha256=(Get-Sha256 (Get-PMMMappingsPath))
+      ProductionRecipesSha256=(Get-PMMProductionRecipeLibrarySha256)
       PatchedMods=$patchedMods
       PatchedModCount=$patchedMods.Count
       AssetCount=$patchedAssets.Count
       DeploymentSuppressions=@(Get-PMMDeploymentSuppressions $mods $plan)
       ExperimentalManualSolutions=$experimentalManual
-      Assets=@($patchedAssets|ForEach-Object{[pscustomobject]@{AssetKey=$_.AssetKey;Asset=$_.Asset;Mode=$_.Mode;Providers=@($_.Providers)}})
+      Assets=@($patchedAssets|ForEach-Object{ConvertTo-PMMPatchManifestAssetProof $_})
+      AnalyzedSharedAssets=@($plan.Assets|Where-Object{[string]$_.Mode -ne 'PackageChoice'}|ForEach-Object{ConvertTo-PMMPatchManifestAssetProof $_})
       Sources=@($mods|Sort-Object Priority,Name|ForEach-Object{[pscustomobject]@{Name=$_.Name;Hash=$_.Hash;Priority=$_.Priority}})
       BuildAssetEvidence=$buildEvidence
       PatchContentSignature=(Get-PMMBuildEvidenceSignature $buildEvidence)
@@ -2046,16 +2490,4 @@ function Build-PMMMerge {
     Remove-Item -LiteralPath $transaction -Recurse -Force -ErrorAction SilentlyContinue
     Remove-PMMTransientStageOwner $transaction
   }
-}
-function Restore-PMMDeployment {
-  param([switch]$Silent)
-  Stop-PalworldForDeployment;Ensure-GameModsFolder;$count=0
-  foreach($pak in @(Get-ChildItem (Get-GameModsPath) -Filter 'zzzzzzzzzz_PMM_Merge_*_P.pak' -File -ErrorAction SilentlyContinue)){
-    $previousPak=Join-Path (Join-PMMPath 'Builds' 'Previous') $pak.Name
-    $sidecar=$pak.FullName+'.manifest.json'
-    Move-Item $pak.FullName $previousPak -Force
-    if(Test-Path -LiteralPath $sidecar -PathType Leaf){Move-Item $sidecar ($previousPak+'.manifest.json') -Force}
-    $count++
-  }
-  if(-not$Silent){return((Get-PMMText 'PMM overlays removed: {0}. Original mods were left untouched.' 'Overlays PMM retirados: {0}. Los mods originales no se tocaron.') -f $count)}
 }

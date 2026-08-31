@@ -1,26 +1,8 @@
-# PMM repository line-ending and binary handling
-* text=auto
-
-*.cs       text eol=lf
-*.csproj   text eol=lf
-*.props    text eol=lf
-*.targets  text eol=lf
-*.xaml     text eol=lf
-*.xml      text eol=lf
-*.json     text eol=lf
-*.md       text eol=lf
-*.yml      text eol=lf
-*.yaml     text eol=lf
-
-*.ps1      text eol=crlf
-*.psm1     text eol=crlf
-*.psd1     text eol=crlf
-*.cmd      text eol=crlf
-*.bat      text eol=crlf
-*.sln      text eol=crlf
-
-*.txt      text eol=lf
-*.ini      text eol=lf
+# Preserve the exact bytes of the validated release tree.
+# PMM verifies its packaged application against SHA256SUMS.txt; automatic EOL
+# normalization can otherwise change valid PowerShell/XAML/JSON files at
+# checkout and make the repository fail its own integrity check.
+* -text
 
 *.exe      binary
 *.dll      binary

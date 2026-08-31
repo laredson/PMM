@@ -1,5 +1,5 @@
 {
-  "title": "Palworld Manager Merger 1.2.1",
+  "title": "Palworld Manager Merger 1.3.0",
   "heading": "PALWORLD MANAGER MERGER",
   "subtitle": "Native runtime shell - no PowerShell FullLanguage required",
   "refresh": "Refresh",
@@ -10,5 +10,5 @@
   "open_legacy_ui": "Open current PMM interface",
   "runtime_self_test": "Runtime self-test",
   "close": "Close",
-  "migration_note": "Native startup and diagnostics require no PowerShell FullLanguage. The complete Analyze/Build/Deploy workspace is still pending native migration before final 1.2."
+  "migration_note": "Native startup and diagnostics require no PowerShell FullLanguage. The complete Analyze/Build/Deploy/Fix Lab workspace remains on the editable WPF path while native migration continues for PMM 1.3."
 }

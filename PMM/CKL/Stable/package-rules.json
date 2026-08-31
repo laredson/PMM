@@ -36,6 +36,76 @@
           ]
         }
       ]
+    },
+    {
+      "id": "pmm-fixlab-gawr-gura-case-001-variants-v1",
+      "title": "Gawr Gura repaired output variant",
+      "source": "PMM Fix Lab Case 001",
+      "trigger": "anyTwoActive",
+      "members": [
+        "GawrGura_gura_P.pak",
+        "GawrGura_red-gura_P.pak",
+        "GawrGura_hooded-gura_P.pak",
+        "GawrGura_hair2-panties-3skins_P.pak",
+        "GawrGura_fullreplacement-3skins_P.pak"
+      ],
+      "choices": [
+        {
+          "id": "normal-locked",
+          "label": "Normal Gura",
+          "enabled": ["GawrGura_gura_P.pak"],
+          "suppressed": [
+            "GawrGura_red-gura_P.pak",
+            "GawrGura_hooded-gura_P.pak",
+            "GawrGura_hair2-panties-3skins_P.pak",
+            "GawrGura_fullreplacement-3skins_P.pak"
+          ]
+        },
+        {
+          "id": "red-locked",
+          "label": "Red / Evil Gura",
+          "enabled": ["GawrGura_red-gura_P.pak"],
+          "suppressed": [
+            "GawrGura_gura_P.pak",
+            "GawrGura_hooded-gura_P.pak",
+            "GawrGura_hair2-panties-3skins_P.pak",
+            "GawrGura_fullreplacement-3skins_P.pak"
+          ]
+        },
+        {
+          "id": "hooded-locked",
+          "label": "Hooded Gura",
+          "enabled": ["GawrGura_hooded-gura_P.pak"],
+          "suppressed": [
+            "GawrGura_gura_P.pak",
+            "GawrGura_red-gura_P.pak",
+            "GawrGura_hair2-panties-3skins_P.pak",
+            "GawrGura_fullreplacement-3skins_P.pak"
+          ]
+        },
+        {
+          "id": "hair2-panties",
+          "label": "Hair 2 / Panties",
+          "enabled": ["GawrGura_hair2-panties-3skins_P.pak"],
+          "suppressed": [
+            "GawrGura_gura_P.pak",
+            "GawrGura_red-gura_P.pak",
+            "GawrGura_hooded-gura_P.pak",
+            "GawrGura_fullreplacement-3skins_P.pak"
+          ]
+        },
+        {
+          "id": "full-replacement",
+          "label": "Full Replacement (3 skins)",
+          "enabled": ["GawrGura_fullreplacement-3skins_P.pak"],
+          "suppressed": [
+            "GawrGura_gura_P.pak",
+            "GawrGura_red-gura_P.pak",
+            "GawrGura_hooded-gura_P.pak",
+            "GawrGura_hair2-panties-3skins_P.pak"
+          ]
+        }
+      ]
     }
   ]
 }

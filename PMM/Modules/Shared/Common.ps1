@@ -1,4 +1,4 @@
-<#
+﻿<#
 Common.ps1 - shared configuration, logging, dependencies and process safety.
 All other PowerShell modules may call these helpers. Keep this file free of UI
 controls so the core can later be reused by a CLI or another front-end.
@@ -173,14 +173,32 @@ function Initialize-PMM {
   $dirs=@((Join-PMMPath 'Builds' 'Current'),(Join-PMMPath 'Builds' 'Previous'),(Join-PMMPath 'Builds' 'DeploymentBackups'),(Join-PMMPath 'Saves' 'Backups'),(Join-PMMPath 'Temp' 'AIIO'))
   foreach($p in $dirs){if(-not(Test-Path -LiteralPath $p)){New-Item -ItemType Directory -Force -Path $p|Out-Null}}
   if(-not(Test-Path -LiteralPath (Get-PMMConfigPath))){
-    $cfg=[pscustomobject]@{GamePath='';SteamRoot='';CloseGameBeforeDeploy=$true;ForceCloseOnTimeout=$false;CloseTimeoutSeconds=12;MergeMode='ConflictGroups';LastBuild='';SaveRoot='';Language='en';UiWindowWidth=1580;UiWindowHeight=940;UiWindowState='Normal';UiLibraryWidth=470;UiAnalysisHeight=300;UiResolutionHeight=220;UiConflictListWidth=250;UiPatchHeight=145;SelectedPatchName=''}
+    $cfg=[pscustomobject]@{GamePath='';SteamRoot='';CloseGameBeforeDeploy=$true;ForceCloseOnTimeout=$false;CloseTimeoutSeconds=12;MergeMode='ConflictGroups';LastBuild='';SaveRoot='';Language='en';UiWindowWidth=1460;UiWindowHeight=900;UiWindowState='Normal';UiLibraryWidth=470;UiAnalysisHeight=300;UiResolutionHeight=220;UiConflictListWidth=250;UiPatchHeight=145;SelectedPatchName='';AutoMode=$false;AutoIncludePlay=$false;ActionHintSeconds=5;Theme='pmm-crystal';ThemeArchitectureVersion=2;CompletionSound='Bell';CompletionVolume=50;CustomCompletionSoundPath='';SoundDefaultsVersion=3;SoundAuto='Microwave';SoundSemiAuto='Ok';SoundManual='Good';SoundAttention='Alert';SoundError='Microwave3';SoundSemiAutoEnabled=$true;SoundAttentionEnabled=$true;AIIOActiveSession='';AIIOAutoCreateErrorCases=$true;AIIOProtocolVersion=2;FeedbackMode='LocalOnly'}
     Save-PMMConfig $cfg
   } else {
     # Non-destructive config migration for older previews.
     $cfg=Get-PMMConfig;$changed=$false
-    $defaults=[ordered]@{SteamRoot='';CloseGameBeforeDeploy=$true;ForceCloseOnTimeout=$false;CloseTimeoutSeconds=12;MergeMode='ConflictGroups';LastBuild='';SaveRoot='';Language='en';UiWindowWidth=1580;UiWindowHeight=940;UiWindowState='Normal';UiLibraryWidth=470;UiAnalysisHeight=300;UiResolutionHeight=220;UiConflictListWidth=250;UiPatchHeight=145;SelectedPatchName=''}
+    $defaults=[ordered]@{SteamRoot='';CloseGameBeforeDeploy=$true;ForceCloseOnTimeout=$false;CloseTimeoutSeconds=12;MergeMode='ConflictGroups';LastBuild='';SaveRoot='';Language='en';UiWindowWidth=1460;UiWindowHeight=900;UiWindowState='Normal';UiLibraryWidth=470;UiAnalysisHeight=300;UiResolutionHeight=220;UiConflictListWidth=250;UiPatchHeight=145;SelectedPatchName='';AutoMode=$false;AutoIncludePlay=$false;ActionHintSeconds=5;Theme='pmm-crystal';ThemeArchitectureVersion=2;CompletionSound='Bell';CompletionVolume=50;CustomCompletionSoundPath='';SoundDefaultsVersion=3;SoundAuto='Microwave';SoundSemiAuto='Ok';SoundManual='Good';SoundAttention='Alert';SoundError='Microwave3';SoundSemiAutoEnabled=$true;SoundAttentionEnabled=$true;AIIOActiveSession='';AIIOAutoCreateErrorCases=$true;AIIOProtocolVersion=2;FeedbackMode='LocalOnly'}
+    $hadSoundDefaultsVersion=($cfg.PSObject.Properties.Name -contains 'SoundDefaultsVersion')
+    $legacySoundDefaults=$false
+    if(-not$hadSoundDefaultsVersion){
+      try{$legacySoundDefaults=([string]$cfg.SoundAuto -eq 'Microwave' -and [string]$cfg.SoundSemiAuto -eq 'Crystal' -and [string]$cfg.SoundManual -eq 'Microwave' -and [string]$cfg.SoundAttention -eq 'Bell' -and [string]$cfg.SoundError -eq 'Alert')}catch{$legacySoundDefaults=$false}
+    }
     foreach($kv in $defaults.GetEnumerator()){
       if(-not($cfg.PSObject.Properties.Name -contains $kv.Key)){$cfg|Add-Member -NotePropertyName $kv.Key -NotePropertyValue $kv.Value;$changed=$true}
+    }
+    # RC19 default migration: only migrate an untouched RC18 sound profile set.
+    # If the user changed even one profile, preserve all of their selections.
+    if($legacySoundDefaults){$cfg.SoundSemiAuto='Ok';$cfg.SoundManual='Good';$cfg.SoundAttention='Alert';$cfg.SoundError='Microwave3';$changed=$true}
+    # RC21 assigned the Semiauto profile but accidentally shipped its master
+    # switch off, so changing that sound appeared to do nothing. Migrate the
+    # affected defaults once; choosing the explicit None profile still mutes it.
+    $soundDefaultsVersion=0
+    try{$soundDefaultsVersion=[int]$cfg.SoundDefaultsVersion}catch{$soundDefaultsVersion=0}
+    if($soundDefaultsVersion -lt 3){
+      $cfg.SoundSemiAutoEnabled=([string]$cfg.SoundSemiAuto -ne 'None')
+      $cfg.SoundDefaultsVersion=3
+      $changed=$true
     }
     if($changed){Save-PMMConfig $cfg}
   }

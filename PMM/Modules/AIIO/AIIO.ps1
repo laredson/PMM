@@ -359,7 +359,7 @@ function Copy-PMMAIIOCaseMetadata($Item,[string]$StageRoot) {
   return $caseId
 }
 
-function Export-PMMAIIOAssetSources($Item,[string]$StageRoot,[array]$Mods,[hashtable]$ProviderFolderMap,[ref]$RawBytes,[bool]$AllowOversize) {
+function Export-PMMAIIOAssetSources($Item,[string]$StageRoot,[array]$Mods,[hashtable]$ProviderFolderMap,[ref]$RawBytes,[bool]$AllowOversize,[string]$RoleFilter='',[string]$ProviderFilter='') {
   $asset=([string]$Item.Asset).Replace([char]92,[char]47)
   $isFamily=([IO.Path]::GetExtension($asset) -ieq '.uasset')
   $case=$Item.Case
@@ -372,13 +372,17 @@ function Export-PMMAIIOAssetSources($Item,[string]$StageRoot,[array]$Mods,[hasht
   }
 
   $sourceRows=[System.Collections.Generic.List[object]]::new()
+  if($RoleFilter -and $RoleFilter -notin @('Vanilla','Provider')){throw ('Unknown AIIO source role filter: '+$RoleFilter)}
+  if($ProviderFilter -and $RoleFilter -ne 'Provider'){throw 'AIIO provider filter requires the Provider role.'}
+  $includeVanilla=([string]::IsNullOrWhiteSpace($RoleFilter) -or $RoleFilter -eq 'Vanilla')
+  $includeProviders=([string]::IsNullOrWhiteSpace($RoleFilter) -or $RoleFilter -eq 'Provider')
 
   $hasVanilla=$false
   if($case -and ($case.PSObject.Properties.Name -contains 'VanillaAvailable')){$hasVanilla=[bool]$case.VanillaAvailable}
   elseif($expectedInputs.Count -gt 0){$hasVanilla=(@($expectedInputs|Where-Object{[string]$_.Role -eq 'Vanilla'}).Count -gt 0)}
   else{$hasVanilla=$true}
 
-  if($hasVanilla){
+  if($includeVanilla -and $hasVanilla){
     $vanillaRoot=Join-Path $StageRoot 'sources\Vanilla'
     $vanillaFiles=[System.Collections.Generic.List[object]]::new()
     try{
@@ -415,7 +419,7 @@ function Export-PMMAIIOAssetSources($Item,[string]$StageRoot,[array]$Mods,[hasht
       if($expectedInputs.Count -gt 0){throw}
       Write-PMMLog ('AIIO Vanilla source not available for '+$asset+': '+$_.Exception.Message)
     }
-  }else{
+  }elseif($includeVanilla){
     # Vanilla absence is part of the analyzed fixture too. A game update that
     # introduces this family must invalidate the handoff instead of silently
     # packaging a different baseline.
@@ -427,6 +431,8 @@ function Export-PMMAIIOAssetSources($Item,[string]$StageRoot,[array]$Mods,[hasht
   }
 
   foreach($providerName in @($Item.Providers)){
+    if(-not$includeProviders){continue}
+    if($ProviderFilter -and [string]$providerName -cne $ProviderFilter){continue}
     $providerKey=[string]$providerName
     $expectedHash=if($providerHashes.ContainsKey($providerKey)){[string]$providerHashes[$providerKey]}else{''}
     $mod=Get-PMMAIIOActiveProvider $providerKey $expectedHash $Mods
@@ -468,6 +474,7 @@ function Export-PMMAIIOAssetSources($Item,[string]$StageRoot,[array]$Mods,[hasht
     }
     $sourceRows.Add([pscustomobject]@{Role='Provider';Name=[string]$providerName;Folder=$folder;PakSha256=[string]$mod.Hash;PakBytes=[int64]$mod.Size;Asset=$asset;Files=$providerFiles.ToArray()})
   }
+  if($ProviderFilter -and @($sourceRows|Where-Object{[string]$_.Role -eq 'Provider' -and [string]$_.Name -ceq $ProviderFilter}).Count -ne 1){throw ('AIIO provider filter did not resolve exactly one current source: '+$ProviderFilter)}
   return $sourceRows.ToArray()
 }
 

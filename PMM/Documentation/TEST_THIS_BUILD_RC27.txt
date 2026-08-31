@@ -1,0 +1,40 @@
+PMM 1.3.0 RC27 WINDOWS ACCEPTANCE
+==================================
+
+Use a fresh RC27 folder. Copy Workspace from the accepted RC26/RC24 test only when testing migration; never overwrite the source test folder.
+
+1. STARTUP AND LAYOUT
+- Start PMM at 1920x1080 with 100%, 125% and 150% scaling where available.
+- Resize down to 900x600. Logo/title and actions must each keep half of the wide header; at narrow width actions stack below branding without hiding tabs.
+- Confirm the transparent logo, larger three-line name, Detect/status, AUTO, folders and Start Palworld remain usable.
+
+2. THEMES AND PROGRESS
+- Settings must show 13 official choices (11 JSON + Night + Light) and a separate bordered user-scheme area.
+- Choose PMM Crystal and Apply changes. Importing the exact official PMM Crystal JSON must report already bundled, not invalid/unsafe.
+- Create a draft in AI & Help, change a color, upload one PNG/JPEG, Preview, Revert, install locally and confirm it appears only under user schemes.
+- During an operation, progress must interpolate below completion. A real 100% report must jump to 100 immediately before the next task.
+
+3. MERGE/FIX LAB REGRESSIONS
+- Repeat the accepted active-mod Analyze. Disabling a unique non-conflicting mod must reuse the effective patch and require only Deploy.
+- Apply Fix and Restore original. Hash the deployed PMM merge PAK and sidecar before/after; both must remain identical.
+- With two known complete Gura outputs enabled, Analyze must stop before asset enumeration and request one variant.
+
+4. AI & HELP / AIIO
+- Create a diagnostic case and a general AIIO session. Restart PMM: both must remain.
+- Prepare for AI. Inspect the ZIP: it must contain bundle.json, session.json, request.json, PMM_CAPABILITIES.json and the response contract; no whole source PAK, save content or credentials.
+- While Prepare, requested-data preparation, response import and Refresh inventory run, switch between Help, Knowledge and Settings. Navigation and repainting must remain responsive; CANCEL must stop the supervised worker without committing a partial result.
+- Import malformed response fixtures (path traversal, script extension, nested ZIP and duplicate response.json). Every one must be rejected without staging files outside the session.
+- Import a valid needs-data response and prepare requested data. Only declared Level A requestable capabilities may be fulfilled. Provider extraction must require the exact providerName from the current Unsupported case; Vanilla extraction must fail when that case has no Vanilla source.
+- Import a valid candidate. It must remain staged. Only an exact current PMM_MANUAL_SOLUTION_V1 may enable Use candidate; accepting it must force Analyze and must not Build or Deploy.
+
+5. VALIDATION AND RECOVERY
+- Select a saved compatibility patch and record PASS/PARTIAL/FAIL. Restart PMM and confirm immutable history and current summary.
+- Generate a feedback file and inspect it locally; confirm no network request occurred.
+- Interrupt one background operation, restart and check the recoverable operation entry under Knowledge & community.
+- Review disposable cleanup. Active sessions, current/deployed builds, Knowledge contributions and save backups must never be deletion targets.
+
+6. FINAL GAME TEST
+- Build and Deploy explicitly. Start Palworld and exercise the affected mods.
+- Record the exact build result. Only then treat LOCAL_PASS as gameplay evidence.
+
+If any step fails, keep Workspace\Logs\PalModMerger.log and the affected Workspace\AIIO session. Do not publish the release until the failure is resolved.

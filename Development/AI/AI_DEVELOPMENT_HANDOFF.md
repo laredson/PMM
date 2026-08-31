@@ -1,5 +1,7 @@
 # Palworld Manager Merger v1.1.1 — AI / Developer Development Handoff
 
+> Historical document. The current continuation authority is `AI_CONTINUE_HERE.md` for PMM 1.3.0 RC24.
+
 ## Canonical current state
 
 - Release: **v1.1.1**

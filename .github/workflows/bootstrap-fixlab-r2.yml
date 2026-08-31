@@ -1,0 +1,86 @@
+name: Bootstrap PMM 1.3 Fix Lab R2 branch
+
+on:
+  push:
+    branches:
+      - '1.3.0-fix-lab'
+    paths:
+      - '.github/bootstrap/fixlab-r2-overlay.ready'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  materialize-branch:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: '1.3.0-fix-lab'
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Decode, verify and apply source patch
+        shell: pwsh
+        run: |
+          $parts = Get-ChildItem -LiteralPath '.github/bootstrap' -Filter 'fixlab-r2-overlay.patch.xz.b64.part*' -File | Sort-Object Name
+          if (-not $parts -or $parts.Count -ne 8) { throw "Expected 8 overlay chunks, found $($parts.Count)." }
+          $encoded = ($parts | ForEach-Object { [System.IO.File]::ReadAllText($_.FullName) }) -join ''
+          $archive = Join-Path $env:RUNNER_TEMP 'fixlab-r2-overlay.patch.xz'
+          [System.IO.File]::WriteAllBytes($archive, [Convert]::FromBase64String($encoded))
+          $actual = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          $expected = '39622b989a4b4a1056f3efc6b527828c3325359c90e5f7ffe399776c6536fcbb'
+          if ($actual -ne $expected) { throw "Overlay hash mismatch: $actual" }
+          $patch = Join-Path $env:RUNNER_TEMP 'fixlab-r2-overlay.patch'
+          $env:PMM_FIXLAB_ARCHIVE = $archive
+          $env:PMM_FIXLAB_PATCH = $patch
+          python -c "import lzma, os, pathlib; pathlib.Path(os.environ['PMM_FIXLAB_PATCH']).write_bytes(lzma.decompress(pathlib.Path(os.environ['PMM_FIXLAB_ARCHIVE']).read_bytes()))"
+          git apply --whitespace=nowarn $patch
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.x'
+
+      - name: Build and test native Fix Lab engine
+        shell: pwsh
+        run: |
+          ./Development/Scripts/build/Build-FixLabEngine.ps1
+
+      - name: Enforce public repository hygiene and regenerate hashes
+        shell: pwsh
+        run: |
+          Remove-Item -LiteralPath './PMM/Engine/oo2core_9_win64.dll' -Force -ErrorAction SilentlyContinue
+          $root = (Resolve-Path './PMM').Path
+          $sumPath = Join-Path $root 'Resources/Metadata/SHA256SUMS.txt'
+          $lines = Get-ChildItem -LiteralPath $root -File -Recurse |
+            Where-Object { $_.FullName -ne $sumPath -and $_.Name -ne 'oo2core_9_win64.dll' } |
+            Sort-Object { $_.FullName.Substring($root.Length + 1).Replace('\','/').ToLowerInvariant() } |
+            ForEach-Object {
+              $rel = $_.FullName.Substring($root.Length + 1).Replace('\','/')
+              $hash = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+              "$hash  $rel"
+            }
+          [System.IO.File]::WriteAllText($sumPath, (($lines -join "`n") + "`n"), [System.Text.UTF8Encoding]::new($false))
+          $forbidden = Get-ChildItem -LiteralPath . -File -Recurse | Where-Object {
+            $_.Extension -in '.pak','.ucas','.utoc' -or $_.Name -eq 'oo2core_9_win64.dll' -or $_.FullName -match '[\\/]Workspace[\\/]'
+          }
+          if ($forbidden) { throw ('Forbidden payloads found: ' + (($forbidden.FullName) -join ', ')) }
+
+      - name: Commit complete PMM 1.3 Fix Lab branch
+        shell: pwsh
+        run: |
+          Remove-Item -LiteralPath '.github/bootstrap/fixlab-r2-overlay.patch.xz.b64.part*' -Force
+          Remove-Item -LiteralPath '.github/bootstrap/fixlab-r2-overlay.ready' -Force
+          Remove-Item -LiteralPath '.github/workflows/bootstrap-fixlab-r2.yml' -Force
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "PMM 1.3.0 Fix Lab native recipe engine and async worker R2"
+          git push origin HEAD:1.3.0-fix-lab

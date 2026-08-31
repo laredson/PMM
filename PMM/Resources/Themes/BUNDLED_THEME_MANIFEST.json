@@ -1,0 +1,81 @@
+{
+  "schema": "PMM_BUNDLED_THEME_MANIFEST_V1",
+  "release": "1.3.0 RC27",
+  "defaultThemeId": "pmm-crystal",
+  "themeCount": 11,
+  "validation": {
+    "contrastMinimum": 4.5,
+    "detectedInstallSurface": "CardAltBackground",
+    "result": "PASS"
+  },
+  "themes": [
+    {
+      "id": "pmm-crystal",
+      "file": "PMM_COLOR_SCHEME_PMM_CRYSTAL.json",
+      "sha256": "4e93c2a892a6c99922d9f3ac6c98f0fbafec49757cfd6f9c2b80584977f30618",
+      "source": "official-pack",
+      "default": true
+    },
+    {
+      "id": "coral-reef",
+      "file": "PMM_COLOR_SCHEME_CORAL_REEF.json",
+      "sha256": "1a806ed56147e36f574acff01004fbc294165b2ec3be62c8e1d950d2407bac17",
+      "source": "official-pack"
+    },
+    {
+      "id": "desert-sunset",
+      "file": "PMM_COLOR_SCHEME_DESERT_SUNSET.json",
+      "sha256": "de7d48e7f01d588cd7165ae5e8442395b9fddd8371d25df8ff9cd8b140909c2f",
+      "source": "official-pack"
+    },
+    {
+      "id": "minecraft-overworld",
+      "file": "PMM_COLOR_SCHEME_MINECRAFT_OVERWORLD.json",
+      "sha256": "eeab838b09157ea006eb609c52ab8b1b9e9402177696d0bd50df43da728ae3f6",
+      "source": "official-pack"
+    },
+    {
+      "id": "mushroom-kingdom",
+      "file": "PMM_COLOR_SCHEME_MUSHROOM_KINGDOM.json",
+      "sha256": "f6f832d8535fb1a0da98162fd4d99d0fc82b379260e8dd59ac66c74a986471da",
+      "source": "official-pack"
+    },
+    {
+      "id": "neon-synthwave",
+      "file": "PMM_COLOR_SCHEME_NEON_SYNTHWAVE.json",
+      "sha256": "974340d37cdbb4e88d624a392602fb545d57a597f8df20b8bec3807c0e8424ce",
+      "source": "official-pack"
+    },
+    {
+      "id": "nocturne-castle",
+      "file": "PMM_COLOR_SCHEME_NOCTURNE_CASTLE.json",
+      "sha256": "0faca117ddfe33dd367ba65cc1b2f2e7859e889c13e6687e0c7e6c6c5ddbbed4",
+      "source": "official-pack"
+    },
+    {
+      "id": "olive-grove",
+      "file": "PMM_COLOR_SCHEME_OLIVE_GROVE.json",
+      "sha256": "f10ca565e9669cbdf6dc06e35be7be59f32fa5e3d0f82444e2c1b2fd84731396",
+      "source": "official-pack"
+    },
+    {
+      "id": "sakura-matcha",
+      "file": "PMM_COLOR_SCHEME_SAKURA_MATCHA.json",
+      "sha256": "f2c748c374269d836e42fe385482c021614576031ca9dc787b8dc6846e982761",
+      "source": "official-pack"
+    },
+    {
+      "id": "web-slinger",
+      "file": "PMM_COLOR_SCHEME_WEB_SLINGER.json",
+      "sha256": "ac83cbced40258b1c1e57eaa6b91e83a2654b30e0d139bc31eb3cef6ec6376b6",
+      "source": "official-pack"
+    },
+    {
+      "id": "aurora-confetti",
+      "file": "PMM_COLOR_SCHEME_AURORA_CONFETTI.json",
+      "sha256": "ae6f79f0293de9c76ed660a98ed7511f2f54baa005aa913e1494cd6468f86325",
+      "source": "official-pack",
+      "note": "Official since RC26 after the complete real-surface contrast matrix passed."
+    }
+  ]
+}

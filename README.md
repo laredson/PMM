@@ -1,48 +1,34 @@
 # Palworld Manager Merger (PMM)
 
-**Current stable repository baseline: PMM 1.2.1 Guided Flow (without Fix Lab).**
+**Current release candidate: PMM 1.3.0 RC30 — lean AI, validation and idle-performance flow.**
 
-PMM is a Palworld mod manager and compatibility merger. The application preserves source mods and, when necessary, builds a compatibility overlay instead of blindly combining every mod into a single MegaMerge.
+Palworld Manager Merger is a local Palworld mod manager, compatibility analyzer/overlay builder and legacy-mod repair platform. It preserves source mods and creates only the compatibility overlay required by shared assets.
 
 ## Repository layout
 
-The repository root is intentionally small:
+- `PMM/` — complete portable application.
+- `Development/` — engineering source, tests, architecture and continuation handoffs.
+- `.github/` — contribution and project-policy files.
+- `LICENSE` — MIT project license.
 
-- `PMM/` — the complete portable application. This is the only folder packaged for normal users.
-- `Development/` — source, tests, build/validation tools, engineering documentation and AI handoff material.
-- `.github/` — GitHub Actions, issue/PR templates and community/security files.
-- `.gitignore` / `.gitattributes` — repository behavior.
-- `LICENSE` — project license.
-
-### Development layout
-
-- `Development/Source/` — Host, Runtime, PMMCore, AssetReader and icon-helper source inherited from the 1.2.1 restructured repository baseline.
-- `Development/Scripts/` — build, CKL and validation tooling.
-- `Development/Tests/` — repository smoke tests.
-- `Development/Docs/` — architecture, protocol, validation, history and publishing documentation.
-- `Development/AI/` — continuation handoffs for developers and AI agents.
-
-For development or AI continuation, read **`Development/AI/CURRENT_STATE.md` first**, then `Development/AI/AI_CONTINUE_HERE.md`.
+Runtime-created `PMM/Workspace/` is private local state and must never be committed or shipped.
 
 ## Start PMM
 
-Download the release ZIP, extract it, and run:
+Extract the portable package and run `PMM.exe`.
 
-`PMM.exe`
+The guided workflow is:
 
-The release ZIP is built from the **contents of `PMM/` only**. `Development/`, `.github/`, Git metadata and repository documentation are not part of the user package.
+`Detect if needed -> Import -> Fix Lab when required -> Analyze -> Build only when required -> Deploy -> Play ready`
 
-## Branch model
+RC30 retains the complete RC22–RC29 merge, Fix Lab, validation, responsive-layout, progress, Gura-preflight, theme and AIIO correction chain. It prevents child selections from rebuilding the whole AI workspace, removes permanent 500 ms UI polling, reduces and gates the external-mod heartbeat, makes exact validation update only its own row, enlarges both validation prompts, and offers a direct tested-Knowledge contribution after a successful in-game result. The header reads Detect/status, folders/optional Play, then AUTO. A successful Deploy highlights Play as ready without presenting it as required.
 
-- `main` — stable/releasable code only.
-- `dev/<version-or-feature>` — active development.
-- `release/<version>` — optional release-candidate stabilization.
-- tags such as `v1.2.1` — exact public releases.
+## AI & Help / AIIO
 
-The next feature line is intended to be **PMM 1.3 / Fix Lab** and should be developed on a separate branch from this stable 1.2.1 baseline.
+The visible **AI & Help** workspace is backed by persistent local AIIO sessions, diagnostics, Knowledge, save activity, a recoverable operation journal, deterministic build validation and a color-scheme editor with image-backed V2 packs. **AI assistance** shows the selected case or an explicit new-case form; **AI reception** accepts a returned ZIP and keeps candidates staged; **Feedback & Knowledge** creates inspectable local files for an exact merge/validation, CKL or general comments. AI-specific behavior remains in its own Settings view, while Vanilla Game Reference is also available from normal Settings.
 
-## Important source note
+The current AI transport is deliberately manual and local: PMM prepares bounded ZIPs and validates returned ZIPs as untrusted data. It does not log into a provider, upload automatically, execute returned code, apply a fix, build, deploy or publish without an explicit user action. Returned solutions remain staged until they satisfy an exact current case contract; accepting an eligible candidate forces Analyze and never triggers Build or Deploy.
 
-`PMM/` in this repository is the user-confirmed working **Guided Flow** application and is the authority for the 1.2.1 release baseline. The native source snapshot originally came from the earlier 1.2.1 restructured repository package. The Guided Flow native `PMM.exe` / `PMMRuntime.exe` binaries are newer than that source snapshot, so do **not** rebuild and overwrite those two binaries from `Development/Source/` until the native source is reconciled. PowerShell/WPF application logic inside `PMM/Modules/` remains directly editable.
+Continue development from `Development/AI/AI_CONTINUE_HERE.md` and `Development/AI/AIIO_1_3_0_HANDOFF.md`. The runnable `PMM/` tree and packaged binaries are the release authority. Do not rebuild the older native-source snapshot over those binaries until parity is proven.
 
 Created by **laredson**.

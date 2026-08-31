@@ -1,0 +1,77 @@
+{
+  "schema": "PMM_FIXLAB_RECIPE_V1",
+  "id": "fixlab-case-001-gawr-gura-v5-core-r1",
+  "name": "Gawr Gura v5 current-provider reconstruction core R1",
+  "version": 1,
+  "status": "experimental-runtime-proven-research-port",
+  "targetBuild": "Palworld 1.0.3.101283",
+  "sourceSignatures": [
+    {
+      "name": "GawrGura v5 Normal source PAK",
+      "sha256": "33a200edbe2f1f08c9666431040c98772321d13a3272f1b93da1fb1f90722c02",
+      "role": "accepted-donor"
+    },
+    {
+      "name": "GawrGura v5 FullReplacement source PAK",
+      "sha256": "ca3919ff0b9980c58189a4511401678064516e2471c374b55b0cd9900569a872",
+      "role": "accepted-donor"
+    }
+  ],
+  "currentNameHashSources": [
+    "Pal/Content/Pal/DataTable/CharacteCreation/DT_CharacterCreationMeshPresetTable_Equipments.uasset",
+    "Pal/Content/Pal/DataTable/CharacteCreation/DT_CharacterCreationMeshPresetTable_Body.uasset",
+    "Pal/Content/Pal/DataTable/CharacteCreation/DT_CharacterCreationMeshPresetTable_Head.uasset",
+    "Pal/Content/Pal/DataTable/CharacteCreation/DT_CharacterCreationMeshPresetTable_Hair.uasset"
+  ],
+  "support": {
+    "includeRoots": [
+      "Pal/Content/Starfelll/GawrGura/Mat"
+    ],
+    "includeFiles": [
+      "Pal/Content/Starfelll/GawrGura/Gura_Skeleton.uasset",
+      "Pal/Content/Starfelll/GawrGura/Gura_Skeleton.uexp"
+    ],
+    "excludeRegex": [
+      "/MI_Spear\\.(uasset|uexp)$",
+      "/Tex/weapon\\."
+    ]
+  },
+  "relocate": [
+    {
+      "name": "body",
+      "donorUasset": "Pal/Content/Starfelll/GawrGura/Gura.uasset",
+      "targetRegex": "^Pal/Content/Pal/Model/Character/Player/Outfit/[^/]+/SK_Player_Female_Outfit_[^/]+\\.uasset$",
+      "postProcess": {
+        "staleClass": "ABP_Gura_C",
+        "safeClass": "Body",
+        "expectedSerializedOffsets": [
+          120
+        ]
+      },
+      "minimumCount": 30,
+      "knownBaselineCount": 30
+    },
+    {
+      "name": "head",
+      "donorUasset": "Pal/Content/Starfelll/GawrGura/Gura_None.uasset",
+      "targetRegex": "^Pal/Content/Pal/Model/Character/Player/Head/Head[0-9]+/SK_Player_Female_Head[0-9]+\\.uasset$",
+      "minimumCount": 26,
+      "knownBaselineCount": 26
+    },
+    {
+      "name": "hair",
+      "donorUasset": "Pal/Content/Starfelll/GawrGura/Gura_None.uasset",
+      "targetRegex": "^Pal/Content/Pal/Model/Character/Player/Hair/Hair[0-9]+/SK_Player_Hair[0-9]+\\.uasset$",
+      "minimumCount": 37,
+      "knownBaselineCount": 37
+    }
+  ],
+  "forbiddenOutputRegex": [
+    "/Blueprint/",
+    "/Phy/",
+    "/Imp_Hair/",
+    "/HairAttachAccessory/"
+  ],
+  "mountPoint": "../../../",
+  "pathHashSeed": 0
+}

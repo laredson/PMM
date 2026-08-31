@@ -1,62 +1,36 @@
 # PMM — CURRENT STATE
 
-**Read this file first when continuing development.**
+## Release authority
 
-## Stable baseline
-
-- Product: **Palworld Manager Merger (PMM)**
+- Product: **Palworld Manager Merger**
 - Creator: **laredson**
-- Stable line prepared here: **v1.2.1**
-- Application baseline: **Guided Flow**
-- Fix Lab: **not included in this stable branch**
-- Runtime status: the user confirmed the Guided Flow build works correctly in normal use.
+- Candidate: **v1.3.0 RC30 — lean AI and validation flow**
+- Build ID: `PMM-v1.3.0-RC30-LEAN-AI-VALIDATION-FLOW`
+- Runnable authority: `PMM/`
+- Native executables: unchanged from the accepted RC21 binary lineage
 
-Known QoL differences in this older stable baseline include a completion confirmation after merge and buttons that do not yet contain the later inline progress bars. Those are not treated as functional blockers for v1.2.1.
+RC30 is built directly on the executed RC29 and preserves RC22–RC29. It fixes routed selection/rebinding, global refresh after validation, undersized repeat-validation controls, idle polling overhead, selected-case AI UX, direct new-case ZIP creation, response routing and false untouched-theme-draft contrast failures. Effective patch reuse, Fix Lab/merge ownership, responsive layout, Gura preflight, official/user theme separation, immediate confirmed 100%, deterministic validation, canonical deployment normalization, exact semantic rules and all local-first AIIO trust gates remain unchanged.
 
-## Repository policy
+## Current product surface
 
-`PMM/` is the distributable application. Everything else is repository/development material.
+`Mods & Merge -> FIX LAB -> AI & Help -> Saves -> Settings`
 
-Do not ship `Development/`, `.github/`, `.git*`, tests, source trees or maintainer handoffs in the normal user ZIP.
+AI & Help provides five focused views: AI assistance, AI reception, Feedback & Knowledge, color-scheme editor and AI Settings. Selecting a case shows that case; New case exposes explicit PMM features and can save locally or create the safe ZIP directly. Standard responses route by embedded session ID, while a recognized standalone theme opens only as an uninstalled draft. Vanilla Game Reference is also in normal Settings. Long AIIO work and recursive artifact inventory run through `Modules/Operations/OperationWorker.ps1`, not the WPF dispatcher.
 
-## Next product line
+The only AI transport in RC30 is user-mediated ZIP. Feedback transport is inspectable local JSON and manual sharing. There is no provider authentication or automatic upload. AI data cannot execute arbitrary code, apply a fix, build, deploy, publish or promote Knowledge. Only an exact current manual cooked-family candidate can be explicitly submitted to normal Merge validation; it remains experimental/unproven and forces Analyze.
 
-Fix Lab is considered a sufficiently large feature to begin **PMM 1.3** rather than continuing to call it 1.2.1.
+## Workflow and ownership
 
-Recommended branch:
+`Detect if needed -> Import -> Fix Lab if required -> Analyze -> Build if required -> Deploy -> Play ready`
 
-`dev/1.3-fixlab`
+Analyze plan schema is 18 and build-manifest schema is 9. Unique non-conflicting PAK changes can reuse an overlay only when the complete saved topology/evidence contract remains exact. Fix Lab Apply/Restore, source-mod operations and AI & Help preserve the deployed compatibility patch. Only Deploy/No compatibility patch, UNDEPLOY and Delete merge own that namespace.
 
-The 1.3 branch should start from this stable 1.2.1 baseline, then import the latest working Fix Lab line and continue with the agreed Workshop / Repair / Deploy Fix / AUTO-routing work.
+## Packaging policy
 
-## Native source caveat
+`PMM/` is the distributable application. Never commit or ship `PMM/Workspace/`, user PAKs/saves/logs, Game Reference data, extracted Vanilla content, credentials, UCAS/UTOC files or `oo2core_9_win64.dll`.
 
-The `Development/Source/` tree comes from the earlier **PMM v1.2.1 RESTRUCTURED_REPOSITORY** snapshot. The `PMM/` folder comes from the later **GUIDED_FLOW_TEST** build confirmed working by the user.
+The native source snapshot under `Development/Source/` is older/incomplete relative to the packaged binary behavior. Do not overwrite `PMM.exe`, `PMMRuntime.exe`, `PMMFixLab.exe` or managed binaries until source/binary reconciliation and Windows tests pass.
 
-The Guided Flow `PMM.exe` and `PMM/Engine/PMMRuntime.exe` are newer than the native Host/Runtime source snapshot. Therefore:
+## Acceptance boundary
 
-1. Treat the binaries in `PMM/` as the release authority for v1.2.1.
-2. Do not rebuild/replace those two binaries from `Development/Source/` until the corresponding native source changes are recovered or reconciled.
-3. The editable PowerShell/WPF code under `PMM/Modules/` and `PMM/Resources/` is part of the working Guided Flow build and can be compared/modified normally.
-4. A future source-reconciliation commit should remove this caveat once source and binaries correspond again.
-
-## Repository path migration
-
-The old restructured repository used root folders named `src/`, `scripts/`, `tests/` and `docs/`. They are now intentionally grouped under `Development/`:
-
-- old `src/...` -> `Development/Source/...`
-- old `scripts/...` -> `Development/Scripts/...`
-- old `tests/...` -> `Development/Tests/...`
-- old `docs/Development/...` -> `Development/AI/...`
-- other old `docs/...` -> `Development/Docs/...`
-
-The packaged 1.2.1 release manifest contains some informational `repository ...` strings from the pre-cleanup layout. They do not affect the portable application's runtime paths. The PMM folder itself has intentionally been kept byte-for-byte identical to the confirmed Guided Flow build.
-
-## Git workflow
-
-- `main`: only stable/releasable states.
-- Develop Fix Lab on `dev/1.3-fixlab`.
-- Commit small coherent changes.
-- Validate before merging to `main`.
-- Tag the exact public release (`v1.2.1`, later `v1.3.0`).
-- Never commit `PMM/Workspace/`, user mods, Game Reference data, saves, logs, Gura assets or other third-party PAK/UCAS/UTOC files.
+Static validation proves schemas, hashes, XAML parity, security invariants and archive integrity. Windows acceptance remains mandatory. Follow `PMM/Documentation/TEST_THIS_BUILD_RC30.txt` before publishing.

@@ -1,0 +1,38 @@
+{
+  "schema": "PMM_FIXLAB_RECIPE_COMPILER_REPORT_V1",
+  "caseId": "FIXLAB-CASE-001-GAWR-GURA",
+  "patchFiles": 137,
+  "patchBytes": 777577,
+  "variants": [
+    {
+      "variant": "original_fullreplacement",
+      "entries": 238,
+      "operations": 80,
+      "newPatchKeys": 37
+    },
+    {
+      "variant": "normal_locked",
+      "entries": 228,
+      "operations": 70,
+      "newPatchKeys": 30
+    },
+    {
+      "variant": "red_locked",
+      "entries": 238,
+      "operations": 80,
+      "newPatchKeys": 30
+    },
+    {
+      "variant": "hooded_locked",
+      "entries": 228,
+      "operations": 70,
+      "newPatchKeys": 30
+    },
+    {
+      "variant": "hair2_panties",
+      "entries": 58,
+      "operations": 25,
+      "newPatchKeys": 10
+    }
+  ]
+}

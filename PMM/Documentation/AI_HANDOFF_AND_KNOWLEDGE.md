@@ -1,37 +1,41 @@
-# AI_HANDOFF, AIIO and Knowledge Library
+# AI & Help, AIIO and Knowledge
 
-This is the advanced extension path for conflicts PMM cannot yet prove automatically.
+PMM 1.3 RC30 includes the local-first **AI & Help** workspace. It is a durable task and evidence system, not a built-in cloud account. PMM does not connect to an AI provider, upload files, request credentials or run returned code.
 
-## Analyze and AIIO are separate
+## Persistent sessions
 
-Analyze only analyzes the current source graph. For every Unsupported item it records an exact review case (`case.json`, input hashes/sizes and analysis evidence). Unreal cooked families keep the existing manual-solution contract; plain/non-Unreal shared files are included as investigation evidence without pretending PMM can auto-import a replacement for those formats. Analyze does **not** build AI handoff ZIPs and does **not** copy source PAKs.
+An AIIO v2 session keeps its description, selected targets, exact Unsupported case IDs, requests, responses, staged candidates and history below `Workspace\AIIO\Sessions`. Sessions survive restarts and may be archived explicitly. Re-analysis reuses an Unsupported session only when the exact case set, source signature and merge-order signature still match.
 
-When the user explicitly chooses **CREATE AI HANDOFF**, AIIO creates **one** `AI_HANDOFF_<bundleId>.zip` for the complete current Unsupported set. After a normal Analyze with Unsupported items, PMM can also ask whether the user wants to create that bundle now.
+**AI assistance** can create bounded diagnostic cases for PMM errors, crashes, feature failures, mods that do not work, build/deploy failures, save problems and performance issues. Selecting an existing case shows that case instead of silently presenting a second creation form. A selected mod or build is recorded as a suspicion, never as a proven cause. Save activity, the recoverable operation journal, deployment metadata, Knowledge matches and bounded log summaries provide local context.
 
-The bundle contains:
+## Manual ZIP exchange
 
-- `cases/<caseId>/` — exact PMM analysis evidence for each Unsupported case;
-- `sources/Vanilla/<logical game path>` — the exact conflicting Vanilla file/family when available;
-- `sources/<mod name>/<logical game path>` — only the exact conflicting file/family extracted from each involved mod;
-- `merge-plan.json`, `source-map.json` and bundled PMM CKL knowledge/documentation.
+**Prepare for AI** creates `PMM_AIIO_REQUEST_...zip`. You choose whether and where to send it. The bundle uses `PMM_AI_HANDOFF_BUNDLE_V2` and includes:
 
-Whole source PAKs are intentionally never included.
+- a sanitized session and current-plan summary;
+- exact current Unsupported case metadata;
+- the local capability registry;
+- bounded diagnostic/operation evidence when relevant;
+- a response contract and template.
 
-## Size policy
+Whole source PAKs, save contents, credentials and arbitrary local paths are not included. If an AI needs more data, its `PMM_AI_RESPONSE_V2` can request only enabled, allowlisted capabilities. A provider-source request must name the exact provider from the current Unsupported case; a Vanilla request is accepted only when that case has a Vanilla source. **Prepare requested data** creates the next bounded ZIP; it does not grant a general filesystem or command capability.
 
-AIIO targets a handoff ZIP of at most 512 MiB and uses a 5 GiB normal uncompressed-bundle budget. The preflight estimate uses a conservative planning ratio and AIIO also enforces the raw budget while extracting. If the handoff is expected to exceed the normal budget, PMM asks the user whether to create the large package anyway.
+Session preparation, requested-data preparation, response import and candidate activation/validation execute through the supervised background operation worker so archive, extraction and hashing work do not block navigation in WPF. **AI reception** owns returned ZIP import and staged candidates; a recognized self-describing theme response may be received without first creating a visible diagnostic case, but it opens only as an uninstalled draft.
 
-Temporary AIIO stages and partial ZIPs are deleted in a `finally` path. PMM also removes abandoned Analyze/AIIO staging, partial archives and legacy per-case handoff ZIPs during startup hygiene.
+## Returned content is untrusted
 
-## Returned solutions
+Imported response archives are checked for size, entry count, duplicate roots, traversal, absolute paths, links, nested archives and executable/script extensions. Every candidate is staged below its session and remains inactive.
 
-One incoming handoff can contain many cases, but PMM continues to validate returned cooked solutions per exact case. For each solved Unreal cooked-family case, return one ZIP following `PMM_MANUAL_SOLUTION_V1`. This preserves the existing caseId/hash safety model and allows an AI/modder to solve all, some or none of the cases independently.
+Only an exact `PMM_MANUAL_SOLUTION_V1` cooked-family candidate can expose **Use candidate in Merge**. The user must confirm it, and PMM then repeats the existing exact case/hash/topology/AssetReader validation and forces Analyze. It never starts Build or Deploy. Full-PAK, theme and development candidates remain staged for inspection; PMM never executes them.
 
-Gameplay semantics still require in-game testing. Successful cases can be contributed back as handoff + returned solution + runtime result so maintainers can generalize the structural lesson rather than add filename exceptions.
+The older one-shot **CREATE AI HANDOFF** flow remains available for compatibility with existing `PMM_MANUAL_SOLUTION_V1` tooling. New work should use the persistent AIIO v2 tab.
 
-See:
+## Knowledge and runtime evidence
 
-- `../Docs/COMMUNITY_KNOWLEDGE_WORKFLOW.md`
-- `../Docs/MANUAL_SOLUTION_CONTRACT.md`
-- `KNOWLEDGE_LIBRARY.md`
-- `DEVELOPERS_AND_AI.md`
+Bundled and local CKL Knowledge can explain or prove narrowly defined compatibility behavior. It cannot silently promote an AI answer. Validation belongs to a complete deterministic SHA-256 build ID and is stored as immutable local events: `UNVALIDATED`, `LOCAL_PASS`, `LOCAL_PARTIAL`, `LOCAL_FAIL` or `NOT_DEPLOYED`.
+
+The Feedback & Knowledge view can export an exact validation event or create `PMM_USER_FEEDBACK_V1` for an exact merge, Knowledge/CKL or a general comment. These are inspectable local JSON files intended for manual sharing. RC30 has no feedback endpoint; `PMM_FEEDBACK_TRANSPORT_V1` is declared only as a disabled future adapter boundary and nothing is uploaded.
+
+Gameplay semantics still require an in-game test. Publishing a branch, contribution or solution, applying a Fix, restoring state and deploying are always separate explicit actions.
+
+See `MANUAL_SOLUTION_CONTRACT.md`, `COMMUNITY_KNOWLEDGE_WORKFLOW.md` and `RC30_RELEASE_CANDIDATE.md`.

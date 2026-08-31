@@ -35,11 +35,14 @@ Data/settings*
 *.log
 
 # User/game data - never commit
-Saves/
-Saved/
-SaveGames/
-GameReference/
-VanillaGameReference/
+# Anchor these runtime folders to the repository root. Unanchored names such as
+# "Saves/" and "GameReference/" also hide the real source modules under
+# PMM/Modules, which made a GitHub Desktop commit silently omit four files.
+/Saves/
+/Saved/
+/SaveGames/
+/GameReference/
+/VanillaGameReference/
 Data/GameReference/
 
 # Intake/quarantine is not validated knowledge
@@ -70,5 +73,7 @@ Development/Temp/
 Development/TestResults/
 
 # Unreal / Palworld payloads must not be committed
+*.pak
 *.ucas
 *.utoc
+oo2core_9_win64.dll

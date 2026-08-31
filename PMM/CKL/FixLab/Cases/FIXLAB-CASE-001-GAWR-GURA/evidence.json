@@ -1,0 +1,30 @@
+{
+  "schema": "PMM_FIXLAB_EVIDENCE_V1",
+  "caseId": "FIXLAB-CASE-001-GAWR-GURA",
+  "runtimeEvidence": {
+    "originalFullReplacement": "PASS",
+    "hair2Panties": "PASS",
+    "weaponAttachment": "PASS after current PalHuman skeleton routing",
+    "pelvis": "PASS after retaining/baking the Gura_1 pelvis continuation",
+    "normalLocked": "PASS 2026-08-27: _P.pak loads in-game and repaired pelvis is present"
+  },
+  "knownOutputSha256": {
+    "original_fullreplacement": "a41ee585940eb441380c9f279ad0d1f552d706eb4b2786cd8e49086a5cdd5691",
+    "normal_locked": "221b48e908b22938b684420ccc914932bd0ba7acf59d7908929056fadee6885e",
+    "red_locked": "03f0098d9eb06303fe2c9607fd1bac43ee1e5d43c5720f2b2e38cc63fe5ed2e5",
+    "hooded_locked": "1319fb5cbb26d147a86d54f4f419305811533291920cbe9ae450ef5a69acd07d",
+    "hair2_panties": "adb05c936225082d199eda0a97b894ca10a7b06ce1bc92b1889ff3cd55a1d0f5"
+  },
+  "notes": [
+    "Do not ship obsolete 2024 player AnimBlueprint override stubs unchanged into Palworld 1.0.3.",
+    "Preserve cooked dependency/preload topology.",
+    "Gura_1 contains the pelvis/upper-thigh continuation required for the repaired full composite.",
+    "The flat Chinese author-notice render section is auxiliary geometry, not the shark tail; attribution remains metadata.",
+    "Hair2 selective mode must preserve the original conditional component architecture.",
+    "The validated Hair2/Panties build requires material-slot isolation.",
+    "Current PalHuman skeleton routing is part of the validated weapon/tool attachment repair.",
+    "Source-matrix update: v5 Normal and v5 FullReplacement are independently accepted providers; native recipe-engine validation reproduced the five known output artifacts from either provider. This proves output equivalence for the documented reference, not in-game runtime status. Runtime-proven classification remains limited to the variants explicitly listed in case.json until user/runtime evidence confirms more.",
+    "Mount-order finding (2026-08-27): the prior native V2 Red output reproduced the supplied reference PAK byte-for-byte, but PMM deployed it without the Unreal _P.pak patch suffix. Case 001 repair outputs now retain _P.pak so same-path assets receive patch mount priority. This corrects deployment naming; it does not promote structural-only variants to runtime-proven.",
+    "Runtime update (2026-08-27): normal_locked was accepted in-game by the user with the required _P.pak mount suffix; pelvis repair is present. normal_locked is now runtime-proven."
+  ]
+}

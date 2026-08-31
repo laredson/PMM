@@ -37,8 +37,19 @@ function Resolve-PalworldRoot([string]$Candidate){
   if(-not $Candidate){return $null}
   try { $p=[IO.Path]::GetFullPath($Candidate) } catch { return $null }
   if(Test-Path -LiteralPath $p -PathType Leaf){$p=Split-Path -Parent $p}
-  $tests=Get-UniqueWindowsPaths @($p,(Split-Path -Parent $p),(Split-Path -Parent (Split-Path -Parent $p)))
-  foreach($t in $tests){
+
+  # A user may select Palworld itself, Pal\Content\Paks, ~mods, an
+  # executable, or another nearby child. Walk upward far enough to recover the
+  # actual game root instead of rejecting a fundamentally correct selection.
+  $tests=New-Object System.Collections.Generic.List[string]
+  $cursor=$p
+  for($i=0; $i -lt 8 -and -not[string]::IsNullOrWhiteSpace([string]$cursor); $i++){
+    $tests.Add([string]$cursor)
+    $parent=Split-Path -Parent $cursor
+    if([string]::IsNullOrWhiteSpace([string]$parent) -or $parent -eq $cursor){break}
+    $cursor=$parent
+  }
+  foreach($t in (Get-UniqueWindowsPaths $tests.ToArray())){
     if((Test-Path -LiteralPath (Join-Path $t 'Palworld.exe') -PathType Leaf) -and (Test-Path -LiteralPath (Join-Path $t 'Pal\Content\Paks') -PathType Container)){return $t}
   }
   return $null

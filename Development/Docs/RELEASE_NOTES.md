@@ -1,4 +1,12 @@
-# Palworld Manager Merger v1.2.1
+# Palworld Manager Merger v1.3.0 RC30
+
+RC30 fixes the executed RC29 selection/rebinding stalls, removes permanent idle UI polling, gates the external-mod heartbeat, makes validation refresh only the affected patch row, enlarges both validation dialogs and offers a direct tested-Knowledge contribution. AI & Help is reduced to five purpose-led views: assistance, reception, Feedback & Knowledge, color-scheme editor and AI settings. Vanilla Game Reference is restored to normal Settings, and untouched theme copies no longer fail contrast because unrelated fields were rewritten. It preserves the complete RC22–RC29 regression chain. See `RC30_RELEASE_NOTES.md` and `PMM/Documentation/TEST_THIS_BUILD_RC30.txt`.
+
+No automatic upload, provider login, returned-code execution, Apply Fix, Build, Deploy or publication is enabled. Windows acceptance remains required before final promotion.
+
+---
+
+# Historical: Palworld Manager Merger v1.2.1
 
 ## Stable 1.2.1 desktop polish
 
@@ -55,4 +63,3 @@ handoff after preserving this candidate's regression behavior.
 - Save backup and Knowledge contribution packaging use the native archiver. Save restore extracts/validates to staging before touching the live save, performs a safety backup, attempts rollback on copy failure, and now checks working disk space before extraction.
 - Game Reference refresh uses an owned incoming stage plus rollback/recovery markers so a hard process kill can be repaired on the next startup.
 - Startup hygiene recognizes active-process ownership and cleans only known abandoned PMM transient paths; unknown user context under Review is preserved.
-
