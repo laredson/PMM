@@ -929,7 +929,10 @@ function script:Backup-PMMFixLabCaseSources($Recipe) {
   if(-not$Recipe){throw 'Fix Lab recipe is required.'}
   $caseId=if($Recipe.PSObject.Properties.Name -contains 'caseId'){[string]$Recipe.caseId}else{[string]$Recipe.id}
   $hashes=@(Get-PMMFixLabRecipePakHashes $Recipe)
-  $allMods=@((Get-LibraryMods)+@(Get-PMMDisabledMods))
+  # Both commands may emit a scalar when exactly one mod exists.  Normalize
+  # each side before concatenation so PowerShell never invokes op_Addition on
+  # a singleton PSObject.
+  $allMods=@(@(Get-LibraryMods)+@(Get-PMMDisabledMods))
   $mods=@($allMods|Where-Object{([string]$_.Hash).ToLowerInvariant() -in $hashes})
   $caseRoot=Join-Path (Get-PMMFixLabFixedSourcesRoot) $caseId
   New-Item -ItemType Directory -Force -Path $caseRoot|Out-Null
@@ -988,7 +991,7 @@ function script:Get-PMMFixLabCaseSourceRecords($Recipe) {
   if(-not$Recipe){return @()}
   $hashes=@(Get-PMMFixLabRecipePakHashes $Recipe)
   $rows=[System.Collections.Generic.List[object]]::new()
-  foreach($m in @((Get-LibraryMods)+@(Get-PMMDisabledMods))){
+  foreach($m in @(@(Get-LibraryMods)+@(Get-PMMDisabledMods))){
     if($m -and ([string]$m.Hash).ToLowerInvariant() -in $hashes){$rows.Add([pscustomobject]@{Name=[string]$m.Name;Hash=[string]$m.Hash;Path=[string]$m.Path;Origin='Library'})}
   }
   $caseId=if($Recipe.PSObject.Properties.Name -contains 'caseId'){[string]$Recipe.caseId}else{[string]$Recipe.id}

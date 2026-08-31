@@ -67,6 +67,10 @@ missing = [name for name, present in ownership_markers.items() if not present]
 if missing:
     raise SystemExit("Missing RC24 invariant(s): " + ", ".join(missing))
 
+singleton_guard = "@(@(Get-LibraryMods)+@(Get-PMMDisabledMods))"
+if fixlab.count(singleton_guard) < 2:
+    raise SystemExit("Fix Lab library/disabled-mod union can unwrap a singleton PSObject")
+
 xaml_namespace = "http://schemas.microsoft.com/winfx/2006/xaml"
 x_name = f"{{{xaml_namespace}}}Name"
 reference_names: set[str] | None = None
