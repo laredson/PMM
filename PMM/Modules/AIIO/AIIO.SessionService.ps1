@@ -143,10 +143,53 @@ function Get-PMMAIIOCurrentDeploymentSnapshot {
   }catch{}
   if(-not$state){return [pscustomobject]@{Present=$false}}
   $managed=[Collections.Generic.List[object]]::new()
-  foreach($row in @($state.ManagedFiles)){
-    $managed.Add([pscustomobject]@{Name=[IO.Path]::GetFileName([string]$row.Path);Sha256=[string]$row.Sha256;Kind=[string]$row.Kind})
+  $seen=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+
+  # Legacy AIIO snapshots used ManagedFiles. Read them defensively because
+  # deployment-state.json itself has never promised those fields.
+  if($state.PSObject.Properties.Name -contains 'ManagedFiles'){
+    foreach($row in @($state.ManagedFiles)){
+      if(-not$row){continue}
+      $name='';$sha256='';$kind='ManagedFile'
+      if($row.PSObject.Properties.Name -contains 'Name'){$name=[string]$row.Name}
+      elseif($row.PSObject.Properties.Name -contains 'Path'){$name=[IO.Path]::GetFileName([string]$row.Path)}
+      if($row.PSObject.Properties.Name -contains 'Sha256'){$sha256=[string]$row.Sha256}
+      elseif($row.PSObject.Properties.Name -contains 'Hash'){$sha256=[string]$row.Hash}
+      if($row.PSObject.Properties.Name -contains 'Kind'){$kind=[string]$row.Kind}
+      if([string]::IsNullOrWhiteSpace($name)){continue}
+      if($seen.Add(($name+'|'+$sha256))){$managed.Add([pscustomobject]@{Name=$name;Sha256=$sha256;Kind=$kind})}
+    }
   }
-  return [pscustomobject]@{Present=$true;UpdatedUtc=[string]$state.UpdatedUtc;SelectedPatch=[string]$state.SelectedPatch;ManagedFiles=@($managed.ToArray())}
+
+  # Canonical deployment schema 3 stores source mods and the compatibility
+  # patch separately. Normalize it into AIIO's path-free ManagedFiles view.
+  if($state.PSObject.Properties.Name -contains 'SourceMods'){
+    foreach($row in @($state.SourceMods)){
+      if(-not$row){continue}
+      if(($row.PSObject.Properties.Name -contains 'Deployed') -and -not[bool]$row.Deployed){continue}
+      $name='';$sha256=''
+      if($row.PSObject.Properties.Name -contains 'Name'){$name=[string]$row.Name}
+      if($row.PSObject.Properties.Name -contains 'Hash'){$sha256=[string]$row.Hash}
+      elseif($row.PSObject.Properties.Name -contains 'Sha256'){$sha256=[string]$row.Sha256}
+      if([string]::IsNullOrWhiteSpace($name)){continue}
+      if($seen.Add(($name+'|'+$sha256))){$managed.Add([pscustomobject]@{Name=$name;Sha256=$sha256;Kind='SourceMod'})}
+    }
+  }
+
+  $selectedPatch=''
+  if(($state.PSObject.Properties.Name -contains 'Patch') -and $state.Patch){
+    $patch=$state.Patch;$name='';$sha256=''
+    if($patch.PSObject.Properties.Name -contains 'Name'){$name=[string]$patch.Name}
+    if($patch.PSObject.Properties.Name -contains 'Hash'){$sha256=[string]$patch.Hash}
+    elseif($patch.PSObject.Properties.Name -contains 'Sha256'){$sha256=[string]$patch.Sha256}
+    $selectedPatch=$name
+    if(-not[string]::IsNullOrWhiteSpace($name) -and $seen.Add(($name+'|'+$sha256))){$managed.Add([pscustomobject]@{Name=$name;Sha256=$sha256;Kind='CompatibilityPatch'})}
+  }elseif($state.PSObject.Properties.Name -contains 'SelectedPatch'){$selectedPatch=[string]$state.SelectedPatch}
+
+  $updatedUtc=''
+  if($state.PSObject.Properties.Name -contains 'UpdatedUtc'){$updatedUtc=[string]$state.UpdatedUtc}
+  elseif($state.PSObject.Properties.Name -contains 'Deployed'){$updatedUtc=[string]$state.Deployed}
+  return [pscustomobject]@{Present=$true;UpdatedUtc=$updatedUtc;SelectedPatch=$selectedPatch;ManagedFiles=@($managed.ToArray())}
 }
 
 function Add-PMMAIIOHistoryEvent {
@@ -197,7 +240,7 @@ function Get-PMMAIIOSessions {
       UpdatedDisplay=$(try{([DateTime]::Parse([string]$session.UpdatedUtc)).ToLocalTime().ToString('g')}catch{[string]$session.UpdatedUtc})
       Attention=[bool]$session.AttentionRequired
       Archived=[bool]$session.Archived
-      Display=([string]$session.Title+'  —  '+[string]$session.Status)
+      Display=([string]$session.Title+'  -  '+[string]$session.Status)
     })
   }
   return @($rows.ToArray())
@@ -392,7 +435,7 @@ function Get-PMMAIIOExportSession($Session) {
 
 function Write-PMMAIIOSystemDocuments([string]$Stage,[string]$SessionId,[string]$BundleId,[int]$Iteration) {
   @"
-# AI READ FIRST — Palworld Manager Merger
+# AI READ FIRST - Palworld Manager Merger
 
 This package belongs to persistent AIIO session $SessionId, iteration $Iteration.
 Bundle ID: $BundleId

@@ -1,0 +1,33 @@
+PMM 1.3.0 RC28 WINDOWS ACCEPTANCE
+==================================
+
+Use a fresh RC28 folder. To reproduce the reported failure without rebuilding, copy the complete Workspace from RC27 while PMM is closed.
+
+1. REUSE THE EXISTING MERGE
+- Start RC28 and confirm the saved/deployed compatibility patch is recognized.
+- Do not press Build Merge.
+- Select the existing patch and press Validate merge.
+- Record PASS, PARTIAL or FAIL. The operation must complete without "Invalid build ID".
+- Restart PMM: the current validation summary and immutable event history must remain.
+- Generate the feedback JSON and inspect it locally. No network request may occur.
+
+2. AI & HELP DEPLOYMENT SNAPSHOT
+- Open AI & Help with the existing schema-3 deployment state.
+- Refresh the page and artifact inventory. No missing ManagedFiles, UpdatedUtc or SelectedPatch property error may appear.
+- Inspect an exported handoff: deployment entries must contain filenames/hashes/kinds only, never absolute game or PMM paths.
+- Confirm the deployed source-mod count excludes suppressed alternatives and includes the selected compatibility patch once.
+
+3. ZERO / ONE / MANY CANDIDATES
+- Open a session with zero staged candidates, then one, then several.
+- Refresh and switch sessions in each state. No .Count/StrictMode error may occur and selection must remain stable when possible.
+
+4. RC27 REGRESSION PASS
+- Repeat the RC27 layout/DPI, 13 official themes plus separate user themes, immediate 100% progress, Analyze/effective-patch reuse, Fix Lab merge-preservation, Gura preflight and manual-ZIP AIIO checks.
+- Apply Fix and Restore original must not alter the deployed compatibility PAK or sidecar.
+- Build and Deploy remain explicit actions only.
+
+5. FINAL GAME TEST
+- Start Palworld with the already deployed merge and exercise the affected mods.
+- Only gameplay evidence may be recorded as LOCAL_PASS.
+
+If any step fails, retain Workspace\Logs\PalModMerger.log and the affected Workspace\AIIO session. Do not publish until the failure is resolved.

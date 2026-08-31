@@ -3,7 +3,7 @@ setlocal
 cd /d "%~dp0\..\..\.."
 echo ================================================================
 echo   PALWORLD MANAGER MERGER - REPOSITORY VALIDATION
-echo   PMM 1.3.0 RC27 - AIIO local-first release candidate
+echo   PMM 1.3.0 RC29 - AI & Help feedback and UI fix candidate
 echo ================================================================
 echo.
 "PMM\Engine\PMMRuntime.exe" self-test

@@ -15,6 +15,10 @@ Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc24_ui_fixlab_ownersh
 Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc25_release_model.py') -PathType Leaf) 'RC25 cross-platform release model exists'
 Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc26_official_themes_progress_compatibility_model.py') -PathType Leaf) 'RC26 cross-platform release model exists'
 Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc26_semantic_compatibility_regression.ps1') -PathType Leaf) 'RC26 Windows PowerShell semantic compatibility regression exists'
+Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc28_validation_runtime_regression.ps1') -PathType Leaf) 'RC28 Windows PowerShell validation/runtime regression exists'
+Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc28_validation_runtime_regression_model.py') -PathType Leaf) 'RC28 cross-platform validation/runtime model exists'
+Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc29_aihelp_feedback_ui_regression.ps1') -PathType Leaf) 'RC29 Windows PowerShell AI & Help/feedback/UI regression exists'
+Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc29_aihelp_feedback_ui_model.py') -PathType Leaf) 'RC29 cross-platform AI & Help/feedback/UI model exists'
 Assert-PMM (@(Get-ChildItem -LiteralPath $App -File -Force).Count -eq 1) 'PMM root exposes only one file'
 Assert-PMM (-not(Test-Path (Join-Path $App 'Workspace'))) 'Workspace is not shipped'
 foreach($d in @('Engine','Modules','Resources','CKL','Documentation')){Assert-PMM (Test-Path (Join-Path $App $d) -PathType Container) ('PMM/'+$d+' exists')}
@@ -48,6 +52,8 @@ foreach($m in @('PMM_CKL_CASE_INDEX_V1','EXACT_PROVIDER_FIXTURE','HASH_PINNED_PA
 Assert-PMM ($contrib -match 'ckl-context.json') 'Knowledge contribution preserves CKL context'
 foreach($m in @('ImgPMMLogo','BtnRestoreDefaults','Everything is ready to play.','PMMLogo.png','Set-PMMPendingSoundId','EffectiveConflictSet')){Assert-PMM ($bootstrap -match [regex]::Escape($m)) ('RC22 bootstrap/UI: '+$m)}
 foreach($m in @('PnlUserThemeOptions','TxtUserThemeEmpty','if($target -ge 100.0)','$Bar.Value=100.0')){Assert-PMM ($bootstrap -match [regex]::Escape($m)) ('RC26 themes/progress: '+$m)}
+foreach($m in @('Complete-PMMAIIOPrepareUi','Repair-PMMDuplicateDiagnosticSessions','Register-PMMAutomaticErrorCase','Flow:PlayReady')){Assert-PMM ($bootstrap -match [regex]::Escape($m)) ('RC29 AI & Help/UI: '+$m)}
+Assert-PMM ($bootstrap -notmatch [regex]::Escape('$Script:LstAIIOSessions.SelectedValue')) 'RC29 AIIO session selection avoids closure-fragile SelectedValue'
 foreach($m in @('x:Name="ImgPMMLogo"','x:Name="BtnRestoreDefaults"','Content="3 beeps"')){Assert-PMM ($xaml -match [regex]::Escape($m)) ('RC22 XAML: '+$m)}
 foreach($m in @('<ColumnDefinition Width="*"/>','x:Name="GrdHeaderActions" Grid.Column="1" MinWidth="0" HorizontalAlignment="Stretch"','x:Name="BtnFixLabRefreshDashboard"')){Assert-PMM ($xaml -match [regex]::Escape($m)) ('RC27 responsive/Fix Lab XAML: '+$m)}
 foreach($m in @('function Queue-PMMFixLabUiRefresh','DispatcherPriority]::ContextIdle','$Script:FixLabRefreshIntervalSeconds=60','Get-PMMFixLabDiscoveryCandidates -IncludeBackups -BackupRows $backups')){Assert-PMM ($bootstrap -match [regex]::Escape($m)) ('RC24 deferred Fix Lab UI: '+$m)}
@@ -67,7 +73,7 @@ $manifest=Get-Content (Join-Path $App 'Resources/Metadata/RELEASE_MANIFEST.json'
 Assert-PMM ([string]$manifest.version -eq '1.3.0') 'Manifest version 1.3.0'
 Assert-PMM ([int]$manifest.mergePlanSchema -eq 18) 'Merge plan schema 18'
 Assert-PMM ([int]$manifest.buildManifestSchema -eq 9) 'Build manifest schema 9'
-Assert-PMM ([string]$manifest.buildId -eq 'PMM-v1.3.0-RC27-AIIO-LOCAL-FIRST') 'RC27 build identity'
+Assert-PMM ([string]$manifest.buildId -eq 'PMM-v1.3.0-RC29-AIHELP-FEEDBACK-UI-FIX') 'RC29 build identity'
 Assert-PMM ([string]$manifest.runtime.executable -eq 'Engine/PMMRuntime.exe') 'Runtime new path'
 Assert-PMM ([string]$manifest.aiioModule -eq 'Modules/AIIO/AIIO.ps1') 'AIIO new path'
 Assert-PMM ([string]$manifest.ckl.catalog -eq 'CKL/Catalog/case-index.json') 'Manifest CKL catalog path'

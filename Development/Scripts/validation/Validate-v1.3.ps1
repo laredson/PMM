@@ -33,9 +33,9 @@ foreach ($directory in @(
 
 foreach ($file in @(
   'README.md','LICENSE','Development\AI\CURRENT_STATE.md','Development\AI\AI_CONTINUE_HERE.md',
-  'Development\AI\AIIO_1_3_0_HANDOFF.md','Development\Docs\RC23_RELEASE_NOTES.md','Development\Docs\RC24_RELEASE_NOTES.md','Development\Docs\RC25_RELEASE_NOTES.md','Development\Docs\RC26_RELEASE_NOTES.md','Development\Docs\RC27_RELEASE_NOTES.md',
-  'Development\Docs\Validation\RC23_STATIC_VALIDATION.md','Development\Docs\Validation\RC24_STATIC_VALIDATION.md','Development\Docs\Validation\RC25_STATIC_VALIDATION.md','Development\Docs\Validation\RC26_STATIC_VALIDATION.md','Development\Docs\Validation\RC27_STATIC_VALIDATION.md','Development\Tests\rc23_singleton_collection_regression.ps1',
-  'Development\Tests\rc23_singleton_guard_model.py','Development\Tests\rc24_ui_fixlab_ownership_regression.ps1','Development\Tests\rc24_ui_fixlab_ownership_model.py','Development\Tests\rc25_release_model.py','Development\Tests\rc26_official_themes_progress_compatibility_model.py','Development\Tests\rc26_semantic_compatibility_regression.ps1','Development\Tests\rc27_aiio_local_first_model.py',
+  'Development\AI\AIIO_1_3_0_HANDOFF.md','Development\Docs\RC23_RELEASE_NOTES.md','Development\Docs\RC24_RELEASE_NOTES.md','Development\Docs\RC25_RELEASE_NOTES.md','Development\Docs\RC26_RELEASE_NOTES.md','Development\Docs\RC27_RELEASE_NOTES.md','Development\Docs\RC28_RELEASE_NOTES.md','Development\Docs\RC29_RELEASE_NOTES.md',
+  'Development\Docs\Validation\RC23_STATIC_VALIDATION.md','Development\Docs\Validation\RC24_STATIC_VALIDATION.md','Development\Docs\Validation\RC25_STATIC_VALIDATION.md','Development\Docs\Validation\RC26_STATIC_VALIDATION.md','Development\Docs\Validation\RC27_STATIC_VALIDATION.md','Development\Docs\Validation\RC28_STATIC_VALIDATION.md','Development\Docs\Validation\RC29_STATIC_VALIDATION.md','Development\Tests\rc23_singleton_collection_regression.ps1',
+  'Development\Tests\rc23_singleton_guard_model.py','Development\Tests\rc24_ui_fixlab_ownership_regression.ps1','Development\Tests\rc24_ui_fixlab_ownership_model.py','Development\Tests\rc25_release_model.py','Development\Tests\rc26_official_themes_progress_compatibility_model.py','Development\Tests\rc26_semantic_compatibility_regression.ps1','Development\Tests\rc27_aiio_local_first_model.py','Development\Tests\rc28_validation_runtime_regression.ps1','Development\Tests\rc28_validation_runtime_regression_model.py','Development\Tests\rc29_aihelp_feedback_ui_regression.ps1','Development\Tests\rc29_aihelp_feedback_ui_model.py',
   'PMM\PMM.exe','PMM\Engine\PMMRuntime.exe','PMM\Engine\PMMFixLab.exe','PMM\Engine\repak.exe',
   'PMM\Modules\Shared\Paths.ps1','PMM\Modules\Bootstrap\Start-PalModMerger.ps1',
   'PMM\Modules\Merge\MergeEngine.ps1','PMM\Modules\Merge\PakService.ps1','PMM\Modules\AIIO\AIIO.ps1','PMM\Modules\AIIO\AIIO.SessionService.ps1','PMM\Modules\AIIO\AIIO.DiagnosticService.ps1','PMM\Modules\AIIO\AIIO.ResponseService.ps1','PMM\Modules\AIIO\AIIO.ArtifactService.ps1','PMM\Modules\AIIO\AIIO.ValidationService.ps1','PMM\Modules\Operations\OperationJournal.ps1','PMM\Modules\Saves\SaveActivityService.ps1','PMM\Modules\Theme\ThemeService.ps1','PMM\Modules\Theme\ThemeEditorService.ps1',
@@ -49,7 +49,9 @@ foreach ($file in @(
   'PMM\Documentation\RC24_RELEASE_CANDIDATE.md','PMM\Documentation\AIIO_HANDOFF_RC24.md',
   'PMM\Documentation\RC25_RELEASE_CANDIDATE.md','PMM\Documentation\AIIO_HANDOFF_RC25.md',
   'PMM\Documentation\RC26_RELEASE_CANDIDATE.md','PMM\Documentation\AIIO_HANDOFF_RC26.md',
-  'PMM\Documentation\RC27_AIIO_RELEASE_CANDIDATE.md','PMM\Documentation\AIIO_HANDOFF_RC27.md','PMM\Documentation\TEST_THIS_BUILD_RC27.txt'
+  'PMM\Documentation\RC27_AIIO_RELEASE_CANDIDATE.md','PMM\Documentation\AIIO_HANDOFF_RC27.md','PMM\Documentation\TEST_THIS_BUILD_RC27.txt',
+  'PMM\Documentation\RC28_VALIDATION_RUNTIME_FIX.md','PMM\Documentation\AIIO_HANDOFF_RC28.md','PMM\Documentation\TEST_THIS_BUILD_RC28.txt',
+  'PMM\Documentation\RC29_AIHELP_FEEDBACK_UI_FIX.md','PMM\Documentation\AIIO_HANDOFF_RC29.md','PMM\Documentation\TEST_THIS_BUILD_RC29.txt'
 )) { NeedFile $file }
 
 $rootFiles = @(Get-ChildItem -LiteralPath $App -File -Force)
@@ -80,14 +82,15 @@ $manifest = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | Convert
 if ([string]$manifest.version -ne '1.3.0') { Fail 'Manifest version must be 1.3.0.' }
 if ([int]$manifest.mergePlanSchema -ne 18) { Fail 'Manifest merge-plan schema must be 18.' }
 if ([int]$manifest.buildManifestSchema -ne 9) { Fail 'Manifest build-manifest schema must be 9.' }
-if ([string]$manifest.releaseCandidate -ne 'rc27-aiio-local-first') { Fail 'Manifest RC27 identity mismatch.' }
-if ([string]$manifest.buildId -ne 'PMM-v1.3.0-RC27-AIIO-LOCAL-FIRST') { Fail 'Manifest RC27 build ID mismatch.' }
+if ([string]$manifest.releaseCandidate -ne 'rc29-aihelp-feedback-ui-fix') { Fail 'Manifest RC29 identity mismatch.' }
+if ([string]$manifest.buildId -ne 'PMM-v1.3.0-RC29-AIHELP-FEEDBACK-UI-FIX') { Fail 'Manifest RC29 build ID mismatch.' }
 if ([int]$manifest.bundledThemeCount -ne 11) { Fail 'Manifest bundled-theme count must be 11.' }
 if ([int]$manifest.officialThemeChoiceCount -ne 13) { Fail 'Manifest official-theme choice count must be 13.' }
 if ([string]$manifest.runtime.executable -ne 'Engine/PMMRuntime.exe') { Fail 'Runtime manifest path mismatch.' }
 if ([string]$manifest.aiioModule -ne 'Modules/AIIO/AIIO.ps1') { Fail 'AIIO manifest path mismatch.' }
 if ([string]$manifest.aiioTransport -ne 'manual local ZIP only') { Fail 'RC27 AIIO transport must remain manual local ZIP only.' }
 if ([bool]$manifest.aiioRemoteUploadEnabled -or [bool]$manifest.aiioProviderLoginEnabled -or [bool]$manifest.aiioReturnedCodeExecutionEnabled) { Fail 'RC27 AIIO trust boundary was weakened.' }
+if ([string]$manifest.aiioFeedbackSchema -ne 'PMM_USER_FEEDBACK_V1' -or [string]$manifest.aiioFeedbackTransport -notmatch 'manual sharing only') { Fail 'RC29 feedback boundary mismatch.' }
 if ('AIIOArtifactRefresh' -notin @($manifest.backgroundOperations|ForEach-Object{[string]$_})) { Fail 'RC27 background artifact inventory is not declared.' }
 $buildId = (Get-Content -LiteralPath (Join-Path $App 'Resources\Metadata\BUILD_ID.txt') -Raw).Trim()
 if ($buildId -ne [string]$manifest.buildId) { Fail 'Metadata BUILD_ID and manifest buildId differ.' }
@@ -195,6 +198,32 @@ foreach ($marker in @('PMM_COLOR_SCHEME_V2','PMM_THEME_PACK_V1','Set-PMMThemeDra
   if ($themeEditor -notmatch [regex]::Escape($marker)) { Fail ('RC27 theme-editor marker missing: ' + $marker) }
 }
 
+$validationService = Get-Content -LiteralPath (Join-Path $App 'Modules\AIIO\AIIO.ValidationService.ps1') -Raw -Encoding UTF8
+foreach ($marker in @('function Get-PMMBuildIdentitySha256','Get-PMMBuildIdentitySha256 ($parts -join','^[0-9a-f]{64}$')) {
+  if ($validationService -notmatch [regex]::Escape($marker)) { Fail ('RC28 build-validation marker missing: ' + $marker) }
+}
+$buildIdBody = [regex]::Match($validationService,'(?s)function Get-PMMDeterministicBuildId\b.*?(?=\r?\nfunction Get-PMMBuildValidationSummaryPath\b)').Value
+if ($buildIdBody -match [regex]::Escape('Get-PMMStableTextId')) { Fail 'RC28 deterministic build ID still uses the truncated stable-text identifier.' }
+$sessionService = Get-Content -LiteralPath (Join-Path $App 'Modules\AIIO\AIIO.SessionService.ps1') -Raw -Encoding UTF8
+foreach ($marker in @("Properties.Name -contains 'SourceMods'","Kind='SourceMod'","Kind='CompatibilityPatch'","Properties.Name -contains 'Deployed'")) {
+  if ($sessionService -notmatch [regex]::Escape($marker)) { Fail ('RC28 schema-3 deployment marker missing: ' + $marker) }
+}
+$candidateBody = [regex]::Match($bootstrap,'(?s)function Refresh-PMMAIIOCandidates\b.*?(?=\r?\nfunction Update-PMMAIIOCandidateSelection\b)').Value
+if ($candidateBody -notmatch [regex]::Escape('$rows=@()') -or $candidateBody -match '\$rows\s*=\s*if\s*\(') { Fail 'RC28 candidate collection can still be unwrapped by Windows PowerShell.' }
+
+foreach ($marker in @('Complete-PMMAIIOPrepareUi','Complete-PMMAIIOImportResponseUi','Complete-PMMAIIOPendingDataUi','Complete-PMMAIIOUseCandidateUi','Repair-PMMDuplicateDiagnosticSessions','Register-PMMAutomaticErrorCase','PMM_USER_FEEDBACK_V1','Flow:PlayReady')) {
+  if (($bootstrap + $validationService) -notmatch [regex]::Escape($marker)) { Fail ('RC29 callback/feedback/UI marker missing: ' + $marker) }
+}
+if ($bootstrap -match [regex]::Escape('$Script:LstAIIOSessions.SelectedValue') -or $bootstrap -match [regex]::Escape('$Script:LstAIHelpDiagnostics.SelectedValue')) { Fail 'RC29 AIIO ListBox selection still uses SelectedValue.' }
+$badgeBody = [regex]::Match($bootstrap,'(?s)function Refresh-PMMAIHelpBadge\b.*?(?=\r?\nfunction Refresh-PMMAIHelpKnowledge\b)').Value
+if ($badgeBody -match 'WaitingForAI' -or $badgeBody -notmatch 'Unsupported' -or $badgeBody -notmatch 'AttentionEligible') { Fail 'RC29 main AI & Help badge semantics mismatch.' }
+$dialogBody = [regex]::Match($bootstrap,'(?s)function Show-PMMBuildValidationDialog\b.*?(?=\r?\n# Action-required hint duration:)').Value
+if ($dialogBody -notmatch [regex]::Escape('$buttonWidth=188') -or $dialogBody -notmatch [regex]::Escape('$button.Height=58')) { Fail 'RC29 validation buttons are not enlarged.' }
+$diagnosticService = Get-Content -LiteralPath (Join-Path $App 'Modules\AIIO\AIIO.DiagnosticService.ps1') -Raw -Encoding UTF8
+foreach ($marker in @('function Register-PMMAutomaticErrorCase','function Resolve-PMMKnownLegacyUiDiagnostics','OccurrenceCount','ResolvedByUpgrade')) {
+  if ($diagnosticService -notmatch [regex]::Escape($marker)) { Fail ('RC29 diagnostic marker missing: ' + $marker) }
+}
+
 $knowledgeService = Get-Content -LiteralPath (Join-Path $App 'Modules\CKL\KnowledgeRecipeService.ps1') -Raw -Encoding UTF8
 foreach ($marker in @('Get-PMMDataTableCompatibilityResolution','requireExactConflictProviders','Get-PMMConflictCanonicalValue')) {
   if ($knowledgeService -notmatch [regex]::Escape($marker)) { Fail ('RC26 semantic-rule marker missing: ' + $marker) }
@@ -235,6 +264,18 @@ try {
   else { Fail ('RC26 semantic-compatibility regression returned unexpected output: ' + ($semanticOutput -join ' | ')) }
 } catch { Fail ('RC26 semantic-compatibility regression failed: ' + $_.Exception.Message) }
 
+try {
+  $runtimeOutput = @(& (Join-Path $Root 'Development\Tests\rc28_validation_runtime_regression.ps1') -Root $Root)
+  if ($runtimeOutput -contains 'RC28_VALIDATION_RUNTIME_REGRESSION_OK') { Pass 'RC28 Windows PowerShell validation/runtime regression' }
+  else { Fail ('RC28 validation/runtime regression returned unexpected output: ' + ($runtimeOutput -join ' | ')) }
+} catch { Fail ('RC28 validation/runtime regression failed: ' + $_.Exception.Message) }
+
+try {
+  $rc29Output = @(& (Join-Path $Root 'Development\Tests\rc29_aihelp_feedback_ui_regression.ps1') -Root $Root)
+  if ($rc29Output -contains 'RC29_AIHELP_FEEDBACK_UI_REGRESSION_OK') { Pass 'RC29 Windows PowerShell AI & Help/feedback/UI regression' }
+  else { Fail ('RC29 AI & Help/feedback/UI regression returned unexpected output: ' + ($rc29Output -join ' | ')) }
+} catch { Fail ('RC29 AI & Help/feedback/UI regression failed: ' + $_.Exception.Message) }
+
 $index = Get-Content -LiteralPath (Join-Path $App 'CKL\Catalog\case-index.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 if ([string]$index.schema -ne 'PMM_CKL_CASE_INDEX_V1') { Fail 'Bad CKL index schema.' }
 if (@($index.entries).Count -lt 12) { Fail 'CKL index unexpectedly incomplete.' }
@@ -261,10 +302,10 @@ if ($expected.Count -ne $actualFiles.Count) { Fail ('SHA256SUMS count mismatch: 
 else { Pass ('SHA256SUMS verified: ' + $expected.Count + ' files') }
 
 if ($Failures.Count) {
-  Write-Output ('PMM_V130_RC27_REPOSITORY_VALIDATION_FAILED count=' + $Failures.Count)
+  Write-Output ('PMM_V130_RC29_REPOSITORY_VALIDATION_FAILED count=' + $Failures.Count)
   exit 1
 }
-Write-Output 'PMM_V130_RC27_REPOSITORY_VALIDATION_OK'
+Write-Output 'PMM_V130_RC29_REPOSITORY_VALIDATION_OK'
 Write-Output 'LAYOUT=PASS'
 Write-Output 'JSON_XAML_POWERSHELL=PASS'
 Write-Output 'HASH_MANIFEST=PASS'

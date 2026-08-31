@@ -92,6 +92,12 @@ function Get-PMMDiagnosticCasePath([string]$CaseId) {
   return (Join-Path (Get-PMMPath 'AIIODiagnostics') ($CaseId+'.json'))
 }
 
+function Get-PMMDiagnosticFingerprint([string]$Type,[string]$Title,[string]$Description='') {
+  $normalizedTitle=([string]$Title).Trim().ToLowerInvariant()
+  $normalizedDescription=([string]$Description).Trim().ToLowerInvariant()
+  return (Get-PMMStableTextId ('PMM_DIAGNOSTIC_FINGERPRINT_V1|'+[string]$Type+'|'+$normalizedTitle+'|'+$normalizedDescription))
+}
+
 function New-PMMDiagnosticCase {
   [CmdletBinding()]
   param(
@@ -100,11 +106,15 @@ function New-PMMDiagnosticCase {
     [string]$UserDescription='',
     [array]$SelectedTargets=@(),
     [array]$SuspectedTargets=@(),
-    [switch]$IncludePalworldLogSummary
+    [switch]$IncludePalworldLogSummary,
+    [ValidateSet('User','AutomaticError')][string]$Origin='User',
+    [bool]$AttentionEligible=$true,
+    [string]$Fingerprint=''
   )
   if([string]::IsNullOrWhiteSpace($Title)){$Title=$Type.Replace('_',' ')}
   if($Title.Length -gt 120){$Title=$Title.Substring(0,120)}
   if($UserDescription.Length -gt 20000){throw 'Diagnostic description exceeds 20,000 characters.'}
+  if([string]::IsNullOrWhiteSpace($Fingerprint)){$Fingerprint=Get-PMMDiagnosticFingerprint $Type $Title $UserDescription}
   $caseId=('DIAG-'+[DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss')+'-'+[guid]::NewGuid().ToString('N').Substring(0,8))
   $plan=Get-PMMAIIOCurrentPlanSnapshot
   $saveEvidence=@()
@@ -113,6 +123,10 @@ function New-PMMDiagnosticCase {
     Schema='PMM_DIAGNOSTIC_CASE_V1'
     CaseId=$caseId
     Type=$Type
+    Origin=$Origin
+    AttentionEligible=$AttentionEligible
+    Fingerprint=$Fingerprint
+    OccurrenceCount=1
     Title=$Title
     UserDescription=$UserDescription
     SelectedTargets=@($SelectedTargets)
@@ -134,9 +148,43 @@ function New-PMMDiagnosticCase {
     Status='Open'
     CreatedUtc=[DateTime]::UtcNow.ToString('o')
     UpdatedUtc=[DateTime]::UtcNow.ToString('o')
+    LastOccurredUtc=[DateTime]::UtcNow.ToString('o')
   }
   Write-PMMAIIOJsonAtomic (Get-PMMDiagnosticCasePath $caseId) $case 70
   return $case
+}
+
+function Register-PMMAutomaticErrorCase {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory=$true)][string]$Title,
+    [Parameter(Mandatory=$true)][string]$Message
+  )
+  $description=$Title+': '+$Message
+  $fingerprint=Get-PMMDiagnosticFingerprint 'PMM_ERROR' $Title $description
+  $root=Get-PMMPath 'AIIODiagnostics'
+  foreach($file in @(Get-ChildItem -LiteralPath $root -Filter 'DIAG-*.json' -File -ErrorAction SilentlyContinue|Sort-Object LastWriteTimeUtc -Descending)){
+    try{
+      $case=Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8|ConvertFrom-Json
+      if([string]$case.Schema -ne 'PMM_DIAGNOSTIC_CASE_V1' -or [string]$case.Type -ne 'PMM_ERROR' -or [string]$case.Status -ne 'Open'){continue}
+      $existingFingerprint=''
+      if($case.PSObject.Properties.Name -contains 'Fingerprint'){$existingFingerprint=[string]$case.Fingerprint}
+      if([string]::IsNullOrWhiteSpace($existingFingerprint)){$existingFingerprint=Get-PMMDiagnosticFingerprint ([string]$case.Type) ([string]$case.Title) ([string]$case.UserDescription)}
+      if($existingFingerprint -cne $fingerprint){continue}
+      $count=1;try{$count=[Math]::Max(1,[int]$case.OccurrenceCount)}catch{$count=1}
+      $case|Add-Member -NotePropertyName Origin -NotePropertyValue 'AutomaticError' -Force
+      $case|Add-Member -NotePropertyName AttentionEligible -NotePropertyValue $true -Force
+      $case|Add-Member -NotePropertyName Fingerprint -NotePropertyValue $fingerprint -Force
+      $case|Add-Member -NotePropertyName OccurrenceCount -NotePropertyValue ($count+1) -Force
+      $now=[DateTime]::UtcNow.ToString('o')
+      $case|Add-Member -NotePropertyName LastOccurredUtc -NotePropertyValue $now -Force
+      $case.UpdatedUtc=$now
+      Write-PMMAIIOJsonAtomic $file.FullName $case 70
+      Write-PMMLog ('Reused automatic diagnostic case '+[string]$case.CaseId+' | occurrence='+[string]($count+1))
+      return $case
+    }catch{}
+  }
+  return (New-PMMDiagnosticCase -Type PMM_ERROR -Title $Title -UserDescription $description -Origin AutomaticError -AttentionEligible $true -Fingerprint $fingerprint)
 }
 
 function Get-PMMDiagnosticCases {
@@ -145,10 +193,41 @@ function Get-PMMDiagnosticCases {
     try{
       $case=Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8|ConvertFrom-Json
       if([string]$case.Schema -ne 'PMM_DIAGNOSTIC_CASE_V1'){continue}
-      $rows.Add([pscustomobject]@{CaseId=[string]$case.CaseId;Type=[string]$case.Type;Title=[string]$case.Title;Status=[string]$case.Status;CreatedUtc=[string]$case.CreatedUtc;Display=([string]$case.Title+'  —  '+[string]$case.Status)})
+      $attentionEligible=$true;if($case.PSObject.Properties.Name -contains 'AttentionEligible'){$attentionEligible=[bool]$case.AttentionEligible}
+      $fingerprint='';if($case.PSObject.Properties.Name -contains 'Fingerprint'){$fingerprint=[string]$case.Fingerprint};if([string]::IsNullOrWhiteSpace($fingerprint)){$fingerprint=Get-PMMDiagnosticFingerprint ([string]$case.Type) ([string]$case.Title) ([string]$case.UserDescription)}
+      $occurrences=1;try{$occurrences=[Math]::Max(1,[int]$case.OccurrenceCount)}catch{$occurrences=1}
+      $suffix=if($occurrences -gt 1){' (x'+[string]$occurrences+')'}else{''}
+      $rows.Add([pscustomobject]@{CaseId=[string]$case.CaseId;Type=[string]$case.Type;Origin=$(if($case.PSObject.Properties.Name -contains 'Origin'){[string]$case.Origin}else{'User'});AttentionEligible=$attentionEligible;Fingerprint=$fingerprint;OccurrenceCount=$occurrences;Title=[string]$case.Title;Status=[string]$case.Status;CreatedUtc=[string]$case.CreatedUtc;Display=([string]$case.Title+$suffix+'  -  '+[string]$case.Status)})
     }catch{}
   }
   return @($rows.ToArray())
+}
+
+function Resolve-PMMKnownLegacyUiDiagnostics {
+  # RC28 could turn two presentation-only faults into open diagnostics: the
+  # delayed AIIO callback lost the WPF script scope, and validation feedback
+  # looked only at DataGrid row selection instead of the selected/deployed
+  # merge. Preserve those records, but retire their attention state after the
+  # fixed build starts so they do not keep a misleading main-tab badge.
+  $resolved=[Collections.Generic.List[string]]::new()
+  foreach($file in @(Get-ChildItem -LiteralPath (Get-PMMPath 'AIIODiagnostics') -Filter 'DIAG-*.json' -File -ErrorAction SilentlyContinue)){
+    try{
+      $case=Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8|ConvertFrom-Json
+      if([string]$case.Schema -ne 'PMM_DIAGNOSTIC_CASE_V1' -or [string]$case.Status -ne 'Open' -or [string]$case.Type -ne 'PMM_ERROR'){continue}
+      $title=[string]$case.Title;$description=[string]$case.UserDescription;$known=$false
+      if($title -eq 'AIIOPrepare completion' -and $description -match '(?i)SelectedValue'){$known=$true}
+      if($title -eq 'Generate local validation feedback' -and $description -match '(?i)(select a compatibility merge|selecciona primero un merge)'){$known=$true}
+      if(-not$known){continue}
+      $now=[DateTime]::UtcNow.ToString('o')
+      $case.Status='ResolvedByUpgrade';$case.UpdatedUtc=$now
+      $case|Add-Member -NotePropertyName AttentionEligible -NotePropertyValue $false -Force
+      $case|Add-Member -NotePropertyName Resolution -NotePropertyValue ([pscustomobject]@{Kind='PMM_UPGRADE_FIX';Build='RC29';ResolvedUtc=$now;EvidencePreserved=$true}) -Force
+      Write-PMMAIIOJsonAtomic $file.FullName $case 75
+      $resolved.Add([string]$case.CaseId)
+    }catch{}
+  }
+  if($resolved.Count -gt 0){Write-PMMLog ('Retired known RC28 UI-only diagnostic(s): '+(@($resolved.ToArray()) -join ', '))}
+  return @($resolved.ToArray())
 }
 
 function New-PMMAIIOSessionFromDiagnostic {

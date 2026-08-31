@@ -1,6 +1,6 @@
-# Palworld Manager Merger v1.3.0 RC27
+# Palworld Manager Merger v1.3.0 RC29
 
-RC27 introduces the local-first **AI & Help** workspace, strict manual ZIP AIIO sessions/candidates, local diagnostics and validation, the image-capable theme editor, equal responsive header halves and the official/user theme architecture. It preserves the complete RC22–RC26 regression chain. See `RC27_RELEASE_NOTES.md` and `PMM/Documentation/TEST_THIS_BUILD_RC27.txt`.
+RC29 repairs delayed AIIO completion scope and duplicate diagnostic/session creation, adds inspectable manual Feedback and AI-specific Settings, corrects badge semantics, enlarges the exact-validation dialog, reorders the header, makes Play an optional ready cue and refreshes selected-row colors after theme changes. It preserves the complete RC22–RC28 regression chain. See `RC29_RELEASE_NOTES.md` and `PMM/Documentation/TEST_THIS_BUILD_RC29.txt`.
 
 No automatic upload, provider login, returned-code execution, Apply Fix, Build, Deploy or publication is enabled. Windows acceptance remains required before final promotion.
 

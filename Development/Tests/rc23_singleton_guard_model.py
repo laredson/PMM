@@ -46,10 +46,10 @@ for name, text in (("LibraryService", library), ("MergeEngine", merge), ("Bootst
         raise SystemExit(f"Conditional pipeline can unwrap a guarded collection in {name}: {match.group(0)}")
 
 manifest = json.loads(read("Resources/Metadata/RELEASE_MANIFEST.json"))
-expected = "PMM-v1.3.0-RC27-AIIO-LOCAL-FIRST"
+expected = "PMM-v1.3.0-RC29-AIHELP-FEEDBACK-UI-FIX"
 if manifest.get("buildId") != expected:
     raise SystemExit("Unexpected current build ID while checking the preserved RC23 guard")
-if manifest.get("releaseCandidate") != "rc27-aiio-local-first":
+if manifest.get("releaseCandidate") != "rc29-aihelp-feedback-ui-fix":
     raise SystemExit("Unexpected current release-candidate ID while checking the preserved RC23 guard")
 if (APP / "Resources/Metadata/BUILD_ID.txt").read_text(encoding="utf-8-sig").strip() != expected:
     raise SystemExit("BUILD_ID.txt does not match the current manifest")

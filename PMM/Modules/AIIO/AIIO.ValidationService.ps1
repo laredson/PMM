@@ -40,9 +40,18 @@ function Get-PMMValidationInstallationIdentity {
   return [pscustomobject]@{Schema='PMM_INSTALLATION_IDENTITY_V1';InstallationId=$id;ProtectedBy='Windows DPAPI CurrentUser';HardwareFingerprintUsed=$false;AccountIdentifierUsed=$false;ResetAvailable=$false}
 }
 
+function Get-PMMBuildIdentitySha256([string]$Text) {
+  $sha=[Security.Cryptography.SHA256]::Create()
+  try{
+    $value=if($null -eq $Text){''}else{[string]$Text}
+    $bytes=[Text.Encoding]::UTF8.GetBytes($value)
+    return ([BitConverter]::ToString($sha.ComputeHash($bytes))).Replace('-','').ToLowerInvariant()
+  }finally{$sha.Dispose()}
+}
+
 function Get-PMMBuildManifestHash($Patch) {
   if($Patch -and $Patch.ManifestPath -and (Test-Path -LiteralPath ([string]$Patch.ManifestPath) -PathType Leaf)){return (Get-Sha256 ([string]$Patch.ManifestPath))}
-  if($Patch -and $Patch.Manifest){return (Get-PMMStableTextId (($Patch.Manifest|ConvertTo-Json -Depth 100 -Compress)))}
+  if($Patch -and $Patch.Manifest){return (Get-PMMBuildIdentitySha256 (($Patch.Manifest|ConvertTo-Json -Depth 100 -Compress)))}
   return ''
 }
 
@@ -101,7 +110,7 @@ function Get-PMMDeterministicBuildId($Patch) {
     [string]$manifest.Engine,
     (@($solutions|Sort-Object -Unique) -join '|')
   )
-  return (Get-PMMStableTextId ($parts -join "`n"))
+  return (Get-PMMBuildIdentitySha256 ($parts -join "`n"))
 }
 
 function Get-PMMBuildValidationSummaryPath([string]$BuildId) {
@@ -183,4 +192,65 @@ function Export-PMMBuildValidationFeedback([string]$EventId) {
   $dest=Join-PMMPath 'ValidationFeedback' ('PMM_FEEDBACK_'+$EventId+'.json')
   Copy-Item -LiteralPath $source -Destination $dest -Force
   return [pscustomobject]@{Path=$dest;Sha256=(Get-Sha256 $dest);RemoteUploadAvailable=$false}
+}
+
+function New-PMMUserFeedbackFile {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory=$true)][ValidateSet('GENERAL_COMMENT','PMM_ISSUE','MERGE_COMMENT','KNOWLEDGE_CKL_COMMENT')][string]$Kind,
+    [string]$Title='',
+    [string]$Comments='',
+    $Patch=$null
+  )
+  $Title=([string]$Title).Trim();$Comments=([string]$Comments).Trim()
+  if([string]::IsNullOrWhiteSpace($Title) -and [string]::IsNullOrWhiteSpace($Comments)){throw 'Write a title or comment before creating feedback.'}
+  if($Title.Length -gt 160){throw 'Feedback title exceeds 160 characters.'}
+  if($Comments.Length -gt 20000){throw 'Feedback comments exceed 20,000 characters.'}
+  $safeTitle=$Title;$safeComments=$Comments
+  try{$safeTitle=Protect-PMMAIIODiagnosticText $Title;$safeComments=Protect-PMMAIIODiagnosticText $Comments}catch{}
+  $build=$null
+  if($Patch){
+    $buildId='';$summary=$null
+    try{$buildId=Get-PMMDeterministicBuildId $Patch}catch{}
+    try{$summary=Get-PMMBuildValidationSummary $Patch}catch{}
+    $build=[ordered]@{
+      BuildId=$buildId
+      PatchName=[IO.Path]::GetFileName([string]$Patch.Name)
+      OutputPakSha256=$(try{([string]$Patch.Hash).ToLowerInvariant()}catch{''})
+      BuildManifestSha256=$(try{Get-PMMBuildManifestHash $Patch}catch{''})
+      ValidationStatus=$(if($summary){[string]$summary.Status}else{'UNAVAILABLE'})
+      LatestValidationEventId=$(if($summary -and $summary.PSObject.Properties.Name -contains 'LatestEventId'){[string]$summary.LatestEventId}else{''})
+    }
+  }
+  $knowledge=$null
+  if($Kind -eq 'KNOWLEDGE_CKL_COMMENT'){
+    try{$summary=Get-PMMKnowledgeSummary;$knowledge=[ordered]@{BehaviorCases=[int]$summary.BehaviorCases;Fixtures=[int]$summary.Fixtures;RuntimeProven=[int]$summary.RuntimeProven;ProductionRecipes=[int]$summary.ProductionRecipes}}catch{}
+  }
+  $id=[guid]::NewGuid().ToString('N');$identity=Get-PMMValidationInstallationIdentity;$product=Get-PMMAIIOProductIdentity
+  $record=[ordered]@{
+    Schema='PMM_USER_FEEDBACK_V1'
+    FeedbackId=$id
+    Kind=$Kind
+    CreatedUtc=[DateTime]::UtcNow.ToString('o')
+    Title=$safeTitle
+    Comments=$safeComments
+    AnonymousInstallationId=[string]$identity.InstallationId
+    PMM=$product
+    ExactBuild=$build
+    KnowledgeSummary=$knowledge
+    Privacy=[ordered]@{ContainsPakContents=$false;ContainsSaveData=$false;ContainsLogs=$false;ContainsStructuredAbsolutePaths=$false;UserTextSanitizedForKnownLocalPaths=$true;UserTextMayContainPersonalData=(-not[string]::IsNullOrWhiteSpace($safeTitle+$safeComments))}
+    Sharing=[ordered]@{Mode='ManualOnly';InspectableJson=$true;UploadAttempted=$false;UploadAvailable=$false;FutureConnectionBoundary='PMM_FEEDBACK_TRANSPORT_V1'}
+  }
+  $path=Join-PMMPath 'ValidationFeedback' ('PMM_COMMENT_'+$id+'.json')
+  Write-PMMAIIOJsonAtomic $path $record 45
+  Write-PMMLog ('Manual feedback file created: '+[IO.Path]::GetFileName($path)+' | kind='+$Kind)
+  return [pscustomobject]@{Path=$path;Sha256=(Get-Sha256 $path);FeedbackId=$id;RemoteUploadAvailable=$false}
+}
+
+function Get-PMMUserFeedbackFiles {
+  $rows=[Collections.Generic.List[object]]::new()
+  foreach($file in @(Get-ChildItem -LiteralPath (Get-PMMPath 'ValidationFeedback') -Filter '*.json' -File -ErrorAction SilentlyContinue|Sort-Object LastWriteTimeUtc -Descending)){
+    $rows.Add([pscustomobject]@{Name=$file.Name;Path=$file.FullName;Bytes=[int64]$file.Length;UpdatedUtc=$file.LastWriteTimeUtc.ToString('o')})
+  }
+  return @($rows.ToArray())
 }

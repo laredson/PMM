@@ -1,6 +1,6 @@
 # AI & Help, AIIO and Knowledge
 
-PMM 1.3 RC27 adds a local-first **AI & Help** workspace. It is a durable task and evidence system, not a built-in cloud account. PMM does not connect to an AI provider, upload files, request credentials or run returned code.
+PMM 1.3 RC29 includes the local-first **AI & Help** workspace. It is a durable task and evidence system, not a built-in cloud account. PMM does not connect to an AI provider, upload files, request credentials or run returned code.
 
 ## Persistent sessions
 
@@ -32,8 +32,10 @@ The older one-shot **CREATE AI HANDOFF** flow remains available for compatibilit
 
 ## Knowledge and runtime evidence
 
-Bundled and local CKL Knowledge can explain or prove narrowly defined compatibility behavior. It cannot silently promote an AI answer. Validation belongs to a deterministic build ID and is stored as immutable local events: `UNVALIDATED`, `LOCAL_PASS`, `LOCAL_PARTIAL`, `LOCAL_FAIL` or `NOT_DEPLOYED`. Feedback files are generated locally for review; RC27 has no feedback API and uploads nothing.
+Bundled and local CKL Knowledge can explain or prove narrowly defined compatibility behavior. It cannot silently promote an AI answer. Validation belongs to a complete deterministic SHA-256 build ID and is stored as immutable local events: `UNVALIDATED`, `LOCAL_PASS`, `LOCAL_PARTIAL`, `LOCAL_FAIL` or `NOT_DEPLOYED`.
+
+The Feedback view can export an exact validation event or create `PMM_USER_FEEDBACK_V1` for an exact merge, Knowledge/CKL or a general comment. These are inspectable local JSON files intended for manual sharing. RC29 has no feedback endpoint; `PMM_FEEDBACK_TRANSPORT_V1` is declared only as a disabled future adapter boundary and nothing is uploaded.
 
 Gameplay semantics still require an in-game test. Publishing a branch, contribution or solution, applying a Fix, restoring state and deploying are always separate explicit actions.
 
-See `MANUAL_SOLUTION_CONTRACT.md`, `COMMUNITY_KNOWLEDGE_WORKFLOW.md` and `RC27_AIIO_RELEASE_CANDIDATE.md`.
+See `MANUAL_SOLUTION_CONTRACT.md`, `COMMUNITY_KNOWLEDGE_WORKFLOW.md` and `RC29_AIHELP_FEEDBACK_UI_FIX.md`.

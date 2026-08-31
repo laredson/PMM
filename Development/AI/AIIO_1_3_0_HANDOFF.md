@@ -2,10 +2,10 @@
 
 **Project:** Palworld Manager Merger  
 **Creator:** `laredson`  
-**Baseline:** RC27, build `PMM-v1.3.0-RC27-AIIO-LOCAL-FIRST`  
-**Authority:** runnable `PMM/` tree plus the packaged RC27 binaries
+**Baseline:** RC29, build `PMM-v1.3.0-RC29-AIHELP-FEEDBACK-UI-FIX`  
+**Authority:** runnable `PMM/` tree plus the packaged RC29 binaries
 
-## What RC27 implements
+## What RC27 implemented and RC29 preserves
 
 AIIO is no longer merely a proposed module. RC27 exposes it through the top-level **AI & Help** tab and keeps the WPF layer thin over these services:
 
@@ -31,9 +31,11 @@ Heavy preparation, requested-data packaging, response import, candidate activati
 - capability registry: `PMM_CAPABILITY_REGISTRY_V1`;
 - staged candidate: `PMM_AIIO_CANDIDATE_RECORD_V1`;
 - deterministic local evidence: `PMM_BUILD_VALIDATION_V1`;
+- inspectable manual comments: `PMM_USER_FEEDBACK_V1`;
+- disabled future feedback adapter boundary: `PMM_FEEDBACK_TRANSPORT_V1`;
 - color-scheme image pack: `PMM_COLOR_SCHEME_V2` inside `PMM_THEME_PACK_V1`.
 
-RC27 transport is manual local ZIP only. Session exports distinguish Vanilla from every provider and never include whole source PAKs. Returned archives are untrusted data and pass Windows-safe path, case-insensitive duplicate, ADS/device-name, symlink, size, extension, nested-archive and schema checks before a candidate can be committed to staging.
+RC29 transport remains manual local ZIP only. Feedback is inspectable local JSON and manual sharing only. Session exports distinguish Vanilla from every provider and never include whole source PAKs. Returned archives are untrusted data and pass Windows-safe path, case-insensitive duplicate, ADS/device-name, symlink, size, extension, nested-archive and schema checks before a candidate can be committed to staging.
 
 ## Authority levels
 
@@ -43,7 +45,7 @@ RC27 transport is manual local ZIP only. Session exports distinguish Vanilla fro
 
 Only one candidate form can enter the current Merge path: an exact `PMM_MANUAL_SOLUTION_V1` cooked family bound to one still-current Unsupported case. The user must press **Use candidate**. PMM then imports it as experimental/unproven and forces Analyze. It never triggers Build or Deploy.
 
-Full PAK candidates may be retained for personal compatibility inspection but are not activated in RC27. Declarative recipes, development patches and other response types remain staged until their own native validators/executors exist.
+Full PAK candidates may be retained for personal compatibility inspection but are not activated in RC29. Declarative recipes, development patches and other response types remain staged until their own native validators/executors exist.
 
 ## Forbidden shortcuts
 
@@ -58,7 +60,13 @@ Do not add any of these without a separately reviewed design:
 - weakening candidate identity from exact hashes/topology to filenames;
 - treating AI confidence as runtime proof.
 
-The installation validation identity is a random secret protected with Windows DPAPI CurrentUser. It is not a hardware/account fingerprint and has no reset UI in RC27. Feedback remains a locally inspectable JSON file; no endpoint is present.
+The installation validation identity is a random secret protected with Windows DPAPI CurrentUser. It is not a hardware/account fingerprint and has no reset UI in RC29. Feedback remains a locally inspectable JSON file; no endpoint is present.
+
+## RC29 UI/session correction
+
+Background completion scriptblocks created with `GetNewClosure()` must capture only immutable IDs and call a named UI helper. Never dereference WPF controls through `$Script:` from such a closure: its dynamic-module script scope is not the main Bootstrap scope under Windows PowerShell 5.1.
+
+Automatic UI errors use a stable fingerprint and increment one open diagnostic. Preparing a diagnostic reuses its existing non-archived AIIO session; a non-Draft session is opened but never re-prepared. `WaitingForAI` and ordinary local validation are normal states and do not raise the main AI & Help badge. The badge is reserved for a returned candidate/data/user decision, an open attention-eligible error, an interrupted operation or a current Unsupported asset.
 
 ## Existing PMM contracts to preserve
 
@@ -78,11 +86,11 @@ The editor exists only in AI & Help. Every palette and ColorFlow brush has a req
 
 ## Next engineering work
 
-RC27 first needs the full Windows checklist in `PMM/Documentation/TEST_THIS_BUILD_RC27.txt`. After acceptance:
+RC29 first needs the full Windows checklist in `PMM/Documentation/TEST_THIS_BUILD_RC29.txt`. After acceptance:
 
-1. add PowerShell 5.1 contract fixtures for zero/one/many sessions, requests and candidates;
-2. add malicious/positive ZIP fixtures for every response and theme boundary;
-3. reconcile `Development/Source` with the packaged Host/Runtime before replacing binaries;
-4. design optional provider adapters as transport-only components with explicit scope and consent, leaving the current session/capability/validation core unchanged.
+1. add malicious/positive ZIP fixtures for every response and theme boundary;
+2. reconcile `Development/Source` with the packaged Host/Runtime before replacing binaries;
+3. design optional provider/feedback adapters as transport-only components with explicit scope and consent, leaving the current session/capability/validation core unchanged;
+4. keep the RC29 PowerShell 5.1 callback, zero/one/many and diagnostic/session reuse fixtures in every release gate.
 
-When this document conflicts with an older RC or 1.2.x handoff, the RC27 runtime and this document win. The separate continuity package retains older documents only as historical evidence.
+When this document conflicts with an older RC or 1.2.x handoff, the RC29 runtime and this document win. The separate continuity package retains older documents only as historical evidence.

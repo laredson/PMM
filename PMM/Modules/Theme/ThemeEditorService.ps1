@@ -80,7 +80,7 @@ function Get-PMMThemeDrafts {
   $rows=[Collections.Generic.List[object]]::new()
   foreach($dir in @(Get-ChildItem -LiteralPath (Get-PMMPath 'ThemeDrafts') -Directory -ErrorAction SilentlyContinue|Sort-Object LastWriteTimeUtc -Descending)){
     $draft=Get-PMMThemeDraft $dir.Name;if(-not$draft){continue}
-    $rows.Add([pscustomobject]@{DraftId=[string]$draft.DraftId;ThemeId=[string]$draft.ThemeId;Name=[string]$draft.Name;UpdatedUtc=[string]$draft.UpdatedUtc;Display=([string]$draft.Name+'  —  '+[string]$draft.ThemeId)})
+    $rows.Add([pscustomobject]@{DraftId=[string]$draft.DraftId;ThemeId=[string]$draft.ThemeId;Name=[string]$draft.Name;UpdatedUtc=[string]$draft.UpdatedUtc;Display=([string]$draft.Name+'  -  '+[string]$draft.ThemeId)})
   }
   return @($rows.ToArray())
 }

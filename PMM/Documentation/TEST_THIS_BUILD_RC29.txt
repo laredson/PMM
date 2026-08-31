@@ -1,0 +1,46 @@
+PMM 1.3.0 RC29 WINDOWS ACCEPTANCE
+Build: PMM-v1.3.0-RC29-AIHELP-FEEDBACK-UI-FIX
+
+Use a fresh RC29 folder. Close PMM, then copy the complete Workspace from the submitted RC28 only for migration testing. Never overwrite the RC28 source folder.
+
+1. STARTUP AND RC28 MIGRATION
+- Start PMM.exe and confirm the existing deployed merge is recognized without Build.
+- Open AI & Help. The old Generate local validation feedback / AIIOPrepare completion cases may remain as preserved ResolvedByUpgrade history, but they must not raise the main badge.
+- Existing WaitingForAI sessions must not raise the main badge.
+
+2. HEADER AND OPTIONAL PLAY
+- At full size and around 900 x 600, confirm the right header order: Detect/status; folders plus Start Palworld; AUTO controls.
+- Run Analyze/Build only if needed and Deploy. Start Palworld must become visibly ready, with no “Action required: press play” balloon or attention sound.
+
+3. EXACT MERGE VALIDATION
+- Select the deployed compatibility merge and press Validate merge.
+- Confirm the dialog is fully visible at the active DPI, its text is not clipped and every button is comfortably clickable.
+- Record PASS or PARTIAL. It must succeed with a 64-character build ID and must not add a main AI & Help badge.
+
+4. FEEDBACK
+- Open AI & Help > Feedback. Select the exact merge and create exact validation feedback. The file must open in Workspace\Validation\Feedback and contain the same build/event identity.
+- Create one general or Knowledge/CKL comment. Inspect its PMM_USER_FEEDBACK_V1 JSON.
+- Confirm Upload says/notates that it is not connected and performs no network operation.
+
+5. AIIO SESSION REUSE
+- Create or select one real diagnostic and press Prepare selected for AI once. The request ZIP must complete without a SelectedValue error and the same session must become WaitingForAI.
+- Press Prepare selected for AI again. PMM must open/reuse that session and must not create another diagnostic, session or request step.
+- Restart PMM and repeat. The same session must remain selected/reusable.
+- An actual PMM error should raise one badge. Repeating the identical failure should increment the same case rather than create another row.
+
+6. AI & HELP STRUCTURE
+- Confirm Help and AI repair each display a concise explanation of their different purpose.
+- Confirm AI behavior and Game Reference controls exist under AI & Help > Settings and are absent from global Settings.
+- Confirm any Unsupported asset, returned candidate/requested data or interrupted operation still raises attention.
+
+7. THEMES AND RESPONSIVE UI
+- Switch directly between PMM Crystal, Night, Nocturne and Neon while the deployed merge row is selected. Text/background must repaint immediately without clicking another row.
+- Verify 13 official choices plus the separate user-scheme area, user imports, Restore defaults and immediate progress at confirmed 100%.
+- Repeat at Windows scaling 100%, 125% and 150% where available.
+
+8. PRESERVED REGRESSIONS
+- Disable an unrelated non-conflicting mod, Analyze and confirm effective-patch reuse without Build; Deploy may still be required for the source-mod set.
+- Apply/Restore a Fix Lab result and confirm the deployed merge PAK/manifest remain byte-identical.
+- Repeat Semiauto sound, Gura variant preflight, Saves backup and normal Analyze/Build/Deploy checks from RC28.
+
+Do not publish RC29 as final until this Windows/WPF/Palworld checklist passes. Static checks cannot certify real DPI, audio, PowerShell 5.1 runtime, external tools or in-game semantics.

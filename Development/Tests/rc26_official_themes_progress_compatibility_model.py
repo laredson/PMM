@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "PMM"
-EXPECTED_BUILD = "PMM-v1.3.0-RC27-AIIO-LOCAL-FIRST"
+EXPECTED_BUILD = "PMM-v1.3.0-RC29-AIHELP-FEEDBACK-UI-FIX"
 ASSET = "Pal/Content/Pal/DataTable/Character/DT_PalMonsterParameter_Common.uasset"
 PROPERTY = "Rows[Boar].WorkSuitability_MonsterFarm"
 FASTER = "FasterMounts4xAllWorkSuitabilitiesLevel10_P.pak"
@@ -153,7 +153,7 @@ def validate_release_identity() -> None:
     manifest = load("Resources/Metadata/RELEASE_MANIFEST.json")
     assert manifest["mergePlanSchema"] == 18
     assert manifest["buildId"] == EXPECTED_BUILD
-    assert manifest["releaseCandidate"] == "rc27-aiio-local-first"
+    assert manifest["releaseCandidate"] == "rc29-aihelp-feedback-ui-fix"
     assert manifest["bundledThemeCount"] == 11
     assert manifest["officialThemeChoiceCount"] == 13
     assert (APP / "Resources/Metadata/BUILD_ID.txt").read_text(encoding="utf-8-sig").strip() == EXPECTED_BUILD
