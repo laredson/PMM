@@ -1,4 +1,4 @@
-# Palworld Manager Merger v1.3.0 — Guía de usuario
+# Palworld Manager Merger v1.3.1 — Guía de usuario
 
 **Flujo guiado:** PMM ilumina solo la siguiente etapa útil: **Importar -> Fix Lab cuando sea necesario -> Analizar -> Build -> Deploy -> Jugar**. El color depende del estado real. Durante Importar/Analizar/Build/Deploy el propio boton iluminado sirve tambien como progreso, mientras la barra persistente bajo Build/Deploy conserva el ultimo porcentaje/resultado hasta que empiece otra operacion.
 
@@ -53,7 +53,9 @@ La pestaña **Saves** permite crear backups de mundos y restaurarlos. PMM crea u
 
 ## IA y ayuda y AIIO local
 
-**IA y ayuda** separa Ayuda y diagnostico, Reparacion IA/AIIO, Feedback, Knowledge, el editor de esquemas y Opciones IA. Ayuda sirve para describir y conservar un problema; Reparacion IA prepara una tarea para razonamiento externo y mantiene sus respuestas/candidatos. **Preparar para IA** crea un ZIP local para que tu decidas donde enviarlo. PMM no tiene login de proveedor ni sube nada automaticamente. Un ZIP devuelto es dato no confiable: se rechazan scripts, ejecutables, rutas inseguras y archivos anidados, y cada candidato queda en staging hasta revisarlo.
+**IA y ayuda** separa asistencia, tareas persistentes de reparacion/creacion con AIIO, Feedback y Knowledge, recepcion de trabajo devuelto, editor de esquemas y opciones IA. **Preparar para IA** crea un ZIP local para que tu decidas donde enviarlo. PMM no tiene login de proveedor ni sube nada automaticamente. Un ZIP devuelto es dato no confiable: se rechazan scripts, ejecutables, rutas inseguras y archivos anidados, y cada candidato queda en staging hasta revisarlo.
+
+Para crear un mod independiente, usa **Nuevo proyecto de mod**, describe el comportamiento y, si lo conoces, indica un asset/familia exacto. Una sesion `CREATE_MOD` puede pedir familias limitadas de la Game Reference actual. Tras importar la respuesta, **Construir PAK independiente...** solo aparece si el candidato declara un arbol cooked seguro y hashes exactos. El resultado permanece en el workspace AIIO como `LOCAL_BUILD_UNPROVEN`: PMM no lo instala, despliega ni publica automaticamente. El PAK contiene metadatos inertes `created using PMM`. Si publicas el mod, su descripcion debe incluir: **This mod was created with PMM assistance.**
 
 Feedback crea JSON inspeccionable para un comentario general, una incidencia de PMM, un merge/validacion exacto o Knowledge/CKL. Compartir sigue siendo manual y el control de subida muestra una conexion futura desactivada. Validar normalmente o esperar una respuesta IA no enciende el contador principal; el contador se reserva para Unsupported, errores reales, operaciones interrumpidas o una respuesta que requiere revision. Los fallos identicos reutilizan un caso y cada diagnostico reutiliza su sesion activa.
 
@@ -71,7 +73,7 @@ Empieza por `Documentation/TROUBLESHOOTING.md` y `Logs/PalModMerger.log`. Para s
 
 ## Game Reference Vanilla y AIIO
 
-En **IA y ayuda > Opciones IA**, **Crear / actualizar Game Reference** mantiene una caché local con identidad de versión. PMM lee material seleccionado de tu `Pal-Windows.pak` dentro de `Workspace/GameReference` y nunca modifica el juego. El análisis normal no necesita una referencia completa, mientras que las recetas de Fix Lab pueden pedir y conservar familias actuales adicionales bajo demanda.
+En **Opciones**, **Crear / actualizar Game Reference** mantiene una caché local con identidad de versión. El mismo control tambien puede consultarse desde las opciones de IA y ayuda. PMM lee material seleccionado de tu `Pal-Windows.pak` dentro de `Workspace/GameReference` y nunca modifica el juego. El análisis normal no necesita una referencia completa, mientras que las recetas de Fix Lab y la creacion explícita de mods pueden pedir y conservar familias actuales adicionales bajo demanda.
 
 AIIO no necesita esa caché para crear un handoff. Cuando creas uno explícitamente, AIIO
 vuelve a extraer el archivo/familia Vanilla exacto en conflicto y sus equivalentes exactos

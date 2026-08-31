@@ -14,8 +14,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "PMM"
-EXPECTED_BUILD = "PMM-v1.3.0-RC30-LEAN-AI-VALIDATION-FLOW"
-EXPECTED_CANDIDATE = "rc30-lean-ai-validation-flow"
+EXPECTED_BUILD = "PMM-v1.3.1-MOD-CREATION-PREVIEW"
+EXPECTED_CANDIDATE = "1.3.1-mod-creation-preview"
 
 
 def read(relative: str) -> str:

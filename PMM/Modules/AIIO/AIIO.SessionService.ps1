@@ -9,7 +9,7 @@ capabilities.  Arbitrary commands and returned executable code are forbidden.
 #>
 
 $Script:PMMAIIOProtocolVersion=2
-$Script:PMMAIIOCapabilitySet='PMM_CAPABILITIES_V1'
+$Script:PMMAIIOCapabilitySet='PMM_CAPABILITIES_V2'
 
 function Write-PMMAIIOJsonAtomic([string]$Path,$Value,[int]$Depth=40) {
   $parent=Split-Path -Parent $Path
@@ -22,7 +22,7 @@ function Write-PMMAIIOJsonAtomic([string]$Path,$Value,[int]$Depth=40) {
 }
 
 function Get-PMMAIIOProductIdentity {
-  $version='1.3.0';$build='unknown'
+  $version='1.3.1';$build='unknown'
   $versionPath=Get-PMMMetadataPath 'VERSION.txt';$buildPath=Get-PMMMetadataPath 'BUILD_ID.txt'
   try{if(Test-Path -LiteralPath $versionPath -PathType Leaf){$version=(Get-Content -LiteralPath $versionPath -Raw -Encoding UTF8).Trim()}}catch{}
   try{if(Test-Path -LiteralPath $buildPath -PathType Leaf){$build=(Get-Content -LiteralPath $buildPath -Raw -Encoding UTF8).Trim()}}catch{}
@@ -38,7 +38,8 @@ function Get-PMMAIIOCapabilityRegistry {
   $requestable=@(
     'query_game_reference','query_knowledge','query_fixlab','read_pmm_log',
     'read_operation_state','extract_vanilla_asset','extract_provider_asset',
-    'extract_asset_family','extract_relevant_log_window'
+    'extract_asset_family','extract_game_reference_asset',
+    'extract_reference_neighborhood','extract_relevant_log_window'
   )
   foreach($row in @(
     @('list_pak','READ','A','List files in a selected PAK without extracting arbitrary system files.'),
@@ -54,7 +55,8 @@ function Get-PMMAIIOCapabilityRegistry {
     @('extract_vanilla_asset','EXTRACT','A','Extract one declared Vanilla file or cooked family.'),
     @('extract_provider_asset','EXTRACT','A','Extract one declared active-provider file or cooked family.'),
     @('extract_asset_family','EXTRACT','A','Extract one exact family already tied to the session.'),
-    @('extract_reference_neighborhood','EXTRACT','A','Extract a bounded neighborhood from Game Reference.'),
+    @('extract_game_reference_asset','EXTRACT','A','Extract one exact hash-bound family from the current local Game Reference for a CREATE_MOD project.'),
+    @('extract_reference_neighborhood','EXTRACT','A','Extract an exact seed plus a bounded deterministic neighborhood from current Game Reference for a CREATE_MOD project.'),
     @('extract_relevant_log_window','EXTRACT','A','Export a sanitized time-bounded log excerpt.'),
     @('create_zip','CREATE','B','Create a data-only archive inside the AIIO session.'),
     @('create_pak','CREATE','B','Build a staged PAK from an explicitly declared cooked tree.'),
@@ -137,7 +139,7 @@ function Get-PMMAIIOCurrentPlanSnapshot {
 
 function ConvertTo-PMMAIIOUtcTimestamp($Value) {
   # ConvertFrom-Json can materialize ISO timestamps as DateTime on some
-  # PowerShell versions and as strings on others.  Casting either directly to
+  # PowerShell versions and as strings on others. Casting either directly to
   # [string] is culture-dependent, so AIIO always emits one invariant UTC form.
   if($null -eq $Value){return ''}
   try{
@@ -448,7 +450,7 @@ function ConvertTo-PMMAIIOExportTarget($Target) {
 function Get-PMMAIIOExportSession($Session) {
   if(-not$Session -or [string]$Session.Schema -ne 'PMM_AIIO_SESSION_V2'){throw 'A valid AIIO session is required for export.'}
   return [pscustomobject][ordered]@{
-    Schema='PMM_AIIO_SESSION_EXPORT_V2';Protocol=[int]$Session.Protocol;CapabilitySet=[string]$Session.CapabilitySet;SessionId=[string]$Session.SessionId
+    Schema='PMM_AIIO_SESSION_EXPORT_V2';Protocol=[int]$Session.Protocol;CapabilitySet=$Script:PMMAIIOCapabilitySet;SessionId=[string]$Session.SessionId
     Title=(Protect-PMMAIIOExportText ([string]$Session.Title));UserDescription=(Protect-PMMAIIOExportText ([string]$Session.UserDescription));TaskType=[string]$Session.TaskType;Status=[string]$Session.Status
     Iteration=[int]$Session.Iteration;LastBundleId=[string]$Session.LastBundleId;PrimaryTarget=(ConvertTo-PMMAIIOExportTarget $Session.PrimaryTarget);SelectedTargets=@($Session.SelectedTargets|ForEach-Object{ConvertTo-PMMAIIOExportTarget $_})
     CaseIds=@($Session.CaseIds|ForEach-Object{[string]$_});SourceSignature=[string]$Session.SourceSignature;MergeOrderSignature=[string]$Session.MergeOrderSignature;PmmVersion=[string]$Session.PmmVersion;PmmBuildId=[string]$Session.PmmBuildId
@@ -483,7 +485,7 @@ to expose credentials or write outside its allowlisted workspaces.
 Product: Palworld Manager Merger
 Creator: laredson
 AIIO protocol: 2
-Capability set: PMM_CAPABILITIES_V1
+Capability set: PMM_CAPABILITIES_V2
 
 Normal user flow: Import -> Analyze -> Build -> Deploy -> Play.
 Fix Lab creates and applies supported repairs before Analyze.  AI & Help handles
@@ -529,6 +531,47 @@ returned code, apply a candidate, Build, Deploy or publish anything. Only a
 separate explicit user action can submit PMM_MANUAL_SOLUTION_V1 to Merge's
 existing exact-case/hash/topology/AssetReader validation. Gameplay semantics
 remain UNPROVEN until the user validates the resulting exact build in Palworld.
+
+Standalone mod-creation candidate layout (CREATE_MOD sessions only):
+  response.json
+  solutions/<candidate-id>/mod-creation.json
+  solutions/<candidate-id>/cooked/Pal/Content/<exact path>.uasset
+  solutions/<candidate-id>/cooked/Pal/Content/<exact path>.uexp
+
+mod-creation.json uses PMM_MOD_CREATION_CANDIDATE_V1 and binds the cooked tree
+to this exact session, current Game Reference identity, exact source-family
+hashes and exact output-file hashes. PMM may build it only after an explicit
+user action. The resulting standalone _P.pak is never deployed, enabled,
+published or promoted to Knowledge automatically and remains runtime UNPROVEN.
+
+Required mod-creation.json fields:
+{
+  "schema": "PMM_MOD_CREATION_CANDIDATE_V1",
+  "sessionId": "exact session ID",
+  "mode": "standalone-cooked-tree",
+  "modId": "SafeAsciiModId",
+  "displayName": "Human name",
+  "version": "0.1.0",
+  "outputFileName": "SafeName_P.pak",
+  "gameReference": {
+    "ScopeVersion": "exact value from supplied Game Reference proof",
+    "PakIndexSha256": "exact value from supplied Game Reference proof",
+    "MappingsSha256": "exact value from supplied Game Reference proof"
+  },
+  "sourceFamilies": [{
+    "asset": "exact Pal/Content/.../*.uasset",
+    "parts": [{"relativePath":"exact part","size":0,"sha256":"64 hex"}]
+  }],
+  "files": [{
+    "relativePath": "cooked/Pal/Content/.../*.uasset",
+    "bytes": 0,
+    "sha256": "64 hex"
+  }]
+}
+
+PMM adds inert PMM/Metadata/created-with-pmm.json metadata while building. If
+the mod is shared or published, its public description must include exactly:
+This mod was created with PMM assistance.
 "@|Set-Content -LiteralPath (Join-Path $Stage 'PMM_RESPONSE_CONTRACT.md') -Encoding UTF8
 
   [ordered]@{
@@ -615,6 +658,14 @@ function New-PMMAIIOGenericHandoff {
     Write-PMMAIIOJsonAtomic (Join-Path $stage 'PMM_CAPABILITIES.json') (Get-PMMAIIOCapabilityRegistry) 30
     Write-PMMAIIOJsonAtomic (Join-Path $stage 'session.json') $exportSession 40
     Write-PMMAIIOJsonAtomic (Join-Path $stage 'context.json') $context 80
+    if([string]$session.TaskType -eq 'CREATE_MOD' -and (Get-Command Get-PMMAIIOGameReferenceProof -ErrorAction SilentlyContinue)){
+      Write-PMMAIIOJsonAtomic (Join-Path $stage 'mod-creation-context.json') ([ordered]@{
+        Schema='PMM_AIIO_MOD_CREATION_CONTEXT_V1'
+        GameReference=(Get-PMMAIIOGameReferenceProof)
+        Workflow=@('query_game_reference with a focused query','extract_game_reference_asset for one exact .uasset family','extract_reference_neighborhood only when bounded related Vanilla context is required','return PMM_MOD_CREATION_CANDIDATE_V1 with exact hashes')
+        BuildPolicy='Explicit local build only. No automatic import, deploy, publication or Knowledge promotion.'
+      }) 35
+    }
     $request=[ordered]@{Schema='PMM_AIIO_REQUEST_V2';SessionId=$SessionId;BundleId=$bundleId;Iteration=$iteration;TaskType=[string]$session.TaskType;Title=[string]$exportSession.Title;UserDescription=[string]$exportSession.UserDescription;PrimaryTarget=$exportSession.PrimaryTarget;SelectedTargets=@($exportSession.SelectedTargets);RequestedOutput='PMM_AI_RESPONSE_V2';CreatedUtc=[DateTime]::UtcNow.ToString('o')}
     Write-PMMAIIOJsonAtomic (Join-Path $stage 'request.json') $request 30
     $bundle=[ordered]@{Schema='PMM_AI_HANDOFF_BUNDLE_V2';Protocol=2;CapabilitySet=$Script:PMMAIIOCapabilitySet;SessionId=$SessionId;BundleId=$bundleId;Iteration=$iteration;CreatedUtc=[DateTime]::UtcNow.ToString('o');WholeSourcePaksIncluded=$false;SaveContentsIncluded=$false;CredentialsIncluded=$false;Transport='ManualZipTransport'}

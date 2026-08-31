@@ -58,7 +58,7 @@ try{
     [xml]$xml=Get-Content -LiteralPath (Join-Path $App ('Resources\UI\'+$name)) -Raw -Encoding UTF8
     $manager=[Xml.XmlNamespaceManager]::new($xml.NameTable);$manager.AddNamespace('x','http://schemas.microsoft.com/winfx/2006/xaml')
     $names=@($xml.SelectNodes('//*[@x:Name]',$manager)|ForEach-Object{[string]$_.GetAttribute('Name','http://schemas.microsoft.com/winfx/2006/xaml')})
-    Assert-RC29 ($names.Count -eq 288 -and @($names|Sort-Object -Unique).Count -eq 288) ('Localized XAML name count mismatch: '+$name)
+    Assert-RC29 ($names.Count -eq 289 -and @($names|Sort-Object -Unique).Count -eq 289) ('Localized XAML name count mismatch: '+$name)
     if($null -eq $referenceNames){$referenceNames=@($names|Sort-Object)}else{Assert-RC29 ((@($names|Sort-Object) -join '|') -ceq ($referenceNames -join '|')) ('Localized XAML parity mismatch: '+$name)}
   }
 

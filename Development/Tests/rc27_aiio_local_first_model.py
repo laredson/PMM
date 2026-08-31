@@ -19,7 +19,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "PMM"
-EXPECTED_BUILD = "PMM-v1.3.0-RC30-LEAN-AI-VALIDATION-FLOW"
+EXPECTED_BUILD = "PMM-v1.3.1-MOD-CREATION-PREVIEW"
 
 
 def read(relative: str) -> str:
@@ -64,7 +64,7 @@ def validate_identity_and_package_boundary() -> None:
     assert manifest["product"] == "Palworld Manager Merger"
     assert manifest["creator"] == "laredson"
     assert manifest["buildId"] == EXPECTED_BUILD
-    assert manifest["releaseCandidate"] == "rc30-lean-ai-validation-flow"
+    assert manifest["releaseCandidate"] == "1.3.1-mod-creation-preview"
     assert manifest["bundledThemeCount"] == 11
     assert manifest["officialThemeChoiceCount"] == 13
     assert manifest["aiioTransport"] == "manual local ZIP only"
@@ -91,7 +91,7 @@ def validate_localized_ui_and_header() -> None:
         text = read(f"Resources/UI/{filename}")
         root = ET.fromstring(text)
         names = [value for node in root.iter() if (value := node.attrib.get(x_name))]
-        assert len(names) == len(set(names)) == 288, filename
+        assert len(names) == len(set(names)) == 289, filename
         current = set(names)
         assert required.issubset(current), filename
         assert root.attrib["MinWidth"] == "900" and root.attrib["MinHeight"] == "600"

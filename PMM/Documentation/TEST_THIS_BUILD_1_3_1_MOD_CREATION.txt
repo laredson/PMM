@@ -1,0 +1,27 @@
+PMM 1.3.1 MOD CREATION PREVIEW - WINDOWS ACCEPTANCE
+====================================================
+
+1. Extract this ZIP into a new folder. Do not overwrite your stable folder.
+2. If desired, copy your existing Workspace folder into this preview.
+3. Confirm PMM starts normally and existing Analyze/Build/Deploy behavior is unchanged.
+4. In Settings, confirm Vanilla Game Reference is Current; build it if needed.
+5. Open AI & Help > AI assistance > New mod project...
+6. Enter a title and description. Test both Save project and Create AI ZIP.
+7. Confirm the ZIP opens in Explorer, the session remains after restarting PMM and nothing was uploaded.
+8. Give the ZIP to an external AI. A query_game_reference request should produce a routed response ZIP.
+9. Import that response. Prepare requested data and confirm only bounded GameReference data is present.
+10. Import a valid PMM_MOD_CREATION_CANDIDATE_V1 response.
+11. Inspect it, then press Build standalone PAK... and read the full warning.
+12. Confirm the output PAK remains in the AIIO session and is NOT copied to Palworld's ~mods folder.
+13. Run repak list on the PAK and confirm both the declared Pal/Content cooked files and:
+      PMM/Metadata/created-with-pmm.json
+14. Confirm mod-build.json contains:
+      RequiredPublicDescription = This mod was created with PMM assistance.
+15. Install/test the PAK only through an explicit separate action. Treat it as UNPROVEN until gameplay testing passes.
+
+Negative checks:
+- stale GameReference candidate is rejected;
+- modified staged bytes are rejected;
+- unexpected files, path traversal, executables and nested archives are rejected;
+- an exact GameReference extraction request outside CREATE_MOD is rejected;
+- no candidate import or build deploys, enables, publishes or promotes Knowledge automatically.

@@ -1,4 +1,4 @@
-# Palworld Manager Merger v1.3.0 — User Guide
+# Palworld Manager Merger v1.3.1 — User Guide
 
 **Guided workflow:** PMM highlights only the next useful stage: **Import -> Fix Lab when required -> Analyze -> Build -> Deploy -> Play**. The color is state-derived. During Import/Analyze/Build/Deploy the highlighted button itself becomes a progress surface, while the persistent progress bar under Build/Deploy keeps the last percentage/result until another operation starts.
 
@@ -53,7 +53,9 @@ The **Saves** tab can create world backups and restore a selected backup. PMM cr
 
 ## AI & Help and local-first AIIO
 
-**AI & Help** contains four areas: bounded diagnostics, persistent AIIO repair/tasks, local Knowledge/recovery, and the color-scheme editor. **Prepare for AI** creates a local ZIP for you to send manually. PMM has no AI-provider login and performs no automatic upload. A returned ZIP is untrusted data: scripts, executable content, unsafe paths and nested archives are rejected, and candidates remain staged until inspected.
+**AI & Help** contains bounded assistance, persistent AIIO repair/mod-creation tasks, Feedback & Knowledge, reception of returned work, and the color-scheme editor. **Prepare for AI** creates a local ZIP for you to send manually. PMM has no AI-provider login and performs no automatic upload. A returned ZIP is untrusted data: scripts, executable content, unsafe paths and nested archives are rejected, and candidates remain staged until inspected.
+
+For a new standalone mod, choose **New mod project**, describe the intended behavior and optionally provide an exact asset/family hint. A `CREATE_MOD` session may request bounded families from the current Game Reference. After importing a response, PMM can expose **Build standalone PAK...** only when the candidate declares a safe cooked tree and exact hashes. The output stays in the AIIO session workspace as `LOCAL_BUILD_UNPROVEN`; it is never installed, deployed or published automatically. Its PAK contains inert `created using PMM` metadata. If you publish the mod, its description must include: **This mod was created with PMM assistance.**
 
 Only an exact current `PMM_MANUAL_SOLUTION_V1` cooked-family candidate may expose **Use candidate in Merge**. Confirmation forces Analyze; it never starts Build or Deploy. Build validation and feedback history are local and deterministic. See `AI_HANDOFF_AND_KNOWLEDGE.md`.
 

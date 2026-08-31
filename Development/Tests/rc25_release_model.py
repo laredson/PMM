@@ -19,7 +19,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "PMM"
-EXPECTED_BUILD = "PMM-v1.3.0-RC30-LEAN-AI-VALIDATION-FLOW"
+EXPECTED_BUILD = "PMM-v1.3.1-MOD-CREATION-PREVIEW"
 
 
 def read(relative: str) -> str:
@@ -232,7 +232,7 @@ def validate_ui_and_import_boundary() -> None:
 def validate_release_identity() -> None:
     manifest = load_json("Resources/Metadata/RELEASE_MANIFEST.json")
     assert manifest["buildId"] == EXPECTED_BUILD
-    assert manifest["releaseCandidate"] == "rc30-lean-ai-validation-flow"
+    assert manifest["releaseCandidate"] == "1.3.1-mod-creation-preview"
     assert manifest["bundledThemeCount"] == 11
     assert manifest["settingsDefaults"]["theme"] == "pmm-crystal"
     assert (APP / "Resources/Metadata/BUILD_ID.txt").read_text(encoding="utf-8-sig").strip() == EXPECTED_BUILD

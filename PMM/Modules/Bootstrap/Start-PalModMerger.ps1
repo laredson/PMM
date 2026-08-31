@@ -52,6 +52,7 @@ Set-PMMHostStartupState 'startup:UI-script-loading'
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.SessionService.ps1')
 . (Join-Path $Script:Root 'Modules\Saves\SaveActivityService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.DiagnosticService.ps1')
+. (Join-Path $Script:Root 'Modules\AIIO\AIIO.ModCreationService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.ResponseService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.ArtifactService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.ValidationService.ps1')
@@ -153,7 +154,7 @@ $controlNames = @(
   'MainTabs','TabFixLab','BtnFixLabOpenRoot','CmbFixLabJob','BtnFixLabRefreshJobs','BtnFixLabOpenJob','LstFixLabPrimaryMods','BtnFixLabUseLibraryMod','BtnFixLabBrowsePrimary','TxtFixLabPrimary',
   'LstFixLabRelated','BtnFixLabAddRelated','BtnFixLabRemoveRelated','TxtFixLabGameReference','BtnFixLabBuildReference','BtnFixLabOpenReference','BtnFixLabAnalyze','TxtFixLabAnalysis','DgFixLabPakInventory','CmbFixLabRecipe','CmbFixLabVariant','TxtFixLabVariantDescription','BtnFixLabCreateHandoff','TxtFixLabBuildState','BtnFixLabBuild','BtnFixLabRebuild','TxtFixLabResult','BtnFixLabOpenOutput','BtnFixLabAddOutputToLibrary',
   'BtnFixLabDiscover','BtnFixLabRefreshDashboard','LstFixLabCandidates','TxtFixLabCandidate','BtnFixLabIgnoreSource','BtnFixLabDeleteSource','LstFixLabBackups','BtnFixLabRevertBackup','BtnFixLabOpenBackupFolder','LstFixLabBuiltFixes','BtnFixLabApplyBuilt','BtnFixLabRepair','TxtFixLabRepairState','TxtFixLabRepairProgress','PrgFixLabRepair','TxtFixLabGameReferenceProgress','PrgFixLabGameReference','BrdFixLabBadge','TxtFixLabBadge','BrdFixLabNotice','TxtFixLabNotice','BtnFixLabDismissNotice','TxtFixLabCandidateCount','TxtFixLabBackupCount','TxtFixLabBuiltCount','TxtFixLabIgnoredCount','BtnFixLabClearIgnored','TxtFixLabLegacySource','TxtFixLabModules','TxtFixLabOutputSize','ExpFixLabSource','ExpFixLabConfigure','ExpFixLabBuild','ExpFixLabOutputs','ExpFixLabBackups','ExpFixLabAdvanced',
-  'TabAIHelp','BrdAIHelpBadge','TxtAIHelpBadge','AIHelpTabs','LstAIHelpDiagnostics','BtnAIHelpRefresh','BtnAIHelpNewCase','BtnAIHelpPrepareDiagnostic','PnlAIHelpSelectedCase','PnlAIHelpNewCase','TxtAIHelpSelectedCaseTitle','TxtAIHelpSelectedCaseMeta','TxtAIHelpSelectedCaseDescription','CmbAIHelpDiagnosticType','TxtAIHelpDiagnosticTitle','TxtAIHelpDiagnosticDescription','ChkAIHelpIncludePalLog','BtnAIHelpCreateCase','BtnAIHelpCreateAndPrepareCase','BtnAIHelpCancelNewCase','TxtAIHelpDiagnosticStatus',
+  'TabAIHelp','BrdAIHelpBadge','TxtAIHelpBadge','AIHelpTabs','LstAIHelpDiagnostics','BtnAIHelpRefresh','BtnAIHelpNewCase','BtnAIHelpNewModProject','BtnAIHelpPrepareDiagnostic','PnlAIHelpSelectedCase','PnlAIHelpNewCase','TxtAIHelpSelectedCaseTitle','TxtAIHelpSelectedCaseMeta','TxtAIHelpSelectedCaseDescription','CmbAIHelpDiagnosticType','TxtAIHelpDiagnosticTitle','TxtAIHelpDiagnosticDescription','ChkAIHelpIncludePalLog','BtnAIHelpCreateCase','BtnAIHelpCreateAndPrepareCase','BtnAIHelpCancelNewCase','TxtAIHelpDiagnosticStatus',
   'LstAIIOSessions','LstAIIOCandidates','TxtAIIOCandidateStatus','BtnAIIOOpenWorkspace','BtnAIIOArchive','BtnAIIOOpenCandidate','BtnAIIOUseCandidate','CmbAIIOType','TxtAIIOTitle','TxtAIIODescription','CmbAIOTargetKind','TxtAIOTargetId','BtnAIIONewSession','BtnAIIOPrepare','BtnAIIOImportResponse','BtnAIIOContinue','TxtAIIOStatus',
   'CmbAIHelpFeedbackType','TxtAIHelpFeedbackTitle','TxtAIHelpFeedbackComments','CmbAIHelpFeedbackBuild','BtnAIHelpCreateFeedback','BtnAIHelpGenerateFeedback','BtnAIHelpOpenFeedback','BtnAIHelpUploadFeedback','TxtAIHelpFeedbackStatus',
   'TxtAIHelpKnowledgeSummary','BtnAIHelpOpenKnowledge','TxtAIHelpStorageSummary','LstAIHelpInterrupted','BtnAIHelpRefreshKnowledge','BtnAIHelpCleanup','ChkAIIOAutoCreateErrorCases','TxtAIIOSettingsStatus',
@@ -772,8 +773,20 @@ function Refresh-PMMAIIOCandidates([string]$SessionId) {
 
 function Update-PMMAIIOCandidateSelection {
   $row=$Script:LstAIIOCandidates.SelectedItem
-  if(-not$row){$Script:BtnAIIOOpenCandidate.IsEnabled=$false;$Script:BtnAIIOUseCandidate.IsEnabled=$false;$Script:TxtAIIOCandidateStatus.Text=L 'No staged candidate is selected.' 'No hay ningun candidato en staging seleccionado.';return}
+  if(-not$row){$Script:BtnAIIOOpenCandidate.IsEnabled=$false;$Script:BtnAIIOUseCandidate.IsEnabled=$false;$Script:BtnAIIOUseCandidate.Content=L 'Use candidate in Merge...' 'Usar candidato en Merge...';$Script:TxtAIIOCandidateStatus.Text=L 'No staged candidate is selected.' 'No hay ningun candidato en staging seleccionado.';return}
   $Script:BtnAIIOOpenCandidate.IsEnabled=$true
+  if([string]$row.InputSchema -eq 'PMM_MOD_CREATION_CANDIDATE_V1'){
+    $Script:BtnAIIOUseCandidate.Content=L 'Build standalone PAK...' 'Crear PAK independiente...'
+    $Script:BtnAIIOUseCandidate.IsEnabled=(-not[bool]$Script:AIIOBusy -and [bool]$row.CanBuildStandalone)
+    if([string]$row.Status -eq 'ModBuiltUnproven'){
+      $path='';try{$path=[string]$row.BuiltPak.Path}catch{}
+      $Script:TxtAIIOCandidateStatus.Text=((L 'Standalone mod built locally and left undeployed. Runtime status: UNPROVEN. Test it in Palworld before contributing Knowledge. Output: {0}' 'Mod independiente creado localmente y dejado sin desplegar. Estado runtime: UNPROVEN. Pruebalo en Palworld antes de aportar Knowledge. Salida: {0}') -f $path)
+    }else{
+      $Script:TxtAIIOCandidateStatus.Text=L 'The cooked-tree candidate passed structural, hash and current GameReference checks. It is still untrusted and inactive. Build creates a standalone PAK locally; PMM will not deploy it.' 'El candidato cooked-tree supero las comprobaciones estructurales, de hashes y de la GameReference vigente. Sigue sin ser confiable ni estar activo. Crear genera un PAK independiente local; PMM no lo desplegara.'
+    }
+    return
+  }
+  $Script:BtnAIIOUseCandidate.Content=L 'Use candidate in Merge...' 'Usar candidato en Merge...'
   $current=$false
   if([bool]$row.CanUseInMerge){try{$ids=@($row.CaseIds|ForEach-Object{[string]$_}|Where-Object{$_});$current=($ids.Count -eq 1 -and -not[string]::IsNullOrWhiteSpace((Get-PMMAIIOCurrentReviewFolderForCaseId $ids[0])))}catch{$current=$false}}
   $Script:BtnAIIOUseCandidate.IsEnabled=(-not[bool]$Script:AIIOBusy -and [bool]$row.CanUseInMerge -and $current)
@@ -3304,7 +3317,7 @@ function Stop-PMMBackgroundOperation([switch]$Silent) {
   $Script:BackgroundOperationOnFailure=$null
   if($kind -eq 'Analyze'){Set-PMMAnalyzeBusy $false}
   elseif($kind -eq 'Build'){Set-PMMBuildBusy $false}
-  elseif($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh')){Set-PMMAIIOBusy $false}
+  elseif($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh')){Set-PMMAIIOBusy $false}
   elseif($kind -eq 'FixLabBuild'){Set-PMMFixLabBusy $false}
   if(-not$Silent -and -not[string]::IsNullOrWhiteSpace($kind)){
     $Script:TxtStatus.Text=(L ($kind+' stopped.') ($kind+' detenido.'))
@@ -3336,7 +3349,7 @@ function Complete-PMMBackgroundOperation {
     # finish cleanly before the next guided action is highlighted.
     if($kind -eq 'Analyze'){Set-PMMAnalyzeProgress 1 1 (L 'Analyze complete.' 'Analisis terminado.')}
     elseif($kind -eq 'Build'){Set-PMMBuildProgress 1 1 (L 'Build complete.' 'Build terminado.')}
-    elseif($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh')){Set-PMMAIIOProgress 1 1 (L 'AIIO operation complete.' 'Operacion AIIO terminada.')}
+    elseif($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh')){Set-PMMAIIOProgress 1 1 (L 'AIIO operation complete.' 'Operacion AIIO terminada.')}
     elseif($kind -eq 'FixLabBuild'){Set-PMMFixLabProgress 1 1 (L 'Fix Lab repair build complete.' 'Build de reparacion Fix Lab terminado.')}
     try{
       if($successCallback){& $successCallback $result}
@@ -3348,7 +3361,7 @@ function Complete-PMMBackgroundOperation {
       (L ($kind+' worker stopped without a valid result.') ('El proceso '+$kind+' termino sin un resultado valido.'))
     }
     Write-PMMLog ('Background '+$kind+' failed: '+$message)
-    $failureOperation=if($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh')){'AIIO'}elseif($kind -eq 'FixLabBuild'){'FixLab'}else{$kind}
+    $failureOperation=if($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh')){'AIIO'}elseif($kind -eq 'FixLabBuild'){'FixLab'}else{$kind}
     Set-PMMOperationFailure $failureOperation $message
     try{
       if($failureCallback){& $failureCallback $message}else{Show-Error $message}
@@ -3360,7 +3373,7 @@ function Complete-PMMBackgroundOperation {
   # next real step, avoiding a one-frame stale highlight between operations.
   if($kind -eq 'Analyze'){Set-PMMAnalyzeBusy $false}
   elseif($kind -eq 'Build'){Set-PMMBuildBusy $false}
-  elseif($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh')){Set-PMMAIIOBusy $false}
+  elseif($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh')){Set-PMMAIIOBusy $false}
   elseif($kind -eq 'FixLabBuild'){Set-PMMFixLabBusy $false}
 
   if($result -and [bool]$result.Success -and @('Analyze','Build','FixLabBuild') -contains $kind){Notify-PMMWorkflowStepComplete}
@@ -3382,7 +3395,7 @@ function Complete-PMMBackgroundOperation {
 
 function Start-PMMBackgroundOperation {
   param(
-    [Parameter(Mandatory=$true)][ValidateSet('Analyze','Build','AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh','FixLabBuild')][string]$Operation,
+    [Parameter(Mandatory=$true)][ValidateSet('Analyze','Build','AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','FixLabBuild')][string]$Operation,
     [switch]$Force,
     [switch]$AllowOversize,
     [ValidateSet('ConflictGroups')][string]$Mode='ConflictGroups',
@@ -3396,9 +3409,9 @@ function Start-PMMBackgroundOperation {
     [scriptblock]$OnFailure=$null
   )
 
-  if($Operation -in @('AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate') -and -not(Test-PMMAIIOSessionId $SessionId)){throw ($Operation+' requires a valid persistent AIIO session id.')}
+  if($Operation -in @('AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild') -and -not(Test-PMMAIIOSessionId $SessionId)){throw ($Operation+' requires a valid persistent AIIO session id.')}
   if($Operation -eq 'AIIOImportResponse' -and -not(Test-Path -LiteralPath $InputZip -PathType Leaf)){throw 'AIIO response ZIP was not found.'}
-  if($Operation -eq 'AIIOUseCandidate' -and $SolutionId -notmatch '^[a-f0-9]{64}$'){throw 'AIIO candidate solution id is invalid.'}
+  if($Operation -in @('AIIOUseCandidate','AIIOModBuild') -and $SolutionId -notmatch '^[a-f0-9]{64}$'){throw 'AIIO candidate solution id is invalid.'}
   if(-not(Request-PMMProcessingSlot $Operation)){return $false}
   Reset-PMMOperationCancellation
 
@@ -3434,11 +3447,11 @@ function Start-PMMBackgroundOperation {
     if(-not[string]::IsNullOrWhiteSpace($FixLabRecipeId)){$args+=' -FixLabRecipeId "'+$FixLabRecipeId+'"'}
     if(-not[string]::IsNullOrWhiteSpace($FixLabVariantId)){$args+=' -FixLabVariantId "'+$FixLabVariantId+'"'}
   }
-  if($Operation -in @('AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate')){
+  if($Operation -in @('AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild')){
     $args+=' -SessionId "'+$SessionId+'"'
   }
   if($Operation -eq 'AIIOImportResponse'){$args+=' -InputZip "'+$InputZip+'"'}
-  if($Operation -eq 'AIIOUseCandidate'){$args+=' -SolutionId "'+$SolutionId+'"'}
+  if($Operation -in @('AIIOUseCandidate','AIIOModBuild')){$args+=' -SolutionId "'+$SolutionId+'"'}
   if($Force){$args+=' -Force'}
   if($AllowOversize){$args+=' -AllowOversize'}
 
@@ -3450,13 +3463,14 @@ function Start-PMMBackgroundOperation {
     Set-PMMBuildBusy $true
     Set-PMMBuildProgress 0 0 (L 'Starting Build in the background...' 'Iniciando Build en segundo plano...') -Indeterminate
     $Script:TxtStatus.Text=L 'Building compatibility patch in the background...' 'Creando parche de compatibilidad en segundo plano...'
-  }elseif($Operation -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh')){
+  }elseif($Operation -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh')){
     Set-PMMAIIOBusy $true
     $message=switch($Operation){
       'AIHandoff' {L 'Creating one AI handoff for all current Unsupported cases...' 'Creando una unica entrega para IA con todos los casos no soportados...'}
       'AIIOPendingData' {L 'Preparing only the validated data requested for this session...' 'Preparando solo los datos validados pedidos para esta sesion...'}
       'AIIOImportResponse' {L 'Validating and staging the untrusted AI response...' 'Validando y dejando en staging la respuesta IA no confiable...'}
       'AIIOUseCandidate' {L 'Revalidating the selected candidate against the exact current case...' 'Revalidando el candidato contra el caso actual exacto...'}
+      'AIIOModBuild' {L 'Building the selected standalone mod locally; it will remain undeployed...' 'Creando localmente el mod independiente seleccionado; quedara sin desplegar...'}
       'AIIOArtifactRefresh' {L 'Refreshing the local artifact inventory...' 'Actualizando el inventario local de artefactos...'}
       default {L 'Preparing the selected persistent AIIO session...' 'Preparando la sesion AIIO persistente seleccionada...'}
     }
@@ -3473,7 +3487,7 @@ function Start-PMMBackgroundOperation {
     try{$Script:BackgroundOperationProcess.PriorityClass=[System.Diagnostics.ProcessPriorityClass]::BelowNormal}catch{}
     Write-PMMLog ('Background processing worker started: '+$Operation+' | pid='+[string]$Script:BackgroundOperationProcess.Id+' | host='+$hostExe)
   }catch{
-    if($Operation -eq 'Analyze'){Set-PMMAnalyzeBusy $false}elseif($Operation -eq 'Build'){Set-PMMBuildBusy $false}elseif($Operation -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh')){Set-PMMAIIOBusy $false}else{Set-PMMFixLabBusy $false}
+    if($Operation -eq 'Analyze'){Set-PMMAnalyzeBusy $false}elseif($Operation -eq 'Build'){Set-PMMBuildBusy $false}elseif($Operation -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh')){Set-PMMAIIOBusy $false}else{Set-PMMFixLabBusy $false}
     $Script:BackgroundOperationKind=''
     $Script:BackgroundOperationFixLabJobId=''
     Remove-Item -LiteralPath $job -Recurse -Force -ErrorAction SilentlyContinue
@@ -3492,7 +3506,7 @@ function Start-PMMBackgroundOperation {
             Set-PMMAnalyzeProgress ([int]$progress.Current) ([int]$progress.Total) ([string]$progress.Message) -Indeterminate:([bool]$progress.Indeterminate)
           }elseif([string]$progress.Operation -eq 'Build'){
             Set-PMMBuildProgress ([int]$progress.Current) ([int]$progress.Total) ([string]$progress.Message) -Indeterminate:([bool]$progress.Indeterminate)
-          }elseif([string]$progress.Operation -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh')){
+          }elseif([string]$progress.Operation -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh')){
             Set-PMMAIIOProgress ([int]$progress.Current) ([int]$progress.Total) ([string]$progress.Message) -Indeterminate:([bool]$progress.Indeterminate)
           }elseif([string]$progress.Operation -eq 'FixLabBuild'){
             if($progress.PSObject.Properties.Name -contains 'JobId' -and -not[string]::IsNullOrWhiteSpace([string]$progress.JobId)){$Script:BackgroundOperationFixLabJobId=[string]$progress.JobId}
@@ -5754,9 +5768,55 @@ function Complete-PMMAIIOUseCandidateUi($Result,[string]$SessionId) {
   [void]$Window.Dispatcher.BeginInvoke([System.Windows.Threading.DispatcherPriority]::ContextIdle,{Start-PMMAIIOCandidateAnalyze})
 }
 
+function Complete-PMMAIIOModBuildUi($Result,[string]$SessionId) {
+  Select-PMMAIIOUiSession $SessionId
+  $Script:TxtAIIOStatus.Text=((L 'Standalone mod built: {0}. It was not deployed or published. Runtime remains UNPROVEN until you test it in Palworld. If shared, its description must include: {1}' 'Mod independiente creado: {0}. No se desplego ni publico. El runtime sigue UNPROVEN hasta que lo pruebes en Palworld. Si se comparte, su descripcion debe incluir: {1}') -f [string]$Result.OutputPath,[string]$Result.RequiredPublicDescription)
+  if(-not[string]::IsNullOrWhiteSpace([string]$Result.OutputPath)){Start-Process explorer.exe -ArgumentList ('/select,"'+[string]$Result.OutputPath+'"')}
+}
+
+function Show-PMMModCreationProjectDialog {
+  $form=[System.Windows.Forms.Form]::new();$form.Text=L 'New standalone mod project' 'Nuevo proyecto independiente de mod';$form.ClientSize=[System.Drawing.Size]::new(760,560);$form.StartPosition='CenterParent';$form.FormBorderStyle=[System.Windows.Forms.FormBorderStyle]::FixedDialog;$form.MaximizeBox=$false;$form.MinimizeBox=$false;$form.AutoScaleMode=[System.Windows.Forms.AutoScaleMode]::Dpi;$form.AutoScroll=$true;$form.Font=[System.Drawing.Font]::new('Segoe UI',10.5)
+  $heading=[System.Windows.Forms.Label]::new();$heading.Left=24;$heading.Top=20;$heading.Width=710;$heading.Height=35;$heading.Font=[System.Drawing.Font]::new('Segoe UI Semibold',15);$heading.Text=L 'Describe the mod you want to create' 'Describe el mod que quieres crear'
+  $intro=[System.Windows.Forms.Label]::new();$intro.Left=24;$intro.Top=58;$intro.Width=710;$intro.Height=58;$intro.Text=L 'PMM creates a local AIIO exchange. An external AI may query your indexed Vanilla GameReference and ask PMM for exact, bounded asset families. Returned files stay inactive until you inspect and explicitly build them.' 'PMM crea un intercambio AIIO local. Una IA externa puede consultar tu GameReference Vanilla indexada y pedir a PMM familias exactas y acotadas. Los archivos devueltos quedan inactivos hasta que los inspecciones y los crees expresamente.'
+  $titleLabel=[System.Windows.Forms.Label]::new();$titleLabel.Left=24;$titleLabel.Top=128;$titleLabel.Width=180;$titleLabel.Text=L 'Project title' 'Titulo del proyecto'
+  $title=[System.Windows.Forms.TextBox]::new();$title.Left=24;$title.Top=154;$title.Width=710;$title.Height=28
+  $ideaLabel=[System.Windows.Forms.Label]::new();$ideaLabel.Left=24;$ideaLabel.Top=198;$ideaLabel.Width=300;$ideaLabel.Text=L 'What should the mod do?' 'Que debe hacer el mod?'
+  $idea=[System.Windows.Forms.TextBox]::new();$idea.Left=24;$idea.Top=224;$idea.Width=710;$idea.Height=170;$idea.Multiline=$true;$idea.ScrollBars=[System.Windows.Forms.ScrollBars]::Vertical;$idea.AcceptsReturn=$true
+  $targetLabel=[System.Windows.Forms.Label]::new();$targetLabel.Left=24;$targetLabel.Top=410;$targetLabel.Width=710;$targetLabel.Text=L 'Optional exact asset or search hint (for example: BP_PlayerBase)' 'Asset exacto o pista de busqueda opcional (por ejemplo: BP_PlayerBase)'
+  $target=[System.Windows.Forms.TextBox]::new();$target.Left=24;$target.Top=436;$target.Width=710;$target.Height=28
+  $reference=[System.Windows.Forms.Label]::new();$reference.Left=24;$reference.Top=474;$reference.Width=285;$reference.Height=48
+  try{$proof=Get-PMMAIIOGameReferenceProof;$reference.Text=((L 'Vanilla GameReference: {0} ({1} indexed families)' 'GameReference Vanilla: {0} ({1} familias indexadas)') -f [string]$proof.Status,[int]$proof.FamilyCount)}catch{$reference.Text=L 'Vanilla GameReference status could not be read.' 'No se pudo leer el estado de la GameReference Vanilla.'}
+  $save=[System.Windows.Forms.Button]::new();$save.Text=L 'Save project' 'Guardar proyecto';$save.Left=458;$save.Top=492;$save.Width=128;$save.Height=42;$save.DialogResult=[System.Windows.Forms.DialogResult]::Retry
+  $prepare=[System.Windows.Forms.Button]::new();$prepare.Text=L 'Create AI ZIP' 'Crear ZIP IA';$prepare.Left=594;$prepare.Top=492;$prepare.Width=140;$prepare.Height=42;$prepare.DialogResult=[System.Windows.Forms.DialogResult]::OK
+  $cancel=[System.Windows.Forms.Button]::new();$cancel.Text=L 'Cancel' 'Cancelar';$cancel.Left=322;$cancel.Top=492;$cancel.Width=128;$cancel.Height=42;$cancel.DialogResult=[System.Windows.Forms.DialogResult]::Cancel
+  foreach($control in @($heading,$intro,$titleLabel,$title,$ideaLabel,$idea,$targetLabel,$target,$reference,$cancel,$save,$prepare)){[void]$form.Controls.Add($control)}
+  $form.AcceptButton=$prepare;$form.CancelButton=$cancel
+  $form.Add_Shown({
+    $work=[System.Windows.Forms.Screen]::FromControl($form).WorkingArea
+    $form.Width=[Math]::Min($form.Width,[Math]::Max(420,$work.Width-32))
+    $form.Height=[Math]::Min($form.Height,[Math]::Max(420,$work.Height-32))
+  })
+  $result=$form.ShowDialog()
+  if($result -notin @([System.Windows.Forms.DialogResult]::OK,[System.Windows.Forms.DialogResult]::Retry)){return $null}
+  $projectTitle=([string]$title.Text).Trim();$description=([string]$idea.Text).Trim();$hint=([string]$target.Text).Trim()
+  if([string]::IsNullOrWhiteSpace($projectTitle)){throw (L 'Enter a project title.' 'Introduce un titulo de proyecto.')}
+  if([string]::IsNullOrWhiteSpace($description)){throw (L 'Describe what the mod should do.' 'Describe que debe hacer el mod.')}
+  return [pscustomobject]@{Title=$projectTitle;Description=$description;TargetHint=$hint;Prepare=($result -eq [System.Windows.Forms.DialogResult]::OK)}
+}
+
 $Script:BtnAIHelpRefresh.Add_Click({try{Refresh-PMMAIHelpDiagnostics;Refresh-PMMAIHelpBadge;$Script:TxtAIHelpDiagnosticStatus.Text=L 'Cases refreshed.' 'Casos actualizados.'}catch{Handle-UIError $_ (L 'Refresh AI assistance' 'Actualizar ayuda IA')}})
 $Script:LstAIHelpDiagnostics.Add_SelectionChanged({try{if(-not[bool]$Script:AIHelpUiRefreshing){$Script:AIHelpNewCaseMode=$false;Update-PMMAIHelpDiagnosticSelection}}catch{}})
 $Script:BtnAIHelpNewCase.Add_Click({try{Set-PMMAIHelpNewCaseMode $true -Clear;try{$Script:TxtAIHelpDiagnosticTitle.Focus()|Out-Null}catch{}}catch{Handle-UIError $_ (L 'Open new AI assistance case' 'Abrir nuevo caso de ayuda IA')}})
+$Script:BtnAIHelpNewModProject.Add_Click({
+  try{
+    $project=Show-PMMModCreationProjectDialog;if(-not$project){return}
+    $targets=@();if(-not[string]::IsNullOrWhiteSpace([string]$project.TargetHint)){$targets=@([pscustomobject]@{Kind='GameReferenceSearchHint';Id=[string]$project.TargetHint;UserSuspects=$false;CauseConfirmed=$false})}
+    $session=New-PMMAIIOSession -Title ([string]$project.Title) -Description ([string]$project.Description) -TaskType CREATE_MOD -TargetKind GameReference -TargetId ([string]$project.TargetHint) -SelectedTargets $targets
+    $sessionId=[string]$session.SessionId;Select-PMMAIIOUiSession $sessionId;$Script:AIHelpTabs.SelectedIndex=1
+    if([bool]$project.Prepare){$done={param($result) Complete-PMMAIIOPrepareUi $result $sessionId $true}.GetNewClosure();[void](Start-PMMBackgroundOperation -Operation AIIOPrepare -SessionId $sessionId -OnSuccess $done)}
+    else{$Script:TxtAIIOStatus.Text=((L 'Standalone mod project saved locally: {0}. It has not been uploaded.' 'Proyecto independiente de mod guardado localmente: {0}. No se ha subido.') -f $sessionId)}
+  }catch{Handle-UIError $_ (L 'Create standalone mod project' 'Crear proyecto independiente de mod')}
+})
 $Script:BtnAIHelpCancelNewCase.Add_Click({try{Set-PMMAIHelpNewCaseMode $false}catch{}})
 $Script:BtnAIHelpRefreshKnowledge.Add_Click({try{$done={param($result) Refresh-PMMAIHelpKnowledge;Refresh-PMMAIHelpBadge};[void](Start-PMMBackgroundOperation -Operation AIIOArtifactRefresh -OnSuccess $done)}catch{Handle-UIError $_ (L 'Refresh Knowledge and storage' 'Actualizar Knowledge y almacenamiento')}})
 function New-PMMAIHelpCaseFromUi {
@@ -5868,6 +5928,14 @@ $Script:BtnAIIOUseCandidate.Add_Click({
   try{
     $session=Get-PMMSelectedAIIOSession;$row=$Script:LstAIIOCandidates.SelectedItem
     if(-not$session -or -not$row){throw (L 'Select a session and candidate.' 'Selecciona una sesion y un candidato.')}
+    if([string]$row.InputSchema -eq 'PMM_MOD_CREATION_CANDIDATE_V1'){
+      $warning=L "Build this standalone mod candidate?`n`nPMM will verify the staged bytes again, require the exact current Vanilla GameReference identity, run a read-only AssetReader probe on every returned asset header, pack only the declared cooked tree plus inert PMM attribution metadata, and verify every PAK entry. The PAK will remain local, undeployed, unpublished and runtime UNPROVEN.`n`nYou must test it in Palworld. If you share or publish it, its public description must include: This mod was created with PMM assistance.`n`nContinue?" "Crear este candidato de mod independiente?`n`nPMM volvera a verificar los bytes en staging, exigira la identidad exacta de la GameReference Vanilla vigente, ejecutara una prueba de solo lectura con AssetReader sobre cada cabecera devuelta, empaquetara solo el arbol cooked declarado mas metadatos inertes de atribucion PMM y verificara cada entrada del PAK. El PAK quedara local, sin desplegar, sin publicar y runtime UNPROVEN.`n`nDebes probarlo en Palworld. Si lo compartes o publicas, su descripcion publica debe incluir: This mod was created with PMM assistance.`n`nContinuar?"
+      if(-not(Confirm $warning)){return}
+      $sessionId=[string]$session.SessionId;$solutionId=[string]$row.SolutionId
+      $done={param($result) Complete-PMMAIIOModBuildUi $result $sessionId}.GetNewClosure()
+      [void](Start-PMMBackgroundOperation -Operation AIIOModBuild -SessionId $sessionId -SolutionId $solutionId -OnSuccess $done)
+      return
+    }
     $warning=L "Use this returned cooked-family candidate in Merge?`n`nPMM will revalidate the exact current case, source hashes, ZIP paths, cooked-family topology, output hashes and a read-only AssetReader parse. This cannot prove gameplay semantics. The candidate remains experimental and runtime UNPROVEN until you test the resulting exact build in Palworld.`n`nNothing will be deployed automatically. Continue?" "Usar este candidato cooked devuelto en Merge?`n`nPMM volvera a validar el caso exacto vigente, hashes fuente, rutas ZIP, topologia de la familia cooked, hashes de salida y una lectura con AssetReader. Esto no puede demostrar la semantica de gameplay. El candidato seguira experimental y runtime UNPROVEN hasta probar el build exacto en Palworld.`n`nNo se desplegara nada automaticamente. Continuar?"
     if(-not(Confirm $warning)){return}
     $sessionId=[string]$session.SessionId;$solutionId=[string]$row.SolutionId

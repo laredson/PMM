@@ -158,7 +158,7 @@ try{
 }
 
 $manifest=Get-Content -LiteralPath (Join-Path $App 'Resources\Metadata\RELEASE_MANIFEST.json') -Raw -Encoding UTF8|ConvertFrom-Json
-Assert-RC24 ([string]$manifest.buildId -eq 'PMM-v1.3.0-RC30-LEAN-AI-VALIDATION-FLOW') 'Current build identity mismatch while checking RC24 ownership.'
-Assert-RC24 ([string]$manifest.releaseCandidate -eq 'rc30-lean-ai-validation-flow') 'Current release-candidate identity mismatch while checking RC24 ownership.'
+Assert-RC24 ([string]$manifest.buildId -eq 'PMM-v1.3.1-MOD-CREATION-PREVIEW') 'Current build identity mismatch while checking RC24 ownership.'
+Assert-RC24 ([string]$manifest.releaseCandidate -eq '1.3.1-mod-creation-preview') 'Current release-candidate identity mismatch while checking RC24 ownership.'
 
 Write-Output 'RC24_UI_FIXLAB_OWNERSHIP_REGRESSION_OK'

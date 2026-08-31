@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "PMM"
-EXPECTED_BUILD = "PMM-v1.3.0-RC30-LEAN-AI-VALIDATION-FLOW"
+EXPECTED_BUILD = "PMM-v1.3.1-MOD-CREATION-PREVIEW"
 XAML_NS = "http://schemas.microsoft.com/winfx/2006/xaml"
 X_NAME = f"{{{XAML_NS}}}Name"
 
@@ -51,7 +51,7 @@ def validate_identity_and_manifest() -> None:
     assert manifest["product"] == "Palworld Manager Merger"
     assert manifest["creator"] == "laredson"
     assert manifest["buildId"] == EXPECTED_BUILD
-    assert manifest["releaseCandidate"] == "rc30-lean-ai-validation-flow"
+    assert manifest["releaseCandidate"] == "1.3.1-mod-creation-preview"
     assert manifest["aiioFeedbackSchema"] == "PMM_USER_FEEDBACK_V1"
     assert manifest["aiioRemoteUploadEnabled"] is False
     assert "manual" in manifest["aiioFeedbackTransport"].lower()
@@ -76,7 +76,7 @@ def validate_localized_ui() -> None:
         root = ET.fromstring(text)
         parents = parent_map(root)
         names = [node.attrib[X_NAME] for node in root.iter() if X_NAME in node.attrib]
-        assert len(names) == len(set(names)) == 288, filename
+        assert len(names) == len(set(names)) == 289, filename
         assert required.issubset(names), filename
         expected_names = set(names) if expected_names is None else expected_names
         assert set(names) == expected_names, filename
@@ -112,14 +112,15 @@ def validate_aiio_callbacks_and_deduplication() -> None:
     assert "$Script:LstAIHelpDiagnostics.SelectedValue" not in bootstrap
     for helper in (
         "Complete-PMMAIIOPrepareUi", "Complete-PMMAIIOImportResponseUi",
-        "Complete-PMMAIIOPendingDataUi", "Complete-PMMAIIOUseCandidateUi",
+        "Complete-PMMAIIOPendingDataUi", "Complete-PMMAIIOModBuildUi",
+        "Complete-PMMAIIOUseCandidateUi",
     ):
         assert helper in bootstrap
     closure_calls = re.findall(
         r"\$done=\{param\(\$result\)\s+(Complete-PMMAIIO[A-Za-z]+Ui[^\r\n}]*)\}\.GetNewClosure\(\)",
         bootstrap,
     )
-    assert len(closure_calls) == 5
+    assert len(closure_calls) == 7
     assert all("$Script:" not in call and "SelectedValue" not in call for call in closure_calls)
     assert "-OnSuccess {param($result) Complete-PMMAIIOCandidateAnalyzeUi $result}" in bootstrap
 

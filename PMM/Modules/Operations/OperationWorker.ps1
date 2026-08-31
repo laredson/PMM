@@ -1,6 +1,6 @@
 ﻿param(
   [Parameter(Mandatory=$true)][string]$Root,
-  [Parameter(Mandatory=$true)][ValidateSet('Analyze','Build','AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh','FixLabBuild')][string]$Operation,
+  [Parameter(Mandatory=$true)][ValidateSet('Analyze','Build','AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','FixLabBuild')][string]$Operation,
   [Parameter(Mandatory=$true)][string]$ProgressPath,
   [Parameter(Mandatory=$true)][string]$ResultPath,
   [switch]$Force,
@@ -40,6 +40,7 @@ Initialize-PMMPaths $Script:Root|Out-Null
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.SessionService.ps1')
 . (Join-Path $Script:Root 'Modules\Saves\SaveActivityService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.DiagnosticService.ps1')
+. (Join-Path $Script:Root 'Modules\AIIO\AIIO.ModCreationService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.ResponseService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.ArtifactService.ps1')
 . (Join-Path $Script:Root 'Modules\CKL\KnowledgeContributionService.ps1')
@@ -101,7 +102,7 @@ try{
   try{$operationLockStream=[IO.File]::Open($operationLockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{
     throw 'Another PMM processing operation is already running for this installation.'
   }
-  $journalTarget=if($Operation -eq 'FixLabBuild'){$FixLabJobId}elseif($Operation -in @('AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate')){$SessionId}else{'Workspace'}
+  $journalTarget=if($Operation -eq 'FixLabBuild'){$FixLabJobId}elseif($Operation -in @('AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild')){$SessionId}else{'Workspace'}
   $journalId=Start-PMMJournalOperation -Kind $Operation -Target $journalTarget -Metadata ([ordered]@{Force=[bool]$Force;Mode=$Mode;WorkerProcessId=$PID;SessionId=$SessionId;SolutionId=$SolutionId})
 
   $startMessage=switch($Operation){
@@ -112,6 +113,7 @@ try{
     'AIIOPendingData' {'Preparing validated requested data in the background...'}
     'AIIOImportResponse' {'Validating the AIIO response in the background...'}
     'AIIOUseCandidate' {'Validating the selected staged candidate in the background...'}
+    'AIIOModBuild' {'Building the selected standalone mod candidate without deploying it...'}
     'AIIOArtifactRefresh' {'Refreshing the local artifact inventory in the background...'}
     'FixLabBuild' {'Starting Fix Lab repair in background...'}
   }
@@ -175,6 +177,21 @@ try{
     $extra['SolutionId']=$SolutionId
     $extra['CaseId']=[string]$used.CaseId
     $extra['Asset']=[string]$used.Asset
+  }elseif($Operation -eq 'AIIOModBuild'){
+    if(-not(Test-PMMAIIOSessionId $SessionId)){throw 'AIIOModBuild requires a valid persistent session id.'}
+    if($SolutionId -notmatch '^[a-f0-9]{64}$'){throw 'AIIOModBuild requires an exact candidate solution id.'}
+    $built=Build-PMMAIIOModCandidate -SessionId $SessionId -SolutionId $SolutionId
+    $resultText='Standalone mod PAK built locally and left undeployed.'
+    $extra['SessionId']=$SessionId
+    $extra['SolutionId']=$SolutionId
+    $extra['OutputPath']=[string]$built.OutputPath
+    $extra['OutputDirectory']=[string]$built.OutputDirectory
+    $extra['FileName']=[string]$built.FileName
+    $extra['PakSha256']=[string]$built.PakSha256
+    $extra['PakBytes']=[int64]$built.PakBytes
+    $extra['Status']=[string]$built.Status
+    $extra['AttributionEntry']=[string]$built.AttributionEntry
+    $extra['RequiredPublicDescription']=[string]$built.RequiredPublicDescription
   }elseif($Operation -eq 'AIIOArtifactRefresh'){
     $summary=Get-PMMArtifactStorageSummary -Refresh
     $resultText='Local artifact inventory refreshed.'
@@ -233,6 +250,7 @@ try{
     'AIIOPendingData' {'AIIO requested-data package ready.'}
     'AIIOImportResponse' {'AIIO response validated.'}
     'AIIOUseCandidate' {'AIIO candidate validated for Merge.'}
+    'AIIOModBuild' {'Standalone mod PAK built locally and left undeployed.'}
     'AIIOArtifactRefresh' {'Local artifact inventory refreshed.'}
     'FixLabBuild' {'Fix Lab repair build complete.'}
   }

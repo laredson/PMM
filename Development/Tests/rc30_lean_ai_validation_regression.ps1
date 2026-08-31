@@ -16,8 +16,8 @@ function Body([string]$Start,[string]$End) {
   return $Bootstrap.Substring($a,$b-$a)
 }
 
-Require ([string]$Manifest.buildId -eq 'PMM-v1.3.0-RC30-LEAN-AI-VALIDATION-FLOW') 'RC30 build identity mismatch.'
-Require ([string]$Manifest.releaseCandidate -eq 'rc30-lean-ai-validation-flow') 'RC30 candidate identity mismatch.'
+Require ([string]$Manifest.buildId -eq 'PMM-v1.3.1-MOD-CREATION-PREVIEW') 'Current build identity mismatch while preserving the RC30 regression.'
+Require ([string]$Manifest.releaseCandidate -eq '1.3.1-mod-creation-preview') 'Current candidate identity mismatch while preserving the RC30 regression.'
 Require (-not[bool]$Manifest.aiioRemoteUploadEnabled) 'Remote upload must remain disabled.'
 
 $namespace = 'http://schemas.microsoft.com/winfx/2006/xaml'
@@ -27,7 +27,7 @@ foreach ($name in @('MainWindow.xaml','MainWindow.en.xaml','MainWindow.es.xaml')
   $manager = New-Object System.Xml.XmlNamespaceManager($document.NameTable)
   $manager.AddNamespace('x',$namespace)
   $names = @($document.SelectNodes('//*[@x:Name]',$manager) | ForEach-Object { $_.GetAttribute('Name',$namespace) } | Sort-Object -Unique)
-  Require ($names.Count -eq 288) ($name + ' must contain 288 unique controls.')
+  Require ($names.Count -eq 289) ($name + ' must contain 289 unique controls.')
   if ($null -eq $reference) { $reference = $names }
   else { Require (@(Compare-Object $reference $names).Count -eq 0) ($name + ' control parity mismatch.') }
   foreach ($required in @('BtnAIHelpCreateAndPrepareCase','PnlAIHelpSelectedCase','PnlAIHelpNewCase','TxtGameReferenceSummary')) {

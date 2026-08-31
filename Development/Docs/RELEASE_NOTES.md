@@ -1,8 +1,20 @@
-# Palworld Manager Merger v1.3.0 RC30
+# Palworld Manager Merger v1.3.1 Mod Creation Preview
+
+This branch starts from the current published v1.3.0 `main` baseline (`9886c4fcb58654c81894f429a60bba5a704af6de`) and adds the first local-first AIIO standalone-mod creation path. A `CREATE_MOD` session can request bounded, exact families from the current Vanilla Game Reference, import an untrusted response, validate its declared cooked tree and hashes, probe every `.uasset`, and build a separate PAK in the AIIO session workspace.
+
+Created PAKs are explicitly `LOCAL_BUILD_UNPROVEN`: PMM does not install, deploy, publish or promote them automatically. Every output includes inert `PMM/Metadata/created-with-pmm.json` attribution, and the UI requires authors to include **“This mod was created with PMM assistance.”** in the public description. See `PMM/Documentation/MOD_CREATION_AIIO.md` and `PMM/Documentation/TEST_THIS_BUILD_1_3_1_MOD_CREATION.txt`.
+
+The preview preserves the complete RC22–RC30 regression chain and incorporates every post-RC30 fix from current `main`, including deterministic UTC build IDs, PowerShell singleton guards, the corrected AIIO CKL handoff path and refreshed CKL hashes.
+
+No automatic upload, provider login, returned-code execution, Apply Fix, compatibility Build, Deploy or publication is enabled. Windows acceptance remains required before promotion.
+
+---
+
+# Historical: Palworld Manager Merger v1.3.0 RC30
 
 RC30 fixes the executed RC29 selection/rebinding stalls, removes permanent idle UI polling, gates the external-mod heartbeat, makes validation refresh only the affected patch row, enlarges both validation dialogs and offers a direct tested-Knowledge contribution. AI & Help is reduced to five purpose-led views: assistance, reception, Feedback & Knowledge, color-scheme editor and AI settings. Vanilla Game Reference is restored to normal Settings, and untouched theme copies no longer fail contrast because unrelated fields were rewritten. It preserves the complete RC22–RC29 regression chain. See `RC30_RELEASE_NOTES.md` and `PMM/Documentation/TEST_THIS_BUILD_RC30.txt`.
 
-No automatic upload, provider login, returned-code execution, Apply Fix, Build, Deploy or publication is enabled. Windows acceptance remains required before final promotion.
+No automatic upload, provider login, returned-code execution, Apply Fix, Build, Deploy or publication is enabled. Windows acceptance remained required before final promotion.
 
 ---
 

@@ -34,11 +34,12 @@ foreach ($directory in @(
 foreach ($file in @(
   'README.md','LICENSE','Development\AI\CURRENT_STATE.md','Development\AI\AI_CONTINUE_HERE.md',
   'Development\AI\AIIO_1_3_0_HANDOFF.md','Development\Docs\RC23_RELEASE_NOTES.md','Development\Docs\RC24_RELEASE_NOTES.md','Development\Docs\RC25_RELEASE_NOTES.md','Development\Docs\RC26_RELEASE_NOTES.md','Development\Docs\RC27_RELEASE_NOTES.md','Development\Docs\RC28_RELEASE_NOTES.md','Development\Docs\RC29_RELEASE_NOTES.md','Development\Docs\RC30_RELEASE_NOTES.md',
+  'Development\Docs\PMM_1_3_1_MOD_CREATION.md','Development\Tests\v131_mod_creation_model.py',
   'Development\Docs\Validation\RC23_STATIC_VALIDATION.md','Development\Docs\Validation\RC24_STATIC_VALIDATION.md','Development\Docs\Validation\RC25_STATIC_VALIDATION.md','Development\Docs\Validation\RC26_STATIC_VALIDATION.md','Development\Docs\Validation\RC27_STATIC_VALIDATION.md','Development\Docs\Validation\RC28_STATIC_VALIDATION.md','Development\Docs\Validation\RC29_STATIC_VALIDATION.md','Development\Docs\Validation\RC30_STATIC_VALIDATION.md','Development\Tests\rc23_singleton_collection_regression.ps1',
   'Development\Tests\rc23_singleton_guard_model.py','Development\Tests\rc24_ui_fixlab_ownership_regression.ps1','Development\Tests\rc24_ui_fixlab_ownership_model.py','Development\Tests\rc25_release_model.py','Development\Tests\rc26_official_themes_progress_compatibility_model.py','Development\Tests\rc26_semantic_compatibility_regression.ps1','Development\Tests\rc27_aiio_local_first_model.py','Development\Tests\rc28_validation_runtime_regression.ps1','Development\Tests\rc28_validation_runtime_regression_model.py','Development\Tests\rc29_aihelp_feedback_ui_regression.ps1','Development\Tests\rc29_aihelp_feedback_ui_model.py','Development\Tests\rc30_lean_ai_validation_regression.ps1','Development\Tests\rc30_lean_ai_validation_model.py',
   'PMM\PMM.exe','PMM\Engine\PMMRuntime.exe','PMM\Engine\PMMFixLab.exe','PMM\Engine\repak.exe',
   'PMM\Modules\Shared\Paths.ps1','PMM\Modules\Bootstrap\Start-PalModMerger.ps1',
-  'PMM\Modules\Merge\MergeEngine.ps1','PMM\Modules\Merge\PakService.ps1','PMM\Modules\AIIO\AIIO.ps1','PMM\Modules\AIIO\AIIO.SessionService.ps1','PMM\Modules\AIIO\AIIO.DiagnosticService.ps1','PMM\Modules\AIIO\AIIO.ResponseService.ps1','PMM\Modules\AIIO\AIIO.ArtifactService.ps1','PMM\Modules\AIIO\AIIO.ValidationService.ps1','PMM\Modules\Operations\OperationJournal.ps1','PMM\Modules\Saves\SaveActivityService.ps1','PMM\Modules\Theme\ThemeService.ps1','PMM\Modules\Theme\ThemeEditorService.ps1',
+  'PMM\Modules\Merge\MergeEngine.ps1','PMM\Modules\Merge\PakService.ps1','PMM\Modules\AIIO\AIIO.ps1','PMM\Modules\AIIO\AIIO.SessionService.ps1','PMM\Modules\AIIO\AIIO.DiagnosticService.ps1','PMM\Modules\AIIO\AIIO.ModCreationService.ps1','PMM\Modules\AIIO\AIIO.ResponseService.ps1','PMM\Modules\AIIO\AIIO.ArtifactService.ps1','PMM\Modules\AIIO\AIIO.ValidationService.ps1','PMM\Modules\Operations\OperationJournal.ps1','PMM\Modules\Saves\SaveActivityService.ps1','PMM\Modules\Theme\ThemeService.ps1','PMM\Modules\Theme\ThemeEditorService.ps1',
   'PMM\Resources\Metadata\RELEASE_MANIFEST.json','PMM\Resources\Metadata\VERSION.txt',
   'PMM\Resources\Metadata\BUILD_ID.txt','PMM\Resources\Metadata\SHA256SUMS.txt',
   'PMM\Resources\UI\PMM.ico','PMM\Resources\UI\PMMLogo.png','PMM\Resources\UI\MainWindow.xaml',
@@ -51,7 +52,8 @@ foreach ($file in @(
   'PMM\Documentation\RC26_RELEASE_CANDIDATE.md','PMM\Documentation\AIIO_HANDOFF_RC26.md',
   'PMM\Documentation\RC27_AIIO_RELEASE_CANDIDATE.md','PMM\Documentation\AIIO_HANDOFF_RC27.md','PMM\Documentation\TEST_THIS_BUILD_RC27.txt',
   'PMM\Documentation\RC28_VALIDATION_RUNTIME_FIX.md','PMM\Documentation\AIIO_HANDOFF_RC28.md','PMM\Documentation\TEST_THIS_BUILD_RC28.txt',
-  'PMM\Documentation\RC29_AIHELP_FEEDBACK_UI_FIX.md','PMM\Documentation\AIIO_HANDOFF_RC29.md','PMM\Documentation\TEST_THIS_BUILD_RC29.txt','PMM\Documentation\RC30_RELEASE_CANDIDATE.md','PMM\Documentation\AIIO_HANDOFF_RC30.md','PMM\Documentation\TEST_THIS_BUILD_RC30.txt'
+  'PMM\Documentation\RC29_AIHELP_FEEDBACK_UI_FIX.md','PMM\Documentation\AIIO_HANDOFF_RC29.md','PMM\Documentation\TEST_THIS_BUILD_RC29.txt','PMM\Documentation\RC30_RELEASE_CANDIDATE.md','PMM\Documentation\AIIO_HANDOFF_RC30.md','PMM\Documentation\TEST_THIS_BUILD_RC30.txt',
+  'PMM\Documentation\MOD_CREATION_AIIO.md','PMM\Documentation\TEST_THIS_BUILD_1_3_1_MOD_CREATION.txt'
 )) { NeedFile $file }
 
 $rootFiles = @(Get-ChildItem -LiteralPath $App -File -Force)
@@ -79,19 +81,22 @@ Pass 'Application JSON parsed'
 
 $manifestPath = Join-Path $App 'Resources\Metadata\RELEASE_MANIFEST.json'
 $manifest = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
-if ([string]$manifest.version -ne '1.3.0') { Fail 'Manifest version must be 1.3.0.' }
+if ([string]$manifest.version -ne '1.3.1') { Fail 'Manifest version must be 1.3.1.' }
 if ([int]$manifest.mergePlanSchema -ne 18) { Fail 'Manifest merge-plan schema must be 18.' }
 if ([int]$manifest.buildManifestSchema -ne 9) { Fail 'Manifest build-manifest schema must be 9.' }
-if ([string]$manifest.releaseCandidate -ne 'rc30-lean-ai-validation-flow') { Fail 'Manifest RC30 identity mismatch.' }
-if ([string]$manifest.buildId -ne 'PMM-v1.3.0-RC30-LEAN-AI-VALIDATION-FLOW') { Fail 'Manifest RC30 build ID mismatch.' }
+if ([string]$manifest.releaseCandidate -ne '1.3.1-mod-creation-preview') { Fail 'Manifest 1.3.1 Mod Creation identity mismatch.' }
+if ([string]$manifest.buildId -ne 'PMM-v1.3.1-MOD-CREATION-PREVIEW') { Fail 'Manifest 1.3.1 Mod Creation build ID mismatch.' }
 if ([int]$manifest.bundledThemeCount -ne 11) { Fail 'Manifest bundled-theme count must be 11.' }
 if ([int]$manifest.officialThemeChoiceCount -ne 13) { Fail 'Manifest official-theme choice count must be 13.' }
 if ([string]$manifest.runtime.executable -ne 'Engine/PMMRuntime.exe') { Fail 'Runtime manifest path mismatch.' }
 if ([string]$manifest.aiioModule -ne 'Modules/AIIO/AIIO.ps1') { Fail 'AIIO manifest path mismatch.' }
+if ([string]$manifest.aiioCapabilitySet -ne 'PMM_CAPABILITIES_V2') { Fail 'AIIO Mod Creation capability-set mismatch.' }
+if ([string]$manifest.aiioModCreationCandidateSchema -ne 'PMM_MOD_CREATION_CANDIDATE_V1') { Fail 'AIIO Mod Creation candidate schema mismatch.' }
 if ([string]$manifest.aiioTransport -ne 'manual local ZIP only') { Fail 'RC27 AIIO transport must remain manual local ZIP only.' }
 if ([bool]$manifest.aiioRemoteUploadEnabled -or [bool]$manifest.aiioProviderLoginEnabled -or [bool]$manifest.aiioReturnedCodeExecutionEnabled) { Fail 'RC27 AIIO trust boundary was weakened.' }
 if ([string]$manifest.aiioFeedbackSchema -ne 'PMM_USER_FEEDBACK_V1' -or [string]$manifest.aiioFeedbackTransport -notmatch 'manual sharing only') { Fail 'RC30 feedback boundary mismatch.' }
 if ('AIIOArtifactRefresh' -notin @($manifest.backgroundOperations|ForEach-Object{[string]$_})) { Fail 'RC27 background artifact inventory is not declared.' }
+if ('AIIOModBuild' -notin @($manifest.backgroundOperations|ForEach-Object{[string]$_})) { Fail 'AIIO standalone mod build operation is not declared.' }
 $buildId = (Get-Content -LiteralPath (Join-Path $App 'Resources\Metadata\BUILD_ID.txt') -Raw).Trim()
 if ($buildId -ne [string]$manifest.buildId) { Fail 'Metadata BUILD_ID and manifest buildId differ.' }
 else { Pass ('Build identity: ' + $buildId) }
@@ -192,6 +197,14 @@ foreach ($marker in @('PMM_AI_RESPONSE_V2','Unsafe AI response path','Duplicate 
 }
 foreach ($forbidden in @('Invoke-WebRequest','Invoke-RestMethod','Invoke-Expression')) {
   if ($aiioResponse -match [regex]::Escape($forbidden)) { Fail ('Forbidden executable/network primitive in AIIO response service: ' + $forbidden) }
+}
+$modCreation = Get-Content -LiteralPath (Join-Path $App 'Modules\AIIO\AIIO.ModCreationService.ps1') -Raw -Encoding UTF8
+foreach ($marker in @('PMM_MOD_CREATION_CANDIDATE_V1','standalone-cooked-tree','Get-PMMAIIOGameReferenceProof -RequireCurrent','PMM/Metadata/created-with-pmm.json','This mod was created with PMM assistance.','AutomaticallyDeployed=$false','AutomaticallyPublished=$false','KnowledgeStatus=''UNPROVEN''')) {
+  if ($modCreation -notmatch [regex]::Escape($marker)) { Fail ('1.3.1 Mod Creation marker missing: ' + $marker) }
+}
+$modBuildBody = [regex]::Match($modCreation,'(?s)function Build-PMMAIIOModCandidate\b.*$').Value
+foreach ($forbidden in @('Invoke-PMMDeploy','Deploy-PMM','Invoke-WebRequest','Invoke-RestMethod')) {
+  if ($modBuildBody -match [regex]::Escape($forbidden)) { Fail ('Forbidden Mod Creation primitive: ' + $forbidden) }
 }
 $themeEditor = Get-Content -LiteralPath (Join-Path $App 'Modules\Theme\ThemeEditorService.ps1') -Raw -Encoding UTF8
 foreach ($marker in @('PMM_COLOR_SCHEME_V2','PMM_THEME_PACK_V1','Set-PMMThemeDraftImage','Import-PMMThemeAIResponse')) {
@@ -303,10 +316,10 @@ if ($expected.Count -ne $actualFiles.Count) { Fail ('SHA256SUMS count mismatch: 
 else { Pass ('SHA256SUMS verified: ' + $expected.Count + ' files') }
 
 if ($Failures.Count) {
-  Write-Output ('PMM_V130_RC30_REPOSITORY_VALIDATION_FAILED count=' + $Failures.Count)
+  Write-Output ('PMM_V131_MOD_CREATION_REPOSITORY_VALIDATION_FAILED count=' + $Failures.Count)
   exit 1
 }
-Write-Output 'PMM_V130_RC30_REPOSITORY_VALIDATION_OK'
+Write-Output 'PMM_V131_MOD_CREATION_REPOSITORY_VALIDATION_OK'
 Write-Output 'LAYOUT=PASS'
 Write-Output 'JSON_XAML_POWERSHELL=PASS'
 Write-Output 'HASH_MANIFEST=PASS'
