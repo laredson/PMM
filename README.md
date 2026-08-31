@@ -1,48 +1,24 @@
-# Palworld Manager Merger (PMM)
+# PMM `info` branch
 
-**Current stable repository baseline: PMM 1.2.1 Guided Flow (without Fix Lab).**
+This branch is a compact, persistent context store for Palworld Manager Merger development.
 
-PMM is a Palworld mod manager and compatibility merger. The application preserves source mods and, when necessary, builds a compatibility overlay instead of blindly combining every mod into a single MegaMerge.
+It is **not an application branch and must not be merged into `main` or development branches**. The code authority always lives in the active development branch and the stable authority lives in `main`.
 
-## Repository layout
+## Snapshot policy
 
-The repository root is intentionally small:
+- `initial/` preserves the useful context from the old `info` branch before it was repurposed.
+- Every meaningful context update creates a **new immutable timestamp folder** using `YYYY-MM-DD_HH-mm` in the maintainer's local time.
+- The newest timestamp folder is the current project-context snapshot.
+- Older folders are retained while useful. They may be deleted from the current tree during cleanup when they become redundant; Git history still preserves earlier commits unless history is explicitly rewritten.
+- Do not update this branch for every prompt. Update it at meaningful milestones: accepted builds, architectural decisions, major discoveries, release/handoff boundaries, or when changing the active development focus.
 
-- `PMM/` — the complete portable application. This is the only folder packaged for normal users.
-- `Development/` — source, tests, build/validation tools, engineering documentation and AI handoff material.
-- `.github/` — GitHub Actions, issue/PR templates and community/security files.
-- `.gitignore` / `.gitattributes` — repository behavior.
-- `LICENSE` — project license.
+## Keep this branch small
 
-### Development layout
+Store concise Markdown/JSON context only. Do **not** store PAKs, cooked Palworld assets, Game Reference payloads, Workspace archives, saves, logs, screenshots, credentials, binaries, or large generated artifacts here.
 
-- `Development/Source/` — Host, Runtime, PMMCore, AssetReader and icon-helper source inherited from the 1.2.1 restructured repository baseline.
-- `Development/Scripts/` — build, CKL and validation tooling.
-- `Development/Tests/` — repository smoke tests.
-- `Development/Docs/` — architecture, protocol, validation, history and publishing documentation.
-- `Development/AI/` — continuation handoffs for developers and AI agents.
+## How a new AI/developer should use it
 
-For development or AI continuation, read **`Development/AI/CURRENT_STATE.md` first**, then `Development/AI/AI_CONTINUE_HERE.md`.
-
-## Start PMM
-
-Download the release ZIP, extract it, and run:
-
-`PMM.exe`
-
-The release ZIP is built from the **contents of `PMM/` only**. `Development/`, `.github/`, Git metadata and repository documentation are not part of the user package.
-
-## Branch model
-
-- `main` — stable/releasable code only.
-- `dev/<version-or-feature>` — active development.
-- `release/<version>` — optional release-candidate stabilization.
-- tags such as `v1.2.1` — exact public releases.
-
-The next feature line is intended to be **PMM 1.3 / Fix Lab** and should be developed on a separate branch from this stable 1.2.1 baseline.
-
-## Important source note
-
-`PMM/` in this repository is the user-confirmed working **Guided Flow** application and is the authority for the 1.2.1 release baseline. The native source snapshot originally came from the earlier 1.2.1 restructured repository package. The Guided Flow native `PMM.exe` / `PMMRuntime.exe` binaries are newer than that source snapshot, so do **not** rebuild and overwrite those two binaries from `Development/Source/` until the native source is reconciled. PowerShell/WPF application logic inside `PMM/Modules/` remains directly editable.
-
-Created by **laredson**.
+1. Read the newest timestamp folder in this branch.
+2. Follow the exact branch/commit references recorded there.
+3. Treat that referenced application branch as source authority.
+4. Use older snapshot folders only for history or rationale.

@@ -1,8 +1,0 @@
-Suggested screenshot captions / arrows
-
-1) IMPORT -> ANALYZE -> BUILD -> DEPLOY -> PLAY
-2) "PMM found the shared assets and merged the compatible changes."
-3) "Only real overlapping values need a decision."
-4) "Choose a saved merge, or No compatibility patch to use PMM only as a manager."
-5) "World backup / restore included."
-6) "Open source: PowerShell/WPF + C# source included."

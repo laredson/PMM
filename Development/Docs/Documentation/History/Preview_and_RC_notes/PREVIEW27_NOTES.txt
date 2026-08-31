@@ -1,7 +1,0 @@
-PalModMerger v1 preview 27
-
-Hotfix over preview 26:
-- Fixes SmokeTest startup failure caused by treating Builds\Current as a regex (\C is invalid).
-- The check is now a literal string containment check.
-- Setup console prefixes now correctly show [PMM27].
-- No merge algorithm changes from preview 26.
