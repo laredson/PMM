@@ -242,6 +242,10 @@ def validate_ui_and_import_boundary() -> None:
         assert 'Name="SparkleLayer"' in text
         assert 'Tag="Idle"' in text
         assert "Auto ON" not in text
+        assert not re.search(r'<TranslateTransform\s+Name=', text), f"Invalid Freezable Name property in {filename}"
+        for sparkle in ("SparkleMove1", "SparkleMove2", "SparkleMove3"):
+            assert f'<TranslateTransform x:Name="{sparkle}"' in text
+            assert f'Storyboard.TargetName="{sparkle}"' in text
 
 
 def validate_release_identity() -> None:

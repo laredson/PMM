@@ -18,6 +18,7 @@ Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc26_semantic_compatib
 Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc28_validation_runtime_regression.ps1') -PathType Leaf) 'RC28 Windows PowerShell validation/runtime regression exists'
 Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc28_validation_runtime_regression_model.py') -PathType Leaf) 'RC28 cross-platform validation/runtime model exists'
 Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc29_aihelp_feedback_ui_regression.ps1') -PathType Leaf) 'RC29 Windows PowerShell AI & Help/feedback/UI regression exists'
+Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\wpf_xaml_runtime_regression.ps1') -PathType Leaf) 'WPF XAML runtime materialization regression exists'
 Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc29_aihelp_feedback_ui_model.py') -PathType Leaf) 'RC29 cross-platform AI & Help/feedback/UI model exists'
 Assert-PMM (@(Get-ChildItem -LiteralPath $App -File -Force).Count -eq 1) 'PMM root exposes only one file'
 Assert-PMM (-not(Test-Path (Join-Path $App 'Workspace'))) 'Workspace is not shipped'

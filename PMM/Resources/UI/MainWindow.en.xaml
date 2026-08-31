@@ -153,9 +153,9 @@
             <Grid ClipToBounds="True" SnapsToDevicePixels="True">
               <Border Name="AutoRunBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6"/>
               <Canvas Name="SparkleLayer" IsHitTestVisible="False" Opacity="0.9" Panel.ZIndex="1">
-                <TextBlock Name="AutoSparkle1" Text="✦" Foreground="{DynamicResource AccentBlue}" FontSize="12" Opacity="0" Canvas.Top="2"><TextBlock.RenderTransform><TranslateTransform Name="SparkleMove1" X="-30"/></TextBlock.RenderTransform></TextBlock>
-                <TextBlock Name="AutoSparkle2" Text="✧" Foreground="{DynamicResource AccentBlue}" FontSize="10" Opacity="0" Canvas.Top="13"><TextBlock.RenderTransform><TranslateTransform Name="SparkleMove2" X="-30"/></TextBlock.RenderTransform></TextBlock>
-                <TextBlock Name="AutoSparkle3" Text="✦" Foreground="{DynamicResource AccentBlue}" FontSize="8" Opacity="0" Canvas.Top="7"><TextBlock.RenderTransform><TranslateTransform Name="SparkleMove3" X="-30"/></TextBlock.RenderTransform></TextBlock>
+                <TextBlock Name="AutoSparkle1" Text="✦" Foreground="{DynamicResource AccentBlue}" FontSize="12" Opacity="0" Canvas.Top="2"><TextBlock.RenderTransform><TranslateTransform x:Name="SparkleMove1" X="-30"/></TextBlock.RenderTransform></TextBlock>
+                <TextBlock Name="AutoSparkle2" Text="✧" Foreground="{DynamicResource AccentBlue}" FontSize="10" Opacity="0" Canvas.Top="13"><TextBlock.RenderTransform><TranslateTransform x:Name="SparkleMove2" X="-30"/></TextBlock.RenderTransform></TextBlock>
+                <TextBlock Name="AutoSparkle3" Text="✦" Foreground="{DynamicResource AccentBlue}" FontSize="8" Opacity="0" Canvas.Top="7"><TextBlock.RenderTransform><TranslateTransform x:Name="SparkleMove3" X="-30"/></TextBlock.RenderTransform></TextBlock>
               </Canvas>
               <ContentPresenter Panel.ZIndex="2" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True"/>
             </Grid>

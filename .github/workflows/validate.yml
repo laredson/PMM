@@ -31,6 +31,11 @@ jobs:
         run: |
           ./Development/Scripts/validation/Validate-v1.3.ps1 -Quiet
 
+      - name: Materialize WPF window and AUTO template
+        shell: powershell
+        run: |
+          ./Development/Tests/wpf_xaml_runtime_regression.ps1
+
       - name: Run RC21 static smoke contract
         shell: pwsh
         run: |

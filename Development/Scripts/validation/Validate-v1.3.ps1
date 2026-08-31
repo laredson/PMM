@@ -34,7 +34,7 @@ foreach ($directory in @(
 foreach ($file in @(
   'README.md','LICENSE','Development\AI\CURRENT_STATE.md','Development\AI\AI_CONTINUE_HERE.md',
   'Development\AI\AIIO_1_3_0_HANDOFF.md','Development\Docs\RC23_RELEASE_NOTES.md','Development\Docs\RC24_RELEASE_NOTES.md','Development\Docs\RC25_RELEASE_NOTES.md','Development\Docs\RC26_RELEASE_NOTES.md','Development\Docs\RC27_RELEASE_NOTES.md','Development\Docs\RC28_RELEASE_NOTES.md','Development\Docs\RC29_RELEASE_NOTES.md','Development\Docs\RC30_RELEASE_NOTES.md',
-  'Development\Docs\PMM_1_3_1_MOD_CREATION.md','Development\Tests\v131_mod_creation_model.py',
+  'Development\Docs\PMM_1_3_1_MOD_CREATION.md','Development\Tests\v131_mod_creation_model.py','Development\Tests\wpf_xaml_runtime_regression.ps1',
   'Development\Docs\Validation\RC23_STATIC_VALIDATION.md','Development\Docs\Validation\RC24_STATIC_VALIDATION.md','Development\Docs\Validation\RC25_STATIC_VALIDATION.md','Development\Docs\Validation\RC26_STATIC_VALIDATION.md','Development\Docs\Validation\RC27_STATIC_VALIDATION.md','Development\Docs\Validation\RC28_STATIC_VALIDATION.md','Development\Docs\Validation\RC29_STATIC_VALIDATION.md','Development\Docs\Validation\RC30_STATIC_VALIDATION.md','Development\Tests\rc23_singleton_collection_regression.ps1',
   'Development\Tests\rc23_singleton_guard_model.py','Development\Tests\rc24_ui_fixlab_ownership_regression.ps1','Development\Tests\rc24_ui_fixlab_ownership_model.py','Development\Tests\rc25_release_model.py','Development\Tests\rc26_official_themes_progress_compatibility_model.py','Development\Tests\rc26_semantic_compatibility_regression.ps1','Development\Tests\rc27_aiio_local_first_model.py','Development\Tests\rc28_validation_runtime_regression.ps1','Development\Tests\rc28_validation_runtime_regression_model.py','Development\Tests\rc29_aihelp_feedback_ui_regression.ps1','Development\Tests\rc29_aihelp_feedback_ui_model.py','Development\Tests\rc30_lean_ai_validation_regression.ps1','Development\Tests\rc30_lean_ai_validation_model.py',
   'PMM\PMM.exe','PMM\Engine\PMMRuntime.exe','PMM\Engine\PMMFixLab.exe','PMM\Engine\repak.exe',
@@ -109,9 +109,15 @@ foreach ($name in @('MainWindow.xaml','MainWindow.en.xaml','MainWindow.es.xaml')
     [xml]$document = Get-Content -LiteralPath $path -Raw -Encoding UTF8
     $manager = New-Object System.Xml.XmlNamespaceManager($document.NameTable)
     $manager.AddNamespace('x',$xamlNamespace)
+    $manager.AddNamespace('wpf',[string]$document.DocumentElement.NamespaceURI)
     $names = @($document.SelectNodes('//*[@x:Name]',$manager) | ForEach-Object { $_.GetAttribute('Name',$xamlNamespace) })
     $duplicates = @($names | Group-Object | Where-Object Count -gt 1 | ForEach-Object Name)
     if ($duplicates.Count) { Fail ($name + ' duplicate x:Name: ' + ($duplicates -join ', ')) }
+    $invalidTransforms = @($document.SelectNodes('//wpf:TranslateTransform[@Name]',$manager))
+    if ($invalidTransforms.Count) { Fail ($name + ' assigns Name as an unknown TranslateTransform property; use x:Name for storyboard targets.') }
+    foreach ($sparkle in @('SparkleMove1','SparkleMove2','SparkleMove3')) {
+      if (-not $document.SelectSingleNode("//wpf:TranslateTransform[@x:Name='$sparkle']",$manager)) { Fail ($name + ' missing x:Name storyboard target: ' + $sparkle) }
+    }
     $xamlNameSets[$name] = @($names | Sort-Object -Unique)
   } catch { Fail ('Invalid XAML ' + $name + ': ' + $_.Exception.Message) }
 }
