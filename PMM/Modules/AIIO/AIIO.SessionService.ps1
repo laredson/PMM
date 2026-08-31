@@ -135,6 +135,30 @@ function Get-PMMAIIOCurrentPlanSnapshot {
   }
 }
 
+function ConvertTo-PMMAIIOUtcTimestamp($Value) {
+  # ConvertFrom-Json can materialize ISO timestamps as DateTime on some
+  # PowerShell versions and as strings on others.  Casting either directly to
+  # [string] is culture-dependent, so AIIO always emits one invariant UTC form.
+  if($null -eq $Value){return ''}
+  try{
+    $utc=$null
+    if($Value -is [DateTimeOffset]){
+      $utc=([DateTimeOffset]$Value).ToUniversalTime()
+    }elseif($Value -is [DateTime]){
+      $date=[DateTime]$Value
+      if($date.Kind -eq [DateTimeKind]::Unspecified){$date=[DateTime]::SpecifyKind($date,[DateTimeKind]::Utc)}
+      $utc=([DateTimeOffset]$date).ToUniversalTime()
+    }else{
+      $text=[string]$Value
+      if([string]::IsNullOrWhiteSpace($text)){return ''}
+      $parsed=[DateTimeOffset]::MinValue
+      if(-not[DateTimeOffset]::TryParse($text,[Globalization.CultureInfo]::InvariantCulture,[Globalization.DateTimeStyles]::None,[ref]$parsed)){return $text}
+      $utc=$parsed.ToUniversalTime()
+    }
+    return $utc.ToString("yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'",[Globalization.CultureInfo]::InvariantCulture)
+  }catch{return [string]$Value}
+}
+
 function Get-PMMAIIOCurrentDeploymentSnapshot {
   $state=$null
   try{
@@ -187,8 +211,8 @@ function Get-PMMAIIOCurrentDeploymentSnapshot {
   }elseif($state.PSObject.Properties.Name -contains 'SelectedPatch'){$selectedPatch=[string]$state.SelectedPatch}
 
   $updatedUtc=''
-  if($state.PSObject.Properties.Name -contains 'UpdatedUtc'){$updatedUtc=[string]$state.UpdatedUtc}
-  elseif($state.PSObject.Properties.Name -contains 'Deployed'){$updatedUtc=[string]$state.Deployed}
+  if($state.PSObject.Properties.Name -contains 'UpdatedUtc'){$updatedUtc=ConvertTo-PMMAIIOUtcTimestamp $state.UpdatedUtc}
+  elseif($state.PSObject.Properties.Name -contains 'Deployed'){$updatedUtc=ConvertTo-PMMAIIOUtcTimestamp $state.Deployed}
   return [pscustomobject]@{Present=$true;UpdatedUtc=$updatedUtc;SelectedPatch=$selectedPatch;ManagedFiles=@($managed.ToArray())}
 }
 

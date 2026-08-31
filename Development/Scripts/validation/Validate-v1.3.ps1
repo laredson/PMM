@@ -205,7 +205,7 @@ foreach ($marker in @('function Get-PMMBuildIdentitySha256','Get-PMMBuildIdentit
 $buildIdBody = [regex]::Match($validationService,'(?s)function Get-PMMDeterministicBuildId\b.*?(?=\r?\nfunction Get-PMMBuildValidationSummaryPath\b)').Value
 if ($buildIdBody -match [regex]::Escape('Get-PMMStableTextId')) { Fail 'RC28 deterministic build ID still uses the truncated stable-text identifier.' }
 $sessionService = Get-Content -LiteralPath (Join-Path $App 'Modules\AIIO\AIIO.SessionService.ps1') -Raw -Encoding UTF8
-foreach ($marker in @("Properties.Name -contains 'SourceMods'","Kind='SourceMod'","Kind='CompatibilityPatch'","Properties.Name -contains 'Deployed'")) {
+foreach ($marker in @('ConvertTo-PMMAIIOUtcTimestamp',"Properties.Name -contains 'SourceMods'","Kind='SourceMod'","Kind='CompatibilityPatch'","Properties.Name -contains 'Deployed'")) {
   if ($sessionService -notmatch [regex]::Escape($marker)) { Fail ('RC28 schema-3 deployment marker missing: ' + $marker) }
 }
 $candidateBody = [regex]::Match($bootstrap,'(?s)function Refresh-PMMAIIOCandidates\b.*?(?=\r?\nfunction Update-PMMAIIOCandidateSelection\b)').Value

@@ -58,8 +58,8 @@ $reference=$null
 foreach($name in @('MainWindow.xaml','MainWindow.en.xaml','MainWindow.es.xaml')){
   $path=Join-Path $App ('Resources\UI\'+$name)
   $text=Get-Content -LiteralPath $path -Raw -Encoding UTF8
-  Assert-RC24 ($text -match [regex]::Escape('<ColumnDefinition Width="245"/>')) ('Responsive title column missing: '+$name)
-  Assert-RC24 ($text -match [regex]::Escape('x:Name="GrdHeaderActions" Grid.Column="2" MinWidth="0" HorizontalAlignment="Stretch"')) ('Responsive controls column missing: '+$name)
+  Assert-RC24 (([regex]::Matches($text,[regex]::Escape('<ColumnDefinition Width="*"/>'))).Count -ge 2) ('Equal responsive header columns missing: '+$name)
+  Assert-RC24 ($text -match [regex]::Escape('x:Name="GrdHeaderActions" Grid.Column="1" MinWidth="0" HorizontalAlignment="Stretch"')) ('Responsive header controls missing: '+$name)
   [xml]$doc=$text
   $manager=New-Object System.Xml.XmlNamespaceManager($doc.NameTable)
   $manager.AddNamespace('x',$xamlNamespace)

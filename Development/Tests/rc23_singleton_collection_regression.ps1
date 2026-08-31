@@ -16,6 +16,9 @@ try{
   function Get-Sha256([string]$Path) {'TEST-MAPPINGS'}
   function Get-PMMProductionRecipeLibrarySha256 {'TEST-RECIPES'}
   function Test-PMMPatchEffectiveOrderCompatible($Patch,[array]$SourceMods){$true}
+  # PMM loads Common.ps1 before LibraryService/MergeEngine.  This isolated
+  # regression must provide the same localization dependency explicitly.
+  function Get-PMMText([string]$English,[string]$Spanish){return $English}
 
   # This mirrors the user's RC22 build: exactly one KnownRecipeAuto asset. In
   # Windows PowerShell 5.1, arrays emitted from an if branch are unrolled. The

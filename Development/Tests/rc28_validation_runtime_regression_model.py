@@ -8,6 +8,7 @@ import importlib.util
 import json
 import re
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -84,6 +85,12 @@ def validate_build_identity_contract() -> None:
     assert re.fullmatch(r"[0-9a-f]{64}", build_id)
 
 
+def normalize_timestamp(value: str) -> str:
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    utc = parsed.astimezone(timezone.utc)
+    return utc.strftime("%Y-%m-%dT%H:%M:%S.%f") + "0Z"
+
+
 def normalize_schema3(state: dict) -> dict:
     managed = []
     seen = set()
@@ -105,7 +112,7 @@ def normalize_schema3(state: dict) -> dict:
             managed.append(record)
     return {
         "Present": True,
-        "UpdatedUtc": state.get("UpdatedUtc", state.get("Deployed", "")),
+        "UpdatedUtc": normalize_timestamp(state.get("UpdatedUtc", state.get("Deployed", ""))),
         "SelectedPatch": selected or state.get("SelectedPatch", ""),
         "ManagedFiles": managed,
     }
@@ -113,7 +120,10 @@ def normalize_schema3(state: dict) -> dict:
 
 def validate_deployment_schema3_contract() -> None:
     service = read("Modules/AIIO/AIIO.SessionService.ps1")
+    timestamp = function_body(service, "ConvertTo-PMMAIIOUtcTimestamp")
     body = function_body(service, "Get-PMMAIIOCurrentDeploymentSnapshot")
+    for marker in ("DateTimeOffset", "ToUniversalTime", "fffffff'Z'", "InvariantCulture"):
+        assert marker in timestamp, marker
     for marker in (
         "PSObject.Properties.Name -contains 'ManagedFiles'",
         "PSObject.Properties.Name -contains 'SourceMods'",
@@ -133,7 +143,7 @@ def validate_deployment_schema3_contract() -> None:
         "Patch": {"Name": "zzzzzzzzzz_PMM_Merge_Test_P.pak", "Hash": "3" * 64},
     }
     result = normalize_schema3(fixture)
-    assert result["UpdatedUtc"] == fixture["Deployed"]
+    assert result["UpdatedUtc"] == "2026-08-30T14:32:14.0000000Z"
     assert result["SelectedPatch"] == fixture["Patch"]["Name"]
     assert result["ManagedFiles"] == [
         ("Enabled_P.pak", "1" * 64, "SourceMod"),

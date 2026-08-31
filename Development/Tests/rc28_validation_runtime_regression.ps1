@@ -47,7 +47,7 @@ try{
   $state|ConvertTo-Json -Depth 10|Set-Content -LiteralPath (Join-Path $fixtureRoot 'State\deployment-state.json') -Encoding UTF8
   $snapshot=Get-PMMAIIOCurrentDeploymentSnapshot
   Assert-RC28 ([bool]$snapshot.Present) 'Schema-3 deployment was not recognized.'
-  Assert-RC28 ([string]$snapshot.UpdatedUtc -ceq [string]$state.Deployed) 'Schema-3 Deployed timestamp was not normalized.'
+  Assert-RC28 ([string]$snapshot.UpdatedUtc -ceq '2026-08-30T14:32:14.0000000Z') 'Schema-3 Deployed timestamp was not normalized to invariant UTC.'
   Assert-RC28 ([string]$snapshot.SelectedPatch -ceq [string]$state.Patch.Name) 'Schema-3 patch selection was not normalized.'
   Assert-RC28 (@($snapshot.ManagedFiles).Count -eq 2) 'Schema-3 snapshot must contain one deployed source and one patch.'
   Assert-RC28 (@($snapshot.ManagedFiles|Where-Object{[string]$_.Kind -eq 'SourceMod'}).Count -eq 1) 'Deployed source-mod normalization failed.'
