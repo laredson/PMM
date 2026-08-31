@@ -20,11 +20,11 @@
     },
     {
       "path": "Stable/package-rules.json",
-      "sha256": "35b3cfe75e2daa262841c1f11d708c3b7b20d70b794f4faa6db0a0c1be38ca5f"
+      "sha256": "19e20eb4cddd651d61ef989f05e4c1c05fd070930b89eda865b9099c725384d8"
     },
     {
       "path": "Stable/production-recipes.json",
-      "sha256": "6ce7ae675b5d3607488e6097410c5657d558b1488b619000acd7ca74ba2f8aeb"
+      "sha256": "e2c9dec91101f0cb5cb4bccc6d0ca74d930d924cb8b10b021f182b9d69d24e81"
     },
     {
       "path": "Stable/reference-relations.json",
