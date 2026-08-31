@@ -669,7 +669,7 @@ function New-PMMAIHandoffBundle {
           }
         }
       }
-      [ordered]@{Schema='PMM_AIIO_CKL_CONTEXT_V1';Matches=@($relevant.ToArray()|Sort-Object KnowledgeId,CaseId -Unique);Channels='knowledge/channels.json';Safety='CKL references are starting evidence. Only production-enabled entries whose exact validation contract matches may authorize an automatic writer.'}|ConvertTo-Json -Depth 20|Set-Content -LiteralPath (Join-Path $stage 'knowledge\relevant-knowledge.json') -Encoding UTF8
+      [ordered]@{Schema='PMM_AIIO_CKL_CONTEXT_V1';Matches=@($relevant.ToArray()|Sort-Object KnowledgeId,CaseId -Unique);Channels='knowledge/channels.json';Safety='CKL references are starting evidence. Only production-enabled entries whose exact validation contract matches may authorize an automatic writer.'}|ConvertTo-Json -Depth 20|Set-Content -LiteralPath (Join-Path (Join-Path $stage 'knowledge') 'relevant-knowledge.json') -Encoding UTF8
     }
     foreach($doc in @('Documentation\MANUAL_SOLUTION_CONTRACT.md','Documentation\COMMUNITY_KNOWLEDGE_WORKFLOW.md')){
       $src=Join-Path $Script:Root $doc
