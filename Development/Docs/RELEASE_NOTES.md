@@ -1,6 +1,6 @@
-# Palworld Manager Merger v1.3.0 RC29
+# Palworld Manager Merger v1.3.0 RC30
 
-RC29 repairs delayed AIIO completion scope and duplicate diagnostic/session creation, adds inspectable manual Feedback and AI-specific Settings, corrects badge semantics, enlarges the exact-validation dialog, reorders the header, makes Play an optional ready cue and refreshes selected-row colors after theme changes. It preserves the complete RC22–RC28 regression chain. See `RC29_RELEASE_NOTES.md` and `PMM/Documentation/TEST_THIS_BUILD_RC29.txt`.
+RC30 fixes the executed RC29 selection/rebinding stalls, removes permanent idle UI polling, gates the external-mod heartbeat, makes validation refresh only the affected patch row, enlarges both validation dialogs and offers a direct tested-Knowledge contribution. AI & Help is reduced to five purpose-led views: assistance, reception, Feedback & Knowledge, color-scheme editor and AI settings. Vanilla Game Reference is restored to normal Settings, and untouched theme copies no longer fail contrast because unrelated fields were rewritten. It preserves the complete RC22–RC29 regression chain. See `RC30_RELEASE_NOTES.md` and `PMM/Documentation/TEST_THIS_BUILD_RC30.txt`.
 
 No automatic upload, provider login, returned-code execution, Apply Fix, Build, Deploy or publication is enabled. Windows acceptance remains required before final promotion.
 

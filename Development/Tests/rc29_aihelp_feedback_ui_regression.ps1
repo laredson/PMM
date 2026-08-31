@@ -41,7 +41,7 @@ try{
 
   . (Join-Path $App 'Modules\AIIO\AIIO.ValidationService.ps1')
   function Get-PMMValidationInstallationIdentity {[pscustomobject]@{InstallationId=('a'*64)}}
-  function Get-PMMAIIOProductIdentity {[pscustomobject]@{Product='Palworld Manager Merger';Creator='laredson';Version='1.3.0';BuildId='PMM-v1.3.0-RC29-AIHELP-FEEDBACK-UI-FIX'}}
+  function Get-PMMAIIOProductIdentity {[pscustomobject]@{Product='Palworld Manager Merger';Creator='laredson';Version='1.3.0';BuildId='PMM-v1.3.0-RC30-LEAN-AI-VALIDATION-FLOW'}}
   $feedback=New-PMMUserFeedbackFile -Kind GENERAL_COMMENT -Title 'Fixture feedback' -Comments 'Inspectable and local.'
   $record=Get-Content -LiteralPath $feedback.Path -Raw -Encoding UTF8|ConvertFrom-Json
   Assert-RC29 ([string]$record.Schema -ceq 'PMM_USER_FEEDBACK_V1') 'Feedback schema mismatch.'
@@ -58,13 +58,13 @@ try{
     [xml]$xml=Get-Content -LiteralPath (Join-Path $App ('Resources\UI\'+$name)) -Raw -Encoding UTF8
     $manager=[Xml.XmlNamespaceManager]::new($xml.NameTable);$manager.AddNamespace('x','http://schemas.microsoft.com/winfx/2006/xaml')
     $names=@($xml.SelectNodes('//*[@x:Name]',$manager)|ForEach-Object{[string]$_.GetAttribute('Name','http://schemas.microsoft.com/winfx/2006/xaml')})
-    Assert-RC29 ($names.Count -eq 280 -and @($names|Sort-Object -Unique).Count -eq 280) ('Localized XAML name count mismatch: '+$name)
+    Assert-RC29 ($names.Count -eq 288 -and @($names|Sort-Object -Unique).Count -eq 288) ('Localized XAML name count mismatch: '+$name)
     if($null -eq $referenceNames){$referenceNames=@($names|Sort-Object)}else{Assert-RC29 ((@($names|Sort-Object) -join '|') -ceq ($referenceNames -join '|')) ('Localized XAML parity mismatch: '+$name)}
   }
 
   $dialog=[regex]::Match($bootstrap,'(?s)function Show-PMMBuildValidationDialog\b.*?(?=\r?\n# Action-required hint duration:)').Value
-  Assert-RC29 ($dialog -match [regex]::Escape('$buttonWidth=188')) 'Validation buttons were not enlarged.'
-  Assert-RC29 ($dialog -match [regex]::Escape('$button.Height=58')) 'Validation button height is too small.'
+  Assert-RC29 ($dialog -match [regex]::Escape('$buttonWidth=230')) 'Validation buttons were not enlarged.'
+  Assert-RC29 ($dialog -match [regex]::Escape('$button.Height=76')) 'Validation button height is too small.'
   Write-Output 'RC29_AIHELP_FEEDBACK_UI_REGRESSION_OK'
 }finally{
   Remove-Item -LiteralPath $fixtureRoot -Recurse -Force -ErrorAction SilentlyContinue

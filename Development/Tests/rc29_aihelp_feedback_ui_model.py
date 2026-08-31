@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "PMM"
-EXPECTED_BUILD = "PMM-v1.3.0-RC29-AIHELP-FEEDBACK-UI-FIX"
+EXPECTED_BUILD = "PMM-v1.3.0-RC30-LEAN-AI-VALIDATION-FLOW"
 XAML_NS = "http://schemas.microsoft.com/winfx/2006/xaml"
 X_NAME = f"{{{XAML_NS}}}Name"
 
@@ -51,7 +51,7 @@ def validate_identity_and_manifest() -> None:
     assert manifest["product"] == "Palworld Manager Merger"
     assert manifest["creator"] == "laredson"
     assert manifest["buildId"] == EXPECTED_BUILD
-    assert manifest["releaseCandidate"] == "rc29-aihelp-feedback-ui-fix"
+    assert manifest["releaseCandidate"] == "rc30-lean-ai-validation-flow"
     assert manifest["aiioFeedbackSchema"] == "PMM_USER_FEEDBACK_V1"
     assert manifest["aiioRemoteUploadEnabled"] is False
     assert "manual" in manifest["aiioFeedbackTransport"].lower()
@@ -61,9 +61,9 @@ def validate_identity_and_manifest() -> None:
 def validate_localized_ui() -> None:
     expected_names: set[str] | None = None
     expected_tabs = {
-        "MainWindow.xaml": ["Help", "AI repair", "Feedback", "Knowledge", "Color scheme editor", "Settings"],
-        "MainWindow.en.xaml": ["Help", "AI repair", "Feedback", "Knowledge", "Color scheme editor", "Settings"],
-        "MainWindow.es.xaml": ["Ayuda", "Reparacion IA", "Feedback", "Knowledge", "Editor de esquemas de color", "Opciones IA"],
+        "MainWindow.xaml": ["AI assistance", "AI reception", "Feedback & Knowledge", "Color scheme editor", "Settings"],
+        "MainWindow.en.xaml": ["AI assistance", "AI reception", "Feedback & Knowledge", "Color scheme editor", "Settings"],
+        "MainWindow.es.xaml": ["Ayuda IA", "Recepcion IA", "Feedback y Knowledge", "Editor de esquemas de color", "Opciones IA"],
     }
     required = {
         "CmbAIHelpFeedbackType", "TxtAIHelpFeedbackTitle", "TxtAIHelpFeedbackComments",
@@ -76,7 +76,7 @@ def validate_localized_ui() -> None:
         root = ET.fromstring(text)
         parents = parent_map(root)
         names = [node.attrib[X_NAME] for node in root.iter() if X_NAME in node.attrib]
-        assert len(names) == len(set(names)) == 280, filename
+        assert len(names) == len(set(names)) == 288, filename
         assert required.issubset(names), filename
         expected_names = set(names) if expected_names is None else expected_names
         assert set(names) == expected_names, filename
@@ -96,7 +96,7 @@ def validate_localized_ui() -> None:
         assert current.attrib.get("Grid.Row") == "2"
 
         assert nearest_tab_header(find_named(root, "ChkAIIOAutoCreateErrorCases"), parents) in {"Settings", "Opciones IA"}
-        assert nearest_tab_header(find_named(root, "TxtGameReferenceSummary"), parents) in {"Settings", "Opciones IA"}
+        assert nearest_tab_header(find_named(root, "TxtGameReferenceSummary"), parents) in {"Settings", "Configuracion"}
         assert find_named(root, "BtnAIHelpUploadFeedback").attrib.get("IsEnabled") == "False"
         assert "Action required: press play" not in text
 
@@ -187,7 +187,7 @@ def validate_feedback_and_legacy_migration() -> None:
 def validate_dialog_theme_and_encoding() -> None:
     bootstrap = read("Modules/Bootstrap/Start-PalModMerger.ps1")
     dialog = function_body(bootstrap, "Show-PMMBuildValidationDialog")
-    for marker in ("840,300", "$buttonWidth=188", "$button.Height=58", "Segoe UI Semibold"):
+    for marker in ("$clientWidth=1040", "$clientWidth,360", "$buttonWidth=230", "$button.Height=76", "Segoe UI Semibold"):
         assert marker in dialog, marker
     assert "System.Drawing.Size" in dialog and "System.Drawing.Font" in dialog
 

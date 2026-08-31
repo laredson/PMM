@@ -153,7 +153,7 @@ $controlNames = @(
   'MainTabs','TabFixLab','BtnFixLabOpenRoot','CmbFixLabJob','BtnFixLabRefreshJobs','BtnFixLabOpenJob','LstFixLabPrimaryMods','BtnFixLabUseLibraryMod','BtnFixLabBrowsePrimary','TxtFixLabPrimary',
   'LstFixLabRelated','BtnFixLabAddRelated','BtnFixLabRemoveRelated','TxtFixLabGameReference','BtnFixLabBuildReference','BtnFixLabOpenReference','BtnFixLabAnalyze','TxtFixLabAnalysis','DgFixLabPakInventory','CmbFixLabRecipe','CmbFixLabVariant','TxtFixLabVariantDescription','BtnFixLabCreateHandoff','TxtFixLabBuildState','BtnFixLabBuild','BtnFixLabRebuild','TxtFixLabResult','BtnFixLabOpenOutput','BtnFixLabAddOutputToLibrary',
   'BtnFixLabDiscover','BtnFixLabRefreshDashboard','LstFixLabCandidates','TxtFixLabCandidate','BtnFixLabIgnoreSource','BtnFixLabDeleteSource','LstFixLabBackups','BtnFixLabRevertBackup','BtnFixLabOpenBackupFolder','LstFixLabBuiltFixes','BtnFixLabApplyBuilt','BtnFixLabRepair','TxtFixLabRepairState','TxtFixLabRepairProgress','PrgFixLabRepair','TxtFixLabGameReferenceProgress','PrgFixLabGameReference','BrdFixLabBadge','TxtFixLabBadge','BrdFixLabNotice','TxtFixLabNotice','BtnFixLabDismissNotice','TxtFixLabCandidateCount','TxtFixLabBackupCount','TxtFixLabBuiltCount','TxtFixLabIgnoredCount','BtnFixLabClearIgnored','TxtFixLabLegacySource','TxtFixLabModules','TxtFixLabOutputSize','ExpFixLabSource','ExpFixLabConfigure','ExpFixLabBuild','ExpFixLabOutputs','ExpFixLabBackups','ExpFixLabAdvanced',
-  'TabAIHelp','BrdAIHelpBadge','TxtAIHelpBadge','AIHelpTabs','LstAIHelpDiagnostics','BtnAIHelpRefresh','BtnAIHelpPrepareDiagnostic','CmbAIHelpDiagnosticType','TxtAIHelpDiagnosticTitle','TxtAIHelpDiagnosticDescription','ChkAIHelpIncludePalLog','BtnAIHelpCreateCase','TxtAIHelpDiagnosticStatus',
+  'TabAIHelp','BrdAIHelpBadge','TxtAIHelpBadge','AIHelpTabs','LstAIHelpDiagnostics','BtnAIHelpRefresh','BtnAIHelpNewCase','BtnAIHelpPrepareDiagnostic','PnlAIHelpSelectedCase','PnlAIHelpNewCase','TxtAIHelpSelectedCaseTitle','TxtAIHelpSelectedCaseMeta','TxtAIHelpSelectedCaseDescription','CmbAIHelpDiagnosticType','TxtAIHelpDiagnosticTitle','TxtAIHelpDiagnosticDescription','ChkAIHelpIncludePalLog','BtnAIHelpCreateCase','BtnAIHelpCreateAndPrepareCase','BtnAIHelpCancelNewCase','TxtAIHelpDiagnosticStatus',
   'LstAIIOSessions','LstAIIOCandidates','TxtAIIOCandidateStatus','BtnAIIOOpenWorkspace','BtnAIIOArchive','BtnAIIOOpenCandidate','BtnAIIOUseCandidate','CmbAIIOType','TxtAIIOTitle','TxtAIIODescription','CmbAIOTargetKind','TxtAIOTargetId','BtnAIIONewSession','BtnAIIOPrepare','BtnAIIOImportResponse','BtnAIIOContinue','TxtAIIOStatus',
   'CmbAIHelpFeedbackType','TxtAIHelpFeedbackTitle','TxtAIHelpFeedbackComments','CmbAIHelpFeedbackBuild','BtnAIHelpCreateFeedback','BtnAIHelpGenerateFeedback','BtnAIHelpOpenFeedback','BtnAIHelpUploadFeedback','TxtAIHelpFeedbackStatus',
   'TxtAIHelpKnowledgeSummary','BtnAIHelpOpenKnowledge','TxtAIHelpStorageSummary','LstAIHelpInterrupted','BtnAIHelpRefreshKnowledge','BtnAIHelpCleanup','ChkAIIOAutoCreateErrorCases','TxtAIIOSettingsStatus',
@@ -533,7 +533,7 @@ function Get-PMMThemeDefinitionBrush($Definition,[string]$Key,[string]$FallbackH
   finally{try{$Window.Resources.Remove($temporary)}catch{}}
 }
 
-function Apply-PMMTheme([string]$Theme='') {
+function Apply-PMMTheme([string]$Theme='',[switch]$Force) {
   if([string]::IsNullOrWhiteSpace($Theme)){try{$Theme=[string](Get-PMMConfig).Theme}catch{$Theme='pmm-crystal'}}
   if($Theme -eq 'Dark'){$Theme='Night'}
   $requested=$Theme;$definitions=@(Get-PMMThemeDefinitions)
@@ -544,6 +544,8 @@ function Apply-PMMTheme([string]$Theme='') {
     if($definition.Count -gt 0){$Script:ThemeFallbackNotice=(L ('Configured scheme "'+$requested+'" is unavailable; PMM Crystal is active without changing your saved choice.') ('El esquema configurado "'+$requested+'" no esta disponible; PMM Crystal esta activo sin cambiar tu eleccion guardada.'))}
   }
   if($definition.Count -eq 0){$definition=@($definitions|Where-Object{[string]$_.Id -eq 'Night'}|Select-Object -First 1);$Script:ThemeFallbackNotice=L 'PMM Crystal is unavailable; the emergency Night palette is active.' 'PMM Crystal no esta disponible; esta activa la paleta de emergencia Noche.'}
+  $resolvedId=[string]$definition[0].Id
+  if(-not$Force -and -not[bool]$Script:ThemePreviewActive -and -not[string]::IsNullOrWhiteSpace([string]$Script:ActiveThemeId) -and [string]$Script:ActiveThemeId -ieq $resolvedId){return}
   Apply-PMMThemeDefinition $definition[0]
 }
 
@@ -577,8 +579,12 @@ function Apply-PMMThemeDefinition($def) {
 # ---------------------------------------------------------------------------
 $Script:AIHelpLoaded=$false
 $Script:AIIOBusy=$false
+$Script:AIHelpUiRefreshing=$false
+$Script:ThemeEditorUiBuilding=$false
+$Script:AIHelpNewCaseMode=$false
 $Script:ActiveThemeDraft=$null
 $Script:ThemeEditorRowControls=@{}
+$Script:ThemeEditorDirtyFields=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 $Script:ThemePreviewActive=$false
 
 function Set-PMMAIIOActiveSession([string]$SessionId) {
@@ -614,6 +620,43 @@ function Update-PMMAIHelpDiagnosticSelection {
   $row=$null;try{$row=$Script:LstAIHelpDiagnostics.SelectedItem}catch{}
   $isOpen=($row -and [string]$row.Status -eq 'Open')
   $Script:BtnAIHelpPrepareDiagnostic.IsEnabled=($isOpen -and -not[bool]$Script:AIIOBusy)
+  if([bool]$Script:AIHelpNewCaseMode){return}
+  $Script:PnlAIHelpNewCase.Visibility=[System.Windows.Visibility]::Collapsed
+  $Script:PnlAIHelpSelectedCase.Visibility=[System.Windows.Visibility]::Visible
+  if(-not$row){
+    $Script:TxtAIHelpSelectedCaseTitle.Text=L 'No case selected' 'Ningun caso seleccionado'
+    $Script:TxtAIHelpSelectedCaseMeta.Text=L 'Choose a case on the left, or press New case.' 'Elige un caso a la izquierda o pulsa Nuevo caso.'
+    $Script:TxtAIHelpSelectedCaseDescription.Text=''
+    return
+  }
+  try{
+    $casePath=Get-PMMDiagnosticCasePath ([string]$row.CaseId)
+    $case=Get-Content -LiteralPath $casePath -Raw -Encoding UTF8|ConvertFrom-Json
+    $session=Get-PMMAIIOSessionForDiagnostic ([string]$row.CaseId)
+    $sessionText=if($session){((L 'AI exchange: {0} ({1})' 'Intercambio IA: {0} ({1})') -f [string]$session.SessionId,[string]$session.Status)}else{L 'AI exchange: not prepared yet' 'Intercambio IA: aun no preparado'}
+    $created='';try{$created=([datetime]$case.CreatedUtc).ToLocalTime().ToString('yyyy-MM-dd HH:mm')}catch{$created=[string]$case.CreatedUtc}
+    $Script:TxtAIHelpSelectedCaseTitle.Text=[string]$case.Title
+    $Script:TxtAIHelpSelectedCaseMeta.Text=((L 'Feature: {0} | Status: {1} | Created: {2} | {3}' 'Funcion: {0} | Estado: {1} | Creado: {2} | {3}') -f [string]$case.Type,[string]$case.Status,$created,$sessionText)
+    $Script:TxtAIHelpSelectedCaseDescription.Text=if([string]::IsNullOrWhiteSpace([string]$case.UserDescription)){L 'No description was recorded.' 'No se guardo ninguna descripcion.'}else{[string]$case.UserDescription}
+  }catch{
+    $Script:TxtAIHelpSelectedCaseTitle.Text=[string]$row.Title
+    $Script:TxtAIHelpSelectedCaseMeta.Text=[string]$row.Display
+    $Script:TxtAIHelpSelectedCaseDescription.Text=L 'The case details could not be read. Refresh the list or inspect the AI workspace.' 'No se pudieron leer los detalles del caso. Actualiza la lista o inspecciona el espacio de IA.'
+  }
+}
+
+function Set-PMMAIHelpNewCaseMode([bool]$Enabled,[switch]$Clear) {
+  $Script:AIHelpNewCaseMode=$Enabled
+  $Script:PnlAIHelpSelectedCase.Visibility=if($Enabled){[System.Windows.Visibility]::Collapsed}else{[System.Windows.Visibility]::Visible}
+  $Script:PnlAIHelpNewCase.Visibility=if($Enabled){[System.Windows.Visibility]::Visible}else{[System.Windows.Visibility]::Collapsed}
+  if($Enabled -and $Clear){
+    $Script:CmbAIHelpDiagnosticType.SelectedIndex=0
+    $Script:TxtAIHelpDiagnosticTitle.Text=''
+    $Script:TxtAIHelpDiagnosticDescription.Text=''
+    $Script:ChkAIHelpIncludePalLog.IsChecked=$false
+    $Script:TxtAIHelpDiagnosticStatus.Text=L 'Describe the problem, then create the case or create its safe AI ZIP.' 'Describe el problema y despues crea el caso o su ZIP seguro para IA.'
+  }
+  if(-not$Enabled){Update-PMMAIHelpDiagnosticSelection}
 }
 
 function Refresh-PMMAIHelpBadge {
@@ -626,7 +669,7 @@ function Refresh-PMMAIHelpBadge {
     }
   }catch{}
   try{
-    foreach($case in @(Get-PMMDiagnosticCases|Where-Object{[string]$_.Status -eq 'Open' -and [bool]$_.AttentionEligible})){
+    foreach($case in @(Get-PMMDiagnosticCases|Where-Object{[string]$_.Status -eq 'Open' -and [bool]$_.AttentionEligible -and ([string]$_.Origin -eq 'AutomaticError' -or [string]$_.Type -eq 'PMM_ERROR')})){
       $id=if([string]$case.Type -eq 'PMM_ERROR' -and -not[string]::IsNullOrWhiteSpace([string]$case.Fingerprint)){'ERROR:'+[string]$case.Fingerprint}else{'CASE:'+[string]$case.CaseId}
       [void]$keys.Add($id)
     }
@@ -689,7 +732,8 @@ function Update-PMMAIHelpFeedbackSelection {
   $Script:BtnAIHelpGenerateFeedback.IsEnabled=$hasValidation
 }
 
-function Refresh-PMMAIHelpFeedback {
+function Refresh-PMMAIHelpFeedback([switch]$Force) {
+  if(-not$Force){try{if([bool]$Script:CmbAIHelpFeedbackBuild.IsDropDownOpen){return}}catch{}}
   $selectedKey=Get-PMMSelectorItemId $Script:CmbAIHelpFeedbackBuild 'Key'
   $rows=[Collections.Generic.List[object]]::new()
   $rows.Add([pscustomobject]@{Key='__NONE__';Patch=$null;BuildId='';NoContext=$true;Display=(L 'No merge context' 'Sin contexto de merge')})
@@ -740,14 +784,18 @@ function Update-PMMAIIOCandidateSelection {
   $Script:TxtAIIOCandidateStatus.Text=((L '{0} | case {1} | {2}' '{0} | caso {1} | {2}') -f [string]$row.InputSchema,$caseText,$state)
 }
 
-function Refresh-PMMAIHelpUi([switch]$EnsureUnsupported) {
-  if($EnsureUnsupported){try{[void](Get-PMMAIIOUnsupportedSession)}catch{Write-PMMLog ('AIIO Unsupported session warning: '+$_.Exception.Message)}}
-  $diagnostics=@(Get-PMMDiagnosticCases);$sessions=@(Get-PMMAIIOSessions)
+function Refresh-PMMAIHelpDiagnostics {
+  $diagnostics=@(Get-PMMDiagnosticCases)
   $selectedDiagnostic=Get-PMMSelectorItemId $Script:LstAIHelpDiagnostics 'CaseId'
-  $selectedSession=Get-PMMSelectorItemId $Script:LstAIIOSessions 'SessionId'
   $Script:LstAIHelpDiagnostics.ItemsSource=$diagnostics
-  $Script:LstAIIOSessions.ItemsSource=$sessions
   if($selectedDiagnostic){[void](Select-PMMSelectorItemId $Script:LstAIHelpDiagnostics 'CaseId' $selectedDiagnostic)}elseif($diagnostics.Count -gt 0){$Script:LstAIHelpDiagnostics.SelectedIndex=0}
+  Update-PMMAIHelpDiagnosticSelection
+}
+
+function Refresh-PMMAIIOSessions {
+  $sessions=@(Get-PMMAIIOSessions)
+  $selectedSession=Get-PMMSelectorItemId $Script:LstAIIOSessions 'SessionId'
+  $Script:LstAIIOSessions.ItemsSource=$sessions
   $configured='';try{$configured=[string](Get-PMMConfig).AIIOActiveSession}catch{}
   $sessionRestored=$false
   if($selectedSession){$sessionRestored=Select-PMMSelectorItemId $Script:LstAIIOSessions 'SessionId' $selectedSession}
@@ -755,24 +803,36 @@ function Refresh-PMMAIHelpUi([switch]$EnsureUnsupported) {
   if(-not$sessionRestored -and $sessions.Count -gt 0){$Script:LstAIIOSessions.SelectedIndex=0}
   $activeSessionId=Get-PMMSelectorItemId $Script:LstAIIOSessions 'SessionId'
   Refresh-PMMAIIOCandidates $activeSessionId
-  Refresh-PMMAIHelpFeedback
-  Refresh-PMMAIHelpKnowledge
-  Refresh-PMMThemeEditorCatalog
-  Refresh-PMMAIHelpBadge
   $hasSession=(-not[string]::IsNullOrWhiteSpace($activeSessionId))
   $busy=[bool]$Script:AIIOBusy
   $activeSession=$null;if($hasSession){try{$activeSession=Get-PMMAIIOSession $activeSessionId}catch{}}
   $canPrepare=(-not$hasSession -or ($activeSession -and [string]$activeSession.Status -eq 'Draft'))
   $Script:BtnAIIONewSession.IsEnabled=-not$busy
   $Script:BtnAIIOPrepare.IsEnabled=(-not$busy -and $canPrepare)
-  $Script:BtnAIIOImportResponse.IsEnabled=(-not$busy -and $hasSession)
+  $Script:BtnAIIOImportResponse.IsEnabled=(-not$busy)
   $Script:BtnAIIOArchive.IsEnabled=(-not$busy -and $hasSession)
-  Update-PMMAIHelpDiagnosticSelection
-  $Script:BtnAIHelpCleanup.IsEnabled=-not$busy
   $pending=0;if($hasSession -and -not$busy){try{$pending=@(Get-PMMAIIOPendingRequests $activeSessionId).Count}catch{$pending=0}}
   $Script:BtnAIIOContinue.IsEnabled=(-not$busy -and $hasSession -and $pending -gt 0)
   if($busy){$Script:BtnAIIOUseCandidate.IsEnabled=$false}
-  $Script:AIHelpLoaded=$true
+}
+
+function Refresh-PMMAIHelpUi([switch]$EnsureUnsupported,[switch]$All) {
+  if([bool]$Script:AIHelpUiRefreshing){return}
+  $Script:AIHelpUiRefreshing=$true
+  try{
+    # Re-evaluate only when the user explicitly enters AI & Help. A later
+    # Analyze may introduce a new Unsupported set after the tab was opened once;
+    # AIHelpLoaded must not suppress creation/reuse of that exact session.
+    if($EnsureUnsupported){try{[void](Get-PMMAIIOUnsupportedSession)}catch{Write-PMMLog ('AIIO Unsupported session warning: '+$_.Exception.Message)}}
+    $tab=0;try{$tab=[int]$Script:AIHelpTabs.SelectedIndex}catch{$tab=0}
+    if($All -or $tab -eq 0){Refresh-PMMAIHelpDiagnostics}
+    if($All -or $tab -eq 1){Refresh-PMMAIIOSessions}
+    if($All -or $tab -eq 2){Refresh-PMMAIHelpFeedback;Refresh-PMMAIHelpKnowledge;$Script:BtnAIHelpCleanup.IsEnabled=-not[bool]$Script:AIIOBusy}
+    if($All -or $tab -eq 3){Refresh-PMMThemeEditorCatalog}
+    if($All -or $tab -eq 4){$Script:BtnAIHelpCleanup.IsEnabled=-not[bool]$Script:AIIOBusy}
+    Refresh-PMMAIHelpBadge
+    $Script:AIHelpLoaded=$true
+  }finally{$Script:AIHelpUiRefreshing=$false}
 }
 
 function Get-PMMSelectedAIIOSession {
@@ -781,7 +841,11 @@ function Get-PMMSelectedAIIOSession {
   return (Set-PMMAIIOActiveSession ([string]$row.SessionId))
 }
 
-function Refresh-PMMThemeEditorCatalog {
+function Refresh-PMMThemeEditorCatalog([switch]$Force) {
+  if(-not$Force){
+    if([bool]$Script:ThemeEditorUiBuilding){return}
+    try{if([bool]$Script:CmbThemeEditorSource.IsDropDownOpen){return}}catch{}
+  }
   $selectedSource='';try{$selectedSource=[string]$Script:CmbThemeEditorSource.SelectedValue}catch{}
   $definitions=@(Get-PMMThemeDefinitions)
   $Script:CmbThemeEditorSource.ItemsSource=$definitions
@@ -826,20 +890,28 @@ function Update-PMMThemeEditorDraftFromUi([switch]$Save) {
   $draft.Name=[string]$Script:TxtThemeEditorName.Text;$draft.ThemeId=[string]$Script:TxtThemeEditorId.Text;$draft.Base=[string]$Script:CmbThemeEditorBase.SelectedItem
   $palette=ConvertTo-PMMThemeDraftHashtable $draft.Palette;$flow=ConvertTo-PMMThemeDraftHashtable $draft.ColorFlow
   foreach($field in @(Get-PMMThemeEditorFields)){
-    $fieldKey=[string]$field.Key;$row=$Script:ThemeEditorRowControls[$fieldKey];if(-not$row){continue};$value=([string]$row.TextBox.Text).Trim()
+    $fieldKey=[string]$field.Key;$row=$Script:ThemeEditorRowControls[$fieldKey];if(-not$row){continue}
+    # Only copy fields the user actually edited. Dynamic WPF rows can receive
+    # presentation TextChanged notifications while a tab/theme catalog is
+    # being rebuilt; copying every control back used to turn an untouched
+    # PMM Crystal clone into a false low-contrast draft on Windows PS 5.1.
+    if($Script:ThemeEditorDirtyFields -and -not$Script:ThemeEditorDirtyFields.Contains($fieldKey)){continue}
+    $value=([string]$row.TextBox.Text).Trim()
     if(-not(Test-PMMThemeHexColor $value)){throw ((L 'Invalid color in {0}: {1}' 'Color no valido en {0}: {1}') -f $fieldKey,$value)}
     if([string]$field.Kind -eq 'Palette'){$palette[$fieldKey]=$value}else{$stateKey=[string]$field.State;$partKey=[string]$field.Part;$state=ConvertTo-PMMThemeDraftHashtable $flow[$stateKey];$state[$partKey]=$value;$flow[$stateKey]=$state}
   }
   $draft.Palette=$palette;$draft.ColorFlow=$flow
   [void](Convert-PMMThemeDraftToDefinition $draft)
-  if($Save){Save-PMMThemeDraft $draft|Out-Null;Refresh-PMMThemeEditorCatalog}
+  if($Save){Save-PMMThemeDraft $draft|Out-Null;[void]$Script:ThemeEditorDirtyFields.Clear();Refresh-PMMThemeEditorCatalog}
   return $draft
 }
 
 function Show-PMMThemeDraft($Draft) {
   if(-not$Draft){return}
+  $Script:ThemeEditorUiBuilding=$true
+  try{
   $Script:ActiveThemeDraft=$Draft;$Script:TxtThemeEditorName.Text=[string]$Draft.Name;$Script:TxtThemeEditorId.Text=[string]$Draft.ThemeId;$Script:CmbThemeEditorBase.SelectedItem=[string]$Draft.Base
-  $Script:PnlThemeEditorRows.Children.Clear();$Script:ThemeEditorRowControls=@{};$lastGroup=''
+  $Script:PnlThemeEditorRows.Children.Clear();$Script:ThemeEditorRowControls=@{};[void]$Script:ThemeEditorDirtyFields.Clear();$lastGroup=''
   $brushes=ConvertTo-PMMThemeDraftHashtable $Draft.Brushes
   foreach($field in @(Get-PMMThemeEditorFields)){
     if([string]$field.Group -ne $lastGroup){$heading=[System.Windows.Controls.TextBlock]::new();$heading.Text=[string]$field.Group;$heading.FontWeight=[System.Windows.FontWeights]::SemiBold;$heading.FontSize=15;$heading.Margin=[System.Windows.Thickness]::new(0,9,0,4);[void]$Script:PnlThemeEditorRows.Children.Add($heading);$lastGroup=[string]$field.Group}
@@ -848,6 +920,8 @@ function Show-PMMThemeDraft($Draft) {
     $label=[System.Windows.Controls.StackPanel]::new();$name=[System.Windows.Controls.TextBlock]::new();$name.Text=[string]$field.Key;$name.FontWeight=[System.Windows.FontWeights]::SemiBold;$affected=[System.Windows.Controls.TextBlock]::new();$affected.Text=[string]$field.Affected;$affected.FontSize=10.5;$affected.Foreground=$Window.Resources['MutedText'];$affected.TextWrapping=[System.Windows.TextWrapping]::Wrap;[void]$label.Children.Add($name);[void]$label.Children.Add($affected);[System.Windows.Controls.Grid]::SetColumn($label,0);[void]$grid.Children.Add($label)
     $key=[string]$field.Key;$imageText=[System.Windows.Controls.TextBlock]::new();$imageText.VerticalAlignment=[System.Windows.VerticalAlignment]::Center;$imageText.Foreground=$Window.Resources['MutedText'];$imageText.TextTrimming=[System.Windows.TextTrimming]::CharacterEllipsis;$imageText.Margin=[System.Windows.Thickness]::new(5,0,5,0);$entry=$null;if($brushes.Contains($key)){$entry=$brushes[$key]};$imageText.Text=if($entry){[string]$entry.source}else{L 'Solid fallback' 'Color solido'};[System.Windows.Controls.Grid]::SetColumn($imageText,1);[void]$grid.Children.Add($imageText)
     $textBox=[System.Windows.Controls.TextBox]::new();$textBox.Text=Get-PMMThemeDraftFieldValue $Draft $field;$textBox.Margin=[System.Windows.Thickness]::new(2);[System.Windows.Controls.Grid]::SetColumn($textBox,2);[void]$grid.Children.Add($textBox)
+    $textBox.Tag=[string]$field.Key
+    $textBox.Add_TextChanged({param($sender,$e)if(-not[bool]$Script:ThemeEditorUiBuilding){[void]$Script:ThemeEditorDirtyFields.Add([string]$sender.Tag)}})
     $pick=[System.Windows.Controls.Button]::new();$pick.Content=L 'Color...' 'Color...';$pick.Margin=[System.Windows.Thickness]::new(2);Set-PMMThemeEditorSwatch $pick $textBox.Text;[System.Windows.Controls.Grid]::SetColumn($pick,3);[void]$grid.Children.Add($pick)
     $upload=[System.Windows.Controls.Button]::new();$upload.Content=L 'Upload image' 'Subir imagen';$upload.Margin=[System.Windows.Thickness]::new(2);[System.Windows.Controls.Grid]::SetColumn($upload,4);[void]$grid.Children.Add($upload)
     $options=[System.Windows.Controls.Button]::new();$options.Content=L 'Image...' 'Imagen...';$options.Margin=[System.Windows.Thickness]::new(2);$options.IsEnabled=($null -ne $entry);[System.Windows.Controls.Grid]::SetColumn($options,5);[void]$grid.Children.Add($options)
@@ -859,6 +933,7 @@ function Show-PMMThemeDraft($Draft) {
     $border.Child=$grid;[void]$Script:PnlThemeEditorRows.Children.Add($border);$Script:ThemeEditorRowControls[$key]=[pscustomobject]@{TextBox=$textBox;Swatch=$pick;ImageText=$imageText;ImageOptions=$options}
   }
   $Script:TxtThemeEditorStatus.Text=((L 'Draft loaded: {0}. Edit colors/images, then Save draft. Preview never changes the saved Settings choice.' 'Borrador cargado: {0}. Edita colores/imagenes y guarda el borrador. Vista previa nunca cambia la eleccion guardada en Opciones.') -f [string]$Draft.Name)
+  }finally{$Script:ThemeEditorUiBuilding=$false}
 }
 
 function Get-PMMThemeDraftPreviewDefinition($Draft) {
@@ -888,7 +963,21 @@ function Initialize-PMMAIHelpUi {
   try{[void](Resolve-PMMKnownLegacyUiDiagnostics)}catch{}
   try{Repair-PMMDuplicateDiagnosticSessions}catch{}
   $Script:CmbAIHelpDiagnosticType.ItemsSource=@(
-    [pscustomobject]@{Id='MOD_NOT_WORKING';Label=(L 'A mod does not work' 'Un mod no funciona')},[pscustomobject]@{Id='GAME_CRASH';Label=(L 'Palworld crash' 'Crash de Palworld')},[pscustomobject]@{Id='BUILD_FAILURE';Label=(L 'Build problem' 'Problema de Build')},[pscustomobject]@{Id='DEPLOY_FAILURE';Label=(L 'Deploy problem' 'Problema de Deploy')},[pscustomobject]@{Id='FIXLAB_FAILURE';Label=(L 'Fix Lab problem' 'Problema de Fix Lab')},[pscustomobject]@{Id='SAVE_PROBLEM';Label=(L 'Save/world problem' 'Problema de save/mundo')},[pscustomobject]@{Id='PERFORMANCE_PROBLEM';Label=(L 'Performance problem' 'Problema de rendimiento')},[pscustomobject]@{Id='FEATURE_MISSING';Label=(L 'Feature missing' 'Falta una funcion')},[pscustomobject]@{Id='UNKNOWN';Label=(L "I don't know" 'No lo se')})
+    [pscustomobject]@{Id='MOD_NOT_WORKING';Feature='ModLibrary';Label=(L 'Mod import and library' 'Importacion y biblioteca de mods')},
+    [pscustomobject]@{Id='BUILD_FAILURE';Feature='Analyze';Label=(L 'Analyze and conflict detection' 'Analisis y deteccion de conflictos')},
+    [pscustomobject]@{Id='BUILD_FAILURE';Feature='Decisions';Label=(L 'Conflict decisions' 'Decisiones de conflictos')},
+    [pscustomobject]@{Id='BUILD_FAILURE';Feature='BuildMerge';Label=(L 'Build compatibility merge' 'Crear merge de compatibilidad')},
+    [pscustomobject]@{Id='DEPLOY_FAILURE';Feature='Deploy';Label=(L 'Deploy / undeploy' 'Deploy / undeploy')},
+    [pscustomobject]@{Id='BUILD_FAILURE';Feature='ValidationFeedback';Label=(L 'Merge validation and feedback' 'Validacion y feedback de merge')},
+    [pscustomobject]@{Id='FIXLAB_FAILURE';Feature='FixLab';Label=(L 'Fix Lab' 'Fix Lab')},
+    [pscustomobject]@{Id='SAVE_PROBLEM';Feature='Saves';Label=(L 'Saves and backups' 'Saves y backups')},
+    [pscustomobject]@{Id='BUILD_FAILURE';Feature='GameReference';Label=(L 'Vanilla Game Reference' 'Vanilla Game Reference')},
+    [pscustomobject]@{Id='FEATURE_MISSING';Feature='AIHelp';Label=(L 'AI assistance / reception' 'Ayuda / recepcion de IA')},
+    [pscustomobject]@{Id='FEATURE_MISSING';Feature='ColorSchemes';Label=(L 'Color schemes and editor' 'Esquemas de color y editor')},
+    [pscustomobject]@{Id='FEATURE_MISSING';Feature='Settings';Label=(L 'Settings and interface' 'Opciones e interfaz')},
+    [pscustomobject]@{Id='PERFORMANCE_PROBLEM';Feature='Performance';Label=(L 'Performance or high CPU usage' 'Rendimiento o uso alto de CPU')},
+    [pscustomobject]@{Id='GAME_CRASH';Feature='PalworldCrash';Label=(L 'Palworld crash' 'Crash de Palworld')},
+    [pscustomobject]@{Id='UNKNOWN';Feature='Other';Label=(L 'Other / I am not sure' 'Otro / No estoy seguro')})
   $Script:CmbAIHelpDiagnosticType.SelectedIndex=0
   $Script:CmbAIIOType.ItemsSource=@(
     [pscustomobject]@{Id='MOD_NOT_WORKING';Label=(L 'Investigate a mod' 'Investigar un mod')},[pscustomobject]@{Id='UNSUPPORTED_CONFLICT';Label=(L 'Resolve Unsupported conflicts' 'Resolver conflictos Unsupported')},[pscustomobject]@{Id='CREATE_MOD';Label=(L 'Create a mod' 'Crear un mod')},[pscustomobject]@{Id='MODIFY_MOD';Label=(L 'Modify a mod' 'Modificar un mod')},[pscustomobject]@{Id='PMM_DEVELOPMENT';Label=(L 'Develop or repair PMM' 'Desarrollar o reparar PMM')},[pscustomobject]@{Id='THEME_DESIGN';Label=(L 'Design a color scheme' 'Disenar un esquema de color')},[pscustomobject]@{Id='UNKNOWN';Label=(L 'General task' 'Tarea general')})
@@ -907,8 +996,9 @@ function Initialize-PMMAIHelpUi {
 }
 
 function Show-PMMBuildValidationDialog([string]$CurrentStatus) {
-  $form=[System.Windows.Forms.Form]::new();$form.Text=L 'Validate exact compatibility merge' 'Validar merge de compatibilidad exacto';$form.ClientSize=[System.Drawing.Size]::new(840,300);$form.StartPosition='CenterParent';$form.FormBorderStyle=[System.Windows.Forms.FormBorderStyle]::FixedDialog;$form.MaximizeBox=$false;$form.MinimizeBox=$false;$form.AutoScaleMode=[System.Windows.Forms.AutoScaleMode]::Dpi;$form.Font=[System.Drawing.Font]::new('Segoe UI',10)
-  $label=[System.Windows.Forms.Label]::new();$label.Left=22;$label.Top=20;$label.Width=796;$label.Height=72;$label.Font=[System.Drawing.Font]::new('Segoe UI Semibold',12);$label.AutoEllipsis=$true
+  $clientWidth=1040
+  $form=[System.Windows.Forms.Form]::new();$form.Text=L 'Validate exact compatibility merge' 'Validar merge de compatibilidad exacto';$form.ClientSize=[System.Drawing.Size]::new($clientWidth,360);$form.StartPosition='CenterParent';$form.FormBorderStyle=[System.Windows.Forms.FormBorderStyle]::FixedDialog;$form.MaximizeBox=$false;$form.MinimizeBox=$false;$form.AutoScaleMode=[System.Windows.Forms.AutoScaleMode]::Dpi;$form.Font=[System.Drawing.Font]::new('Segoe UI',11)
+  $label=[System.Windows.Forms.Label]::new();$label.Left=28;$label.Top=24;$label.Width=984;$label.Height=90;$label.Font=[System.Drawing.Font]::new('Segoe UI Semibold',15);$label.AutoEllipsis=$false
   $label.Text=if($CurrentStatus -eq 'LOCAL_PASS'){L 'This exact merge is marked as working. Has it stopped working?' 'Este merge exacto esta marcado como funcional. Ha dejado de funcionar?'}else{L 'Have you tested this exact merge in Palworld?' 'Has probado este merge exacto dentro de Palworld?'}
   $buttons=[Collections.Generic.List[object]]::new()
   $choices=@()
@@ -926,10 +1016,19 @@ function Show-PMMBuildValidationDialog([string]$CurrentStatus) {
       [pscustomobject]@{Result='CANCEL';Label=(L 'Cancel' 'Cancelar')}
     )
   }
-  $buttonWidth=188;$buttonGap=10;$totalWidth=($choices.Count*$buttonWidth)+([Math]::Max(0,$choices.Count-1)*$buttonGap);$left=[int]((840-$totalWidth)/2)
-  foreach($choice in $choices){$button=[System.Windows.Forms.Button]::new();$button.Text=[string]$choice.Label;$button.Tag=[string]$choice.Result;$button.Left=$left;$button.Top=112;$button.Width=$buttonWidth;$button.Height=58;$button.Font=[System.Drawing.Font]::new('Segoe UI Semibold',10);$button.AutoEllipsis=$true;$button.UseMnemonic=$false;$button.Add_Click({param($sender,$e)$form.Tag=[string]$sender.Tag;$form.Close()});[void]$form.Controls.Add($button);$buttons.Add($button);if([string]$choice.Result -eq 'CANCEL'){$form.CancelButton=$button};$left+=$buttonWidth+$buttonGap}
-  $note=[System.Windows.Forms.Label]::new();$note.Left=22;$note.Top=205;$note.Width=796;$note.Height=62;$note.Font=[System.Drawing.Font]::new('Segoe UI',9.5);$note.Text=L 'The result is recorded locally against a deterministic buildId. It is not uploaded.' 'El resultado se registra localmente contra un buildId determinista. No se sube.'
+  $buttonWidth=230;$buttonGap=14;$totalWidth=($choices.Count*$buttonWidth)+([Math]::Max(0,$choices.Count-1)*$buttonGap);$left=[int](($clientWidth-$totalWidth)/2)
+  foreach($choice in $choices){$button=[System.Windows.Forms.Button]::new();$button.Text=[string]$choice.Label;$button.Tag=[string]$choice.Result;$button.Left=$left;$button.Top=126;$button.Width=$buttonWidth;$button.Height=76;$button.Font=[System.Drawing.Font]::new('Segoe UI Semibold',12);$button.AutoEllipsis=$false;$button.UseMnemonic=$false;$button.Add_Click({param($sender,$e)$form.Tag=[string]$sender.Tag;$form.Close()});[void]$form.Controls.Add($button);$buttons.Add($button);if([string]$choice.Result -eq 'CANCEL'){$form.CancelButton=$button};$left+=$buttonWidth+$buttonGap}
+  $note=[System.Windows.Forms.Label]::new();$note.Left=28;$note.Top=250;$note.Width=984;$note.Height=70;$note.Font=[System.Drawing.Font]::new('Segoe UI',11);$note.Text=L 'The result is recorded locally against a deterministic buildId. It is not uploaded.' 'El resultado se registra localmente contra un buildId determinista. No se sube.'
   [void]$form.Controls.Add($label);[void]$form.Controls.Add($note);[void]$form.ShowDialog();return [string]$form.Tag
+}
+
+function Show-PMMValidationContributionDialog {
+  $form=[System.Windows.Forms.Form]::new();$form.Text=L 'Share tested knowledge' 'Compartir conocimiento probado';$form.ClientSize=[System.Drawing.Size]::new(760,300);$form.StartPosition='CenterParent';$form.FormBorderStyle=[System.Windows.Forms.FormBorderStyle]::FixedDialog;$form.MaximizeBox=$false;$form.MinimizeBox=$false;$form.AutoScaleMode=[System.Windows.Forms.AutoScaleMode]::Dpi;$form.Font=[System.Drawing.Font]::new('Segoe UI',11)
+  $label=[System.Windows.Forms.Label]::new();$label.Left=28;$label.Top=24;$label.Width=704;$label.Height=112;$label.Font=[System.Drawing.Font]::new('Segoe UI Semibold',14);$label.Text=L 'This exact merge works. Would you like to contribute that result to PMM Knowledge? You can review and add comments before creating the share file.' 'Este merge exacto funciona. Quieres aportar ese resultado a PMM Knowledge? Podras revisarlo y anadir comentarios antes de crear el archivo para compartir.'
+  $yes=[System.Windows.Forms.Button]::new();$yes.Text=L 'Yes, open feedback' 'Si, abrir feedback';$yes.Left=122;$yes.Top=164;$yes.Width=245;$yes.Height=72;$yes.Font=[System.Drawing.Font]::new('Segoe UI Semibold',12);$yes.DialogResult=[System.Windows.Forms.DialogResult]::Yes
+  $later=[System.Windows.Forms.Button]::new();$later.Text=L 'Not now' 'Ahora no';$later.Left=393;$later.Top=164;$later.Width=245;$later.Height=72;$later.Font=[System.Drawing.Font]::new('Segoe UI Semibold',12);$later.DialogResult=[System.Windows.Forms.DialogResult]::No
+  $form.Controls.AddRange(@($label,$yes,$later));$form.AcceptButton=$yes;$form.CancelButton=$later
+  return ($form.ShowDialog() -eq [System.Windows.Forms.DialogResult]::Yes)
 }
 
 # Action-required hint duration: 0 disables the popup, 1..120 are seconds,
@@ -1542,7 +1641,12 @@ Set-PMMFixLabControlsEnabled $false
 $Script:TxtFixLabAnalysis.Text=L 'Fix Lab will load only when this tab is opened.' 'Fix Lab se cargara solo cuando abras esta pestana.'
 Initialize-PMMAIHelpUi
 $Script:MainTabs.Add_SelectionChanged({
+  param($sender,$e)
   try{
+    # SelectionChanged is a routed event. Ignore ComboBox/ListBox changes that
+    # bubble out of the selected tab; rebinding AI controls while their popup
+    # is open was the reason the Feedback merge selector appeared to reset.
+    if($e.OriginalSource -ne $sender){return}
     # Tab navigation must stay presentation-only. Older builds recalculated the
     # entire normal workflow (library signature, merge-plan freshness and
     # deployment state) on every tab click; after a large AUTO run that could
@@ -1578,6 +1682,13 @@ $Script:MainTabs.Add_SelectionChanged({
     }
   }catch{Write-PMMLog ('Tab navigation refresh warning: '+$_.Exception.Message)}
 })
+$Script:AIHelpTabs.Add_SelectionChanged({
+  param($sender,$e)
+  try{
+    if($e.OriginalSource -ne $sender){return}
+    [void]$Window.Dispatcher.BeginInvoke([System.Action]{try{Refresh-PMMAIHelpUi}catch{Write-PMMLog ('AI & Help section refresh failed: '+$_.Exception.Message)}},[System.Windows.Threading.DispatcherPriority]::ContextIdle)
+  }catch{Write-PMMLog ('AI & Help navigation warning: '+$_.Exception.Message)}
+})
 
 # ---------------------------------------------------------------------------
 # Guided workflow button colors + in-button progress.
@@ -1594,10 +1705,8 @@ $Script:ImportBusyButton=$null
 $Script:BuildBusy=$false
 $Script:DeployBusy=$false
 $Script:GameModsFingerprint=''
+$Script:LastExternalModsCheckUtc=[DateTime]::MinValue
 $Script:ExternalModsTimer=$null
-$Script:UiResponsivenessTimer=$null
-$Script:UiResponsivenessExpectedUtc=[datetime]::UtcNow
-$Script:UiResponsivenessLastLogUtc=[datetime]::MinValue
 $Script:CancelRequested=$false
 $Script:AutoPipelineActive=$false
 $Script:AutoOneShotActive=$false
@@ -1755,27 +1864,6 @@ function Start-PMMAutoPipeline {
   Ensure-PMMAutoWorkflowTimer
   $Script:AutoWorkflowTimer.Start()
   Update-PMMCancelButtonState
-}
-
-function Ensure-PMMUiResponsivenessMonitor {
-  if($Script:UiResponsivenessTimer){return}
-  $timer=[System.Windows.Threading.DispatcherTimer]::new([System.Windows.Threading.DispatcherPriority]::Background)
-  $timer.Interval=[TimeSpan]::FromMilliseconds(500)
-  $Script:UiResponsivenessExpectedUtc=[datetime]::UtcNow.AddMilliseconds(500)
-  $timer.Add_Tick({
-    try{
-      $now=[datetime]::UtcNow
-      $lag=($now-$Script:UiResponsivenessExpectedUtc).TotalMilliseconds
-      $Script:UiResponsivenessExpectedUtc=$now.AddMilliseconds(500)
-      if($lag -gt 750 -and ($now-$Script:UiResponsivenessLastLogUtc).TotalSeconds -gt 5){
-        $Script:UiResponsivenessLastLogUtc=$now
-        $active=Get-PMMActiveProcessingOperation
-        Write-PMMLog (('UI dispatcher delay detected: {0:N0} ms | active={1}') -f $lag,$active)
-      }
-    }catch{}
-  })
-  $Script:UiResponsivenessTimer=$timer
-  $timer.Start()
 }
 
 function Get-PMMGuidePalette([ValidateSet('Import','Analyze','Build','Deploy','Play')][string]$State) {
@@ -2213,7 +2301,7 @@ function Get-PMMImportGuidanceTarget {
     # No PMM deployment record: if the game copy is newer than the library,
     # treat a different-size file as an external install immediately. For a
     # same-size replacement, hash only this one candidate after metadata moved;
-    # the 2-second heartbeat itself never hashes the full mod set.
+    # the low-frequency metadata heartbeat never hashes the full mod set.
     if($gamePak.LastWriteTimeUtc -gt $libraryPak.LastWriteTimeUtc.AddSeconds(2)){
       if([int64]$libraryPak.Length -ne [int64]$gamePak.Length){return 'GameMods'}
       $libraryHash=Get-PMMCachedFileHash $libraryPak
@@ -2227,7 +2315,8 @@ function Get-PMMImportGuidanceTarget {
 function Get-PMMGameModsFingerprint {
   <#
   Cheap external-change detector: names, sizes and LastWriteTime only. No PAK
-  hashes are computed here, so even a 70+ GB mod set can be checked frequently.
+  hashes are computed here, so even a 70+ GB mod set can be checked safely at
+  the low-frequency active-window heartbeat.
   The expensive state comparison runs only when this metadata fingerprint moves.
   #>
   try{
@@ -2732,6 +2821,9 @@ function Invoke-PMMAutoContinue {
 
 function Check-PMMExternalModChanges([switch]$Force) {
   try{
+    $now=[DateTime]::UtcNow
+    if(-not$Force -and $Script:LastExternalModsCheckUtc -ne [DateTime]::MinValue -and ($now-$Script:LastExternalModsCheckUtc).TotalSeconds -lt 60){return}
+    $Script:LastExternalModsCheckUtc=$now
     $fingerprint=Get-PMMGameModsFingerprint
     $changed=($fingerprint -cne [string]$Script:GameModsFingerprint)
     $Script:GameModsFingerprint=$fingerprint
@@ -2923,7 +3015,10 @@ function Confirm([string]$Message) {
 
 Apply-PMMLayoutFromConfig
 $Window.Add_SizeChanged({Update-PMMResponsiveLayout})
-Ensure-PMMUiResponsivenessMonitor
+# The 500 ms dispatcher watchdog was diagnostic instrumentation, not product
+# work. Leaving it armed for the full lifetime of an idle window caused an
+# unnecessary permanent wake-up. Operation-specific timers still report and
+# stop with their operation.
 Update-PMMWorkspaceRows
 
 # ---------------------------------------------------------------------------
@@ -4439,7 +4534,8 @@ function Refresh-UI {
       'NOT_DEPLOYED' {L 'NOT DEPLOYED' 'NO DESPLEGADO'}
       default {L 'UNVALIDATED' 'SIN VALIDAR'}
     }
-    $status=$validationLabel+' | '+$status
+    $baseStatus=$status
+    $status=$validationLabel+' | '+$baseStatus
     $tip=if($sourceMatch){
       if($effectivePlanMatch -and -not$exactSourceMatch){L 'Selectable: current Analyze proves that every effective conflict participant, provider hash, adapter, decision, mapping and Vanilla input still matches. Unrelated unique source mods may differ; Deploy will synchronize them without rebuilding the overlay.' 'Seleccionable: el Analisis actual demuestra que siguen coincidiendo todos los participantes efectivos de conflicto, hashes de providers, adapters, decisiones, mappings y Vanilla. Pueden diferir mods fuente unicos no relacionados; Deploy los sincronizara sin reconstruir el overlay.'}
       elseif($decisionMatch){L 'Selectable: exact source hashes, mappings, effective conflict order and current Analyze decisions match.' 'Seleccionable: coinciden hashes fuente, mappings, orden efectivo de conflictos y decisiones actuales de Analisis.'}
@@ -4453,7 +4549,7 @@ function Refresh-UI {
     $decisionDisplay=Get-PMMPatchDecisionDisplay $patch
     [void]$Script:LstPatches.Items.Add([pscustomobject]@{
       Name=[string]$patch.Name;SelectionKey=[string]$patch.Name;Patch=$patch;Selected=[bool]$selected;Selectable=[bool]$sourceMatch;SelectTip=$tip;Validated=[bool]$validated;
-      Status=$status;Built=$built;Assets=[string]$patch.AssetCount;DecisionSummary=[string]$decisionDisplay.Summary;DecisionDetails=[string]$decisionDisplay.Details
+      BaseStatus=$baseStatus;Status=$status;Built=$built;Assets=[string]$patch.AssetCount;DecisionSummary=[string]$decisionDisplay.Summary;DecisionDetails=[string]$decisionDisplay.Details
     })
   }
   $Script:TxtPatchCount.Text=((L '{0} saved  |  {1} selectable for active set  |  {2} deployed' '{0} guardado(s)  |  {1} seleccionable(s) para activos  |  {2} desplegado(s)') -f $savedCount,$compatibleCount,$deployedCount)
@@ -4533,7 +4629,7 @@ function Handle-UIError($ErrorRecord,[string]$Action,[switch]$NoDiagnostic) {
     $cfg=Get-PMMConfig;$create=$true;try{$create=[bool]$cfg.AIIOAutoCreateErrorCases}catch{}
     if($create -and -not$NoDiagnostic){
       $case=Register-PMMAutomaticErrorCase -Title $Action -Message $message
-      Refresh-PMMAIHelpUi;[void](Select-PMMSelectorItemId $Script:LstAIHelpDiagnostics 'CaseId' ([string]$case.CaseId))
+      Refresh-PMMAIHelpDiagnostics;Refresh-PMMAIHelpBadge;[void](Select-PMMSelectorItemId $Script:LstAIHelpDiagnostics 'CaseId' ([string]$case.CaseId))
       $Script:MainTabs.SelectedItem=$Script:TabAIHelp;$Script:AIHelpTabs.SelectedIndex=0
       $Script:TxtAIHelpDiagnosticStatus.Text=((L 'PMM recorded this error in diagnostic case {0}. Repeated identical failures reuse the same case.' 'PMM registro este error en el caso de diagnostico {0}. Los fallos identicos repetidos reutilizan el mismo caso.') -f [string]$case.CaseId)
     }
@@ -4717,7 +4813,7 @@ $Script:SldCompletionVolume.Add_ValueChanged({
 $Script:BtnApplySettings.Add_Click({
   try{
     Save-UiSettings
-    Apply-PMMTheme (Get-PMMSelectedThemeId)
+    Apply-PMMTheme (Get-PMMSelectedThemeId) -Force
     $Script:ThemePreviewActive=$false
     Close-PMMRequiredActionPopup;$Script:RequiredActionSignature='';Update-PMMGuidedActionState
     $Script:TxtStatus.Text=L 'Settings applied.' 'Ajustes aplicados.'
@@ -5182,6 +5278,45 @@ $Script:LstMods.AddHandler([System.Windows.Controls.Primitives.ButtonBase]::Clic
     $e.Handled=$true
   }
 })
+function Get-PMMBuildValidationLabel([string]$Status) {
+  switch($Status){
+    'LOCAL_PASS' {return (L 'LOCAL PASS' 'PASS LOCAL')}
+    'LOCAL_PARTIAL' {return (L 'LOCAL PARTIAL' 'PARCIAL LOCAL')}
+    'LOCAL_FAIL' {return (L 'LOCAL FAIL' 'FALLO LOCAL')}
+    'STALE' {return (L 'VALIDATION STALE' 'VALIDACION OBSOLETA')}
+    'NOT_DEPLOYED' {return (L 'NOT DEPLOYED' 'NO DESPLEGADO')}
+    default {return (L 'UNVALIDATED' 'SIN VALIDAR')}
+  }
+}
+
+function Update-PMMValidatedPatchRow($Entry,$Summary) {
+  if(-not$Entry -or -not$Entry.Patch -or -not$Summary){return}
+  $base='';try{$base=[string]$Entry.BaseStatus}catch{}
+  if([string]::IsNullOrWhiteSpace($base)){
+    $current=[string]$Entry.Status
+    $separator=$current.IndexOf(' | ',[StringComparison]::Ordinal)
+    $base=if($separator -ge 0){$current.Substring($separator+3)}else{$current}
+    $Entry|Add-Member -NotePropertyName BaseStatus -NotePropertyValue $base -Force
+  }
+  $Entry.Status=(Get-PMMBuildValidationLabel ([string]$Summary.Status))+' | '+$base
+  $Entry.Validated=([string]$Summary.Status -eq 'LOCAL_PASS')
+  try{$Script:LstPatches.Items.Refresh()}catch{}
+  Update-PMMPatchActionButtons
+}
+
+function Open-PMMValidationFeedbackForPatch($Patch) {
+  if(-not$Patch){return}
+  $Script:MainTabs.SelectedItem=$Script:TabAIHelp
+  $Script:AIHelpTabs.SelectedIndex=2
+  Refresh-PMMAIHelpFeedback -Force
+  [void](Select-PMMSelectorItemId $Script:CmbAIHelpFeedbackBuild 'Key' ([string]$Patch.Name))
+  $Script:CmbAIHelpFeedbackType.SelectedValue='MERGE_COMMENT'
+  $Script:TxtAIHelpFeedbackTitle.Text=((L 'Tested merge: {0}' 'Merge probado: {0}') -f [string]$Patch.Name)
+  $Script:TxtAIHelpFeedbackStatus.Text=L 'The exact validated merge is selected. Add any useful comments, then create the validation feedback or a general share file.' 'El merge exacto validado esta seleccionado. Anade comentarios utiles y crea el feedback de validacion o un archivo general para compartir.'
+  Update-PMMAIHelpFeedbackSelection
+  try{$Script:TxtAIHelpFeedbackComments.Focus()|Out-Null}catch{}
+}
+
 $Script:LstPatches.Add_SelectionChanged({
   try{
     Update-PMMPatchActionButtons
@@ -5199,7 +5334,8 @@ $Script:BtnValidatePatch.Add_Click({
     $result=Show-PMMBuildValidationDialog ([string]$summary.Status);if([string]::IsNullOrWhiteSpace($result) -or $result -eq 'CANCEL'){return}
     $record=New-PMMBuildValidationEvent -Patch $entry.Patch -Result $result
     $Script:TxtStatus.Text=((L 'Local validation recorded: {0}. buildId {1}' 'Validacion local registrada: {0}. buildId {1}') -f [string]$record.Summary.Status,[string]$record.Summary.BuildId)
-    Refresh-UI
+    Update-PMMValidatedPatchRow $entry $record.Summary
+    if($result -in @('PASS','PASS_RECONFIRMED') -and (Show-PMMValidationContributionDialog)){Open-PMMValidationFeedbackForPatch $entry.Patch}
   }catch{Handle-UIError $_ (L 'Validate merge' 'Validar merge')}
 })
 $Script:BtnDeletePatch.Add_Click({
@@ -5558,7 +5694,7 @@ $Script:BtnOpenSaveBackupFolder.Add_Click({try{$row=$Script:LstSaveBackups.Selec
 # AI & Help.
 # ---------------------------------------------------------------------------
 function Select-PMMAIIOUiSession([string]$SessionId) {
-  Refresh-PMMAIHelpUi
+  Refresh-PMMAIIOSessions
   if(-not[string]::IsNullOrWhiteSpace($SessionId)){
     [void](Select-PMMSelectorItemId $Script:LstAIIOSessions 'SessionId' $SessionId)
     [void](Set-PMMAIIOActiveSession $SessionId)
@@ -5618,16 +5754,29 @@ function Complete-PMMAIIOUseCandidateUi($Result,[string]$SessionId) {
   [void]$Window.Dispatcher.BeginInvoke([System.Windows.Threading.DispatcherPriority]::ContextIdle,{Start-PMMAIIOCandidateAnalyze})
 }
 
-$Script:BtnAIHelpRefresh.Add_Click({try{Refresh-PMMAIHelpUi -EnsureUnsupported;$Script:TxtAIHelpDiagnosticStatus.Text=L 'Diagnostics refreshed.' 'Diagnosticos actualizados.'}catch{Handle-UIError $_ (L 'Refresh AI & Help' 'Actualizar IA y ayuda')}})
-$Script:LstAIHelpDiagnostics.Add_SelectionChanged({try{Update-PMMAIHelpDiagnosticSelection}catch{}})
+$Script:BtnAIHelpRefresh.Add_Click({try{Refresh-PMMAIHelpDiagnostics;Refresh-PMMAIHelpBadge;$Script:TxtAIHelpDiagnosticStatus.Text=L 'Cases refreshed.' 'Casos actualizados.'}catch{Handle-UIError $_ (L 'Refresh AI assistance' 'Actualizar ayuda IA')}})
+$Script:LstAIHelpDiagnostics.Add_SelectionChanged({try{if(-not[bool]$Script:AIHelpUiRefreshing){$Script:AIHelpNewCaseMode=$false;Update-PMMAIHelpDiagnosticSelection}}catch{}})
+$Script:BtnAIHelpNewCase.Add_Click({try{Set-PMMAIHelpNewCaseMode $true -Clear;try{$Script:TxtAIHelpDiagnosticTitle.Focus()|Out-Null}catch{}}catch{Handle-UIError $_ (L 'Open new AI assistance case' 'Abrir nuevo caso de ayuda IA')}})
+$Script:BtnAIHelpCancelNewCase.Add_Click({try{Set-PMMAIHelpNewCaseMode $false}catch{}})
 $Script:BtnAIHelpRefreshKnowledge.Add_Click({try{$done={param($result) Refresh-PMMAIHelpKnowledge;Refresh-PMMAIHelpBadge};[void](Start-PMMBackgroundOperation -Operation AIIOArtifactRefresh -OnSuccess $done)}catch{Handle-UIError $_ (L 'Refresh Knowledge and storage' 'Actualizar Knowledge y almacenamiento')}})
-$Script:BtnAIHelpCreateCase.Add_Click({
+function New-PMMAIHelpCaseFromUi {
+  $option=$Script:CmbAIHelpDiagnosticType.SelectedItem
+  $type=if($option){[string]$option.Id}else{'UNKNOWN'}
+  $feature=if($option){[string]$option.Feature}else{'Other'}
+  $targets=@([pscustomobject]@{Kind='PMMFeature';Id=$feature;UserSuspects=$true;CauseConfirmed=$false})
+  $case=New-PMMDiagnosticCase -Type $type -Title ([string]$Script:TxtAIHelpDiagnosticTitle.Text) -UserDescription ([string]$Script:TxtAIHelpDiagnosticDescription.Text) -SelectedTargets $targets -AttentionEligible $false -IncludePalworldLogSummary:([bool]$Script:ChkAIHelpIncludePalLog.IsChecked)
+  Refresh-PMMAIHelpDiagnostics
+  [void](Select-PMMSelectorItemId $Script:LstAIHelpDiagnostics 'CaseId' ([string]$case.CaseId))
+  Set-PMMAIHelpNewCaseMode $false
+  $Script:TxtAIHelpDiagnosticStatus.Text=((L 'Diagnostic case created locally: {0}. It has not been uploaded.' 'Caso de diagnostico creado localmente: {0}. No se ha subido.') -f [string]$case.CaseId)
+  return $case
+}
+$Script:BtnAIHelpCreateCase.Add_Click({try{[void](New-PMMAIHelpCaseFromUi)}catch{Handle-UIError $_ (L 'Create diagnostic case' 'Crear caso de diagnostico')}})
+$Script:BtnAIHelpCreateAndPrepareCase.Add_Click({
   try{
-    $type=[string]$Script:CmbAIHelpDiagnosticType.SelectedValue;if(-not$type){$type='UNKNOWN'}
-    $case=New-PMMDiagnosticCase -Type $type -Title ([string]$Script:TxtAIHelpDiagnosticTitle.Text) -UserDescription ([string]$Script:TxtAIHelpDiagnosticDescription.Text) -IncludePalworldLogSummary:([bool]$Script:ChkAIHelpIncludePalLog.IsChecked)
-    Refresh-PMMAIHelpUi;[void](Select-PMMSelectorItemId $Script:LstAIHelpDiagnostics 'CaseId' ([string]$case.CaseId))
-    $Script:TxtAIHelpDiagnosticStatus.Text=((L 'Diagnostic case created locally: {0}. It has not been uploaded.' 'Caso de diagnostico creado localmente: {0}. No se ha subido.') -f [string]$case.CaseId)
-  }catch{Handle-UIError $_ (L 'Create diagnostic case' 'Crear caso de diagnostico')}
+    $case=New-PMMAIHelpCaseFromUi
+    if($case){$Script:BtnAIHelpPrepareDiagnostic.RaiseEvent([System.Windows.RoutedEventArgs]::new([System.Windows.Controls.Button]::ClickEvent))}
+  }catch{Handle-UIError $_ (L 'Create AI assistance ZIP' 'Crear ZIP de ayuda IA')}
 })
 $Script:BtnAIHelpPrepareDiagnostic.Add_Click({
   try{
@@ -5648,6 +5797,7 @@ $Script:BtnAIHelpPrepareDiagnostic.Add_Click({
 })
 $Script:LstAIIOSessions.Add_SelectionChanged({
   try{
+    if([bool]$Script:AIHelpUiRefreshing){return}
     $session=Get-PMMSelectedAIIOSession
     if($session){Refresh-PMMAIIOCandidates ([string]$session.SessionId);$Script:TxtAIIOStatus.Text=((L 'Session {0} - {1} - iteration {2}. Returned candidates remain staged until you explicitly review and act.' 'Sesion {0} - {1} - iteracion {2}. Los candidatos devueltos quedan en staging hasta que los revises y actues expresamente.') -f [string]$session.SessionId,[string]$session.Status,[int]$session.Iteration)}
   }catch{}
@@ -5683,10 +5833,27 @@ $Script:BtnAIIOPrepare.Add_Click({
 })
 $Script:BtnAIIOImportResponse.Add_Click({
   try{
-    $session=Get-PMMSelectedAIIOSession;if(-not$session){throw (L 'Select the session that owns the response.' 'Selecciona la sesion a la que pertenece la respuesta.')}
     $dialog=[Microsoft.Win32.OpenFileDialog]::new();$dialog.Title=L 'Import AI response ZIP' 'Importar ZIP de respuesta IA';$dialog.Filter='PMM AI response (*.zip)|*.zip'
     if($dialog.ShowDialog() -ne $true){return}
-    $sessionId=[string]$session.SessionId;$zipPath=[string]$dialog.FileName
+    $zipPath=[string]$dialog.FileName;$hint=Get-PMMAIIOResponsePackageHint $zipPath;$session=$null
+    if([string]$hint.Kind -eq 'ThemeResponse'){
+      $result=Import-PMMThemeAIResponse $zipPath
+      $Script:ActiveThemeDraft=$result.Draft;Refresh-PMMThemeEditorCatalog -Force;$Script:LstThemeDrafts.SelectedValue=[string]$result.Draft.DraftId;Show-PMMThemeDraft $result.Draft
+      $Script:AIHelpTabs.SelectedIndex=3
+      $Script:TxtThemeEditorStatus.Text=((L 'Standalone AI theme validated into draft {0}. It remains uninstalled until you review and explicitly install it.' 'Tema IA independiente validado como borrador {0}. Sigue sin instalar hasta que lo revises y lo instales expresamente.') -f [string]$result.Draft.Name)
+      return
+    }
+    if([string]$hint.SessionId){$session=Get-PMMAIIOSession ([string]$hint.SessionId)}
+    elseif([string]$hint.CaseId){
+      foreach($candidate in @(Get-PMMAIIOSessions|Where-Object{-not[bool]$_.Archived})){
+        $full=Get-PMMAIIOSession ([string]$candidate.SessionId)
+        if($full -and [string]$hint.CaseId -in @($full.CaseIds|ForEach-Object{[string]$_})){$session=$full;break}
+      }
+      if(-not$session){$session=Get-PMMSelectedAIIOSession}
+    }
+    if(-not$session){throw (L 'PMM could not match this package to a known AI exchange. Standard responses route themselves by their embedded session id; standalone cooked solutions still require their exact existing case.' 'PMM no pudo relacionar este paquete con un intercambio IA conocido. Las respuestas estandar se enrutan solas por su id de sesion; las soluciones cooked independientes aun necesitan su caso exacto existente.')}
+    $sessionId=[string]$session.SessionId
+    Select-PMMAIIOUiSession $sessionId
     $done={param($result) Complete-PMMAIIOImportResponseUi $result $sessionId}.GetNewClosure()
     [void](Start-PMMBackgroundOperation -Operation AIIOImportResponse -SessionId $sessionId -InputZip $zipPath -OnSuccess $done)
   }catch{Handle-UIError $_ (L 'Import AI response' 'Importar respuesta IA')}
@@ -5833,10 +6000,17 @@ $Script:BtnResetLayout.Add_Click({
 # lightweight metadata heartbeat below also covers changes made while PMM stays
 # focused (downloads/mod managers/background copies). It never hashes unless the
 # higher-level state logic finds evidence that a same-size deployed file changed.
-$Window.Add_Activated({try{Check-PMMExternalModChanges -Force}catch{}})
+$Window.Add_Activated({try{Check-PMMExternalModChanges}catch{}})
 $Script:ExternalModsTimer=[System.Windows.Threading.DispatcherTimer]::new([System.Windows.Threading.DispatcherPriority]::Background)
-$Script:ExternalModsTimer.Interval=[TimeSpan]::FromSeconds(10)
-$Script:ExternalModsTimer.Add_Tick({try{Check-PMMExternalModChanges}catch{}})
+$Script:ExternalModsTimer.Interval=[TimeSpan]::FromSeconds(60)
+$Script:ExternalModsTimer.Add_Tick({
+  try{
+    if(-not[bool]$Window.IsActive -or $Window.WindowState -eq [System.Windows.WindowState]::Minimized){return}
+    if(-not[string]::IsNullOrWhiteSpace((Get-PMMActiveProcessingOperation))){return}
+    Check-PMMExternalModChanges
+  }catch{}
+})
+try{$Script:GameModsFingerprint=Get-PMMGameModsFingerprint;$Script:LastExternalModsCheckUtc=[DateTime]::UtcNow}catch{}
 $Script:ExternalModsTimer.Start()
 
 $Window.Add_Closing({

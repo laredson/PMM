@@ -20,6 +20,37 @@ function Read-PMMAIIOZipJsonEntry($Archive,[string]$Name,[int64]$MaximumBytes=10
   try{return ($reader.ReadToEnd()|ConvertFrom-Json -ErrorAction Stop)}finally{$reader.Dispose()}
 }
 
+function Get-PMMAIIOResponsePackageHint([string]$ZipPath) {
+  # Lightweight routing only. The worker still performs the complete archive,
+  # identity, size, path, capability and candidate validation before staging.
+  if(-not(Test-Path -LiteralPath $ZipPath -PathType Leaf)){throw 'AI response ZIP was not found.'}
+  $item=Get-Item -LiteralPath $ZipPath
+  if($item.Extension -ine '.zip'){throw 'AI responses must be ZIP archives.'}
+  if([int64]$item.Length -gt 2147483648){throw 'AI response ZIP exceeds 2 GiB.'}
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $archive=[IO.Compression.ZipFile]::OpenRead($item.FullName)
+  try{
+    if($archive.Entries.Count -gt 5000){throw 'AI response contains more than 5,000 entries.'}
+    $entryNames=@($archive.Entries|ForEach-Object{([string]$_.FullName).Replace([char]92,[char]47)})
+    $roots=@($entryNames|Where-Object{$_ -in @('response.json','solution.json')})
+    if($roots.Count -ne 1){throw 'AI response ZIP must contain exactly one root response.json or solution.json.'}
+    if($roots[0] -ceq 'response.json'){
+      $response=Read-PMMAIIOZipJsonEntry $archive 'response.json' 2097152
+      if($response -and [string]$response.schema -eq 'PMM_THEME_AI_RESPONSE_V1'){
+        if(@($entryNames|Where-Object{$_ -ceq 'theme.json'}).Count -ne 1){throw 'Theme AI response requires exactly one root theme.json.'}
+        return [pscustomobject]@{Kind='ThemeResponse';SessionId='';CaseId=''}
+      }
+      if(-not$response -or [string]$response.schema -notin @('PMM_AI_RESPONSE_V2','PMM_AIIO_RESPONSE_V2')){throw 'Unsupported AI response schema.'}
+      $sessionId=[string]$response.sessionId
+      if(-not(Test-PMMAIIOSessionId $sessionId)){throw 'AI response contains an invalid session id.'}
+      return [pscustomobject]@{Kind='Response';SessionId=$sessionId;CaseId=''}
+    }
+    $solution=Read-PMMAIIOZipJsonEntry $archive 'solution.json' 2097152
+    if(-not$solution -or [string]$solution.schema -ne 'PMM_MANUAL_SOLUTION_V1'){throw 'Unsupported standalone AI solution schema.'}
+    return [pscustomobject]@{Kind='ManualSolution';SessionId='';CaseId=[string]$solution.caseId}
+  }finally{$archive.Dispose()}
+}
+
 function Test-PMMAIIOResponseArchiveEnvelope([string]$ZipPath) {
   if(-not(Test-Path -LiteralPath $ZipPath -PathType Leaf)){throw 'AI response ZIP was not found.'}
   $item=Get-Item -LiteralPath $ZipPath

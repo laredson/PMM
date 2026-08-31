@@ -1,12 +1,12 @@
 # AI & Help, AIIO and Knowledge
 
-PMM 1.3 RC29 includes the local-first **AI & Help** workspace. It is a durable task and evidence system, not a built-in cloud account. PMM does not connect to an AI provider, upload files, request credentials or run returned code.
+PMM 1.3 RC30 includes the local-first **AI & Help** workspace. It is a durable task and evidence system, not a built-in cloud account. PMM does not connect to an AI provider, upload files, request credentials or run returned code.
 
 ## Persistent sessions
 
 An AIIO v2 session keeps its description, selected targets, exact Unsupported case IDs, requests, responses, staged candidates and history below `Workspace\AIIO\Sessions`. Sessions survive restarts and may be archived explicitly. Re-analysis reuses an Unsupported session only when the exact case set, source signature and merge-order signature still match.
 
-The Help page can create bounded diagnostic cases for PMM errors, crashes, mods that do not work, build/deploy failures, save problems and performance issues. A selected mod or build is recorded as a suspicion, never as a proven cause. Save activity, the recoverable operation journal, deployment metadata, Knowledge matches and bounded log summaries provide local context.
+**AI assistance** can create bounded diagnostic cases for PMM errors, crashes, feature failures, mods that do not work, build/deploy failures, save problems and performance issues. Selecting an existing case shows that case instead of silently presenting a second creation form. A selected mod or build is recorded as a suspicion, never as a proven cause. Save activity, the recoverable operation journal, deployment metadata, Knowledge matches and bounded log summaries provide local context.
 
 ## Manual ZIP exchange
 
@@ -20,7 +20,7 @@ The Help page can create bounded diagnostic cases for PMM errors, crashes, mods 
 
 Whole source PAKs, save contents, credentials and arbitrary local paths are not included. If an AI needs more data, its `PMM_AI_RESPONSE_V2` can request only enabled, allowlisted capabilities. A provider-source request must name the exact provider from the current Unsupported case; a Vanilla request is accepted only when that case has a Vanilla source. **Prepare requested data** creates the next bounded ZIP; it does not grant a general filesystem or command capability.
 
-Session preparation, requested-data preparation, response import and candidate activation/validation execute through the supervised background operation worker so archive, extraction and hashing work do not block navigation in WPF.
+Session preparation, requested-data preparation, response import and candidate activation/validation execute through the supervised background operation worker so archive, extraction and hashing work do not block navigation in WPF. **AI reception** owns returned ZIP import and staged candidates; a recognized self-describing theme response may be received without first creating a visible diagnostic case, but it opens only as an uninstalled draft.
 
 ## Returned content is untrusted
 
@@ -34,8 +34,8 @@ The older one-shot **CREATE AI HANDOFF** flow remains available for compatibilit
 
 Bundled and local CKL Knowledge can explain or prove narrowly defined compatibility behavior. It cannot silently promote an AI answer. Validation belongs to a complete deterministic SHA-256 build ID and is stored as immutable local events: `UNVALIDATED`, `LOCAL_PASS`, `LOCAL_PARTIAL`, `LOCAL_FAIL` or `NOT_DEPLOYED`.
 
-The Feedback view can export an exact validation event or create `PMM_USER_FEEDBACK_V1` for an exact merge, Knowledge/CKL or a general comment. These are inspectable local JSON files intended for manual sharing. RC29 has no feedback endpoint; `PMM_FEEDBACK_TRANSPORT_V1` is declared only as a disabled future adapter boundary and nothing is uploaded.
+The Feedback & Knowledge view can export an exact validation event or create `PMM_USER_FEEDBACK_V1` for an exact merge, Knowledge/CKL or a general comment. These are inspectable local JSON files intended for manual sharing. RC30 has no feedback endpoint; `PMM_FEEDBACK_TRANSPORT_V1` is declared only as a disabled future adapter boundary and nothing is uploaded.
 
 Gameplay semantics still require an in-game test. Publishing a branch, contribution or solution, applying a Fix, restoring state and deploying are always separate explicit actions.
 
-See `MANUAL_SOLUTION_CONTRACT.md`, `COMMUNITY_KNOWLEDGE_WORKFLOW.md` and `RC29_AIHELP_FEEDBACK_UI_FIX.md`.
+See `MANUAL_SOLUTION_CONTRACT.md`, `COMMUNITY_KNOWLEDGE_WORKFLOW.md` and `RC30_RELEASE_CANDIDATE.md`.

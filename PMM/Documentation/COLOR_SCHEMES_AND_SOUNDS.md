@@ -1,6 +1,6 @@
 # Color schemes and sound events
 
-PMM 1.3 RC29 gives color schemes the same ownership model as sounds:
+PMM 1.3 RC30 gives color schemes the same ownership model as sounds:
 
 - **Official PMM schemes** are release resources. Eleven hash-pinned JSON schemes plus legacy Night and Light are always shown in the official area. PMM Crystal is the fresh-install and Restore-defaults choice.
 - **Added user schemes** live only in `Workspace\Themes`, appear in a separate bordered collection, and use **Add scheme** / **Open schemes folder** controls. They cannot replace or shadow official IDs.

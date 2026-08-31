@@ -1,0 +1,47 @@
+PMM 1.3.0 RC30 WINDOWS ACCEPTANCE
+Build: PMM-v1.3.0-RC30-LEAN-AI-VALIDATION-FLOW
+
+Use a fresh RC30 folder. Close PMM, then copy the complete Workspace from the submitted RC29 only for migration testing. Never overwrite the RC29 source folder.
+
+1. IDLE CPU AND RESPONSIVENESS
+- Start PMM, wait until startup work ends, leave it untouched and active for five minutes.
+- In Task Manager compare PMM.exe, PMMRuntime.exe and powershell.exe individually. Sustained PMM idle CPU should settle near zero; a brief metadata check may occur about once per minute.
+- Minimize PMM for two minutes. No external-mod heartbeat should run while minimized.
+- Open each main/AI subtab and resize the window. No tab click or child selector should trigger Analyze, full library hashing or a multi-second UI freeze.
+
+2. FEEDBACK MERGE SELECTOR
+- Start with one saved/deployed merge, delete it, run AUTO to create/deploy a replacement, then immediately open AI & Help > Feedback & Knowledge.
+- Open Optional exact merge context and choose the new merge repeatedly. The popup must stay open until you choose; it must not reset to No merge.
+- Leave the dropdown open for more than 60 seconds. Its contents and selection must remain stable.
+
+3. VALIDATE TWICE
+- Select the deployed merge and press Validate merge. Confirm all first-time buttons are large, fully readable and not clipped at the active DPI.
+- Choose Yes, it works. Confirm a second large prompt asks whether to contribute tested Knowledge.
+- Choose Yes. PMM must open Feedback & Knowledge with the exact merge selected and a prepared merge-validation title/comment surface. The main AI & Help tab must not gain a badge merely because of validation.
+- Press Validate merge again. The repeat-validation question and all three buttons must also be fully readable. Confirm No, it still works works without a global UI freeze.
+
+4. AI ASSISTANCE
+- Select an existing case. Its title, feature/status/session and description must appear on the right; the new-case form must not replace it.
+- Press New case, select at least three different PMM features and confirm the selection remains stable.
+- Create one case with Save locally and one with Create AI ZIP. The latter must create/reuse exactly one exchange and open AI reception without duplicate cases/sessions.
+- Ordinary user-created cases must not raise the main badge. Create/reproduce a real automatic PMM error or current Unsupported case and confirm that it does.
+
+5. AI RECEPTION
+- Import the response ZIP for the exact request/session. PMM must route it by embedded sessionId even if another exchange is selected.
+- Confirm returned candidates remain staged and inactive until explicit inspection/acceptance.
+- Import a valid standalone PMM_THEME_AI_RESPONSE_V1 ZIP. It must open in Color scheme editor as an uninstalled draft.
+- Try an unknown schema, executable/nested archive, unsafe path and wrong case identity. Each must be rejected without modifying installed themes, Merge or game files.
+
+6. SETTINGS AND THEMES
+- Confirm Vanilla Game Reference is present in normal Settings and still works from Fix Lab/AUTO.
+- Clone PMM Crystal and press Save draft without changing any color. It must pass contrast validation.
+- Change one color to an invalid low-contrast value. It must still be rejected. Restore it and save successfully.
+- Switch dark schemes while a merge row is selected; selected-row text must repaint immediately.
+
+7. PRESERVED REGRESSIONS
+- Confirm Deploy ends with Start Palworld highlighted only; there must be no “Action required: press play” prompt.
+- Disable a non-conflicting mod, Analyze and confirm effective patch reuse without Build.
+- Apply/Restore a Fix Lab result and confirm the deployed merge PAK/manifest remain byte-identical.
+- Repeat Gura variant preflight, Semiauto sound, Saves backup and normal Analyze/Build/Deploy checks from RC29.
+
+Do not publish RC30 as final until this Windows/WPF/Palworld checklist passes. Static checks cannot certify real idle CPU, DPI, audio, Windows PowerShell 5.1, external tools or in-game semantics.

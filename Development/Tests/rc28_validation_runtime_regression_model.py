@@ -13,8 +13,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "PMM"
-EXPECTED_BUILD = "PMM-v1.3.0-RC29-AIHELP-FEEDBACK-UI-FIX"
-EXPECTED_CANDIDATE = "rc29-aihelp-feedback-ui-fix"
+EXPECTED_BUILD = "PMM-v1.3.0-RC30-LEAN-AI-VALIDATION-FLOW"
+EXPECTED_CANDIDATE = "rc30-lean-ai-validation-flow"
 
 
 def read(relative: str) -> str:
