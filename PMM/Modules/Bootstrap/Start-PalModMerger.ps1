@@ -155,7 +155,7 @@ $controlNames = @(
   'LstFixLabRelated','BtnFixLabAddRelated','BtnFixLabRemoveRelated','TxtFixLabGameReference','BtnFixLabBuildReference','BtnFixLabOpenReference','BtnFixLabAnalyze','TxtFixLabAnalysis','DgFixLabPakInventory','CmbFixLabRecipe','CmbFixLabVariant','TxtFixLabVariantDescription','BtnFixLabCreateHandoff','TxtFixLabBuildState','BtnFixLabBuild','BtnFixLabRebuild','TxtFixLabResult','BtnFixLabOpenOutput','BtnFixLabAddOutputToLibrary',
   'BtnFixLabDiscover','BtnFixLabRefreshDashboard','LstFixLabCandidates','TxtFixLabCandidate','BtnFixLabIgnoreSource','BtnFixLabDeleteSource','LstFixLabBackups','BtnFixLabRevertBackup','BtnFixLabOpenBackupFolder','LstFixLabBuiltFixes','BtnFixLabApplyBuilt','BtnFixLabRepair','TxtFixLabRepairState','TxtFixLabRepairProgress','PrgFixLabRepair','TxtFixLabGameReferenceProgress','PrgFixLabGameReference','BrdFixLabBadge','TxtFixLabBadge','BrdFixLabNotice','TxtFixLabNotice','BtnFixLabDismissNotice','TxtFixLabCandidateCount','TxtFixLabBackupCount','TxtFixLabBuiltCount','TxtFixLabIgnoredCount','BtnFixLabClearIgnored','TxtFixLabLegacySource','TxtFixLabModules','TxtFixLabOutputSize','ExpFixLabSource','ExpFixLabConfigure','ExpFixLabBuild','ExpFixLabOutputs','ExpFixLabBackups','ExpFixLabAdvanced',
   'TabAIHelp','BrdAIHelpBadge','TxtAIHelpBadge','AIHelpTabs','LstAIHelpDiagnostics','BtnAIHelpRefresh','BtnAIHelpNewCase','BtnAIHelpNewModProject','BtnAIHelpPrepareDiagnostic','PnlAIHelpSelectedCase','PnlAIHelpNewCase','TxtAIHelpSelectedCaseTitle','TxtAIHelpSelectedCaseMeta','TxtAIHelpSelectedCaseDescription','CmbAIHelpDiagnosticType','TxtAIHelpDiagnosticTitle','TxtAIHelpDiagnosticDescription','ChkAIHelpIncludePalLog','BtnAIHelpCreateCase','BtnAIHelpCreateAndPrepareCase','BtnAIHelpCancelNewCase','TxtAIHelpDiagnosticStatus',
-  'LstAIIOSessions','LstAIIOCandidates','TxtAIIOCandidateStatus','BtnAIIOOpenWorkspace','BtnAIIOArchive','BtnAIIOOpenCandidate','BtnAIIOUseCandidate','CmbAIIOType','TxtAIIOTitle','TxtAIIODescription','CmbAIOTargetKind','TxtAIOTargetId','BtnAIIONewSession','BtnAIIOPrepare','BtnAIIOImportResponse','BtnAIIOContinue','TxtAIIOStatus',
+  'LstAIIOSessions','LstAIIOCandidates','TxtAIIOCandidateStatus','BtnAIIOOpenWorkspace','BtnAIIOOpenHandoff','BtnAIIOArchive','BtnAIIOOpenCandidate','BtnAIIOUseCandidate','CmbAIIOType','TxtAIIOTitle','TxtAIIODescription','CmbAIOTargetKind','TxtAIOTargetId','BtnAIIONewSession','BtnAIIOPrepare','BtnAIIOImportResponse','BtnAIIOContinue','TxtAIIOStatus',
   'CmbAIHelpFeedbackType','TxtAIHelpFeedbackTitle','TxtAIHelpFeedbackComments','CmbAIHelpFeedbackBuild','BtnAIHelpCreateFeedback','BtnAIHelpGenerateFeedback','BtnAIHelpOpenFeedback','BtnAIHelpUploadFeedback','TxtAIHelpFeedbackStatus',
   'TxtAIHelpKnowledgeSummary','BtnAIHelpOpenKnowledge','TxtAIHelpStorageSummary','LstAIHelpInterrupted','BtnAIHelpRefreshKnowledge','BtnAIHelpCleanup','ChkAIIOAutoCreateErrorCases','TxtAIIOSettingsStatus',
   'CmbThemeEditorSource','BtnThemeEditorNew','LstThemeDrafts','BtnThemeEditorLoad','BtnThemeEditorDelete','TxtThemeEditorName','TxtThemeEditorId','CmbThemeEditorBase','BrdThemeEditorPreview','PnlThemeEditorRows','TxtThemeEditorPrompt','BtnThemeEditorSave','BtnThemeEditorPreview','BtnThemeEditorRevert','BtnThemeEditorInstall','BtnThemeEditorExport','BtnThemeEditorCreateAI','BtnThemeEditorImportAI','TxtThemeEditorStatus',
@@ -205,7 +205,7 @@ try {
 $Script:ThemeOptionButtons=[System.Collections.Generic.List[object]]::new()
 $Script:CustomSoundOptionButtons=[System.Collections.Generic.List[object]]::new()
 $Script:PendingSoundSelections=@{}
-$Script:ActiveThemeId='pmm-crystal'
+$Script:ActiveThemeId=''
 $Script:ActiveThemeColorFlow=$null
 $Script:ActiveThemeDefinition=$null
 $Script:ThemeFallbackNotice=''
@@ -546,7 +546,9 @@ function Apply-PMMTheme([string]$Theme='',[switch]$Force) {
   }
   if($definition.Count -eq 0){$definition=@($definitions|Where-Object{[string]$_.Id -eq 'Night'}|Select-Object -First 1);$Script:ThemeFallbackNotice=L 'PMM Crystal is unavailable; the emergency Night palette is active.' 'PMM Crystal no esta disponible; esta activa la paleta de emergencia Noche.'}
   $resolvedId=[string]$definition[0].Id
-  if(-not$Force -and -not[bool]$Script:ThemePreviewActive -and -not[string]::IsNullOrWhiteSpace([string]$Script:ActiveThemeId) -and [string]$Script:ActiveThemeId -ieq $resolvedId){return}
+  # An id alone is not proof that its brushes were installed. At startup the
+  # selected id is known before any theme definition has been applied.
+  if(-not$Force -and -not[bool]$Script:ThemePreviewActive -and $Script:ActiveThemeDefinition -and -not[string]::IsNullOrWhiteSpace([string]$Script:ActiveThemeId) -and [string]$Script:ActiveThemeId -ieq $resolvedId){return}
   Apply-PMMThemeDefinition $definition[0]
 }
 
@@ -771,6 +773,15 @@ function Refresh-PMMAIIOCandidates([string]$SessionId) {
   Update-PMMAIIOCandidateSelection
 }
 
+function Update-PMMAIIOHandoffButton {
+  if(-not$Script:BtnAIIOOpenHandoff){return}
+  $path='';$session=Get-PMMSelectedAIIOSession
+  if($session){try{$path=[string](Get-PMMAIIOLatestHandoffPath ([string]$session.SessionId))}catch{$path=''}}
+  $Script:BtnAIIOOpenHandoff.Tag=$path
+  $Script:BtnAIIOOpenHandoff.IsEnabled=(-not[bool]$Script:AIIOBusy -and -not[string]::IsNullOrWhiteSpace($path))
+  $Script:BtnAIIOOpenHandoff.ToolTip=if($path){(L 'Show the latest request ZIP for this exchange in Explorer.' 'Mostrar en el Explorador el ultimo ZIP de peticion de este intercambio.')}else{(L 'This exchange does not have a handoff ZIP yet.' 'Este intercambio aun no tiene un ZIP handoff.')}
+}
+
 function Update-PMMAIIOCandidateSelection {
   $row=$Script:LstAIIOCandidates.SelectedItem
   if(-not$row){$Script:BtnAIIOOpenCandidate.IsEnabled=$false;$Script:BtnAIIOUseCandidate.IsEnabled=$false;$Script:BtnAIIOUseCandidate.Content=L 'Use candidate in Merge...' 'Usar candidato en Merge...';$Script:TxtAIIOCandidateStatus.Text=L 'No staged candidate is selected.' 'No hay ningun candidato en staging seleccionado.';return}
@@ -827,6 +838,7 @@ function Refresh-PMMAIIOSessions {
   $pending=0;if($hasSession -and -not$busy){try{$pending=@(Get-PMMAIIOPendingRequests $activeSessionId).Count}catch{$pending=0}}
   $Script:BtnAIIOContinue.IsEnabled=(-not$busy -and $hasSession -and $pending -gt 0)
   if($busy){$Script:BtnAIIOUseCandidate.IsEnabled=$false}
+  Update-PMMAIIOHandoffButton
 }
 
 function Refresh-PMMAIHelpUi([switch]$EnsureUnsupported,[switch]$All) {
@@ -3219,7 +3231,7 @@ function Set-PMMAIIOBusy([bool]$Busy) {
   if($Busy){
     Reset-PMMGuidedActionStyles
     $Script:BtnOpenAIHandoff.IsEnabled=$false
-    foreach($button in @($Script:BtnAIIONewSession,$Script:BtnAIIOPrepare,$Script:BtnAIIOImportResponse,$Script:BtnAIIOContinue,$Script:BtnAIIOArchive,$Script:BtnAIIOUseCandidate,$Script:BtnAIHelpCleanup)){$button.IsEnabled=$false}
+    foreach($button in @($Script:BtnAIIONewSession,$Script:BtnAIIOPrepare,$Script:BtnAIIOImportResponse,$Script:BtnAIIOContinue,$Script:BtnAIIOOpenHandoff,$Script:BtnAIIOArchive,$Script:BtnAIIOUseCandidate,$Script:BtnAIHelpCleanup)){$button.IsEnabled=$false}
     $Script:BtnScan.IsEnabled=$false
     $Script:BtnImport.IsEnabled=$false
     $Script:BtnImportGameMods.IsEnabled=$false
@@ -4742,6 +4754,15 @@ function Save-UiSettings {
   Save-PMMLayoutSettings
 }
 
+function Save-PMMAutoPreferences {
+  # AUTO controls commit immediately. Keep them isolated from Settings values
+  # that deliberately remain a draft until the user presses Apply changes.
+  $cfg=Get-PMMConfig
+  $cfg.AutoMode=[bool]$Script:TglAutoMode.IsChecked
+  $cfg.AutoIncludePlay=[bool]$Script:ChkAutoPlay.IsChecked
+  Save-PMMConfig $cfg
+}
+
 function Save-PMMAIHelpSettings {
   # AI & Help settings commit independently.  Toggling one must not silently
   # save a theme or sound selection that is still awaiting Apply changes.
@@ -4803,12 +4824,12 @@ $Script:BtnPlay.Add_Click({try{Start-Palworld}catch{Handle-UIError $_ (L 'Start 
 
 $Script:TglAutoMode.Add_Click({
   try{
-    $enabled=[bool]$Script:TglAutoMode.IsChecked;Save-UiSettings
+    $enabled=[bool]$Script:TglAutoMode.IsChecked;Save-PMMAutoPreferences
     if(-not$enabled){Stop-PMMAutoPipeline (L 'Auto ON is disabled. Manual actions perform one workflow step per click.' 'Auto ON esta desactivado. Las acciones manuales hacen un paso del flujo por clic.')}
     else{$Script:TxtStatus.Text=L 'Auto ON armed. The next workflow action you start manually will continue through the remaining safe steps.' 'Auto ON preparado. La siguiente accion del flujo que inicies manualmente continuara por los pasos seguros restantes.';Update-PMMCancelButtonState}
   }catch{Handle-UIError $_ (L 'Automatic mode' 'Modo automatico')}
 })
-$Script:ChkAutoPlay.Add_Click({try{Save-UiSettings;Update-PMMGuidedActionState}catch{}})
+$Script:ChkAutoPlay.Add_Click({try{Save-PMMAutoPreferences;Update-PMMGuidedActionState}catch{}})
 $Script:BtnAutoRun.Add_Click({
   try{
     Start-PMMAutoPipeline -OneShot
@@ -5594,7 +5615,6 @@ $Script:BtnOpenReview.Add_Click({
 
 $Script:BtnBuild.Add_Click({
   try {
-    Save-UiSettings
     Save-DecisionGridToPlan
     $plan=Read-PMMMergePlan
 
@@ -5631,7 +5651,6 @@ $Script:BtnDeploy.Add_Click({
   Reset-PMMOperationCancellation
   if([bool]$Script:TglAutoMode.IsChecked){Start-PMMAutoPipeline}
   try{
-    Save-UiSettings
     Save-DecisionGridToPlan
     $preview=Get-PMMDeploymentPreview
     Write-PMMLog ('Deploy preflight: '+($preview -replace "(`r`n|`n|`r)",' | '))
@@ -5775,33 +5794,115 @@ function Complete-PMMAIIOModBuildUi($Result,[string]$SessionId) {
 }
 
 function Show-PMMModCreationProjectDialog {
-  $form=[System.Windows.Forms.Form]::new();$form.Text=L 'New standalone mod project' 'Nuevo proyecto independiente de mod';$form.ClientSize=[System.Drawing.Size]::new(760,560);$form.StartPosition='CenterParent';$form.FormBorderStyle=[System.Windows.Forms.FormBorderStyle]::FixedDialog;$form.MaximizeBox=$false;$form.MinimizeBox=$false;$form.AutoScaleMode=[System.Windows.Forms.AutoScaleMode]::Dpi;$form.AutoScroll=$true;$form.Font=[System.Drawing.Font]::new('Segoe UI',10.5)
-  $heading=[System.Windows.Forms.Label]::new();$heading.Left=24;$heading.Top=20;$heading.Width=710;$heading.Height=35;$heading.Font=[System.Drawing.Font]::new('Segoe UI Semibold',15);$heading.Text=L 'Describe the mod you want to create' 'Describe el mod que quieres crear'
-  $intro=[System.Windows.Forms.Label]::new();$intro.Left=24;$intro.Top=58;$intro.Width=710;$intro.Height=58;$intro.Text=L 'PMM creates a local AIIO exchange. An external AI may query your indexed Vanilla GameReference and ask PMM for exact, bounded asset families. Returned files stay inactive until you inspect and explicitly build them.' 'PMM crea un intercambio AIIO local. Una IA externa puede consultar tu GameReference Vanilla indexada y pedir a PMM familias exactas y acotadas. Los archivos devueltos quedan inactivos hasta que los inspecciones y los crees expresamente.'
-  $titleLabel=[System.Windows.Forms.Label]::new();$titleLabel.Left=24;$titleLabel.Top=128;$titleLabel.Width=180;$titleLabel.Text=L 'Project title' 'Titulo del proyecto'
-  $title=[System.Windows.Forms.TextBox]::new();$title.Left=24;$title.Top=154;$title.Width=710;$title.Height=28
-  $ideaLabel=[System.Windows.Forms.Label]::new();$ideaLabel.Left=24;$ideaLabel.Top=198;$ideaLabel.Width=300;$ideaLabel.Text=L 'What should the mod do?' 'Que debe hacer el mod?'
-  $idea=[System.Windows.Forms.TextBox]::new();$idea.Left=24;$idea.Top=224;$idea.Width=710;$idea.Height=170;$idea.Multiline=$true;$idea.ScrollBars=[System.Windows.Forms.ScrollBars]::Vertical;$idea.AcceptsReturn=$true
-  $targetLabel=[System.Windows.Forms.Label]::new();$targetLabel.Left=24;$targetLabel.Top=410;$targetLabel.Width=710;$targetLabel.Text=L 'Optional exact asset or search hint (for example: BP_PlayerBase)' 'Asset exacto o pista de busqueda opcional (por ejemplo: BP_PlayerBase)'
-  $target=[System.Windows.Forms.TextBox]::new();$target.Left=24;$target.Top=436;$target.Width=710;$target.Height=28
-  $reference=[System.Windows.Forms.Label]::new();$reference.Left=24;$reference.Top=474;$reference.Width=285;$reference.Height=48
+  # This dialog belongs to the WPF application. Dynamic layout is required:
+  # Windows text scaling may grow typography independently from physical DPI.
+  # Fixed WinForms coordinates made labels overlap and pushed actions offscreen.
+  $dialogMarkup=@'
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Width="780" MinWidth="620" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResizeWithGrip"
+        ShowInTaskbar="False" FontFamily="Segoe UI" FontSize="14"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <Grid Margin="24">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+      <TextBlock x:Name="TxtModProjectHeading" Grid.Row="0" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap"/>
+      <TextBlock x:Name="TxtModProjectIntro" Grid.Row="1" Margin="0,6,0,18" TextWrapping="Wrap" Foreground="{DynamicResource MutedText}"/>
+      <TextBlock x:Name="LblModProjectTitle" Grid.Row="2" FontWeight="SemiBold" Margin="0,0,0,5"/>
+      <TextBox x:Name="TxtModProjectTitle" Grid.Row="3" MinHeight="34" VerticalContentAlignment="Center"/>
+      <TextBlock x:Name="LblModProjectIdea" Grid.Row="4" FontWeight="SemiBold" Margin="0,15,0,5"/>
+      <TextBox x:Name="TxtModProjectIdea" Grid.Row="5" MinHeight="170" MaxHeight="280"
+               AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+      <TextBlock x:Name="LblModProjectTarget" Grid.Row="6" FontWeight="SemiBold" Margin="0,15,0,5" TextWrapping="Wrap"/>
+      <TextBox x:Name="TxtModProjectTarget" Grid.Row="7" MinHeight="34" VerticalContentAlignment="Center"/>
+      <Border Grid.Row="8" Margin="0,15,0,0" Padding="10,8" CornerRadius="6"
+              Background="{DynamicResource CardAltBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1">
+        <TextBlock x:Name="TxtModProjectReference" TextWrapping="Wrap" Foreground="{DynamicResource MutedText}"/>
+      </Border>
+      <TextBlock x:Name="TxtModProjectValidation" Grid.Row="9" Margin="0,9,0,0" TextWrapping="Wrap"
+                 Foreground="#B91C1C" FontWeight="SemiBold" Visibility="Collapsed"/>
+      <Grid Grid.Row="10" Margin="0,18,0,0">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+          <Button x:Name="BtnModProjectCancel" MinWidth="110" IsCancel="True"/>
+          <Button x:Name="BtnModProjectSave" MinWidth="135"/>
+          <Button x:Name="BtnModProjectPrepare" MinWidth="145" IsDefault="True" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Grid>
+    </Grid>
+  </ScrollViewer>
+</Window>
+'@
+  [xml]$dialogXaml=$dialogMarkup
+  $dialogReader=[System.Xml.XmlNodeReader]::new($dialogXaml)
+  try{$form=[Windows.Markup.XamlReader]::Load($dialogReader)}finally{$dialogReader.Dispose()}
+
+  # Window-local PMM resources keep the modal legible in every installed theme.
+  foreach($key in @($Window.Resources.Keys)){try{$form.Resources[$key]=$Window.Resources[$key]}catch{}}
+  try{$form.Background=$form.Resources['CardBackground'];$form.Foreground=$form.Resources['PrimaryText']}catch{}
+  try{$form.Owner=$Window}catch{}
+  try{$form.Icon=$Window.Icon}catch{}
+  $work=[System.Windows.SystemParameters]::WorkArea
+  $form.MaxWidth=[Math]::Max(520.0,[double]$work.Width-48.0)
+  $form.MaxHeight=[Math]::Max(480.0,[double]$work.Height-48.0)
+  $form.MinWidth=[Math]::Min(620.0,[double]$form.MaxWidth)
+  $form.Width=[Math]::Min(780.0,[double]$form.MaxWidth)
+  $form.Title=L 'New standalone mod project' 'Nuevo proyecto independiente de mod'
+
+  $heading=$form.FindName('TxtModProjectHeading');$heading.Text=L 'Describe the mod you want to create' 'Describe el mod que quieres crear'
+  $intro=$form.FindName('TxtModProjectIntro');$intro.Text=L 'PMM creates a local AIIO exchange. An external AI may query your indexed Vanilla GameReference and ask PMM for exact, bounded asset families. Returned files stay inactive until you inspect and explicitly build them.' 'PMM crea un intercambio AIIO local. Una IA externa puede consultar tu GameReference Vanilla indexada y pedir a PMM familias exactas y acotadas. Los archivos devueltos quedan inactivos hasta que los inspecciones y los crees expresamente.'
+  $titleLabel=$form.FindName('LblModProjectTitle');$titleLabel.Text=L 'Project title' 'Titulo del proyecto'
+  $title=$form.FindName('TxtModProjectTitle')
+  $ideaLabel=$form.FindName('LblModProjectIdea');$ideaLabel.Text=L 'What should the mod do?' 'Que debe hacer el mod?'
+  $idea=$form.FindName('TxtModProjectIdea')
+  $targetLabel=$form.FindName('LblModProjectTarget');$targetLabel.Text=L 'Optional exact asset or search hint (for example: BP_PlayerBase)' 'Asset exacto o pista de busqueda opcional (por ejemplo: BP_PlayerBase)'
+  $target=$form.FindName('TxtModProjectTarget')
+  $reference=$form.FindName('TxtModProjectReference')
   try{$proof=Get-PMMAIIOGameReferenceProof;$reference.Text=((L 'Vanilla GameReference: {0} ({1} indexed families)' 'GameReference Vanilla: {0} ({1} familias indexadas)') -f [string]$proof.Status,[int]$proof.FamilyCount)}catch{$reference.Text=L 'Vanilla GameReference status could not be read.' 'No se pudo leer el estado de la GameReference Vanilla.'}
-  $save=[System.Windows.Forms.Button]::new();$save.Text=L 'Save project' 'Guardar proyecto';$save.Left=458;$save.Top=492;$save.Width=128;$save.Height=42;$save.DialogResult=[System.Windows.Forms.DialogResult]::Retry
-  $prepare=[System.Windows.Forms.Button]::new();$prepare.Text=L 'Create AI ZIP' 'Crear ZIP IA';$prepare.Left=594;$prepare.Top=492;$prepare.Width=140;$prepare.Height=42;$prepare.DialogResult=[System.Windows.Forms.DialogResult]::OK
-  $cancel=[System.Windows.Forms.Button]::new();$cancel.Text=L 'Cancel' 'Cancelar';$cancel.Left=322;$cancel.Top=492;$cancel.Width=128;$cancel.Height=42;$cancel.DialogResult=[System.Windows.Forms.DialogResult]::Cancel
-  foreach($control in @($heading,$intro,$titleLabel,$title,$ideaLabel,$idea,$targetLabel,$target,$reference,$cancel,$save,$prepare)){[void]$form.Controls.Add($control)}
-  $form.AcceptButton=$prepare;$form.CancelButton=$cancel
-  $form.Add_Shown({
-    $work=[System.Windows.Forms.Screen]::FromControl($form).WorkingArea
-    $form.Width=[Math]::Min($form.Width,[Math]::Max(420,$work.Width-32))
-    $form.Height=[Math]::Min($form.Height,[Math]::Max(420,$work.Height-32))
-  })
+  $validation=$form.FindName('TxtModProjectValidation')
+  $cancel=$form.FindName('BtnModProjectCancel');$cancel.Content=L 'Cancel' 'Cancelar'
+  $save=$form.FindName('BtnModProjectSave');$save.Content=L 'Save project' 'Guardar proyecto'
+  $prepare=$form.FindName('BtnModProjectPrepare');$prepare.Content=L 'Create AI ZIP' 'Crear ZIP IA'
+  try{
+    [System.Windows.Automation.AutomationProperties]::SetName($title,[string]$titleLabel.Text)
+    [System.Windows.Automation.AutomationProperties]::SetName($idea,[string]$ideaLabel.Text)
+    [System.Windows.Automation.AutomationProperties]::SetName($target,[string]$targetLabel.Text)
+  }catch{}
+
+  $complete={
+    param([bool]$Prepare)
+    $projectTitle=([string]$title.Text).Trim();$description=([string]$idea.Text).Trim();$hint=([string]$target.Text).Trim()
+    if([string]::IsNullOrWhiteSpace($projectTitle)){
+      $validation.Text=L 'Enter a project title.' 'Introduce un titulo de proyecto.'
+      $validation.Visibility=[System.Windows.Visibility]::Visible
+      [void]$title.Focus();return
+    }
+    if([string]::IsNullOrWhiteSpace($description)){
+      $validation.Text=L 'Describe what the mod should do.' 'Describe que debe hacer el mod.'
+      $validation.Visibility=[System.Windows.Visibility]::Visible
+      [void]$idea.Focus();return
+    }
+    $form.Tag=[pscustomobject]@{Title=$projectTitle;Description=$description;TargetHint=$hint;Prepare=$Prepare}
+    $form.DialogResult=$true
+  }.GetNewClosure()
+  $saveHandler={& $complete $false}.GetNewClosure()
+  $prepareHandler={& $complete $true}.GetNewClosure()
+  $focusHandler={[void]$title.Focus()}.GetNewClosure()
+  $save.Add_Click($saveHandler)
+  $prepare.Add_Click($prepareHandler)
+  $form.Add_ContentRendered($focusHandler)
+
   $result=$form.ShowDialog()
-  if($result -notin @([System.Windows.Forms.DialogResult]::OK,[System.Windows.Forms.DialogResult]::Retry)){return $null}
-  $projectTitle=([string]$title.Text).Trim();$description=([string]$idea.Text).Trim();$hint=([string]$target.Text).Trim()
-  if([string]::IsNullOrWhiteSpace($projectTitle)){throw (L 'Enter a project title.' 'Introduce un titulo de proyecto.')}
-  if([string]::IsNullOrWhiteSpace($description)){throw (L 'Describe what the mod should do.' 'Describe que debe hacer el mod.')}
-  return [pscustomobject]@{Title=$projectTitle;Description=$description;TargetHint=$hint;Prepare=($result -eq [System.Windows.Forms.DialogResult]::OK)}
+  if($result -ne $true){return $null}
+  return $form.Tag
 }
 
 $Script:BtnAIHelpRefresh.Add_Click({try{Refresh-PMMAIHelpDiagnostics;Refresh-PMMAIHelpBadge;$Script:TxtAIHelpDiagnosticStatus.Text=L 'Cases refreshed.' 'Casos actualizados.'}catch{Handle-UIError $_ (L 'Refresh AI assistance' 'Actualizar ayuda IA')}})
@@ -5860,6 +5961,7 @@ $Script:LstAIIOSessions.Add_SelectionChanged({
     if([bool]$Script:AIHelpUiRefreshing){return}
     $session=Get-PMMSelectedAIIOSession
     if($session){Refresh-PMMAIIOCandidates ([string]$session.SessionId);$Script:TxtAIIOStatus.Text=((L 'Session {0} - {1} - iteration {2}. Returned candidates remain staged until you explicitly review and act.' 'Sesion {0} - {1} - iteracion {2}. Los candidatos devueltos quedan en staging hasta que los revises y actues expresamente.') -f [string]$session.SessionId,[string]$session.Status,[int]$session.Iteration)}
+    Update-PMMAIIOHandoffButton
   }catch{}
 })
 $Script:LstAIIOCandidates.Add_SelectionChanged({try{Update-PMMAIIOCandidateSelection}catch{}})
@@ -5923,6 +6025,7 @@ $Script:BtnAIIOContinue.Add_Click({
 })
 $Script:BtnAIIOArchive.Add_Click({try{$session=Get-PMMSelectedAIIOSession;if(-not$session){return};if(Confirm ((L 'Archive session {0}? Its history and artifacts remain on disk.' 'Archivar la sesion {0}? Su historial y artefactos seguiran guardados.') -f [string]$session.SessionId)){Set-PMMAIIOSessionArchived ([string]$session.SessionId) $true|Out-Null;Refresh-PMMAIHelpUi}}catch{Handle-UIError $_ (L 'Archive AIIO session' 'Archivar sesion AIIO')}})
 $Script:BtnAIIOOpenWorkspace.Add_Click({try{$session=Get-PMMSelectedAIIOSession;$path=if($session){Get-PMMAIIOSessionPath ([string]$session.SessionId)}else{Get-PMMPath 'AIIO'};Start-Process explorer.exe -ArgumentList ('"'+$path+'"')}catch{Handle-UIError $_ (L 'Open AI workspace' 'Abrir espacio de IA')}})
+$Script:BtnAIIOOpenHandoff.Add_Click({try{$session=Get-PMMSelectedAIIOSession;if(-not$session){throw (L 'Select an AI exchange first.' 'Selecciona primero un intercambio IA.')};$path=[string](Get-PMMAIIOLatestHandoffPath ([string]$session.SessionId));if([string]::IsNullOrWhiteSpace($path)){throw (L 'The selected exchange does not have an available handoff ZIP.' 'El intercambio seleccionado no tiene un ZIP handoff disponible.')};Start-Process explorer.exe -ArgumentList ('/select,"'+$path+'"')}catch{Handle-UIError $_ (L 'Open latest AI handoff' 'Abrir ultimo handoff IA')}})
 $Script:BtnAIIOOpenCandidate.Add_Click({try{$row=$Script:LstAIIOCandidates.SelectedItem;if(-not$row){return};Start-Process explorer.exe -ArgumentList ('"'+[string]$row.Root+'"')}catch{Handle-UIError $_ (L 'Inspect AI candidate' 'Inspeccionar candidato IA')}})
 $Script:BtnAIIOUseCandidate.Add_Click({
   try{
@@ -6084,7 +6187,6 @@ $Script:ExternalModsTimer.Start()
 $Window.Add_Closing({
   try { if($Script:ExternalModsTimer){$Script:ExternalModsTimer.Stop()} } catch {}
   try { Save-DecisionGridToPlan -Silent } catch {}
-  try { Save-UiSettings } catch {}
   try { Save-PMMLayoutSettings } catch {}
   try { Stop-PMMBackgroundOperation -Silent } catch {}
   try { Stop-PMMGameReferenceBuild -Silent } catch {}

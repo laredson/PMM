@@ -7,7 +7,7 @@ PMM 1.3.1 adds a separate `CREATE_MOD` exchange for creating a new standalone Pa
 1. Build or refresh **Vanilla Game Reference** in normal Settings when its status is not `Current`.
 2. Open **AI & Help → AI assistance → New mod project...**.
 3. Enter a title, describe the desired behavior and optionally add an asset/search hint.
-4. Choose **Create AI ZIP** and give that ZIP to an external AI yourself. PMM uploads nothing.
+4. Choose **Create AI ZIP** and give that ZIP to an external AI yourself. PMM uploads nothing. If you close Explorer, select the exchange in **AI reception** and use **Open latest handoff**.
 5. Import the AI response in **AI reception**.
 6. If the response asks for evidence, select the routed exchange and press **Prepare requested data**. Give the new ZIP back to the same AI conversation.
 7. When a returned cooked-tree candidate is present, inspect it and press **Build standalone PAK...** only if you accept it.

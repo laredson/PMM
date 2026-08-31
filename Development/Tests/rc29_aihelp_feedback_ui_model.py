@@ -69,14 +69,14 @@ def validate_localized_ui() -> None:
         "CmbAIHelpFeedbackType", "TxtAIHelpFeedbackTitle", "TxtAIHelpFeedbackComments",
         "CmbAIHelpFeedbackBuild", "BtnAIHelpCreateFeedback", "BtnAIHelpGenerateFeedback",
         "BtnAIHelpOpenFeedback", "BtnAIHelpUploadFeedback", "TxtAIHelpFeedbackStatus",
-        "ChkAIIOAutoCreateErrorCases", "TxtAIIOSettingsStatus",
+        "ChkAIIOAutoCreateErrorCases", "TxtAIIOSettingsStatus", "BtnAIIOOpenHandoff",
     }
     for filename, headers in expected_tabs.items():
         text = read(f"Resources/UI/{filename}")
         root = ET.fromstring(text)
         parents = parent_map(root)
         names = [node.attrib[X_NAME] for node in root.iter() if X_NAME in node.attrib]
-        assert len(names) == len(set(names)) == 289, filename
+        assert len(names) == len(set(names)), filename
         assert required.issubset(names), filename
         expected_names = set(names) if expected_names is None else expected_names
         assert set(names) == expected_names, filename

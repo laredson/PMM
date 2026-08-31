@@ -39,9 +39,9 @@ PMM may keep several patches built from the same exact source hashes + mappings,
 - **Delete from library** removes the local managed copy and records the managed removal for the next Deploy.
 - Deploy does not blindly delete unrelated PAKs PMM has never managed.
 
-## Saves
+## World Save
 
-The **Saves** tab can create world backups and restore a selected backup. PMM creates a safety backup before replacing a world during restore. Keep independent backups for important worlds as well.
+The **World Save** tab can create world backups and restore a selected backup. PMM creates a safety backup before replacing a world during restore. Keep independent backups for important worlds as well.
 
 ## What Unsupported means
 

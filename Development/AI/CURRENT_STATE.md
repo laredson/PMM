@@ -18,7 +18,7 @@ deployment ownership and the stable binaries remain unchanged.
 
 ## Current product surface
 
-`Mods & Merge -> FIX LAB -> AI & Help -> Saves -> Settings`
+`Mods & Merge -> FIX LAB -> AI & Help -> World Save -> Settings`
 
 AI & Help provides five focused views: AI assistance, AI reception, Feedback & Knowledge, color-scheme editor and AI Settings. Selecting a case shows that case; New case exposes explicit PMM features and can save locally or create the safe ZIP directly. Standard responses route by embedded session ID, while a recognized standalone theme opens only as an uninstalled draft. Vanilla Game Reference is also in normal Settings. Long AIIO work and recursive artifact inventory run through `Modules/Operations/OperationWorker.ps1`, not the WPF dispatcher.
 

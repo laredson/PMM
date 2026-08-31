@@ -251,6 +251,20 @@ function Get-PMMAIIOSession([string]$SessionId) {
   }catch{return $null}
 }
 
+function Get-PMMAIIOLatestHandoffPath([string]$SessionId) {
+  if(-not(Test-PMMAIIOSessionId $SessionId)){return ''}
+  $session=Get-PMMAIIOSession $SessionId
+  if(-not$session -or [int]$session.Iteration -le 0){return ''}
+  $iteration=[int]$session.Iteration
+  $sessionRoot=Get-PMMAIIOSessionPath $SessionId
+  $requestDir=Join-Path $sessionRoot ('requests\request-{0:D4}' -f $iteration)
+  $path=Join-Path $requestDir ('PMM_AIIO_REQUEST_'+$SessionId+'_STEP_{0:D2}.zip' -f $iteration)
+  try{$path=[IO.Path]::GetFullPath($path)}catch{return ''}
+  if(-not(Test-PMMPathInside $path $sessionRoot)){return ''}
+  if(-not(Test-Path -LiteralPath $path -PathType Leaf)){return ''}
+  return $path
+}
+
 function Get-PMMAIIOSessions {
   $rows=[Collections.Generic.List[object]]::new()
   foreach($dir in @(Get-ChildItem -LiteralPath (Get-PMMAIIOSessionRoot) -Directory -ErrorAction SilentlyContinue|Sort-Object LastWriteTimeUtc -Descending)){

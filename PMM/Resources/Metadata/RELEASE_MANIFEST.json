@@ -61,7 +61,7 @@
   "releaseCandidate": "1.3.1-mod-creation-preview",
   "buildId": "PMM-v1.3.1-MOD-CREATION-PREVIEW",
   "buildIdentityFile": "Resources/Metadata/BUILD_ID.txt",
-  "uiContract": "Public tabs are Mods & Merge, FIX LAB, AI & Help, Saves and Settings. Fresh size is 1460x900 and the normal minimum is 900x600; startup clamps to the Windows work area in device-independent pixels. Branding and action areas occupy equal header halves. Header actions are ordered Detect/status, folder/Play controls, then AUTO. AI & Help contains five focused subtabs: AI assistance, AI reception, Feedback & Knowledge, color-scheme editor and AI settings. AI assistance exposes separate diagnostic-case and standalone-mod-project entry points. Normal Settings also owns Vanilla Game Reference. General Settings follows the Sound events architecture by separating official PMM schemes from a bordered user-scheme collection. ColorFlow ends by highlighting Play as optional readiness without an action-required popup.",
+  "uiContract": "Public tabs are Mods & Merge, FIX LAB, AI & Help, World Save and Settings. Fresh size is 1460x900 and the normal minimum is 900x600; startup clamps to the Windows work area in device-independent pixels. Branding and action areas occupy equal header halves. Header actions are ordered Detect/status, folder/Play controls, then AUTO. AI & Help contains five focused subtabs: AI assistance, AI reception, Feedback & Knowledge, color-scheme editor and AI settings. AI assistance exposes separate diagnostic-case and standalone-mod-project entry points. Normal Settings also owns Vanilla Game Reference. General Settings follows the Sound events architecture by separating official PMM schemes from a bordered user-scheme collection. ColorFlow ends by highlighting Play as optional readiness without an action-required popup.",
   "bundledThemeCount": 11,
   "officialThemeChoiceCount": 13,
   "bundledThemeDefault": "pmm-crystal",
@@ -158,7 +158,7 @@
     "startupDependencyPathRequiresFullLanguage": false,
     "legacyPowerShellUiCoreRequireFullLanguage": true,
     "policyBypassAttempted": false,
-    "note": "v1.3.1 preserves native Host/Runtime startup and the native Win32 shell independent of PowerShell FullLanguage. The full Analyze/Build/Deploy/Saves/Fix Lab/AIIO creation workspace remains on the WPF/Core PowerShell path on FullLanguage systems. PMM does not weaken or bypass Windows application-control policy.",
+    "note": "v1.3.1 preserves native Host/Runtime startup and the native Win32 shell independent of PowerShell FullLanguage. The full Analyze/Build/Deploy/World Save/Fix Lab/AIIO creation workspace remains on the WPF/Core PowerShell path on FullLanguage systems. PMM does not weaken or bypass Windows application-control policy.",
     "normalStartupRouteRequiresPowerShell": false,
     "nativeUiRequiresFullLanguage": false
   },

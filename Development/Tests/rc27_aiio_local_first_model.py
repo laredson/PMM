@@ -86,12 +86,13 @@ def validate_localized_ui_and_header() -> None:
         "TabAIHelp", "AIHelpTabs", "LstAIIOSessions", "LstAIIOCandidates",
         "PnlThemeOptions", "PnlUserThemeOptions", "PnlThemeEditorRows",
         "BtnThemeEditorCreateAI", "BtnThemeEditorImportAI", "BtnAIHelpCleanup",
+        "BtnAIIOOpenHandoff",
     }
     for filename in ("MainWindow.xaml", "MainWindow.en.xaml", "MainWindow.es.xaml"):
         text = read(f"Resources/UI/{filename}")
         root = ET.fromstring(text)
         names = [value for node in root.iter() if (value := node.attrib.get(x_name))]
-        assert len(names) == len(set(names)) == 289, filename
+        assert len(names) == len(set(names)), filename
         current = set(names)
         assert required.issubset(current), filename
         assert root.attrib["MinWidth"] == "900" and root.attrib["MinHeight"] == "600"

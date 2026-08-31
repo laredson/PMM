@@ -47,9 +47,9 @@ PMM may keep several patches, for example different choices from a conflict. An 
 - **Delete selected** is immediate: it removes the imported copy from PMM and the exact same hash from Palworld `~mods` if it is deployed there. A same-name file with a different SHA-256 blocks the delete. Any deployed PMM compatibility merge and sidecar are preserved until you explicitly change them in **Compatibility patches**; Analyze freshness is invalidated so PMM can explain the new source state.
 - Deploy does not blindly delete unrelated PAKs PMM has never managed.
 
-## Saves
+## World Save
 
-The **Saves** tab can create world backups and restore a selected backup. PMM creates a safety backup before replacing a world during restore. Keep independent backups for important worlds as well.
+The **World Save** tab can create world backups and restore a selected backup. PMM creates a safety backup before replacing a world during restore. Keep independent backups for important worlds as well.
 
 ## AI & Help and local-first AIIO
 
@@ -76,6 +76,8 @@ In **Settings**, **Build / refresh Game Reference** maintains a local, version-a
 AIIO handoff creation does not require this cache. When you explicitly create a handoff,
 AIIO re-extracts the exact conflicting Vanilla file/family and the exact counterparts from
 each involved source PAK, then places them in separate origin folders in one bundle.
+If you close the Explorer window, select the exchange in **AI reception** and press
+**Open latest handoff** to show its most recent request ZIP again.
 
 After PMM accepts an AI/manual solution and you have actually tested it successfully in
 Palworld, Settings -> **Create tested contribution...** creates one evidence ZIP that can
@@ -138,7 +140,7 @@ Appearance, action-hint duration, completion sound and volume are staged in Sett
 
 New installations default to **PMM Crystal** while upgrades preserve a valid existing choice. Settings separates **Color scheme** and **Completion sound** into independent lists. **Add schemes (JSON/ZIP)...** accepts one or several `PMM_COLOR_SCHEME_V1` JSON files or a bounded ZIP and stores only validated user schemes in `Workspace\Themes`; **Add sound...** copies a WAV/MP3/WMA into `Workspace\Sounds`. Press **Apply changes** to commit theme, ColorFlow hint duration, sound and volume without restarting PMM. **Restore defaults**, placed beside Apply at the upper right, stages PMM Crystal, a 5-second hint, 50% volume and the RC19 sound-profile defaults without changing language, paths, library or user data; press Apply to save them.
 
-The Saves tab now has two collapsible right-side panes: **Selected save** and **PMM backups made**. Selecting a backup shows its date, archive size, expanded size, file count and simple delta against the current save. Restore uses the selected PMM backup and creates a safety backup before replacing the live world.
+The World Save tab has two collapsible right-side panes: **Selected save** and **PMM backups made**. Selecting a backup shows its date, archive size, expanded size, file count and simple delta against the current save. Restore uses the selected PMM backup and creates a safety backup before replacing the live world.
 
 
 ### Sound events

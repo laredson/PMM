@@ -44,7 +44,7 @@ No automatic upload, provider login, returned-code execution, Apply Fix, Build, 
 
 v1.2.1 keeps an explicit ConstrainedLanguage migration boundary. Startup,
 dependency preparation, supervision and the native fallback UI no longer require FullLanguage,
-but the complete existing Analyze/Build/Deploy/Saves workspace still runs through the proven
+but the complete existing Analyze/Build/Deploy/World Save workspace still runs through the proven
 PowerShell/WPF/Core path on FullLanguage systems. Do not advertise the WPF workspace as fully CLM-native until
 those remaining end-user operations are migrated behind PMMRuntime or independently proven CLM-safe.
 

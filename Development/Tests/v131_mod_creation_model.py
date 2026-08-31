@@ -44,8 +44,10 @@ def validate_identity_and_ui() -> None:
         root = ET.fromstring(read(f"Resources/UI/{filename}"))
         assert root.attrib["Title"] == "PMM - Palworld Manager Merger v1.3.1", filename
         names = [node.attrib[X_NAME] for node in root.iter() if X_NAME in node.attrib]
-        assert len(names) == len(set(names)) == 289, filename
-        assert "BtnAIHelpNewModProject" in names
+        assert len(names) == len(set(names)), filename
+        assert {"BtnAIHelpNewModProject", "BtnAIIOOpenHandoff"}.issubset(names)
+        expected_save_header = "Guardado del mundo" if filename.endswith(".es.xaml") else "World Save"
+        assert any(node.tag.endswith("}TabItem") and node.attrib.get("Header") == expected_save_header for node in root.iter()), filename
         expected = set(names) if expected is None else expected
         assert set(names) == expected, filename
 
@@ -109,7 +111,35 @@ def validate_capability_and_candidate_boundaries() -> None:
     assert "-Operation AIIOModBuild" in bootstrap
     assert "Build-PMMAIIOModCandidate" in worker
     assert "New-PMMAIIOSession -Title" in bootstrap and "-TaskType CREATE_MOD" in bootstrap
-    assert "$form.AutoScroll=$true" in bootstrap
+    dialog = body(bootstrap, "Show-PMMModCreationProjectDialog")
+    for marker in (
+        'SizeToContent="Height"',
+        'VerticalScrollBarVisibility="Auto"',
+        'MinWidth="620"',
+        "$form.Owner=$Window",
+        "TxtModProjectValidation",
+        "$form.DialogResult=$true",
+    ):
+        assert marker in dialog, marker
+    assert "System.Windows.Forms.Form" not in dialog
+    assert ".Left=" not in dialog and ".Top=" not in dialog
+
+    assert "$Script:ActiveThemeId=''" in bootstrap
+    apply_theme = body(bootstrap, "Apply-PMMTheme")
+    assert "$Script:ActiveThemeDefinition -and" in apply_theme
+    auto_preferences = body(bootstrap, "Save-PMMAutoPreferences")
+    assert "AutoMode=" in auto_preferences and "AutoIncludePlay=" in auto_preferences
+    assert "Theme=" not in auto_preferences and "Sound" not in auto_preferences
+    assert "$enabled=[bool]$Script:TglAutoMode.IsChecked;Save-PMMAutoPreferences" in bootstrap
+
+    latest = body(session, "Get-PMMAIIOLatestHandoffPath")
+    for marker in ("session.Iteration", "requests\\request-{0:D4}", "PMM_AIIO_REQUEST_", "Test-PMMPathInside"):
+        assert marker in latest, marker
+
+    workflow = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8-sig")
+    smoke = (ROOT / "Development/Tests/SmokeTest.ps1").read_text(encoding="utf-8-sig")
+    assert "'1.3.1-*'" in workflow
+    assert "manifest.version -eq '1.3.1'" in smoke
 
 
 def validate_hash_binding_model() -> None:

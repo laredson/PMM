@@ -70,7 +70,7 @@ $recipe=Get-Content (Join-Path $App 'CKL/Stable/production-recipes.json') -Raw|C
 Assert-PMM (@($recipe.recipes|Where-Object{$_.production.enabled}).Count -eq 1) 'Stable CKL has exactly one automatic production recipe'
 
 $manifest=Get-Content (Join-Path $App 'Resources/Metadata/RELEASE_MANIFEST.json') -Raw|ConvertFrom-Json
-Assert-PMM ([string]$manifest.version -eq '1.3.0') 'Manifest version 1.3.0'
+Assert-PMM ([string]$manifest.version -eq '1.3.1') 'Manifest version 1.3.1'
 Assert-PMM ([int]$manifest.mergePlanSchema -eq 18) 'Merge plan schema 18'
 Assert-PMM ([int]$manifest.buildManifestSchema -eq 9) 'Build manifest schema 9'
 Assert-PMM ([string]$manifest.buildId -eq 'PMM-v1.3.1-MOD-CREATION-PREVIEW') 'PMM 1.3.1 Mod Creation build identity'

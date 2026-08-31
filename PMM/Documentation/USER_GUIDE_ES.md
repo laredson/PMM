@@ -47,9 +47,9 @@ PMM puede conservar varios patches, por ejemplo con decisiones distintas para un
 - **Borrar seleccionados** es inmediato: elimina la copia importada de PMM y el mismo hash de Palworld `~mods` si esta desplegado alli. Un archivo con el mismo nombre pero SHA-256 diferente bloquea el borrado. Cualquier merge de compatibilidad PMM desplegado y su sidecar se conservan hasta que los cambies explicitamente en **Compatibility patches**; la vigencia de Analyze se invalida para que PMM explique el nuevo estado de fuentes.
 - Deploy no borra a ciegas PAK ajenos que PMM nunca haya gestionado.
 
-## Saves
+## Guardado del mundo
 
-La pestaña **Saves** permite crear backups de mundos y restaurarlos. PMM crea un backup de seguridad antes de sustituir el mundo durante Restore. Mantén también copias independientes de los mundos importantes.
+La pestaña **Guardado del mundo** permite crear backups de mundos y restaurarlos. PMM crea un backup de seguridad antes de sustituir el mundo durante Restore. Mantén también copias independientes de los mundos importantes.
 
 ## IA y ayuda y AIIO local
 
@@ -78,6 +78,8 @@ En **Opciones**, **Crear / actualizar Game Reference** mantiene una caché local
 AIIO no necesita esa caché para crear un handoff. Cuando creas uno explícitamente, AIIO
 vuelve a extraer el archivo/familia Vanilla exacto en conflicto y sus equivalentes exactos
 de cada PAK implicado, y los coloca por origen dentro de un único bundle.
+Si cierras la ventana del Explorador, selecciona el intercambio en **Recepcion IA** y pulsa
+**Abrir ultimo handoff** para volver a mostrar su ZIP de peticion mas reciente.
 
 Después de importar una solución IA/manual y comprobarla realmente dentro de Palworld,
 IA y ayuda -> Feedback -> **Crear contribución probada...** genera un único ZIP de evidencia para
@@ -140,7 +142,7 @@ La apariencia, duración del aviso, sonido y volumen se preparan en Ajustes y se
 
 Las instalaciones nuevas usan **PMM Crystal** por defecto y conservan la eleccion valida de una instalacion existente. Configuracion separa **Esquema de color** y **Sonido de finalizacion** en listas independientes. **Agregar esquemas (JSON/ZIP)...** admite uno o varios JSON `PMM_COLOR_SCHEME_V1`, o un ZIP acotado, y guarda solo esquemas validados en `Workspace\Themes`; **Agregar sonido...** copia un WAV/MP3/WMA a `Workspace\Sounds`. Pulsa **Aplicar cambios** para aplicar tema, duración del aviso ColorFlow, sonido y volumen sin reiniciar PMM. **Restaurar valores**, situado junto a Aplicar en la esquina superior derecha, prepara PMM Crystal, aviso de 5 segundos, volumen 50% y los perfiles de sonido RC19 sin cambiar idioma, rutas, biblioteca ni datos del usuario; pulsa Aplicar para guardarlos.
 
-La pestana Partidas tiene ahora dos paneles colapsables a la derecha: **Save seleccionado** y **Backups PMM creados**. Al seleccionar un backup se muestran fecha, tamano ZIP, tamano expandido, numero de archivos y una comparacion simple con el save actual. Restaurar utiliza el backup PMM seleccionado y crea antes un backup de seguridad.
+La pestana Guardado del mundo tiene dos paneles colapsables a la derecha: **Save seleccionado** y **Backups PMM creados**. Al seleccionar un backup se muestran fecha, tamano ZIP, tamano expandido, numero de archivos y una comparacion simple con el save actual. Restaurar utiliza el backup PMM seleccionado y crea antes un backup de seguridad.
 
 
 ### Eventos de sonido
