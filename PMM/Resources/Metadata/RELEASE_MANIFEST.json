@@ -61,7 +61,7 @@
   "releaseCandidate": "1.3.1-mod-creation-preview",
   "buildId": "PMM-v1.3.1-MOD-CREATION-PREVIEW",
   "buildIdentityFile": "Resources/Metadata/BUILD_ID.txt",
-  "uiContract": "Public tabs are Mods & Merge, FIX LAB, AI & Help, World Save and Settings. Fresh size is 1460x900 and the normal minimum is 900x600; startup clamps to the Windows work area in device-independent pixels. Branding and action areas occupy equal header halves. Header actions are ordered Detect/status, folder/Play controls, then AUTO. AI & Help contains five focused subtabs: AI assistance, AI reception, Feedback & Knowledge, color-scheme editor and AI settings. AI assistance exposes separate diagnostic-case and standalone-mod-project entry points. Normal Settings also owns Vanilla Game Reference. General Settings follows the Sound events architecture by separating official PMM schemes from a bordered user-scheme collection. ColorFlow ends by highlighting Play as optional readiness without an action-required popup.",
+  "uiContract": "Public tabs are Mods & Merge, FIX LAB, AI & Help, World Save and Settings. Fresh size is 1460x900 and the normal minimum is 900x600; startup clamps to the Windows work area in device-independent pixels. Branding and action areas occupy equal header halves. Header actions are ordered Detect/status, folder/Play controls, then SemiAUTO/AUTO. SemiAUTO arms continuation after a manually started workflow action; the wider AUTO button runs the remaining safe workflow once and uses an idle-only sparkle treatment. AI & Help contains five focused subtabs: AI assistance, AI reception, Feedback & Knowledge, color-scheme editor and AI settings. AI assistance exposes separate diagnostic-case and standalone-mod-project entry points. Normal Settings also owns Vanilla Game Reference. General Settings follows the Sound events architecture by separating official PMM schemes from a bordered user-scheme collection. ColorFlow ends by highlighting Play as optional readiness without an action-required popup.",
   "bundledThemeCount": 11,
   "officialThemeChoiceCount": 13,
   "bundledThemeDefault": "pmm-crystal",
@@ -69,7 +69,7 @@
   "officialThemeManifest": "Resources/Themes/OFFICIAL_THEME_MANIFEST.json",
   "themeUiOwnership": "The eleven release JSON schemes plus legacy Night and Light appear under Official PMM schemes. Valid definitions under Workspace/Themes appear separately under User schemes and cannot shadow official IDs.",
   "themeImportContract": "Settings accepts bounded PMM_COLOR_SCHEME_V1 JSON/ZIP data with parse-all-before-commit, official-id protection, user replacement confirmation/backup, unsafe-path/symlink/executable/nested-archive rejection and a 4.5:1 contrast matrix. The AI & Help editor creates PMM_COLOR_SCHEME_V1 or image-backed PMM_COLOR_SCHEME_V2 definitions, installs them locally as user schemes and exports V2 as a PMM_THEME_PACK_V1 ZIP with local PNG/JPEG assets, hashes and solid fallback colors. Official schemes load only from the release hash manifest; user schemes live separately under Workspace/Themes.",
-  "progressPresentation": "Determinate bars lag but never exceed worker-reported progress. Each newly proven range below completion advances in integer points over approximately three seconds; a newer report may catch the display up only to the previous proven target before animating onward. A confirmed 100% update always jumps immediately to 100 and clears pending animation before the next task begins.",
+  "progressPresentation": "Determinate bars begin visually at 0 for each real operation. Between worker reports the display advances by at most one integer point every random 0.5-2.0 seconds and never exceeds the current worker-reported ceiling. When a newer real target arrives, presentation catches up only to the previous proven target at a random 0.1-0.5 seconds per point, then returns to the slower pace toward the new ceiling. Bars do not regress within one operation. A confirmed 100% update jumps immediately to 100 and clears pending animation before the next task begins.",
   "analyzeVariantPreflight": "PMM Fix Lab Gawr Gura outputs are mutually exclusive. If any two known complete outputs are active, Analyze pauses before PAK asset enumeration for an explicit PackageChoice and suppresses the unselected output from analysis/deployment after confirmation.",
   "operationBackgroundWorker": "Modules/Operations/OperationWorker.ps1",
   "backgroundOperations": [
@@ -297,7 +297,7 @@
     "enabledByDefault": false,
     "configField": "AutoMode",
     "includePlayConfigField": "AutoIncludePlay",
-    "trigger": "AUTO runs once from the current state; Auto ON continues after any manually started flow action.",
+    "trigger": "AUTO runs once from the current state; SemiAUTO continues after any manually started flow action.",
     "stages": [
       "DetectIfNeeded",
       "Import",
@@ -320,7 +320,7 @@
     ],
     "fixLabPolicy": "Exact supported legacy identities route before normal Analyze. If current Game Reference is required, AUTO invokes the internal background Game Reference worker immediately without changing tabs. Shared progress remains visible in Settings and Fix Lab. Multiple outputs remain a concurrent human choice while the reference builds; once both reference and choice are ready, AUTO continues Repair -> Apply Fix -> Analyze -> Build -> Deploy -> optional Palworld.",
     "oneShotButton": "AUTO",
-    "persistentMode": "Auto ON",
+    "persistentMode": "SemiAUTO",
     "workflowAuthority": "Get-PMMWorkflowState (shared with ColorFlow)",
     "knownGameModsImportMayAutoRun": true,
     "arbitraryFileImportRequiresUserSelection": true,
@@ -394,7 +394,7 @@
   "stableCandidate": false,
   "completionSound": {
     "resource": "Resources/Sounds/PMM_complete.wav",
-    "policy": "Manual workflow steps chime individually. AUTO/Auto ON plays the configured Semiauto cue after each successful step when enabled, then plays Auto once when the complete chain reaches its terminal successful state.",
+    "policy": "Manual workflow steps chime individually. AUTO/SemiAUTO plays the configured Semiauto cue after each successful step when enabled, then plays Auto once when the complete chain reaches its terminal successful state.",
     "level": "modest/medium-low, mastered in the WAV because System.Media.SoundPlayer has no per-instance volume control"
   },
   "analyzeCachePolicy": {

@@ -385,7 +385,7 @@ function Get-PMMCustomSoundDefinitions {
 function Get-PMMSoundProfileDefinitions {
   return @(
     [pscustomobject]@{Id='Auto';Label=(L 'Auto - workflow finished' 'Auto - flujo terminado');Description=(L 'Played once when an automatic workflow really finishes. If Run Palworld after Deploy is enabled, it plays after Palworld is launched; otherwise after Deploy.' 'Suena una vez cuando termina realmente un flujo automatico. Si Iniciar Palworld tras Deploy esta activado, suena despues de iniciar Palworld; si no, despues de Deploy.')},
-    [pscustomobject]@{Id='SemiAuto';Label=(L 'Semiauto - each AUTO step' 'Semiauto - cada paso de AUTO');Description=(L 'Optional short sound after each completed step while AUTO/Auto ON is still running.' 'Sonido corto opcional despues de cada paso completado mientras AUTO/Auto ON sigue ejecutandose.')},
+    [pscustomobject]@{Id='SemiAuto';Label=(L 'Semiauto - each AUTO step' 'Semiauto - cada paso de AUTO');Description=(L 'Optional short sound after each completed step while AUTO/SemiAUTO is still running.' 'Sonido corto opcional despues de cada paso completado mientras AUTO/SemiAUTO sigue ejecutandose.')},
     [pscustomobject]@{Id='Manual';Label=(L 'Manual - completed action' 'Manual - accion completada');Description=(L 'Played after a manually-started workflow action completes. Start Palworld by itself never plays this sound.' 'Suena cuando termina una accion del flujo iniciada manualmente. Iniciar Palworld por si solo nunca reproduce este sonido.')},
     [pscustomobject]@{Id='Attention';Label=(L 'Attention required' 'Atencion requerida');Description=(L 'Optional notification when PMM is waiting for a real user decision, such as choosing a Fix Lab output or resolving a compatibility decision.' 'Aviso opcional cuando PMM espera una decision real del usuario, como elegir una salida de Fix Lab o resolver una decision de compatibilidad.')},
     [pscustomobject]@{Id='Error';Label=(L 'Error' 'Error');Description=(L 'Short alert when PMM reports an operation error.' 'Alerta corta cuando PMM informa de un error de operacion.')}
@@ -1847,6 +1847,7 @@ function Update-PMMCancelButtonState {
 
 function Stop-PMMAutoPipeline([string]$Reason='') {
   $Script:AutoPipelineActive=$false
+  if($Script:BtnAutoRun){$Script:BtnAutoRun.Tag='Idle'}
   $Script:AutoOneShotActive=$false
   $Script:AutoStepInProgress=$false
   $Script:AutoFixLabPresentedRecipeId=''
@@ -1886,6 +1887,7 @@ function Start-PMMAutoPipeline {
   if(-not$wasActive){$Script:AutoFixLabPresentedRecipeId='';$Script:AutoLastWorkflowKey='';$Script:AutoReferenceStartRecipeId=''}
   $Script:CancelRequested=$false
   $Script:AutoPipelineActive=$true
+  if($Script:BtnAutoRun){$Script:BtnAutoRun.Tag='Running'}
   Ensure-PMMAutoWorkflowTimer
   $Script:AutoWorkflowTimer.Start()
   Update-PMMCancelButtonState
@@ -1922,6 +1924,13 @@ function Update-PMMUniversalProgressText([string]$Operation,[string]$Message,[bo
   $Script:TxtOperationProgress.Text=$text
 }
 
+function Get-PMMProgressAnimationInterval([bool]$CatchUp) {
+  # Natural presentation pacing: catch-up uses 0.1-0.5 s per point, while
+  # ordinary visual progress advances by one point every 0.5-2.0 s.
+  if($CatchUp){return [double](Get-Random -Minimum 100 -Maximum 501)}
+  return [double](Get-Random -Minimum 500 -Maximum 2001)
+}
+
 function Ensure-PMMProgressAnimationTimer {
   if($Script:ProgressAnimationTimer){if(-not$Script:ProgressAnimationTimer.IsEnabled){$Script:ProgressAnimationTimer.Start()};return}
   $timer=[System.Windows.Threading.DispatcherTimer]::new([System.Windows.Threading.DispatcherPriority]::Background)
@@ -1937,8 +1946,10 @@ function Ensure-PMMProgressAnimationTimer {
           if(($now-[datetime]$state.LastStepUtc).TotalMilliseconds -ge [double]$state.IntervalMs){
             $state.Displayed=[Math]::Min([double]$state.Target,[double]$state.Displayed+1.0)
             $state.LastStepUtc=$now
+            $catchUp=([double]$state.Displayed -lt [double]$state.CatchUpFloor)
+            $state.IntervalMs=Get-PMMProgressAnimationInterval $catchUp
             $state.Bar.Value=[double]$state.Displayed
-            if([string]$key -eq 'Universal'){Update-PMMUniversalProgressText ([string]$state.Operation) ([string]$state.Message) $false}
+            if($key -eq 'Universal'){Update-PMMUniversalProgressText ([string]$state.Operation) ([string]$state.Message) $false}
           }
         }
       }
@@ -1962,48 +1973,54 @@ function Set-PMMSmoothedProgressBar {
   $Bar.Minimum=0;$Bar.Maximum=100;$Bar.IsIndeterminate=[bool]$Indeterminate
   if($Indeterminate){
     [void]$Script:ProgressAnimationStates.Remove($Key)
-    # Every indeterminate phase is a new real operation boundary. Clearing the
-    # stale percentage here lets the first known target animate from zero rather
-    # than inheriting the previous operation's 100%.
+    # Every indeterminate phase is a new real operation boundary. Clear stale
+    # presentation so the first known target begins visually at zero.
     $Bar.Value=0
     return 0.0
   }
-
-  # Floor is deliberate: presentation can lag real work, but can never claim a
-  # percentage the worker has not reached.
   $target=[Math]::Floor([Math]::Max(0.0,[Math]::Min(100.0,$TargetPercent)))
-  # Completion is a real operation boundary, not an interval to animate. If
-  # 100% were left to catch up one point at a time, the next workflow step
-  # could already be running while the previous bar still looked busy.
+  # Completion remains an exact boundary. Once the worker proves 100%, do not
+  # leave the previous operation visually busy while the workflow moves on.
   if($target -ge 100.0){
     [void]$Script:ProgressAnimationStates.Remove($Key)
     $Bar.Value=100.0
     if($Key -eq 'Universal'){Update-PMMUniversalProgressText $Operation $Message $false}
     return 100.0
   }
+
   $state=$null;if($Script:ProgressAnimationStates.ContainsKey($Key)){$state=$Script:ProgressAnimationStates[$Key]}
   if(-not$state -or ([string]$state.Operation -ne $Operation -and -not[string]::IsNullOrWhiteSpace($Operation))){
-    # A missing state or changed operation is a real presentation boundary.
-    # Never inherit a stale 100% from the preceding worker; animate the first
-    # known range from zero (except a 0/1% acknowledgement).
-    $start=if($target -le 1){$target}else{0.0}
-    $state=[pscustomobject]@{Bar=$Bar;Displayed=[double]$start;Target=[double]$target;IntervalMs=250.0;LastStepUtc=[DateTime]::UtcNow;Operation=$Operation;Message=$Message}
+    # A new real operation always starts at zero. The current worker report is
+    # a hard ceiling, never a value the animation may exceed.
+    $state=[pscustomobject]@{
+      Bar=$Bar;Displayed=0.0;Target=[double]$target;CatchUpFloor=0.0
+      IntervalMs=(Get-PMMProgressAnimationInterval $false);LastStepUtc=[DateTime]::UtcNow
+      Operation=$Operation;Message=$Message
+    }
     $Script:ProgressAnimationStates[$Key]=$state
   }else{
-    # If real work advances again while the display is still catching up, snap
-    # only to the previous proven target and animate the newly reported range.
     $priorTarget=[double]$state.Target
-    if($target -gt $priorTarget -and [double]$state.Displayed -lt $priorTarget){$state.Displayed=$priorTarget}
-    if($target -lt [double]$state.Displayed -or $target -eq 0){$state.Displayed=$target}
-    $state.Target=$target;$state.Operation=$Operation;$state.Message=$Message
-    # Repeated status messages at the same percentage must not keep postponing
-    # the next visual step. Restart the pacing window only for a real target change.
-    if($target -ne $priorTarget){$state.LastStepUtc=[DateTime]::UtcNow}
+    # Within one operation, noisy/stale reports may not move the presentation
+    # backwards. A true new operation is handled by reset/indeterminate or by
+    # an Operation identity change above.
+    if($target -lt $priorTarget){$target=$priorTarget}
+    if($target -gt $priorTarget){
+      # The old worker target is now a proven floor. If presentation lagged
+      # behind it, catch up quickly (0.1-0.5 s/point), then return to the slow
+      # 0.5-2.0 s/point pace toward the new worker ceiling.
+      $state.CatchUpFloor=[Math]::Max([double]$state.CatchUpFloor,$priorTarget)
+      $state.Target=[double]$target
+      $state.LastStepUtc=[DateTime]::UtcNow
+      $state.IntervalMs=Get-PMMProgressAnimationInterval ([double]$state.Displayed -lt [double]$state.CatchUpFloor)
+    }else{
+      $state.Target=[double]$target
+    }
+    $state.Operation=$Operation;$state.Message=$Message;$state.Bar=$Bar
   }
-  $gap=[Math]::Max(0.0,[double]$state.Target-[double]$state.Displayed)
-  if($gap -gt 0){$state.IntervalMs=[Math]::Max(50.0,[Math]::Min(500.0,3000.0/$gap))}
+
   $Bar.Value=[double]$state.Displayed
-  if($gap -gt 0){Ensure-PMMProgressAnimationTimer}
+  if([double]$state.Displayed -lt [double]$state.Target){Ensure-PMMProgressAnimationTimer}
+  if($Key -eq 'Universal'){Update-PMMUniversalProgressText $Operation $Message $false}
   return [double]$state.Displayed
 }
 
@@ -2809,7 +2826,7 @@ function Invoke-PMMAutoContinue {
         if((Get-PMMNextWorkflowAction) -eq 'Detect'){Stop-PMMAutoPipeline (L 'Auto paused: choose a valid Steam or Palworld folder to continue.' 'Auto pausado: elige una carpeta valida de Steam o Palworld para continuar.')}
       }
       'ImportGameMods' { Reset-PMMOperationCancellation;Invoke-PMMButtonClick $Script:BtnImportGameMods }
-      'ImportFiles' { Stop-PMMAutoPipeline (L 'Auto paused: choose the mod files/folder to import, then press AUTO again (or enable Auto ON).' 'Auto pausado: elige los archivos/carpeta de mods que quieres importar y despues pulsa AUTO de nuevo (o activa Auto ON).') }
+      'ImportFiles' { Stop-PMMAutoPipeline (L 'Auto paused: choose the mod files/folder to import, then press AUTO again (or enable SemiAUTO).' 'Auto pausado: elige los archivos/carpeta de mods que quieres importar y despues pulsa AUTO de nuevo (o activa SemiAUTO).') }
       'FixLabOpen' {
         if(-not $Script:FixLabLoaded){[void](Initialize-PMMFixLabFeature)}
         if($Script:FixLabLoaded){Refresh-PMMFixLabUI}
@@ -4825,8 +4842,8 @@ $Script:BtnPlay.Add_Click({try{Start-Palworld}catch{Handle-UIError $_ (L 'Start 
 $Script:TglAutoMode.Add_Click({
   try{
     $enabled=[bool]$Script:TglAutoMode.IsChecked;Save-PMMAutoPreferences
-    if(-not$enabled){Stop-PMMAutoPipeline (L 'Auto ON is disabled. Manual actions perform one workflow step per click.' 'Auto ON esta desactivado. Las acciones manuales hacen un paso del flujo por clic.')}
-    else{$Script:TxtStatus.Text=L 'Auto ON armed. The next workflow action you start manually will continue through the remaining safe steps.' 'Auto ON preparado. La siguiente accion del flujo que inicies manualmente continuara por los pasos seguros restantes.';Update-PMMCancelButtonState}
+    if(-not$enabled){Stop-PMMAutoPipeline (L 'SemiAUTO is disabled. Manual actions perform one workflow step per click.' 'SemiAUTO esta desactivado. Las acciones manuales hacen un paso del flujo por clic.')}
+    else{$Script:TxtStatus.Text=L 'SemiAUTO armed. The next workflow action you start manually will continue through the remaining safe steps.' 'SemiAUTO preparado. La siguiente accion del flujo que inicies manualmente continuara por los pasos seguros restantes.';Update-PMMCancelButtonState}
   }catch{Handle-UIError $_ (L 'Automatic mode' 'Modo automatico')}
 })
 $Script:ChkAutoPlay.Add_Click({try{Save-PMMAutoPreferences;Update-PMMGuidedActionState}catch{}})
@@ -6112,7 +6129,7 @@ $Script:BtnBuildGameReference.Add_Click({
       $question=L 'Rebuild the local Game Reference now? This reads Pal-Windows.pak in the background and replaces only PMM Workspace\GameReference. Palworld is never modified.' 'Volver a crear Game Reference local? Esto lee Pal-Windows.pak en segundo plano y solo sustituye PMM Workspace\GameReference. Palworld no se modifica.'
       if(-not(Confirm $question)){return}
     }
-    # Game Reference is itself a workflow step. With Auto ON, a manual click
+    # Game Reference is itself a workflow step. With SemiAUTO, a manual click
     # arms continuation; with one-shot AUTO already running, it preserves that
     # run and completion resumes from the new reference state.
     if(-not$Script:AutoPipelineActive -and [bool]$Script:TglAutoMode.IsChecked){Start-PMMAutoPipeline}

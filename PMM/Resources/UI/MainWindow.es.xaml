@@ -139,6 +139,54 @@
       </Style.Triggers>
     </Style>
 
+    <Style x:Key="AutoRunButton" TargetType="Button" BasedOn="{StaticResource DefaultButton}">
+      <Setter Property="Background" Value="{DynamicResource ButtonBackground}"/>
+      <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBlue}"/>
+      <Setter Property="BorderThickness" Value="2"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="Padding" Value="18,6"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Grid ClipToBounds="True" SnapsToDevicePixels="True">
+              <Border Name="AutoRunBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6"/>
+              <Canvas Name="SparkleLayer" IsHitTestVisible="False" Opacity="0.9" Panel.ZIndex="1">
+                <TextBlock Name="AutoSparkle1" Text="✦" Foreground="{DynamicResource AccentBlue}" FontSize="12" Opacity="0" Canvas.Top="2"><TextBlock.RenderTransform><TranslateTransform Name="SparkleMove1" X="-30"/></TextBlock.RenderTransform></TextBlock>
+                <TextBlock Name="AutoSparkle2" Text="✧" Foreground="{DynamicResource AccentBlue}" FontSize="10" Opacity="0" Canvas.Top="13"><TextBlock.RenderTransform><TranslateTransform Name="SparkleMove2" X="-30"/></TextBlock.RenderTransform></TextBlock>
+                <TextBlock Name="AutoSparkle3" Text="✦" Foreground="{DynamicResource AccentBlue}" FontSize="8" Opacity="0" Canvas.Top="7"><TextBlock.RenderTransform><TranslateTransform Name="SparkleMove3" X="-30"/></TextBlock.RenderTransform></TextBlock>
+              </Canvas>
+              <ContentPresenter Panel.ZIndex="2" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="AutoRunBorder" Property="Background" Value="{DynamicResource ButtonHover}"/></Trigger>
+              <Trigger Property="IsEnabled" Value="False"><Setter TargetName="SparkleLayer" Property="Visibility" Value="Collapsed"/><Setter Property="Opacity" Value="0.72"/></Trigger>
+              <Trigger Property="Tag" Value="Running"><Setter TargetName="SparkleLayer" Property="Visibility" Value="Collapsed"/></Trigger>
+              <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="SparkleMove1" Storyboard.TargetProperty="X" From="-30" To="420" Duration="0:0:6" RepeatBehavior="Forever"/>
+                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="AutoSparkle1" Storyboard.TargetProperty="Opacity" Duration="0:0:6" RepeatBehavior="Forever">
+                      <DiscreteDoubleKeyFrame KeyTime="0:0:0" Value="0"/><SplineDoubleKeyFrame KeyTime="0:0:1.2" Value="0"/><SplineDoubleKeyFrame KeyTime="0:0:1.55" Value="0.9"/><SplineDoubleKeyFrame KeyTime="0:0:2.25" Value="0.8"/><SplineDoubleKeyFrame KeyTime="0:0:2.6" Value="0"/><DiscreteDoubleKeyFrame KeyTime="0:0:6" Value="0"/>
+                    </DoubleAnimationUsingKeyFrames>
+                    <DoubleAnimation Storyboard.TargetName="SparkleMove2" Storyboard.TargetProperty="X" From="-30" To="420" BeginTime="0:0:2" Duration="0:0:6" RepeatBehavior="Forever"/>
+                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="AutoSparkle2" Storyboard.TargetProperty="Opacity" BeginTime="0:0:2" Duration="0:0:6" RepeatBehavior="Forever">
+                      <DiscreteDoubleKeyFrame KeyTime="0:0:0" Value="0"/><SplineDoubleKeyFrame KeyTime="0:0:1.0" Value="0"/><SplineDoubleKeyFrame KeyTime="0:0:1.35" Value="0.8"/><SplineDoubleKeyFrame KeyTime="0:0:2.0" Value="0.75"/><SplineDoubleKeyFrame KeyTime="0:0:2.35" Value="0"/><DiscreteDoubleKeyFrame KeyTime="0:0:6" Value="0"/>
+                    </DoubleAnimationUsingKeyFrames>
+                    <DoubleAnimation Storyboard.TargetName="SparkleMove3" Storyboard.TargetProperty="X" From="-30" To="420" BeginTime="0:0:4" Duration="0:0:6" RepeatBehavior="Forever"/>
+                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="AutoSparkle3" Storyboard.TargetProperty="Opacity" BeginTime="0:0:4" Duration="0:0:6" RepeatBehavior="Forever">
+                      <DiscreteDoubleKeyFrame KeyTime="0:0:0" Value="0"/><SplineDoubleKeyFrame KeyTime="0:0:1.1" Value="0"/><SplineDoubleKeyFrame KeyTime="0:0:1.4" Value="0.75"/><SplineDoubleKeyFrame KeyTime="0:0:2.1" Value="0.7"/><SplineDoubleKeyFrame KeyTime="0:0:2.45" Value="0"/><DiscreteDoubleKeyFrame KeyTime="0:0:6" Value="0"/>
+                    </DoubleAnimationUsingKeyFrames>
+                  </Storyboard>
+                </BeginStoryboard>
+              </EventTrigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
     <Style TargetType="TextBox">
       <Setter Property="BorderBrush" Value="{DynamicResource InputBorder}"/>
       <Setter Property="Background" Value="{DynamicResource InputBackground}"/>
@@ -344,7 +392,14 @@
               <TextBlock Text="Detectar automáticamente o configurar la instalación desde Opciones." Foreground="{DynamicResource MutedText}" FontSize="11.5" TextAlignment="Center" Margin="0,2,0,0"/>
             </StackPanel>
           </Button>
-          <Border Grid.Row="2" Background="{DynamicResource CardAltBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="7" Padding="8,4"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><WrapPanel VerticalAlignment="Center"><CheckBox x:Name="TglAutoMode" Content="Auto ON" VerticalAlignment="Center" Margin="2,0,12,0" ToolTip="Al activarlo, una acción del flujo iniciada manualmente continúa automáticamente por los pasos seguros restantes."/><CheckBox x:Name="ChkAutoPlay" Content="Ejecutar Palworld tras Deploy" VerticalAlignment="Center" Margin="0,0,8,0" ToolTip="Inicia Palworld después del Deploy final correcto de una ejecución automática."/></WrapPanel><StackPanel Grid.Column="1" Orientation="Horizontal"><Button x:Name="BtnAutoRun" Content="AUTO" Style="{StaticResource DefaultButton}" MinWidth="82" FontWeight="Bold" ToolTip="Ejecuta una sola vez todos los pasos seguros restantes desde el estado actual sin activar Auto ON."/><Button x:Name="BtnCancelOperation" Content="CANCELAR" MinWidth="92" IsEnabled="False" ToolTip="Cancela la operación actual o el flujo automático. Deploy hace rollback si el commit ya había comenzado."/></StackPanel></Grid></Border>
+          <Border Grid.Row="2" Background="{DynamicResource CardAltBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="7" Padding="8,4">
+            <Grid>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*" MinWidth="150"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+              <WrapPanel Grid.Column="0" VerticalAlignment="Center"><CheckBox x:Name="TglAutoMode" Content="SemiAUTO" VerticalAlignment="Center" Margin="2,0,12,0" ToolTip="Cuando está activado, una acción del flujo que inicies manualmente continúa automáticamente por todos los pasos seguros restantes."/><CheckBox x:Name="ChkAutoPlay" Content="Ejecutar Palworld tras Deploy" VerticalAlignment="Center" Margin="0,0,8,0" ToolTip="Inicia Palworld después del Deploy final correcto de una ejecución automática."/></WrapPanel>
+              <Button Grid.Column="1" x:Name="BtnAutoRun" Content="AUTO" Style="{StaticResource AutoRunButton}" Tag="Idle" HorizontalAlignment="Stretch" MinWidth="150" FontWeight="Bold" Margin="10,3,6,3" ToolTip="Ejecuta una sola vez todos los pasos seguros restantes desde el estado actual sin activar SemiAUTO."/>
+              <Button Grid.Column="2" x:Name="BtnCancelOperation" Content="CANCELAR" MinWidth="92" IsEnabled="False" ToolTip="Cancela la operación actual o el flujo automático. Deploy hace rollback si el commit ya había comenzado."/>
+            </Grid>
+          </Border>
           <UniformGrid Grid.Row="1" Columns="3" HorizontalAlignment="Stretch" Margin="0,0,0,6"><Button x:Name="BtnOpenGame" Content="Abrir carpeta del juego"/><Button x:Name="BtnOpenModsFolder" Content="Abrir carpeta de mods"/><Button x:Name="BtnPlay" Content="Iniciar Palworld" Padding="16,6"/></UniformGrid>
         </Grid>
       </Grid>
@@ -892,7 +947,7 @@
                 <WrapPanel Margin="0,0,0,7" VerticalAlignment="Center">
                   <TextBlock Text="Configurar:" VerticalAlignment="Center" Margin="0,0,7,0"/>
                   <ComboBox x:Name="CmbSoundEventProfile" Width="285"/>
-                  <CheckBox x:Name="ChkSoundEachAutoStep" Content="Sonido en cada paso de AUTO" VerticalAlignment="Center" Margin="14,0,0,0" ToolTip="Reproduce el sonido Semiauto tras cada paso completado durante AUTO/Auto ON. Activado por defecto; elige Ninguno o desmarca esta opcion para silenciarlo."/>
+                  <CheckBox x:Name="ChkSoundEachAutoStep" Content="Sonido en cada paso de AUTO" VerticalAlignment="Center" Margin="14,0,0,0" ToolTip="Reproduce el sonido Semiauto tras cada paso completado durante AUTO/SemiAUTO. Activado por defecto; elige Ninguno o desmarca esta opcion para silenciarlo."/>
                   <CheckBox x:Name="ChkSoundAttention" Content="Sonido cuando se requiera atencion" VerticalAlignment="Center" Margin="14,0,0,0"/>
                 </WrapPanel>
                 <TextBlock x:Name="TxtSoundEventDescription" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,0,0,7"/>

@@ -129,8 +129,8 @@ $bootstrap = Get-Content -LiteralPath $bootstrapPath -Raw -Encoding UTF8
 foreach ($marker in @('ImgPMMLogo','BtnRestoreDefaults','Everything is ready to play.','Ya está todo listo para jugar.','PMMLogo.png')) {
   if ($bootstrap -notmatch [regex]::Escape($marker)) { Fail ('Bootstrap marker missing: ' + $marker) }
 }
-foreach ($marker in @('function Set-PMMSmoothedProgressBar','3000.0/$gap','state.Displayed=$priorTarget','$start=if($target -le 1){$target}else{0.0}','function Update-PMMResponsiveLayout','SetRow($Script:GrdHeaderActions,1)','Import-PMMThemeInputs -Paths')) {
-  if ($bootstrap -notmatch [regex]::Escape($marker)) { Fail ('RC25 bootstrap marker missing: ' + $marker) }
+foreach ($marker in @('function Set-PMMSmoothedProgressBar','function Get-PMMProgressAnimationInterval','Get-Random -Minimum 100 -Maximum 501','Get-Random -Minimum 500 -Maximum 2001','CatchUpFloor=0.0','if($target -lt $priorTarget){$target=$priorTarget}','$state.CatchUpFloor=[Math]::Max','Displayed=0.0','function Update-PMMResponsiveLayout','SetRow($Script:GrdHeaderActions,1)','Import-PMMThemeInputs -Paths')) {
+  if ($bootstrap -notmatch [regex]::Escape($marker)) { Fail ('RC25/current bootstrap marker missing: ' + $marker) }
 }
 foreach ($marker in @('PnlUserThemeOptions','TxtUserThemeEmpty','if($target -ge 100.0)','$Bar.Value=100.0','return 100.0')) {
   if ($bootstrap -notmatch [regex]::Escape($marker)) { Fail ('RC26 theme/progress marker missing: ' + $marker) }

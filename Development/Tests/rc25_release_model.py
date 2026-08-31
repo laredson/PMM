@@ -132,55 +132,64 @@ def validate_gura_preflight() -> None:
 class ProgressState:
     displayed: float
     target: float
-    interval_ms: float = 250.0
+    catch_up_floor: float = 0.0
 
     def report(self, target: float) -> None:
         target = math.floor(max(0.0, min(100.0, target)))
-        if target > self.target and self.displayed < self.target:
-            self.displayed = self.target
-        if target < self.displayed or target == 0:
-            self.displayed = target
+        if target < self.target:
+            target = self.target
+        if target > self.target:
+            self.catch_up_floor = max(self.catch_up_floor, self.target)
         self.target = target
-        gap = max(0.0, self.target - self.displayed)
-        if gap:
-            self.interval_ms = max(50.0, min(500.0, 3000.0 / gap))
 
-    def finish(self) -> list[int]:
-        sequence: list[int] = []
-        while self.displayed < self.target:
-            self.displayed = min(self.target, self.displayed + 1.0)
-            sequence.append(int(self.displayed))
-            assert self.displayed <= self.target
-        return sequence
+    def tick(self) -> tuple[int, str] | None:
+        if self.displayed >= self.target:
+            return None
+        self.displayed = min(self.target, self.displayed + 1.0)
+        assert self.displayed <= self.target
+        mode = "fast" if self.displayed < self.catch_up_floor else "slow"
+        return int(self.displayed), mode
 
 
 def validate_progress_model() -> None:
-    state = ProgressState(10, 10)
-    state.report(22)
-    assert state.interval_ms == 250.0
-    assert state.finish() == list(range(11, 23))
-    assert state.interval_ms * 12 == 3000.0
+    # A newly reported operation starts visually at zero and can drift only
+    # toward the current real ceiling using the slow 0.5-2.0 s cadence.
+    state = ProgressState(0, 14)
+    assert [state.tick() for _ in range(4)] == [(1, "slow"), (2, "slow"), (3, "slow"), (4, "slow")]
+    assert state.displayed == 4 and state.displayed <= state.target == 14
 
-    # When a newer real target arrives while presentation is behind, it may
-    # catch up only to the old proven target, then animates the new range.
-    state = ProgressState(14, 22)
-    state.report(30)
-    assert state.displayed == 22
-    assert state.interval_ms == 375.0
-    assert state.finish() == list(range(23, 31))
-    assert state.interval_ms * 8 == 3000.0
+    # When the worker advances from 1/7 to 2/7, the former 14% ceiling becomes
+    # a proven floor. Presentation catches up quickly only to 14, then returns
+    # to slow pacing toward the new 28% ceiling.
+    state.report(28)
+    assert state.catch_up_floor == 14 and state.target == 28 and state.displayed == 4
+    modes: list[str] = []
+    while state.displayed < 16:
+        tick = state.tick()
+        assert tick is not None
+        modes.append(tick[1])
+    assert modes[:9] == ["fast"] * 9
+    assert modes[9:] == ["slow"] * 3
+
+    # A stale/lower report inside the same operation never moves the bar back.
+    state.report(20)
+    assert state.target == 28 and state.displayed == 16
 
     bootstrap = read("Modules/Bootstrap/Start-PalModMerger.ps1")
     for marker in (
-        "function Set-PMMSmoothedProgressBar",
-        "3000.0/$gap",
-        "[Math]::Min(500.0",
-        "state.Displayed=$priorTarget",
-        "$start=if($target -le 1){$target}else{0.0}",
-        "if($target -ne $priorTarget){$state.LastStepUtc=",
+        "function Get-PMMProgressAnimationInterval",
+        "Get-Random -Minimum 100 -Maximum 501",
+        "Get-Random -Minimum 500 -Maximum 2001",
+        "CatchUpFloor=0.0",
+        "if($target -lt $priorTarget){$target=$priorTarget}",
+        "$state.CatchUpFloor=[Math]::Max",
+        "Displayed=0.0",
         "[Math]::Floor([Math]::Max(0.0",
     ):
-        assert marker in bootstrap
+        assert marker in bootstrap, marker
+    assert "$Script:BtnAutoRun.Tag='Running'" in bootstrap
+    assert "$Script:BtnAutoRun.Tag='Idle'" in bootstrap
+    assert "Auto ON" not in bootstrap
 
 
 def validate_ui_and_import_boundary() -> None:
@@ -227,6 +236,12 @@ def validate_ui_and_import_boundary() -> None:
             assert current == reference_names, f"Localized control mismatch in {filename}"
         assert 'x:Name="BtnDetectGame" Grid.Row="0" HorizontalAlignment="Stretch" MinWidth="0"' in text
         assert 'Background" Value="{DynamicResource CardAltBackground}"' in text
+        assert 'Content="SemiAUTO"' in text
+        assert 'x:Key="AutoRunButton"' in text
+        assert 'Style="{StaticResource AutoRunButton}"' in text
+        assert 'Name="SparkleLayer"' in text
+        assert 'Tag="Idle"' in text
+        assert "Auto ON" not in text
 
 
 def validate_release_identity() -> None:

@@ -20,6 +20,9 @@ PMM 1.3.1 MOD CREATION PREVIEW - WINDOWS ACCEPTANCE
 15. Install/test the PAK only through an explicit separate action. Treat it as UNPROVEN until gameplay testing passes.
 
 UI correctness checks:
+- Confirm the top workflow row says SemiAUTO, the wide AUTO button occupies the center and CANCEL remains on the right.
+- While AUTO is idle and enabled, confirm subtle sparkles cross the button; start AUTO and confirm the sparkles disappear until the workflow stops.
+- Start a sufficiently long operation and confirm progress begins at 0, advances irregularly without exceeding worker-reported progress, catches up faster after a real backend advance and reaches exact 100 only on proven completion.
 - Start with PMM Crystal saved, then reopen PMM. Confirm its colors are active immediately without pressing Apply changes.
 - Open New mod project at Windows display/text scaling 100%, 125%, 150% and 200%. Confirm all labels, fields and the three bottom actions remain readable and reachable.
 - Leave title or description empty and press Save project/Create AI ZIP. Confirm the dialog stays open, preserves typed text and focuses the missing field.

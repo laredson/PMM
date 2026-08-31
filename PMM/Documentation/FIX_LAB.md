@@ -100,6 +100,6 @@ When an exact Fix Lab case requires Current Game Reference, AUTO raises the exac
 
 For multi-output recipes, AUTO is allowed to evaluate the Fix Lab human-choice state while Game Reference is running; the Game Reference worker blocks processing operations but no longer blocks `FixLabOpen`, `FixLabChooseVariant`, or `FixLabWaitReference`. If the user chooses before the reference finishes, AUTO waits and continues to Repair immediately after completion. If the reference finishes first, the action-required state remains on the output choice.
 
-A Game Reference started manually does not break an already-active AUTO chain. Completion explicitly re-enters the unified workflow after the Game Reference process has been cleared. With Auto ON, starting Game Reference manually arms the normal continuation pipeline.
+A Game Reference started manually does not break an already-active AUTO chain. Completion explicitly re-enters the unified workflow after the Game Reference process has been cleared. With SemiAUTO, starting Game Reference manually arms the normal continuation pipeline.
 
 Successful informational completions are non-modal. PMM reserves modal dialogs for errors and explicit decisions. Completion audio is user-configurable (none/bell/microwave/crystal/custom plus volume); manual steps sound once, while an automatic chain suppresses intermediate sounds and sounds once at terminal success.
