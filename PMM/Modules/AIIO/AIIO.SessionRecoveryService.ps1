@@ -40,6 +40,74 @@ function Test-PMMAIIOSessionRecoveryDocument($Response) {
   return ([string]$markerProperty.Value -eq $Script:PMMAIIOSessionRecoverySchema)
 }
 
+function New-PMMAIIOReceivedModCandidateSession {
+  [CmdletBinding()]
+  param([Parameter(Mandatory=$true)]$Response,[Parameter(Mandatory=$true)][string]$ZipPath)
+
+  if(-not$Response -or [string]$Response.schema -notin @('PMM_AI_RESPONSE_V2','PMM_AIIO_RESPONSE_V2')){return $null}
+  if([string]$Response.responseType -ne 'candidate-ready'){return $null}
+  if(@($Response.requests).Count -ne 0){return $null}
+  $candidates=@($Response.candidates)
+  if($candidates.Count -lt 1 -or $candidates.Count -gt 32){return $null}
+
+  $sessionId=[string]$Response.sessionId
+  if(-not(Test-PMMAIIOSessionId $sessionId)){return $null}
+  $existing=Get-PMMAIIOSession $sessionId
+  if($existing){return $existing}
+  if(-not(Test-Path -LiteralPath $ZipPath -PathType Leaf)){return $null}
+
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $archive=[IO.Compression.ZipFile]::OpenRead((Get-Item -LiteralPath $ZipPath).FullName)
+  $displayName='Imported standalone mod candidate'
+  try{
+    foreach($candidate in $candidates){
+      $candidatePath=[string]$candidate.path
+      if([string]::IsNullOrWhiteSpace($candidatePath)){try{$candidatePath=[string]$candidate.candidatePath}catch{}}
+      if([string]::IsNullOrWhiteSpace($candidatePath)){return $null}
+      $manifestInfo=Get-PMMAIIOCandidateManifestFromArchive $archive $candidatePath
+      $manifest=$manifestInfo.Document
+      if(-not$manifest -or [string]$manifest.schema -ne 'PMM_MOD_CREATION_CANDIDATE_V1'){return $null}
+      if([string]$manifest.sessionId -ne $sessionId){return $null}
+      if([string]$manifest.mode -ne 'standalone-cooked-tree'){return $null}
+      if($displayName -eq 'Imported standalone mod candidate' -and -not[string]::IsNullOrWhiteSpace([string]$manifest.displayName)){$displayName=[string]$manifest.displayName}
+    }
+  }finally{$archive.Dispose()}
+
+  [int]$iteration=0
+  try{$iteration=[int]$Response.iteration}catch{return $null}
+  $bundleId=[string]$Response.bundleId
+  if($iteration -lt 1 -or [string]::IsNullOrWhiteSpace($bundleId)){return $null}
+  if($displayName.Length -gt 120){$displayName=$displayName.Substring(0,120)}
+  $summary=[string]$Response.summary
+  if($summary.Length -gt 20000){$summary=$summary.Substring(0,20000)}
+
+  $root=Get-PMMAIIOSessionPath $sessionId
+  if(Test-Path -LiteralPath $root){return $null}
+  foreach($name in @('requests','responses','candidates','test-runs','contributions','artifacts')){New-Item -ItemType Directory -Force -Path (Join-Path $root $name)|Out-Null}
+  $identity=Get-PMMAIIOProductIdentity
+  $plan=Get-PMMAIIOCurrentPlanSnapshot
+  $now=[DateTime]::UtcNow.ToString('o')
+  $session=[pscustomobject][ordered]@{
+    Schema='PMM_AIIO_SESSION_V2';Protocol=$Script:PMMAIIOProtocolVersion;CapabilitySet=$Script:PMMAIIOCapabilitySet
+    SessionId=$sessionId;Title=$displayName;UserDescription=$summary;TaskType='CREATE_MOD';Status='ReceivingCandidate';AttentionRequired=$true
+    Iteration=$iteration;LastBundleId=$bundleId;LastPresentedCandidate='';SelectedCandidateIds=@();SelectedTargets=@()
+    PrimaryTarget=[pscustomobject]@{Kind='Palworld';Id='';UserSuspects=$false;CauseConfirmed=$false};CaseIds=@()
+    SourceSignature=$(if($plan){[string]$plan.SourceSignature}else{''});MergeOrderSignature=$(if($plan){[string]$plan.MergeOrderSignature}else{''})
+    GameVersion='';PmmVersion=[string]$identity.Version;PmmBuildId=[string]$identity.BuildId;CurrentDeployment=(Get-PMMAIIOCurrentDeploymentSnapshot)
+    OperationState='ReceivingCandidate';Archived=$false;ReceivedWithoutOriginalWorkspace=$true;CreatedUtc=$now;UpdatedUtc=$now
+  }
+  try{
+    Save-PMMAIIOSession $session|Out-Null
+    try{Add-PMMAIIOHistoryEvent -SessionId $sessionId -Event DETACHED_CANDIDATE_RECEIVED -Message $displayName -Data ([ordered]@{Iteration=$iteration;BundleId=$bundleId;CandidateCount=$candidates.Count})|Out-Null}catch{}
+    try{$cfg=Get-PMMConfig;$cfg.AIIOActiveSession=$sessionId;Save-PMMConfig $cfg}catch{}
+    Write-PMMLog ('AIIO portable CREATE_MOD candidate adopted without original workspace: '+$sessionId)
+    return $session
+  }catch{
+    Remove-Item -LiteralPath $root -Recurse -Force -ErrorAction SilentlyContinue
+    throw
+  }
+}
+
 function Get-PMMAIIOResponsePackageHint([string]$ZipPath) {
   if(-not(Test-Path -LiteralPath $ZipPath -PathType Leaf)){throw 'AI response ZIP was not found.'}
   $item=Get-Item -LiteralPath $ZipPath
@@ -66,6 +134,7 @@ function Get-PMMAIIOResponsePackageHint([string]$ZipPath) {
       if(-not$response -or [string]$response.schema -notin @('PMM_AI_RESPONSE_V2','PMM_AIIO_RESPONSE_V2')){throw 'Unsupported AI response schema.'}
       $sessionId=[string]$response.sessionId
       if(-not(Test-PMMAIIOSessionId $sessionId)){throw 'AI response contains an invalid session id.'}
+      if([string]$response.responseType -eq 'candidate-ready' -and -not(Get-PMMAIIOSession $sessionId)){[void](New-PMMAIIOReceivedModCandidateSession -Response $response -ZipPath $ZipPath)}
       return [pscustomobject]@{Kind='Response';SessionId=$sessionId;CaseId=''}
     }
     $solution=Read-PMMAIIOZipJsonEntry $archive 'solution.json' 2097152
@@ -184,5 +253,29 @@ function Import-PMMAIIOAnyResponseZip {
   if($roots.Count -ne 1){throw 'AI response ZIP must contain exactly one root response.json or solution.json.'}
   if($roots[0] -ceq 'solution.json'){return (Import-PMMAIIOManualSolutionCandidate -ZipPath $ZipPath -SessionId $ExpectedSessionId)}
   if(Test-PMMAIIOSessionRecoveryDocument $response){return (Import-PMMAIIOSessionRecoveryZip -ZipPath $ZipPath -ExpectedSessionId $ExpectedSessionId)}
-  return (Import-PMMAIIOResponseZip -ZipPath $ZipPath -ExpectedSessionId $ExpectedSessionId)
+  $session=Get-PMMAIIOSession $ExpectedSessionId
+  $provisional=$false
+  if($session -and [string]$response.responseType -eq 'candidate-ready'){
+    $receivedProperty=$session.PSObject.Properties['ReceivedWithoutOriginalWorkspace']
+    if($receivedProperty){$provisional=[bool]$receivedProperty.Value}
+  }
+  try{
+    $result=Import-PMMAIIOResponseZip -ZipPath $ZipPath -ExpectedSessionId $ExpectedSessionId
+    if($provisional){
+      $committed=Get-PMMAIIOSession $ExpectedSessionId
+      if($committed){
+        $committed.OperationState='CandidateReady'
+        Save-PMMAIIOSession $committed|Out-Null
+      }
+    }
+    return $result
+  }catch{
+    if($provisional){
+      $sessionId=$ExpectedSessionId
+      Remove-Item -LiteralPath (Get-PMMAIIOSessionPath $sessionId) -Recurse -Force -ErrorAction SilentlyContinue
+      Write-PMMLog ('AIIO portable CREATE_MOD candidate adoption rolled back after validation failure: '+$sessionId)
+    }
+    throw
+  }
+
 }
