@@ -27,8 +27,17 @@ $Script:PMMAIIOSessionRecoverySchema='PMM_AIIO_SESSION_RECOVERY_V1'
 
 function Test-PMMAIIOSessionRecoveryDocument($Response) {
   if(-not$Response){return $false}
-  if([string]$Response.schema -eq $Script:PMMAIIOSessionRecoverySchema){return $true}
-  return ([string]$Response.schema -in @('PMM_AI_RESPONSE_V2','PMM_AIIO_RESPONSE_V2') -and [string]$Response.recoverySchema -eq $Script:PMMAIIOSessionRecoverySchema)
+  $schema=[string]$Response.schema
+  if($schema -eq $Script:PMMAIIOSessionRecoverySchema){return $true}
+  if($schema -notin @('PMM_AI_RESPONSE_V2','PMM_AIIO_RESPONSE_V2')){return $false}
+
+  # ConvertFrom-Json returns PSCustomObject. Under Set-StrictMode, directly
+  # reading a property that is not present (for example recoverySchema on a
+  # normal candidate-ready response) is a terminating error. Recovery is an
+  # optional transport marker, so inspect the property bag before reading it.
+  $markerProperty=$Response.PSObject.Properties['recoverySchema']
+  if(-not$markerProperty){return $false}
+  return ([string]$markerProperty.Value -eq $Script:PMMAIIOSessionRecoverySchema)
 }
 
 function Get-PMMAIIOResponsePackageHint([string]$ZipPath) {
