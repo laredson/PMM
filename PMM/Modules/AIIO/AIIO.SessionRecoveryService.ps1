@@ -14,9 +14,22 @@ This is intentionally narrow:
   * only the normal requestable AIIO capabilities may be queued;
   * previous iterations remain immutable;
   * each recoveryId is accepted at most once per session.
+
+Compatibility note:
+  Recovery ZIPs may use the native PMM_AIIO_SESSION_RECOVERY_V1 schema or a
+  PMM_AI_RESPONSE_V2 transport envelope carrying recoverySchema. The latter is
+  intentionally accepted by the pre-recovery UI router, so an updated worker can
+  recover a terminal session even if the WPF process still has the older lightweight
+  response router loaded.
 #>
 
 $Script:PMMAIIOSessionRecoverySchema='PMM_AIIO_SESSION_RECOVERY_V1'
+
+function Test-PMMAIIOSessionRecoveryDocument($Response) {
+  if(-not$Response){return $false}
+  if([string]$Response.schema -eq $Script:PMMAIIOSessionRecoverySchema){return $true}
+  return ([string]$Response.schema -in @('PMM_AI_RESPONSE_V2','PMM_AIIO_RESPONSE_V2') -and [string]$Response.recoverySchema -eq $Script:PMMAIIOSessionRecoverySchema)
+}
 
 function Get-PMMAIIOResponsePackageHint([string]$ZipPath) {
   if(-not(Test-Path -LiteralPath $ZipPath -PathType Leaf)){throw 'AI response ZIP was not found.'}
@@ -36,7 +49,7 @@ function Get-PMMAIIOResponsePackageHint([string]$ZipPath) {
         if(@($entryNames|Where-Object{$_ -ceq 'theme.json'}).Count -ne 1){throw 'Theme AI response requires exactly one root theme.json.'}
         return [pscustomobject]@{Kind='ThemeResponse';SessionId='';CaseId=''}
       }
-      if($response -and [string]$response.schema -eq $Script:PMMAIIOSessionRecoverySchema){
+      if(Test-PMMAIIOSessionRecoveryDocument $response){
         $sessionId=[string]$response.sessionId
         if(-not(Test-PMMAIIOSessionId $sessionId)){throw 'AIIO recovery package contains an invalid session id.'}
         return [pscustomobject]@{Kind='SessionRecovery';SessionId=$sessionId;CaseId=''}
@@ -55,7 +68,7 @@ function Get-PMMAIIOResponsePackageHint([string]$ZipPath) {
 function Test-PMMAIIOSessionRecoveryArchive([string]$ZipPath) {
   $envelope=Test-PMMAIIOResponseArchiveEnvelope $ZipPath
   $response=$envelope.Response
-  if(-not$response -or [string]$response.schema -ne $Script:PMMAIIOSessionRecoverySchema){throw 'Unsupported AIIO recovery schema.'}
+  if(-not(Test-PMMAIIOSessionRecoveryDocument $response)){throw 'Unsupported AIIO recovery schema.'}
 
   Add-Type -AssemblyName System.IO.Compression.FileSystem
   $archive=[IO.Compression.ZipFile]::OpenRead((Get-Item -LiteralPath $ZipPath).FullName)
@@ -161,6 +174,6 @@ function Import-PMMAIIOAnyResponseZip {
   }finally{$archive.Dispose()}
   if($roots.Count -ne 1){throw 'AI response ZIP must contain exactly one root response.json or solution.json.'}
   if($roots[0] -ceq 'solution.json'){return (Import-PMMAIIOManualSolutionCandidate -ZipPath $ZipPath -SessionId $ExpectedSessionId)}
-  if($response -and [string]$response.schema -eq $Script:PMMAIIOSessionRecoverySchema){return (Import-PMMAIIOSessionRecoveryZip -ZipPath $ZipPath -ExpectedSessionId $ExpectedSessionId)}
+  if(Test-PMMAIIOSessionRecoveryDocument $response){return (Import-PMMAIIOSessionRecoveryZip -ZipPath $ZipPath -ExpectedSessionId $ExpectedSessionId)}
   return (Import-PMMAIIOResponseZip -ZipPath $ZipPath -ExpectedSessionId $ExpectedSessionId)
 }
