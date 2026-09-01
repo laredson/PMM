@@ -110,4 +110,5 @@ function Remove-PMMDisposableArtifacts {
 # Load additive AIIO extensions after the base ModCreation/Response services so
 # their safe runtime overrides are active.
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.GameReferenceHydrationService.ps1')
+. (Join-Path $Script:Root 'Modules\AIIO\AIIO.GameReferenceFastIndexService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.SessionRecoveryService.ps1')
