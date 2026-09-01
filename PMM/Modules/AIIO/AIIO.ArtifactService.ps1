@@ -106,3 +106,7 @@ function Remove-PMMDisposableArtifacts {
   }
   return [pscustomobject]@{Removed=@($removed.ToArray());Skipped=@($skipped.ToArray());RemovedBytes=[int64](($removed|Measure-Object -Property Bytes -Sum).Sum)}
 }
+
+# Load the additive CREATE_MOD Game Reference index/hydration layer after the
+# base ModCreation/Response services so its safe runtime overrides are active.
+. (Join-Path $Script:Root 'Modules\AIIO\AIIO.GameReferenceHydrationService.ps1')
