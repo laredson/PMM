@@ -111,4 +111,5 @@ function Remove-PMMDisposableArtifacts {
 # their safe runtime overrides are active.
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.GameReferenceHydrationService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.GameReferenceFastIndexService.ps1')
+. (Join-Path $Script:Root 'Modules\AIIO\AIIO.PendingDataProgressService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.SessionRecoveryService.ps1')
