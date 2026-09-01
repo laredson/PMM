@@ -96,7 +96,7 @@ function Remove-PMMDisposableArtifacts {
     foreach($path in @($artifact.Paths|ForEach-Object{[string]$_})){
       $inside=$false;foreach($root in $allowedRoots){if(Test-PMMPathInside $path $root){$inside=$true;break}}
       if(-not$inside){$skipped.Add([pscustomobject]@{Path=$path;Reason='Outside disposable allowlist'});continue}
-      if($OlderThanDays -gt 0){try{if((Get-Item -LiteralPath $path).LastWriteTimeUtc -gt [DateTime]::UtcNow.AddDays(-$OlderThanDays)){$skipped.Add([pscustomobject]@{Path=$path;Reason='Too recent'});continue}}catch{}
+      if($OlderThanDays -gt 0){try{if((Get-Item -LiteralPath $path).LastWriteTimeUtc -gt [DateTime]::UtcNow.AddDays(-$OlderThanDays)){$skipped.Add([pscustomobject]@{Path=$path;Reason='Too recent'});continue}}catch{}}
       if(-not(Test-Path -LiteralPath $path)){$skipped.Add([pscustomobject]@{Path=$path;Reason='Already absent'});continue}
       if($PSCmdlet.ShouldProcess($path,'Delete disposable PMM artifact')){
         Remove-Item -LiteralPath $path -Recurse -Force -ErrorAction Stop
