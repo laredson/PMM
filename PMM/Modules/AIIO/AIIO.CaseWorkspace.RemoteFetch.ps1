@@ -229,10 +229,11 @@ function Invoke-PMMAIIOCaseAction([string]$Id,$Action){
 }
 
 function New-PMMAIIOCaseHandoff([string]$Id,[int]$FromStep=0){
-  $result=& $Script:PMMAIIORemoteBaseHandoff $Id $FromStep;$zip=[string]$result.ZipPath;if(-not(Test-Path -LiteralPath $zip -PathType Leaf)){return$result}
+  $result=& $Script:PMMAIIORemoteBaseHandoff $Id $FromStep;$zip=[string]$result.ZipPath;if(-not(Test-Path -LiteralPath $zip -PathType Leaf)){return $result}
   Add-Type -AssemblyName System.IO.Compression.FileSystem;$archive=[IO.Compression.ZipFile]::Open($zip,[IO.Compression.ZipArchiveMode]::Update)
   try{
     $old=$archive.GetEntry('capabilities.json');if($old){$old.Delete()};$entry=$archive.CreateEntry('capabilities.json',[IO.Compression.CompressionLevel]::Optimal);$writer=[IO.StreamWriter]::new($entry.Open(),[Text.UTF8Encoding]::new($false))
     try{$writer.Write(([ordered]@{Schema='PMM_AIIO_CASE_CAPABILITIES_V3';WorkOrderSchema=$Script:PMMAIIOWorkOrderSchema;Actions=@('ensure_game_reference','include_game_reference_family','query_game_reference','include_log','include_mod_full','include_mod_family','include_file','fetch_link','run_program','run_command');Transports=@('AUTO','MANUAL_ZIP','AGENT_SERVER','GIT','NEXUS','LINK')}|ConvertTo-Json -Depth 20))}finally{$writer.Dispose()}
-  }finally{$archive.Dispose()};return$result
+  }finally{$archive.Dispose()}
+  return $result
 }
