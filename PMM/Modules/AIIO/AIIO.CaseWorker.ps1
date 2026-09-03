@@ -46,6 +46,7 @@ try{
   . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspaceService.ps1')
   . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspace.ActionSafety.ps1')
   . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspace.RemoteFetch.ps1')
+  . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspace.LocalSource.ps1')
 }catch{
   $message='AIIO worker bootstrap failed: '+$_.Exception.Message
   Write-PMMAIIOWorkerBootstrapFailure $message ($_|Out-String)
