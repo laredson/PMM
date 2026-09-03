@@ -1,9 +1,9 @@
 <# AIIO remote-fetch capability.
    A work order declares a URL; PMM owns storage, progress, hashing and evidence.
-   No work order should depend on PMM Temp paths or on side effects from another action. #>
+   Work orders never depend on PMM Temp paths. For private GitHub sources PMM
+   prefers an existing local checkout and reads the requested ref without
+   changing that checkout's branch or working tree. #>
 
-# StrictMode-safe, idempotent installation. A fresh CaseWorker process has no
-# PMMAIIORemoteFetchInstalled variable yet, so never read it directly.
 $remoteFetchInstalled=$false
 try{
   $existing=Get-Variable -Name PMMAIIORemoteFetchInstalled -Scope Script -ErrorAction Stop
@@ -66,30 +66,109 @@ function Get-PMMAIIOGitHubRawDescriptor([Uri]$Uri){
   return [pscustomobject]@{Owner=$owner;Repo=$repo;Ref=$ref;Path=$path;RepositoryUrl=('https://github.com/'+$owner+'/'+$repo+'.git')}
 }
 
+function Normalize-PMMAIIOGitRemote([string]$Remote){
+  $v=([string]$Remote).Trim().Replace('\','/').ToLowerInvariant()
+  if($v.EndsWith('.git')){$v=$v.Substring(0,$v.Length-4)}
+  $v=$v -replace '^git@github\.com:','https://github.com/'
+  $v=$v -replace '^ssh://git@github\.com/','https://github.com/'
+  return $v.TrimEnd('/')
+}
+
+function Test-PMMAIIOLocalRepository([string]$Git,[string]$Path,$Desc){
+  if([string]::IsNullOrWhiteSpace($Path) -or -not(Test-Path -LiteralPath (Join-Path $Path '.git'))){return $false}
+  try{
+    $remote=@(Invoke-PMMAIIOGit $Git @('-C',$Path,'config','--get','remote.origin.url')|Select-Object -First 1)
+    if($remote.Count-eq0){return $false}
+    $want=Normalize-PMMAIIOGitRemote ('https://github.com/'+$Desc.Owner+'/'+$Desc.Repo)
+    return ((Normalize-PMMAIIOGitRemote ([string]$remote[0])) -eq $want)
+  }catch{return $false}
+}
+
+function Find-PMMAIIOLocalGitHubRepository([string]$Git,$Desc){
+  $candidates=[Collections.Generic.List[string]]::new()
+  try{
+    $app=[IO.Path]::GetFullPath((Get-PMMPath 'App'))
+    $repoRoot=Split-Path -Parent $app
+    $container=Split-Path -Parent $repoRoot
+    if($container){$candidates.Add((Join-Path $container ([string]$Desc.Repo)))}
+  }catch{}
+  if($HOME){
+    $candidates.Add((Join-Path $HOME ('Documents\GitHub\'+[string]$Desc.Repo)))
+    $candidates.Add((Join-Path $HOME ('source\repos\'+[string]$Desc.Repo)))
+  }
+  if($env:USERPROFILE){
+    $candidates.Add((Join-Path $env:USERPROFILE ('Documents\GitHub\'+[string]$Desc.Repo)))
+    if($env:OneDrive){$candidates.Add((Join-Path $env:OneDrive ('Documents\GitHub\'+[string]$Desc.Repo)))}
+  }
+  $seen=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+  foreach($candidate in $candidates){
+    if([string]::IsNullOrWhiteSpace($candidate)){continue}
+    try{$full=[IO.Path]::GetFullPath($candidate)}catch{continue}
+    if(-not$seen.Add($full)){continue}
+    if(Test-PMMAIIOLocalRepository $Git $full $Desc){return $full}
+  }
+  return ''
+}
+
+function Export-PMMAIIOLocalGitFile([string]$Git,[string]$Repo,$Desc,[string]$Target){
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $tmp=Join-PMMPath 'Temp' ('AIIO\GitArchive\'+[guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Force -Path $tmp|Out-Null
+  $zip=Join-Path $tmp 'one.zip'
+  try{
+    $refs=@([string]$Desc.Ref,('origin/'+[string]$Desc.Ref),('refs/heads/'+[string]$Desc.Ref),('refs/remotes/origin/'+[string]$Desc.Ref))
+    $ok=$false;$last=''
+    foreach($ref in $refs){
+      try{
+        if(Test-Path -LiteralPath $zip){Remove-Item -LiteralPath $zip -Force}
+        [void](Invoke-PMMAIIOGit $Git @('-C',$Repo,'archive','--format=zip',('--output='+$zip),$ref,'--',[string]$Desc.Path))
+        if(Test-Path -LiteralPath $zip -PathType Leaf){$ok=$true;break}
+      }catch{$last=$_.Exception.Message}
+    }
+    if(-not$ok){
+      try{
+        [void](Invoke-PMMAIIOGit $Git @('-C',$Repo,'fetch','--depth','1','origin',[string]$Desc.Ref))
+        [void](Invoke-PMMAIIOGit $Git @('-C',$Repo,'archive','--format=zip',('--output='+$zip),'FETCH_HEAD','--',[string]$Desc.Path))
+        $ok=(Test-Path -LiteralPath $zip -PathType Leaf)
+      }catch{$last=$_.Exception.Message}
+    }
+    if(-not$ok){throw ('Local repository found, but ref/path could not be read: '+$last)}
+    $archive=[IO.Compression.ZipFile]::OpenRead($zip)
+    try{
+      $entry=$archive.Entries|Where-Object{([string]$_.FullName).Replace('\','/') -ceq ([string]$Desc.Path).Replace('\','/')}|Select-Object -First 1
+      if(-not$entry){throw ('Git archive did not contain requested path: '+$Desc.Path)}
+      $parent=Split-Path -Parent $Target;if($parent){New-Item -ItemType Directory -Force -Path $parent|Out-Null}
+      $input=$entry.Open();$output=[IO.File]::Open($Target,[IO.FileMode]::Create,[IO.FileAccess]::Write,[IO.FileShare]::None)
+      try{$input.CopyTo($output)}finally{$output.Dispose();$input.Dispose()}
+    }finally{$archive.Dispose()}
+    return $true
+  }finally{Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue}
+}
+
 function Copy-PMMAIIOPrivateGitHubRaw([string]$Id,[Uri]$Uri,[string]$Target,[string]$FileName){
   $desc=Get-PMMAIIOGitHubRawDescriptor $Uri;if(-not$desc){return $false}
   $git=Get-PMMAIIOGitExecutable
-  if([string]::IsNullOrWhiteSpace($git)){throw 'GitHub link may be private, but PMM could not find git.exe for authenticated Git fallback.'}
+  if([string]::IsNullOrWhiteSpace($git)){throw 'GitHub source may be private, but PMM could not find git.exe.'}
+
+  $local=Find-PMMAIIOLocalGitHubRepository $git $desc
+  if($local){
+    Set-PMMAIIOCaseProgress $Id 0 100 ('Reading '+$desc.Owner+'/'+$desc.Repo+' from local Git checkout...') -Indeterminate
+    [void](Export-PMMAIIOLocalGitFile $git $local $desc $Target)
+    Set-PMMAIIOCaseProgress $Id 99 100 ('Collected '+$FileName+' from local Git checkout.')
+    return $true
+  }
+
   $safe=(($desc.Owner+'_'+$desc.Repo+'_'+$desc.Ref)-replace'[^A-Za-z0-9._-]','_')
   $cacheRoot=Join-PMMPath 'Temp' 'AIIO\GitFetch';New-Item -ItemType Directory -Force -Path $cacheRoot|Out-Null
   $repoRoot=Join-Path $cacheRoot $safe
-  Set-PMMAIIOCaseProgress $Id 0 100 ('GitHub link needs authentication. Using Git transport for '+$desc.Owner+'/'+$desc.Repo+'...') -Indeterminate
+  Set-PMMAIIOCaseProgress $Id 0 100 ('Private GitHub source. Trying authenticated Git transport for '+$desc.Owner+'/'+$desc.Repo+'...') -Indeterminate
   if(-not(Test-Path -LiteralPath (Join-Path $repoRoot '.git') -PathType Container)){
     if(Test-Path -LiteralPath $repoRoot){Remove-Item -LiteralPath $repoRoot -Recurse -Force -ErrorAction SilentlyContinue}
     try{[void](Invoke-PMMAIIOGit $git @('clone','--depth','1','--single-branch','--branch',[string]$desc.Ref,[string]$desc.RepositoryUrl,[string]$repoRoot))}
-    catch{throw ('Private GitHub repository '+$desc.Owner+'/'+$desc.Repo+' could not be opened with local Git credentials: '+$_.Exception.Message)}
-  }else{
-    try{
-      [void](Invoke-PMMAIIOGit $git @('-C',[string]$repoRoot,'fetch','--depth','1','origin',[string]$desc.Ref))
-      [void](Invoke-PMMAIIOGit $git @('-C',[string]$repoRoot,'checkout','--force','FETCH_HEAD'))
-    }catch{throw ('Could not refresh private GitHub repository '+$desc.Owner+'/'+$desc.Repo+': '+$_.Exception.Message)}
+    catch{throw ('Private GitHub repository '+$desc.Owner+'/'+$desc.Repo+' is not available locally and authenticated Git access failed. Clone it once with GitHub Desktop or configure Git credentials. Details: '+$_.Exception.Message)}
   }
-  $relative=([string]$desc.Path).Replace('/',[IO.Path]::DirectorySeparatorChar)
-  $source=[IO.Path]::GetFullPath((Join-Path $repoRoot $relative));$prefix=[IO.Path]::GetFullPath($repoRoot).TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar
-  if(-not$source.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)){throw 'GitHub file path escaped the authenticated repository checkout.'}
-  if(-not(Test-Path -LiteralPath $source -PathType Leaf)){throw ('Authenticated Git checkout does not contain requested file: '+$desc.Path)}
-  Copy-Item -LiteralPath $source -Destination $Target -Force
-  Set-PMMAIIOCaseProgress $Id 99 100 ('Collected '+$FileName+' through authenticated Git transport.')
+  [void](Export-PMMAIIOLocalGitFile $git $repoRoot $desc $Target)
+  Set-PMMAIIOCaseProgress $Id 99 100 ('Collected '+$FileName+' through Git transport.')
   return $true
 }
 
@@ -136,8 +215,8 @@ function Invoke-PMMAIIOFetchLink([string]$Id,$Raw,[string]$Evidence){
   $info=Get-Item -LiteralPath $target;if($maxBytes-gt0 -and [int64]$info.Length-gt$maxBytes){Remove-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue;throw ('Remote file exceeds requested maximum size: '+$info.Length+' bytes.')}
   $sha=(Get-Sha256 $target).ToLowerInvariant();if($expected -and $sha-ne$expected){Remove-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue;throw ('Remote file SHA256 mismatch. Got '+$sha+', expected '+$expected+'.')}
   $meta=Join-Path $Evidence 'download.json';Write-PMMAIIOCaseJson $meta ([ordered]@{Schema='PMM_AIIO_REMOTE_FETCH_V1';Url=$url;FileName=$fileName;Size=[int64]$info.Length;Sha256=$sha;Utc=[DateTime]::UtcNow.ToString('o')}) 12
-  Set-PMMAIIOCaseProgress $Id 100 100 ('Downloaded '+$fileName+' ('+([Math]::Round($info.Length/1MB,1))+' MiB)') -Completed
-  return [pscustomobject]@{Summary=('Downloaded '+$fileName+' from link');Artifacts=@($target,$meta)}
+  Set-PMMAIIOCaseProgress $Id 100 100 ('Collected '+$fileName+' ('+([Math]::Round($info.Length/1MB,1))+' MiB)') -Completed
+  return [pscustomobject]@{Summary=('Collected '+$fileName+' from link/source');Artifacts=@($target,$meta)}
 }
 
 function Invoke-PMMAIIOCaseAction([string]$Id,$Action){
