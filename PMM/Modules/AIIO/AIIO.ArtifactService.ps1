@@ -117,3 +117,4 @@ function Remove-PMMDisposableArtifacts {
 # response routing stay underneath it for migration/backward compatibility.
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspaceService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspace.UI.ps1')
+. (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspace.UI.Preview2.ps1')
