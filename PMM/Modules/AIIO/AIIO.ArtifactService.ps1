@@ -40,7 +40,7 @@ function Update-PMMArtifactRegistry {
     try{$active=(@($deployment.ManagedFiles|Where-Object{[string]$_.Sha256 -eq (Get-Sha256 $file.FullName)}).Count -gt 0)}catch{}
     $records.Add((New-PMMArtifactRecord 'COMPATIBILITY_BUILD' $(if($active){'CURRENT_PROTECTED'}else{'REBUILDABLE'}) $file.FullName $active $active $true))
   }
-  foreach($file in @(Get-ChildItem -LiteralPath (Get-PMMPath 'Handoffs') -Filter '*.pak' -File -Recurse -ErrorAction SilentlyContinue)){
+  foreach($file in @(Get-ChildItem -LiteralPath (Get-PMMPath 'Handoffs') -Filter '*.zip' -File -Recurse -ErrorAction SilentlyContinue)){
     $records.Add((New-PMMArtifactRecord 'HANDOFF_EXPORT' 'DISPOSABLE' $file.FullName $false $false $true))
   }
   $reference=Get-PMMGameReferenceCurrentRoot
@@ -53,6 +53,8 @@ function Update-PMMArtifactRegistry {
     if(Test-PMMTransientStageActive $stagePath){$activeTempStage=$true;break}
   }
   foreach($item in @(Get-ChildItem -LiteralPath $tempRoot -Force -ErrorAction SilentlyContinue)){
+    # Partial archives may be siblings of their active stage. If any owner in
+    # Temp is live, defer every Temp deletion until that operation completes.
     if($activeTempStage -or (Test-PMMTransientStageActive $item.FullName)){continue}
     $records.Add((New-PMMArtifactRecord 'TEMP_STAGE' 'DISPOSABLE' $item.FullName $false $false $true))
   }
@@ -94,7 +96,7 @@ function Remove-PMMDisposableArtifacts {
     foreach($path in @($artifact.Paths|ForEach-Object{[string]$_})){
       $inside=$false;foreach($root in $allowedRoots){if(Test-PMMPathInside $path $root){$inside=$true;break}}
       if(-not$inside){$skipped.Add([pscustomobject]@{Path=$path;Reason='Outside disposable allowlist'});continue}
-      if($OlderThanDays -gt 0){try{if((Get-Item -LiteralPath $path).LastWriteTimeUtc -gt [DateTime]::UtcNow.AddDays(-$OlderThanDays)){$skipped.Add([pscustomobject]@{Path=$path;Reason='Too recent'});continue}}catch{}
+      if($OlderThanDays -gt 0){try{if((Get-Item -LiteralPath $path).LastWriteTimeUtc -gt [DateTime]::UtcNow.AddDays(-$OlderThanDays)){$skipped.Add([pscustomobject]@{Path=$path;Reason='Too recent'});continue}}catch{}}
       if(-not(Test-Path -LiteralPath $path)){$skipped.Add([pscustomobject]@{Path=$path;Reason='Already absent'});continue}
       if($PSCmdlet.ShouldProcess($path,'Delete disposable PMM artifact')){
         Remove-Item -LiteralPath $path -Recurse -Force -ErrorAction Stop
@@ -105,9 +107,14 @@ function Remove-PMMDisposableArtifacts {
   return [pscustomobject]@{Removed=@($removed.ToArray());Skipped=@($skipped.ToArray());RemovedBytes=[int64](($removed|Measure-Object -Property Bytes -Sum).Sum)}
 }
 
+# Load additive AIIO extensions after the base ModCreation/Response services so
+# their runtime overrides are active.
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.GameReferenceHydrationService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.PendingDataService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.SessionRecoveryService.ps1')
+
+# AIIO V3 Case Workspace preview. This remains additive: v2 sessions and
+# response routing stay underneath it for migration/backward compatibility.
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspaceService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspace.UI.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspace.UI.Preview2.ps1')
