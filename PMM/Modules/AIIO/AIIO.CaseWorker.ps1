@@ -30,6 +30,7 @@ Initialize-PMMPaths $Script:Root|Out-Null
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.PendingDataService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.SessionRecoveryService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspaceService.ps1')
+. (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspace.ActionSafety.ps1')
 
 function Set-PMMGameReferenceProgress {
   param([int]$Current=0,[int]$Total=100,[string]$Message='',[switch]$Indeterminate)
@@ -51,7 +52,7 @@ try{
   $zipPath=''
   if($Mode -eq 'HANDOFF'){
     $step=$FromStep
-    if($step -le 0){$step=[int]$case.SelectedStep;if($step -le 0){$step=[int]$case.CurrentStep}}
+    if($step -le 0){$step=[int](Get-PMMAIIOActionValue $case 'SelectedStep' 0);if($step -le 0){$step=[int](Get-PMMAIIOActionValue $case 'CurrentStep' 0)}}
     if($step -lt 1){throw 'The case has no step to export.'}
     Set-PMMAIIOCaseProgress $CaseId 0 1 ('Creating AI handoff from step '+$step+'...')
     $result=New-PMMAIIOCaseHandoff $CaseId $step
@@ -63,8 +64,11 @@ try{
       $guard++
       $case=Get-PMMAIIOCase $CaseId
       if(-not$case){throw 'AIIO case disappeared while the worker was running.'}
-      $next=[string]$case.NextAction
-      $pending=@($case.PendingActions|Where-Object{[string]$_.Status -eq 'Pending'})
+      $next=[string](Get-PMMAIIOActionValue $case 'NextAction' '')
+      $pending=[Collections.Generic.List[object]]::new()
+      foreach($action in @(Get-PMMAIIOActionArray $case 'PendingActions')){
+        if([string](Get-PMMAIIOActionValue $action 'Status' 'Pending') -eq 'Pending'){$pending.Add($action)}
+      }
 
       if($pending.Count -gt 0 -and $next -ne 'PROCESS_REQUESTS'){
         $case.NextAction='PROCESS_REQUESTS';Save-PMMAIIOCase $case|Out-Null;$next='PROCESS_REQUESTS'
@@ -76,7 +80,7 @@ try{
       }
       if($next -in @('CREATE_HANDOFF','EDIT_OR_CREATE_HANDOFF')){
         $case=Get-PMMAIIOCase $CaseId
-        $step=[int]$case.CurrentStep
+        $step=[int](Get-PMMAIIOActionValue $case 'CurrentStep' 0)
         if($step -lt 1){throw 'The case has no current step to export.'}
         Set-PMMAIIOCaseProgress $CaseId 0 1 ('Creating AI handoff from step '+$step+'...')
         $result=New-PMMAIIOCaseHandoff $CaseId $step
