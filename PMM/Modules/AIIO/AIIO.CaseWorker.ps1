@@ -31,6 +31,7 @@ Initialize-PMMPaths $Script:Root|Out-Null
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.SessionRecoveryService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspaceService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspace.ActionSafety.ps1')
+. (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspace.RemoteFetch.ps1')
 
 function Set-PMMGameReferenceProgress {
   param([int]$Current=0,[int]$Total=100,[string]$Message='',[switch]$Indeterminate)
