@@ -118,3 +118,4 @@ function Remove-PMMDisposableArtifacts {
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspaceService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspace.UI.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspace.UI.Preview2.ps1')
+. (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspace.UI.Preview3.ps1')
