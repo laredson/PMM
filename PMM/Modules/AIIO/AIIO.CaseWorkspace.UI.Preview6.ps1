@@ -1,4 +1,4 @@
-<# AIIO Case Workspace preview 6.
+﻿<# AIIO Case Workspace preview 6.
    Long AIIO operations run in a separate worker process. The WPF thread only
    imports/routes quickly, launches the worker and polls persisted case progress. #>
 
@@ -60,7 +60,7 @@ function Complete-PMMAIIOWorkerV6 {
   Set-PMMAIIOWorkerUiBusyV6 $false
   if($exitCode -eq 0 -and $result -and [string](Get-PMMAIIOCaseValue $result 'Status' '') -eq 'Complete'){
     $zip=[string](Get-PMMAIIOCaseValue $result 'ZipPath' '')
-    Set-PMMAIIOCaseUiStatus $(if($zip){'AIIO background work complete. Handoff ready: '+[IO.Path]::GetFileName($zip)}else{'AIIO background work complete.'})
+    Set-PMMAIIOCaseUiStatus $(if($zip){'AIIO background work complete. Handoff ready: '+[IO.Path]::GetFileName($zip)}else{[string](Get-PMMAIIOCaseValue $result 'Message' 'AIIO background work complete.')})
     if($zip){Show-PMMAIIOHandoffInExplorerV5 $zip}
   }else{
     $message=$(if($result){[string](Get-PMMAIIOCaseValue $result 'Message' 'AIIO worker failed.')}else{'AIIO worker stopped unexpectedly.'})
@@ -117,9 +117,9 @@ function Stop-PMMAIIOCaseAutomation {
   $Script:PMMAIIOCaseCancelRequested=$true
   if(-not$Script:PMMAIIOWorkerProcess -or $Script:PMMAIIOWorkerProcess.HasExited){return}
   $caseId=$Script:PMMAIIOWorkerCaseId
-  $pid=[int]$Script:PMMAIIOWorkerProcess.Id
+  $workerPid=[int]$Script:PMMAIIOWorkerProcess.Id
   try{
-    $killer=Start-Process -FilePath 'taskkill.exe' -ArgumentList @('/PID',[string]$pid,'/T','/F') -WindowStyle Hidden -Wait -PassThru
+    $killer=Start-Process -FilePath 'taskkill.exe' -ArgumentList @('/PID',[string]$workerPid,'/T','/F') -WindowStyle Hidden -Wait -PassThru
   }catch{try{$Script:PMMAIIOWorkerProcess.Kill()}catch{}}
   try{Set-PMMAIIOCaseProgress $caseId 1 1 'AIIO operation cancelled by user.' -Completed}catch{}
   try{Write-PMMAIIOCaseJson (Join-Path (Get-PMMAIIOCasePath $caseId) 'worker-result.json') ([ordered]@{Schema='PMM_AIIO_CASE_WORKER_RESULT_V1';CaseId=$caseId;Mode=$Script:PMMAIIOWorkerMode;Status='Cancelled';Message='AIIO operation cancelled by user.';ZipPath='';Utc=[DateTime]::UtcNow.ToString('o')}) 12}catch{}
@@ -158,6 +158,7 @@ function Invoke-PMMAIIOAutoCaseUiV4 {
   if($next -in @('USER_DECISION','REVIEW_CANDIDATE')){
     Set-PMMAIIOCaseUiStatus ('AUTO paused for supervision: '+(Get-PMMAIIOCaseNextLabel $next));return
   }
+  if($next -eq 'WAIT_FOR_MCP' -and -not(Get-PMMMCPClient)){Set-PMMAIIOCaseUiStatus 'Available via MCP. Waiting for a connected AI to read the case.';return}
   if($next -eq 'WAIT_FOR_AI'){
     Set-PMMAIIOCaseUiStatus 'AUTO is waiting for AI input.';return
   }

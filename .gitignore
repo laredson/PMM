@@ -77,3 +77,6 @@ Development/TestResults/
 *.ucas
 *.utoc
 oo2core_9_win64.dll
+
+# Per-machine MCP client paths
+/.codex/config.toml

@@ -17,3 +17,9 @@ Palworld, Unreal Engine and third-party mods remain the property of their respec
 ## Go toolchain/runtime (PMM.exe / PMMRuntime.exe)
 
 PMM's Host and Runtime executables are built from the included Go source. The Go runtime/toolchain license is reproduced at `Documentation/ThirdParty/Go-LICENSE.txt`.
+
+## Optional modding environment
+
+Unreal Engine, Visual Studio, Audiokinetic/Wwise SDK and Wwise Unreal integration are acquired separately under their respective terms. They are not bundled in the public PMM package. A personal offline backup is not a public redistribution license. PalworldModdingKit is acquired at the revision and SHA-256 recorded in Resources/Unreal/profile.json.
+
+The managed AssetTools module reuses the UAssetAPI, Newtonsoft.Json and ZstdSharp dependencies and licenses listed above. PMM does not require users to compile this module or install an additional SDK.

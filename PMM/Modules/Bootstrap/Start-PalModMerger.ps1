@@ -1,4 +1,4 @@
-﻿<#
+<#
 Palworld Manager Merger WPF front-end
 ==========================
 
@@ -849,12 +849,10 @@ function Refresh-PMMAIHelpUi([switch]$EnsureUnsupported,[switch]$All) {
     # Analyze may introduce a new Unsupported set after the tab was opened once;
     # AIHelpLoaded must not suppress creation/reuse of that exact session.
     if($EnsureUnsupported){try{[void](Get-PMMAIIOUnsupportedSession)}catch{Write-PMMLog ('AIIO Unsupported session warning: '+$_.Exception.Message)}}
-    $tab=0;try{$tab=[int]$Script:AIHelpTabs.SelectedIndex}catch{$tab=0}
-    if($All -or $tab -eq 0){Refresh-PMMAIHelpDiagnostics}
-    if($All -or $tab -eq 1){Refresh-PMMAIIOSessions}
-    if($All -or $tab -eq 2){Refresh-PMMAIHelpFeedback;Refresh-PMMAIHelpKnowledge;$Script:BtnAIHelpCleanup.IsEnabled=-not[bool]$Script:AIIOBusy}
-    if($All -or $tab -eq 3){Refresh-PMMThemeEditorCatalog}
-    if($All -or $tab -eq 4){$Script:BtnAIHelpCleanup.IsEnabled=-not[bool]$Script:AIIOBusy}
+    $tab='CASES';try{$tab=[string]$Script:AIHelpTabs.SelectedItem.Tag}catch{}
+    if($All -or $tab -eq 'CASES'){Refresh-PMMAIHelpDiagnostics;Refresh-PMMAIIOSessions}
+    if($All -or $tab -eq 'FEEDBACK'){Refresh-PMMAIHelpFeedback;Refresh-PMMAIHelpKnowledge;$Script:BtnAIHelpCleanup.IsEnabled=-not[bool]$Script:AIIOBusy}
+    if($All -or $tab -eq 'THEME'){Refresh-PMMThemeEditorCatalog}
     Refresh-PMMAIHelpBadge
     $Script:AIHelpLoaded=$true
   }finally{$Script:AIHelpUiRefreshing=$false}
@@ -905,7 +903,7 @@ function Show-PMMThemeImageOptions($Entry) {
   $overlay=[System.Windows.Forms.TextBox]::new();$overlay.Left=270;$overlay.Top=176;$overlay.Width=210;$overlay.Text=if(Test-PMMThemeHexColor ([string]$Entry.overlay)){[string]$Entry.overlay}else{'#00000000'}
   foreach($control in @($stretch,$align,$tile,$opacity,$overlay)){[void]$form.Controls.Add($control)}
   $ok=[System.Windows.Forms.Button]::new();$ok.Text='OK';$ok.Left=300;$ok.Top=220;$ok.Width=85;$ok.DialogResult=[System.Windows.Forms.DialogResult]::OK;$cancel=[System.Windows.Forms.Button]::new();$cancel.Text=L 'Cancel' 'Cancelar';$cancel.Left=395;$cancel.Top=220;$cancel.Width=85;$cancel.DialogResult=[System.Windows.Forms.DialogResult]::Cancel;[void]$form.Controls.Add($ok);[void]$form.Controls.Add($cancel);$form.AcceptButton=$ok;$form.CancelButton=$cancel
-  if($form.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK){return $null}
+  if((Show-PMMStyledDialog $form) -ne [System.Windows.Forms.DialogResult]::OK){return $null}
   if(-not(Test-PMMThemeHexColor ([string]$overlay.Text))){throw 'Overlay color must be #RRGGBB or #RRGGBBAA.'}
   return [pscustomobject]@{stretch=[string]$stretch.SelectedItem;alignment=[string]$align.SelectedItem;tileMode=[string]$tile.SelectedItem;opacity=([double]$opacity.Value/100.0);overlay=([string]$overlay.Text).ToUpperInvariant()}
 }
@@ -1044,7 +1042,7 @@ function Show-PMMBuildValidationDialog([string]$CurrentStatus) {
   $buttonWidth=230;$buttonGap=14;$totalWidth=($choices.Count*$buttonWidth)+([Math]::Max(0,$choices.Count-1)*$buttonGap);$left=[int](($clientWidth-$totalWidth)/2)
   foreach($choice in $choices){$button=[System.Windows.Forms.Button]::new();$button.Text=[string]$choice.Label;$button.Tag=[string]$choice.Result;$button.Left=$left;$button.Top=126;$button.Width=$buttonWidth;$button.Height=76;$button.Font=[System.Drawing.Font]::new('Segoe UI Semibold',12);$button.AutoEllipsis=$false;$button.UseMnemonic=$false;$button.Add_Click({param($sender,$e)$form.Tag=[string]$sender.Tag;$form.Close()});[void]$form.Controls.Add($button);$buttons.Add($button);if([string]$choice.Result -eq 'CANCEL'){$form.CancelButton=$button};$left+=$buttonWidth+$buttonGap}
   $note=[System.Windows.Forms.Label]::new();$note.Left=28;$note.Top=250;$note.Width=984;$note.Height=70;$note.Font=[System.Drawing.Font]::new('Segoe UI',11);$note.Text=L 'The result is recorded locally against a deterministic buildId. It is not uploaded.' 'El resultado se registra localmente contra un buildId determinista. No se sube.'
-  [void]$form.Controls.Add($label);[void]$form.Controls.Add($note);[void]$form.ShowDialog();return [string]$form.Tag
+  [void]$form.Controls.Add($label);[void]$form.Controls.Add($note);[void](Show-PMMStyledDialog $form);return [string]$form.Tag
 }
 
 function Show-PMMValidationContributionDialog {
@@ -1053,7 +1051,7 @@ function Show-PMMValidationContributionDialog {
   $yes=[System.Windows.Forms.Button]::new();$yes.Text=L 'Yes, open feedback' 'Si, abrir feedback';$yes.Left=122;$yes.Top=164;$yes.Width=245;$yes.Height=72;$yes.Font=[System.Drawing.Font]::new('Segoe UI Semibold',12);$yes.DialogResult=[System.Windows.Forms.DialogResult]::Yes
   $later=[System.Windows.Forms.Button]::new();$later.Text=L 'Not now' 'Ahora no';$later.Left=393;$later.Top=164;$later.Width=245;$later.Height=72;$later.Font=[System.Drawing.Font]::new('Segoe UI Semibold',12);$later.DialogResult=[System.Windows.Forms.DialogResult]::No
   $form.Controls.AddRange(@($label,$yes,$later));$form.AcceptButton=$yes;$form.CancelButton=$later
-  return ($form.ShowDialog() -eq [System.Windows.Forms.DialogResult]::Yes)
+  return ((Show-PMMStyledDialog $form) -eq [System.Windows.Forms.DialogResult]::Yes)
 }
 
 # Action-required hint duration: 0 disables the popup, 1..120 are seconds,
@@ -1478,12 +1476,12 @@ function Register-PMMFixLabHandlers {
     try{
       $candidate=Get-PMMFixLabSelectedCandidate;if(-not$candidate){return}
       $warning=L 'Ignore Fix Lab for this exact legacy source hash? PMM will allow Analyze/AUTO to continue with the unfixed mod under your responsibility. You can clear ignored repairs from Advanced.' 'Ignorar Fix Lab para este hash exacto del mod antiguo? PMM permitira continuar Analyze/AUTO con el mod sin reparar bajo tu responsabilidad. Puedes borrar los ignorados desde Advanced.'
-      if([System.Windows.MessageBox]::Show($warning,(L 'Ignore repair warning' 'Ignorar aviso de reparacion'),[System.Windows.MessageBoxButton]::YesNo,[System.Windows.MessageBoxImage]::Warning) -ne [System.Windows.MessageBoxResult]::Yes){return}
+      if((Show-PMMThemedMessage @($warning,(L 'Ignore repair warning' 'Ignorar aviso de reparacion'),'YesNo')) -ne [System.Windows.MessageBoxResult]::Yes){return}
       [void](Ignore-PMMFixLabCandidate $candidate)
       $Script:FixLabSelectedRecipeId='';$Script:FixLabSelectedVariantId='';$Script:FixLabNoticeDismissed=$true
       Refresh-PMMFixLabUI
       $live=@(Get-PMMFixLabDiscoveryCandidates);$Script:FixLabCachedAttentionCandidates=@($live);Set-PMMFixLabAttentionVisual $live ''
-      $Script:MainTabs.SelectedIndex=0
+      $Script:MainTabs.SelectedItem=$Script:PMMMergeTab
       $Script:TxtStatus.Text=L 'Fix Lab warning ignored for this exact source. Next action: Analyze.' 'Aviso de Fix Lab ignorado para esta fuente exacta. Siguiente accion: Analyze.'
       Close-PMMRequiredActionPopup;$Script:RequiredActionSignature='';Update-PMMGuidedActionState
       if([bool]$Script:TglAutoMode.IsChecked){Start-PMMAutoPipeline;Invoke-PMMAutoContinue}
@@ -1606,7 +1604,7 @@ function Register-PMMFixLabHandlers {
       $live=@(Get-PMMFixLabDiscoveryCandidates);$Script:FixLabCachedAttentionCandidates=@($live);$Script:FixLabNoticeDismissed=$true
       try{Set-PMMFixLabAttentionVisual $live ''}catch{}
       Close-PMMRequiredActionPopup;$Script:RequiredActionSignature=''
-      $Script:MainTabs.SelectedIndex=0
+      $Script:MainTabs.SelectedItem=$Script:PMMMergeTab
       Update-PMMGuidedActionState
       Notify-PMMWorkflowStepComplete
     }catch{if(Test-PMMCancellationError $_){Set-PMMOperationResult 'FixLab' (L 'Apply Fix cancelled. Transaction rolled back.' 'Aplicar Fix cancelado. La transaccion se revirtio.');Stop-PMMAutoPipeline}else{Handle-UIError $_ (L 'Apply Fix' 'Aplicar Fix')}}
@@ -1618,7 +1616,7 @@ function Register-PMMFixLabHandlers {
   $Script:BtnFixLabRevertBackup.Add_Click({
     try{
       $row=$Script:LstFixLabBackups.SelectedItem;if(-not$row){return}
-      $answer=[System.Windows.MessageBox]::Show((L 'Restore the original legacy mod? PMM will remove/archive the applied repair and restore the original source to both the PMM library and Palworld ~mods. The deployed compatibility merge will not be changed.' 'Restaurar el mod antiguo original? PMM retirara/archivara el fix aplicado y restaurara la fuente original tanto en la biblioteca PMM como en ~mods de Palworld. El merge de compatibilidad desplegado no se modificara.'),(L 'Restore original mod' 'Restaurar mod original'),[System.Windows.MessageBoxButton]::YesNo,[System.Windows.MessageBoxImage]::Warning)
+      $answer=Show-PMMThemedMessage @((L 'Restore the original legacy mod? PMM will remove/archive the applied repair and restore the original source to both the PMM library and Palworld ~mods. The deployed compatibility merge will not be changed.' 'Restaurar el mod antiguo original? PMM retirara/archivara el fix aplicado y restaurara la fuente original tanto en la biblioteca PMM como en ~mods de Palworld. El merge de compatibilidad desplegado no se modificara.'),(L 'Restore original mod' 'Restaurar mod original'),'YesNo')
       if($answer -ne [System.Windows.MessageBoxResult]::Yes){return}
       [void](Restore-PMMFixLabCase ([string]$row.CaseId))
       Refresh-UI;Check-PMMExternalModChanges -Force;Refresh-PMMFixLabUI
@@ -2886,7 +2884,7 @@ function Show-Info([string]$Message) {
 
 function Show-Error([string]$Message) {
   try{Play-PMMSoundEvent 'Error'}catch{}
-  [System.Windows.MessageBox]::Show($Message,'Palworld Manager Merger',[System.Windows.MessageBoxButton]::OK,[System.Windows.MessageBoxImage]::Error) | Out-Null
+  Show-PMMThemedMessage @($Message,'Palworld Manager Merger','OK') | Out-Null
 }
 
 function Get-PMMUiNumber($Config,[string]$Property,[double]$Default,[double]$Minimum,[double]$Maximum) {
@@ -3052,7 +3050,7 @@ function Reset-PMMLayout {
 }
 
 function Confirm([string]$Message) {
-  return ([System.Windows.MessageBox]::Show($Message,'Palworld Manager Merger',[System.Windows.MessageBoxButton]::YesNo,[System.Windows.MessageBoxImage]::Question) -eq [System.Windows.MessageBoxResult]::Yes)
+  return ((Show-PMMThemedMessage @($Message,'Palworld Manager Merger','YesNo')) -eq [System.Windows.MessageBoxResult]::Yes)
 }
 
 Apply-PMMLayoutFromConfig
@@ -4527,7 +4525,7 @@ function Refresh-UI {
     $volume=50;try{$volume=[int]$cfg.CompletionVolume}catch{};$volume=[Math]::Max(0,[Math]::Min(100,$volume))
     $Script:SldCompletionVolume.Value=$volume;$Script:TxtCompletionVolume.Text=($volume.ToString()+'%')
     $autoErrorCases=$true;try{$autoErrorCases=[bool]$cfg.AIIOAutoCreateErrorCases}catch{};$Script:ChkAIIOAutoCreateErrorCases.IsChecked=$autoErrorCases
-    $Script:TxtAIIOSettingsStatus.Text=L 'Local-only mode. PMM never uploads automatically; sharing remains an explicit manual action.' 'Modo solo local. PMM nunca sube nada automaticamente; compartir sigue siendo una accion manual explicita.'
+    $Script:TxtAIIOSettingsStatus.Text=L 'PMM never uploads on its own. If MCP is enabled, a connected client can request scoped data.' 'PMM no sube datos por su cuenta. Si habilitas MCP, un cliente conectado puede solicitar datos limitados.'
   }finally{$Script:UiSettingsRefreshing=$false}
 
   $sourceMods=@(Get-LibraryMods)
@@ -4657,7 +4655,7 @@ function Select-PalworldInstallation([array]$Paths) {
   $ok = New-Object System.Windows.Forms.Button; $ok.Text = 'OK'; $ok.Left = 575; $ok.Top = 300; $ok.Width = 80; $ok.DialogResult = [System.Windows.Forms.DialogResult]::OK
   $cancel = New-Object System.Windows.Forms.Button; $cancel.Text = L 'Cancel' 'Cancelar'; $cancel.Left = 665; $cancel.Top = 300; $cancel.Width = 85; $cancel.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
   $form.Controls.AddRange(@($label,$list,$ok,$cancel)); $form.AcceptButton = $ok; $form.CancelButton = $cancel
-  if ($form.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK) { return $null }
+  if ((Show-PMMStyledDialog $form) -ne [System.Windows.Forms.DialogResult]::OK) { return $null }
   return [string]$list.SelectedItem
 }
 
@@ -4673,7 +4671,7 @@ function Handle-UIError($ErrorRecord,[string]$Action,[switch]$NoDiagnostic) {
     if($create -and -not$NoDiagnostic){
       $case=Register-PMMAutomaticErrorCase -Title $Action -Message $message
       Refresh-PMMAIHelpDiagnostics;Refresh-PMMAIHelpBadge;[void](Select-PMMSelectorItemId $Script:LstAIHelpDiagnostics 'CaseId' ([string]$case.CaseId))
-      $Script:MainTabs.SelectedItem=$Script:TabAIHelp;$Script:AIHelpTabs.SelectedIndex=0
+      $Script:MainTabs.SelectedItem=$Script:TabAIHelp;$Script:AIHelpTabs.SelectedItem=$Script:PMMHelpCaseTab
       $Script:TxtAIHelpDiagnosticStatus.Text=((L 'PMM recorded this error in diagnostic case {0}. Repeated identical failures reuse the same case.' 'PMM registro este error en el caso de diagnostico {0}. Los fallos identicos repetidos reutilizan el mismo caso.') -f [string]$case.CaseId)
     }
   }catch{Write-PMMLog ('Could not route the error into AI & Help: '+$_.Exception.Message)}
@@ -4727,7 +4725,7 @@ function Show-PMMGameDetectionFallback {
   $game.Add_Click({$form.Tag='Palworld';$form.Close()})
   $cancel.Add_Click({$form.Tag='Cancel';$form.Close()})
   $form.Controls.AddRange(@($label,$steam,$game,$cancel));$form.CancelButton=$cancel
-  [void]$form.ShowDialog()
+  [void](Show-PMMStyledDialog $form)
   return [string]$form.Tag
 }
 
@@ -5359,7 +5357,7 @@ function Update-PMMValidatedPatchRow($Entry,$Summary) {
 function Open-PMMValidationFeedbackForPatch($Patch) {
   if(-not$Patch){return}
   $Script:MainTabs.SelectedItem=$Script:TabAIHelp
-  $Script:AIHelpTabs.SelectedIndex=2
+  $Script:AIHelpTabs.SelectedItem=$Script:PMMHelpFeedbackTab
   Refresh-PMMAIHelpFeedback -Force
   [void](Select-PMMSelectorItemId $Script:CmbAIHelpFeedbackBuild 'Key' ([string]$Patch.Name))
   $Script:CmbAIHelpFeedbackType.SelectedValue='MERGE_COMMENT'
@@ -5789,7 +5787,7 @@ function Complete-PMMAIIOPendingDataUi($Result,[string]$SessionId) {
 
 function Complete-PMMAIIOCandidateAnalyzeUi($Result) {
   Refresh-UI
-  $Script:MainTabs.SelectedIndex=0
+  $Script:MainTabs.SelectedItem=$Script:PMMMergeTab
 }
 
 function Start-PMMAIIOCandidateAnalyze {
@@ -5917,7 +5915,7 @@ function Show-PMMModCreationProjectDialog {
   $prepare.Add_Click($prepareHandler)
   $form.Add_ContentRendered($focusHandler)
 
-  $result=$form.ShowDialog()
+  $result=(Show-PMMStyledDialog $form)
   if($result -ne $true){return $null}
   return $form.Tag
 }
@@ -5930,7 +5928,7 @@ $Script:BtnAIHelpNewModProject.Add_Click({
     $project=Show-PMMModCreationProjectDialog;if(-not$project){return}
     $targets=@();if(-not[string]::IsNullOrWhiteSpace([string]$project.TargetHint)){$targets=@([pscustomobject]@{Kind='GameReferenceSearchHint';Id=[string]$project.TargetHint;UserSuspects=$false;CauseConfirmed=$false})}
     $session=New-PMMAIIOSession -Title ([string]$project.Title) -Description ([string]$project.Description) -TaskType CREATE_MOD -TargetKind GameReference -TargetId ([string]$project.TargetHint) -SelectedTargets $targets
-    $sessionId=[string]$session.SessionId;Select-PMMAIIOUiSession $sessionId;$Script:AIHelpTabs.SelectedIndex=1
+    $sessionId=[string]$session.SessionId;Select-PMMAIIOUiSession $sessionId;$Script:AIHelpTabs.SelectedItem=$Script:PMMHelpCaseTab
     if([bool]$project.Prepare){$done={param($result) Complete-PMMAIIOPrepareUi $result $sessionId $true}.GetNewClosure();[void](Start-PMMBackgroundOperation -Operation AIIOPrepare -SessionId $sessionId -OnSuccess $done)}
     else{$Script:TxtAIIOStatus.Text=((L 'Standalone mod project saved locally: {0}. It has not been uploaded.' 'Proyecto independiente de mod guardado localmente: {0}. No se ha subido.') -f $sessionId)}
   }catch{Handle-UIError $_ (L 'Create standalone mod project' 'Crear proyecto independiente de mod')}
@@ -5964,7 +5962,7 @@ $Script:BtnAIHelpPrepareDiagnostic.Add_Click({
     $session=Get-PMMAIIOSessionForDiagnostic ([string]$case.CaseId)
     if(-not$session){$session=New-PMMAIIOSessionFromDiagnostic $case}
     $sessionId=[string]$session.SessionId
-    Select-PMMAIIOUiSession $sessionId;$Script:AIHelpTabs.SelectedIndex=1
+    Select-PMMAIIOUiSession $sessionId;$Script:AIHelpTabs.SelectedItem=$Script:PMMHelpCaseTab
     if([string]$session.Status -ne 'Draft'){
       $Script:TxtAIIOStatus.Text=((L 'This diagnostic already uses session {0} ({1}). PMM opened the existing session instead of creating another one.' 'Este diagnostico ya usa la sesion {0} ({1}). PMM abrio la sesion existente en lugar de crear otra.') -f $sessionId,[string]$session.Status)
       return
@@ -6018,7 +6016,7 @@ $Script:BtnAIIOImportResponse.Add_Click({
     if([string]$hint.Kind -eq 'ThemeResponse'){
       $result=Import-PMMThemeAIResponse $zipPath
       $Script:ActiveThemeDraft=$result.Draft;Refresh-PMMThemeEditorCatalog -Force;$Script:LstThemeDrafts.SelectedValue=[string]$result.Draft.DraftId;Show-PMMThemeDraft $result.Draft
-      $Script:AIHelpTabs.SelectedIndex=3
+      $Script:AIHelpTabs.SelectedItem=$Script:PMMHelpThemeTab
       $Script:TxtThemeEditorStatus.Text=((L 'Standalone AI theme validated into draft {0}. It remains uninstalled until you review and explicitly install it.' 'Tema IA independiente validado como borrador {0}. Sigue sin instalar hasta que lo revises y lo instales expresamente.') -f [string]$result.Draft.Name)
       return
     }
@@ -6155,7 +6153,7 @@ $Script:BtnExportKnowledgeContribution.Add_Click({
       $ok=New-Object System.Windows.Forms.Button;$ok.Text='OK';$ok.Left=650;$ok.Top=305;$ok.Width=75;$ok.DialogResult=[System.Windows.Forms.DialogResult]::OK
       $cancel=New-Object System.Windows.Forms.Button;$cancel.Text=L 'Cancel' 'Cancelar';$cancel.Left=735;$cancel.Top=305;$cancel.Width=85;$cancel.DialogResult=[System.Windows.Forms.DialogResult]::Cancel
       $form.Controls.AddRange(@($label,$list,$ok,$cancel));$form.AcceptButton=$ok;$form.CancelButton=$cancel
-      if($form.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK){return};$chosen=$list.SelectedItem
+      if((Show-PMMStyledDialog $form) -ne [System.Windows.Forms.DialogResult]::OK){return};$chosen=$list.SelectedItem
     }
     if(-not$chosen){return}
     $warning=L "Only create a runtime contribution after you tested this exact imported solution in Palworld and the expected behaviors worked. Mark this case as a user-reported runtime PASS and package it for maintainer/community validation?`n`nThe package can contain the original AIIO handoff, returned solution and validation/runtime evidence. Whole source mod PAKs are not copied into it. Send it to the PMM maintainer/approved private intake.`n`nThis does NOT auto-authorize a Knowledge recipe on this PC." "Crea una contribucion runtime solo despues de probar esta solucion importada exacta dentro de Palworld y confirmar los comportamientos esperados. Marcar este caso como PASS runtime reportado por el usuario y empaquetarlo para validacion comunitaria/mantenedor?`n`nEl paquete puede contener la entrega AIIO original, la solucion devuelta y la evidencia de validacion/runtime. No se copian PAK fuente completos dentro del paquete. Envialo al mantenedor/servicio privado aprobado de PMM.`n`nEsto NO autoriza automaticamente una receta Knowledge en este PC."
@@ -6264,6 +6262,10 @@ Refresh-UI
 if (-not $autoDepsOk) {
   Show-Info (L 'Some dependencies are still unavailable. Restart PMM.exe or use Settings > Prepare / repair dependencies.' 'Aun faltan algunas dependencias. Reinicia PMM.exe o usa Configuracion > Preparar / reparar dependencias.')
 }
+. (Join-Path $Script:Root 'Modules\MCP\MCP.UI.ps1')
+. (Join-Path $Script:Root 'Modules\Unreal\Dependencies.UI.ps1')
+. (Join-Path $Script:Root 'Modules\AIIO\AIIO.Workspaces.UI.ps1')
+Initialize-PMMWorkspaces
 $uiExitState='Normal'
 try {
   [void]$Window.ShowDialog()

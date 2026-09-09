@@ -1,4 +1,4 @@
-param(
+﻿param(
   [Parameter(Mandatory=$true)][string]$Root,
   [Parameter(Mandatory=$true)][string]$CaseId,
   [ValidateSet('AUTO','HANDOFF')][string]$Mode='AUTO',
@@ -73,14 +73,14 @@ try{
   if(-not$case){throw 'AIIO case not found.'}
   Set-PMMAIIOCaseProgress $CaseId 0 100 'AIIO worker started...' -Indeterminate
 
-  $zipPath=''
+  $zipPath='';$completionMessage='AIIO worker completed.'
   if($Mode-eq'HANDOFF'){
     $step=$FromStep
     if($step-le0){$step=[int](Get-PMMAIIOActionValue $case 'SelectedStep' 0);if($step-le0){$step=[int](Get-PMMAIIOActionValue $case 'CurrentStep' 0)}}
     if($step-lt1){throw 'The case has no step to export.'}
     Set-PMMAIIOCaseProgress $CaseId 0 1 ('Creating AI handoff from step '+$step+'...')
     $result=New-PMMAIIOCaseHandoff $CaseId $step;$zipPath=[string]$result.ZipPath
-    Set-PMMAIIOCaseProgress $CaseId 1 1 ('Handoff ready: '+[IO.Path]::GetFileName($zipPath)) -Completed
+    Set-PMMAIIOCaseProgress $CaseId 1 1 $(if($zipPath){'Handoff ready: '+[IO.Path]::GetFileName($zipPath)}else{$completionMessage=[string]$result.Message;$completionMessage}) -Completed
   }else{
     $guard=0
     while($guard-lt30){
@@ -96,15 +96,23 @@ try{
         if($step-lt1){throw 'The case has no current step to export.'}
         Set-PMMAIIOCaseProgress $CaseId 0 1 ('Creating AI handoff from step '+$step+'...')
         $result=New-PMMAIIOCaseHandoff $CaseId $step;$zipPath=[string]$result.ZipPath
-        Set-PMMAIIOCaseProgress $CaseId 1 1 ('Handoff ready: '+[IO.Path]::GetFileName($zipPath)) -Completed;break
+        Set-PMMAIIOCaseProgress $CaseId 1 1 $(if($zipPath){'Handoff ready: '+[IO.Path]::GetFileName($zipPath)}else{$completionMessage=[string]$result.Message;$completionMessage}) -Completed;break
       }
+      if($next-eq'WAIT_FOR_MCP'){$completionMessage='Available via MCP. Waiting for a connected AI to read the case.';Set-PMMAIIOCaseProgress $CaseId 1 1 $completionMessage -Completed;break}
       if($next-eq'WAIT_FOR_AI'){Set-PMMAIIOCaseProgress $CaseId 1 1 'AIIO is waiting for AI input.' -Completed;break}
       if($next-in@('USER_DECISION','REVIEW_CANDIDATE')){Set-PMMAIIOCaseProgress $CaseId 1 1 ('AIIO paused for supervision: '+$next) -Completed;break}
       $case.NextAction='CREATE_HANDOFF';$case.Status='READY_FOR_HANDOFF';Save-PMMAIIOCase $case|Out-Null
     }
     if($guard-ge30){throw 'AIIO worker exceeded its local step guard.'}
   }
-  Write-PMMAIIOWorkerResult 'Complete' 'AIIO worker completed.' $zipPath
+  $currentCase=Get-PMMAIIOCase $CaseId
+  if($currentCase.Transport -eq 'MCP' -and $currentCase.NextAction -eq 'WAIT_FOR_MCP'){
+    . (Join-Path $Script:Root 'Modules\MCP\MCP.Service.ps1')
+    . (Join-Path $Script:Root 'Modules\MCP\MCP.Client.ps1')
+    $completionMessage=Invoke-PMMMCPClient $CaseId
+    Set-PMMAIIOCaseProgress $CaseId 1 1 $completionMessage -Completed
+  }
+  Write-PMMAIIOWorkerResult 'Complete' $completionMessage $zipPath
   exit 0
 }catch{
   $message=$_.Exception.Message

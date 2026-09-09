@@ -1,4 +1,4 @@
-<# AIIO Case Workspace preview 3 runtime fixes.
+﻿<# AIIO Case Workspace preview 3 runtime fixes.
    Windows PowerShell 5.1 can scalarize a one-item command result when assigning
    directly to WPF ItemsSource. Use the DataGrid Items collection instead so
    zero, one and many rows follow exactly the same path. #>
@@ -83,6 +83,7 @@ function Show-PMMAIIOCaseEditor{
   (Get-PMMAIIOCaseControl 'CmbType').SelectedValue=$type
   (Get-PMMAIIOCaseControl 'TxtDescription').Text=$description
   (Get-PMMAIIOCaseControl 'CmbTransport').SelectedValue=$transport
+  Update-PMMAIIOTransportButton
   Set-PMMAIIOCaseGridRows $referenceGrid @(Get-PMMAIIOReferenceRows $view)
 
   $pending=[Collections.Generic.List[object]]::new()

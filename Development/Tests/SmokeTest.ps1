@@ -70,6 +70,9 @@ Assert-PMM (@($idx.entries|Where-Object{[string]$_.kind -eq 'production-recipe' 
 $recipe=Get-Content (Join-Path $App 'CKL/Stable/production-recipes.json') -Raw|ConvertFrom-Json
 Assert-PMM (@($recipe.recipes|Where-Object{$_.production.enabled}).Count -eq 1) 'Stable CKL has exactly one automatic production recipe'
 
+$manifestBytes=[IO.File]::ReadAllBytes((Join-Path $App 'Resources/Metadata/RELEASE_MANIFEST.json'))
+$manifestHasBom=($manifestBytes.Length -ge 3 -and $manifestBytes[0] -eq 0xEF -and $manifestBytes[1] -eq 0xBB -and $manifestBytes[2] -eq 0xBF)
+Assert-PMM (-not $manifestHasBom) 'Native release manifest is UTF-8 without BOM'
 $manifest=Get-Content (Join-Path $App 'Resources/Metadata/RELEASE_MANIFEST.json') -Raw|ConvertFrom-Json
 Assert-PMM ([string]$manifest.version -eq '1.3.1') 'Manifest version 1.3.1'
 Assert-PMM ([int]$manifest.mergePlanSchema -eq 18) 'Merge plan schema 18'
