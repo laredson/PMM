@@ -14,7 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "PMM"
-EXPECTED_BUILD = "PMM-v1.3.1-MOD-CREATION-PREVIEW"
+EXPECTED_BUILD = "PMM-v1.3.1ModCreator"
 EXPECTED_CANDIDATE = "1.3.1-mod-creation-preview"
 
 

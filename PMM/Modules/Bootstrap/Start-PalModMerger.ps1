@@ -1,4 +1,4 @@
-<#
+﻿<#
 Palworld Manager Merger WPF front-end
 ==========================
 

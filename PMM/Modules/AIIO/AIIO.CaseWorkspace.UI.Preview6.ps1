@@ -153,6 +153,8 @@ function Invoke-PMMAIIOAutoCaseUiV4 {
   if(-not$case){return}
   [void](Save-PMMAIIOCaseEditor)
   $case=Get-PMMAIIOCase ([string]$case.CaseId)
+  if($case.Transport -eq 'MCP' -and (Get-PMMCaseClient $case) -eq 'CHATGPT'){Show-PMMChatGPTCase;return}
+  if($case.Transport -eq 'MCP' -and (Get-PMMCaseClient $case) -eq 'CODEX' -and -not(Get-PMMMCPClient)){Set-PMMMCPClient $true}
   if(-not$case){throw 'Case disappeared while AUTO was starting.'}
   $next=[string](Get-PMMAIIOCaseValue $case 'NextAction' '')
   if($next -in @('USER_DECISION','REVIEW_CANDIDATE')){
@@ -170,6 +172,8 @@ function Invoke-PMMAIIOCreateHandoffUi {
   if(-not$case){return}
   [void](Save-PMMAIIOCaseEditor)
   $case=Get-PMMAIIOCase ([string]$case.CaseId)
+  if($case.Transport -eq 'MCP' -and (Get-PMMCaseClient $case) -eq 'CHATGPT'){Show-PMMChatGPTCase;return}
+  if($case.Transport -eq 'MCP' -and (Get-PMMCaseClient $case) -eq 'CODEX' -and -not(Get-PMMMCPClient)){Set-PMMMCPClient $true}
   $step=[int](Get-PMMAIIOCaseValue $case 'SelectedStep' 0)
   if($step -le 0){$step=[int](Get-PMMAIIOCaseValue $case 'CurrentStep' 0)}
   if($step -lt 1){throw 'The case has no step to export.'}

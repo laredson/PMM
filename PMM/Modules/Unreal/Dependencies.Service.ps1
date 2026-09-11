@@ -1,9 +1,10 @@
+. (Join-Path $PSScriptRoot '../MCP/ChatGPT.Desktop.ps1')
 . (Join-Path $PSScriptRoot 'Wwise.Offline.ps1')
 
 function Get-PMMDependencyRoot {return (Resolve-PMMMCPPath $Script:Root 'Workspace\Dependencies')}
 function Get-PMMDependencyDefinitions {
     return @(
-        @{id='unreal';name='Unreal Engine / Epic Launcher';version='5.1.1';kind='epic'},
+        @{id='chatgpt';name='ChatGPT Desktop (optional AI client)';version='Current';kind='microsoft-store'},        @{id='unreal';name='Unreal Engine / Epic Launcher';version='5.1.1';kind='epic'},
         @{id='visualstudio';name='Visual Studio 2022 + MSVC';version='14.38 / 17.8';kind='microsoft'},
         @{id='windowssdk';name='Windows SDK';version='10 / 11';kind='microsoft'},
         @{id='dotnet6';name='.NET Runtime x64';version='6.0';kind='microsoft'},
@@ -16,7 +17,7 @@ function Get-PMMDependencyCatalog {
     $e=Get-PMMUnrealEnvironment
     $kit=Join-Path (Get-PMMUnrealRoot) ('Downloads\'+$e.kitCommit+'.zip')
     $kitOK=(Test-Path $kit) -and (Get-FileHash $kit).Hash -ieq (Get-PMMUnrealProfile).kitSha256
-    $ready=@{unreal=$e.compatible;visualstudio=[bool]$e.visualStudio;windowssdk=$e.windowsSdk;dotnet6=$e.dotnet6;wwise=($e.missing -notcontains 'Wwise 2021.1.11 SDK (Win32/x64 vc170)');wwiseintegration=([bool]$e.wwiseIntegration -and (Test-Path $e.wwiseIntegration));kit=$kitOK}
+    $ready=@{chatgpt=[bool](Get-PMMChatGPTDesktop);unreal=$e.compatible;visualstudio=[bool]$e.visualStudio;windowssdk=$e.windowsSdk;dotnet6=$e.dotnet6;wwise=($e.missing -notcontains 'Wwise 2021.1.11 SDK (Win32/x64 vc170)');wwiseintegration=([bool]$e.wwiseIntegration -and (Test-Path $e.wwiseIntegration));kit=$kitOK}
     $rows=@(foreach($d in Get-PMMDependencyDefinitions){[pscustomobject]@{id=$d.id;name=$d.name;version=$d.version;installed=[bool]$ready[$d.id];status=$(if($ready[$d.id]){'DETECTED'}else{'MISSING'});verified=$false;path=''}})
     if($e.PSObject.Properties['visualStudioInstalled'] -and $e.visualStudioInstalled -and -not $ready.visualstudio){
         ($rows | Where-Object {$_.id -eq 'visualstudio'}).status='VS 2022 DETECTED; MSVC 14.38 MISSING'
@@ -78,7 +79,6 @@ function Approve-PMMDependencyInstall([string]$Id,[string]$Mode){
     if($job.status -ne 'AWAITING_CONSENT'){throw 'Request is no longer awaiting consent.'}
     Set-PMMDependencyPolicy $Mode
     $job.automatic=$Mode -eq 'automatic';$job.status='QUEUED'
-    if($job.automatic){$job.component='all'}
     Write-PMMAIIOJsonAtomic $path $job 8
     Start-PMMDependencyWorker $Id
 }
@@ -93,7 +93,7 @@ function Get-PMMDependencyJob([string]$Id,[string]$CaseId=''){
     if($CaseId -and $job.caseId -cne $CaseId){throw 'Dependency job belongs to another case.'}
     if($job.status -eq 'WAITING_EXTERNAL'){
         $rows=@(Get-PMMDependencyCatalog)
-        $missing=@($rows|Where-Object{(-not $_.installed) -and ($job.component -eq 'all' -or $_.id -eq $job.component)})
+        $missing=@($rows|Where-Object{(-not $_.installed) -and (($job.component -eq 'all' -and $_.id -ne 'chatgpt') -or $_.id -eq $job.component)})
         if(-not $missing.Count){$job.status='COMPLETE';$job.message='Requested components detected; project verification is separate.';Write-PMMAIIOJsonAtomic (Get-PMMDependencyJobPath $Id) $job 8}
     }
     return $job
@@ -102,6 +102,7 @@ function Get-PMMDependencyJob([string]$Id,[string]$CaseId=''){
 function Open-PMMDependencyComponent([string]$Component){
     $pf86=[Environment]::GetEnvironmentVariable('ProgramFiles(x86)')
     switch($Component){
+        'chatgpt' {Open-PMMChatGPTDesktop}
         'unreal' {Open-PMMUnrealInstaller}
         'visualstudio' {
             $setup=Join-Path $pf86 'Microsoft Visual Studio/Installer/setup.exe'
@@ -122,7 +123,7 @@ function Repair-PMMDependencyJobStates($Rows){
         if($j.operation -ne 'install' -or $j.cancel){continue}
         $changed=$false
         if($j.status -eq 'WAITING_EXTERNAL'){
-            $missing=@($Rows|Where-Object{-not $_.installed -and ($j.component -eq 'all' -or $_.id -eq $j.component)})
+            $missing=@($Rows|Where-Object{-not $_.installed -and (($j.component -eq 'all' -and $_.id -ne 'chatgpt') -or $_.id -eq $j.component)})
             if(-not $missing.Count){$j.status='COMPLETE';$j.message='Requested components detected; project verification is separate.';$changed=$true}
         }elseif($j.status -in @('QUEUED','RUNNING')){
             $alive=$false

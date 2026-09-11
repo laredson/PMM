@@ -110,8 +110,11 @@ function Get-PMMMCPTools {
     $str=@{type='string';minLength=1;maxLength=256}
     $case=@{type='string';pattern='^AICASE-[0-9]{8}-[0-9]{6}-[a-f0-9]{8}$';maxLength=32}
     $defs=@(
+        @('pmm_desktop_pair','Verify a PMM-generated installation pairing code. Does not grant folder access or authenticate an account.',@{nonce=$str},@('nonce'),$false),
+        @('pmm_desktop_case_link','Record receipt, research or waiting for plan approval for a Desktop request. Supply a real thread ID only when available.',@{caseId=$case;requestId=$str;token=$str;threadId=@{type='string';pattern='^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'};phase=@{type='string';enum=@('RECEIVED','RESEARCHING','AWAITING_APPROVAL')}},@('caseId','requestId','token','phase'),$false),
+        @('pmm_connection_check','Confirm a user-created case connection challenge. Does not grant permissions.',@{caseId=$case;nonce=$str},@('caseId','nonce'),$false),
         @('pmm_dependencies_status','Detect optional modding components. Detection is not project verification.',@{},@(),$true),
-        @('pmm_dependency_install','Request an official catalog component. PMM asks the user unless automatic installation was authorized. Cannot grant consent.',@{caseId=$case;component=@{type='string';enum=@('all','unreal','visualstudio','windowssdk','dotnet6','wwise','wwiseintegration','kit')}},@('caseId','component'),$false),
+        @('pmm_dependency_install','Request an official catalog component. PMM asks the user unless automatic installation was authorized. Cannot grant consent.',@{caseId=$case;component=@{type='string';enum=@('all','chatgpt','unreal','visualstudio','windowssdk','dotnet6','wwise','wwiseintegration','kit')}},@('caseId','component'),$false),
         @('pmm_dependency_job','Read installation progress; WAITING_EXTERNAL means official launcher steps remain.',@{caseId=$case;jobId=$str},@('caseId','jobId'),$true),
         @('pmm_dependency_cancel','Cancel an installation request owned by this case.',@{caseId=$case;jobId=$str},@('caseId','jobId'),$false),
 
@@ -185,6 +188,9 @@ function Invoke-PMMMCPTool([string]$Name,$Arguments) {
     if($Name -eq 'pmm_dependency_job'){return (Get-PMMDependencyJob $Arguments.jobId $Arguments.caseId)}
     if($Name -eq 'pmm_dependency_cancel'){[void](Get-PMMDependencyJob $Arguments.jobId $Arguments.caseId);return (Cancel-PMMDependencyInstall $Arguments.jobId)}
 
+    if($Name -eq 'pmm_desktop_pair'){return (Confirm-PMMDesktopBinding $Arguments)}
+    if($Name -eq 'pmm_desktop_case_link'){return (Set-PMMDesktopCaseLink $Arguments)}
+    if($Name -eq 'pmm_connection_check'){return (Confirm-PMMDesktopConnection $Arguments)}
     if($Name -eq 'pmm_reference_prepare'){Write-PMMMCPAudit $Name 'STARTED';try{return (Start-PMMMCPReference)}finally{Write-PMMMCPAudit $Name 'FINISHED_ATTEMPT'}}
     if($Name -eq 'pmm_reference_status'){
         $wait=0

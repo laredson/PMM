@@ -1,5 +1,8 @@
+. (Join-Path $PSScriptRoot 'AIIO.CaseNavigation.UI.ps1')
+. (Join-Path $PSScriptRoot '../Shared/Settings.Workspaces.UI.ps1')
 
 # One reusable editor with per-area selection; no case files are moved.
+$Script:PMMWorkspacesInitialized=$false
 $Script:PMMCaseArea='HELP'
 $Script:PMMAreaSelections=@{}
 $Script:PMMAreaHosts=@{}
@@ -7,7 +10,7 @@ function Get-PMMCaseArea([string]$Type){
     switch($Type){'NEW_MOD'{'CREATE'};'FIX_MOD'{'FIX'};'COMPATIBILITY'{'MERGE'};default{'HELP'}}
 }
 function Get-PMMAIIOCaseRows {
-    return ,@(Get-PMMAIIOCases|Where-Object{(Get-PMMCaseArea $_.Type) -eq $Script:PMMCaseArea}|ForEach-Object{
+    return @(Get-PMMAIIOCases|Where-Object{(Get-PMMCaseArea $_.Type) -eq $Script:PMMCaseArea}|ForEach-Object{
         [pscustomobject]@{CaseId=[string]$_.CaseId;Title=[string]$_.Title;LastStep=[string]$_.LastAction;NextStep=(Get-PMMAIIOCaseNextLabel ([string]$_.NextAction))}
     })
 }
@@ -15,7 +18,7 @@ function Switch-PMMCaseArea([string]$Area){
     if(-not $Script:PMMAreaHosts.ContainsKey($Area)){return}
     if($Script:PMMCaseEditor.Parent -eq $Script:PMMAreaHosts[$Area]){return}
     if($Script:PMMAIIOCaseSelectedId){
-        Save-PMMAIIOCaseEditor
+        [void](Save-PMMAIIOCaseEditor)
         $Script:PMMAreaSelections[$Script:PMMCaseArea]=$Script:PMMAIIOCaseSelectedId
     }
     foreach($hostPanel in $Script:PMMAreaHosts.Values){$hostPanel.Content=$null}
@@ -29,10 +32,13 @@ function New-PMMAreaTab([string]$Header,[string]$Area){
     $tab=[Windows.Controls.TabItem]::new();$tab.Header=$Header;$tab.Tag=$Area
     $layout=[Windows.Controls.DockPanel]::new();$tab.Content=$layout
     $actions=[Windows.Controls.StackPanel]::new();$actions.Orientation='Horizontal';$actions.Margin=[Windows.Thickness]::new(8)
-    $settings=[Windows.Controls.Button]::new();$settings.Content='AI / MCP Settings'
-    $settings.Add_Click({$Script:MainTabs.SelectedItem=$Script:PMMSettingsTab;$Script:PMMSettingsTabs.SelectedItem=$Script:PMMAISettingsTab})
+    $settings=[Windows.Controls.Button]::new();$settings.Content=L 'Options' 'Opciones';$settings.Tag=$Area
+    $settings.Add_Click({param($sender,$e) Open-PMMSettings ([string]$sender.Tag)})
     $candidates=[Windows.Controls.Button]::new();$candidates.Content=L 'Candidates' 'Candidatos';$candidates.Margin=[Windows.Thickness]::new(8,0,0,0)
     $candidates.Add_Click({try{Show-PMMStructuredCandidates}catch{Handle-UIError $_ 'Candidates'}})
+    $desktop=[Windows.Controls.Button]::new();$desktop.Content=L 'Send to ChatGPT' 'Enviar a ChatGPT';$desktop.Margin=[Windows.Thickness]::new(8,0,0,0)
+    $desktop.Add_Click({try{Show-PMMChatGPTCase}catch{Handle-UIError $_ 'ChatGPT'}})
+    [void]$actions.Children.Add($desktop)
     [void]$actions.Children.Add($settings);[void]$actions.Children.Add($candidates)
     [Windows.Controls.DockPanel]::SetDock($actions,'Top');[void]$layout.Children.Add($actions)
     $hostPanel=[Windows.Controls.ContentControl]::new();[void]$layout.Children.Add($hostPanel)
@@ -40,18 +46,20 @@ function New-PMMAreaTab([string]$Header,[string]$Area){
     return $tab
 }
 function Initialize-PMMWorkspaces {
+    if($Script:PMMWorkspacesInitialized){return}
     if(-not $Script:PMMAIIOCaseWorkspaceInitialized){Initialize-PMMAIIOCaseWorkspaceUI}
     $main=$Script:MainTabs;$help=$Script:TabAIHelp
-    $caseTab=$Script:AIHelpTabs.Items[0];$caseTab.Tag='CASES'
+    $caseTab=$Script:AIHelpTabs.Items|Where-Object {$_.Name -eq 'TabCaseWorkspace'}|Select-Object -First 1;$caseTab.Tag='CASES'
     $Script:PMMHelpCaseTab=$caseTab
-    $Script:PMMHelpFeedbackTab=$Script:AIHelpTabs.Items[1];$Script:PMMHelpFeedbackTab.Tag='FEEDBACK'
-    $Script:PMMHelpThemeTab=$Script:AIHelpTabs.Items[2];$Script:PMMHelpThemeTab.Tag='THEME'
+    $Script:PMMHelpFeedbackTab=$Window.FindName('TabHelpFeedback');$Script:PMMHelpFeedbackTab.Tag='FEEDBACK'
+    $Script:PMMHelpThemeTab=$Window.FindName('TabHelpTheme');$Script:PMMHelpThemeTab.Tag='THEME'
+    Initialize-PMMCaseClientSelector
     $Script:PMMCaseEditor=$caseTab.Content;$caseTab.Content=$null
     $helpHost=[Windows.Controls.ContentControl]::new();$caseTab.Content=$helpHost
     $caseTab.Header=L 'Research cases' 'Casos de investigacion'
     $Script:PMMAreaHosts['HELP']=$helpHost
     $help.Header='Help';$help.Tag='HELP'
-    $merge=$main.Items[0];$merge.Name='TabMerge';$merge.Tag='MERGE';$Script:PMMMergeTab=$merge
+    $merge=$Window.FindName('TabMerge');$merge.Name='TabMerge';$merge.Tag='MERGE';$Script:PMMMergeTab=$merge
     $fix=$Script:TabFixLab;$fix.Tag='FIX'
     foreach($pair in @(@($merge,'MERGE'),@($fix,'FIX'))){
         $tab=$pair[0];$content=$tab.Content;$tab.Content=$null
@@ -63,24 +71,9 @@ function Initialize-PMMWorkspaces {
     $creation=[Windows.Controls.TabItem]::new();$creation.Header='Mod Creation';$creation.Name='TabModCreation';$creation.Tag='CREATE'
     $tabs=[Windows.Controls.TabControl]::new()
     [void]$tabs.Items.Add((New-PMMAreaTab (L 'Projects' 'Proyectos') 'CREATE'))
-    $tools=[Windows.Controls.TabItem]::new();$tools.Header=L 'Tools' 'Herramientas';$tools.Name='TabModdingTools'
-    $tools.Content=New-PMMDependencyPanel
-    [void]$tabs.Items.Add($tools);$creation.Content=$tabs
+    $creation.Content=$tabs
     $main.Items.Insert($main.Items.IndexOf($help),$creation)
-    $settings=$main.Items[$main.Items.Count-1];$settings.Name='TabSettings'
-    $generalContent=$settings.Content;$settings.Content=$null
-    $settingsTabs=[Windows.Controls.TabControl]::new()
-    $general=[Windows.Controls.TabItem]::new();$general.Header=L 'General' 'General';$general.Content=$generalContent
-    [void]$settingsTabs.Items.Add($general)
-    $aiSettings=$Script:AIHelpTabs.Items[$Script:AIHelpTabs.Items.Count-1]
-    $Script:AIHelpTabs.Items.Remove($aiSettings);$aiSettings.Header='AI / MCP';$aiSettings.Name='TabAISettings'
-    [void]$settingsTabs.Items.Add($aiSettings);$settings.Content=$settingsTabs
-    $permissions=[Windows.Controls.TabItem]::new();$permissions.Header=L 'Installation permissions' 'Permisos de instalacion'
-    $panel=[Windows.Controls.StackPanel]::new();$panel.Margin=[Windows.Thickness]::new(20)
-    $revoke=[Windows.Controls.Button]::new();$revoke.Content=L 'Ask before future dependency installations' 'Preguntar antes de futuras instalaciones de dependencias';$revoke.HorizontalAlignment='Left'
-    $revoke.Add_Click({Set-PMMDependencyPolicy 'ask';$this.Content=L 'Permission revoked' 'Permiso revocado'})
-    [void]$panel.Children.Add($revoke);$permissions.Content=$panel;[void]$settingsTabs.Items.Add($permissions)
-    $Script:PMMAISettingsTab=$aiSettings;$Script:PMMSettingsTab=$settings;$Script:PMMSettingsTabs=$settingsTabs
+    Initialize-PMMSettingsWorkspaces
     $main.Add_SelectionChanged({
         if($_.OriginalSource -ne $Script:MainTabs){return}
         $tag=[string]$Script:MainTabs.SelectedItem.Tag
@@ -88,6 +81,7 @@ function Initialize-PMMWorkspaces {
     })
     if(-not $main.SelectedItem){$main.SelectedItem=$merge}
     Switch-PMMCaseArea ([string]$main.SelectedItem.Tag)
+    $Script:PMMWorkspacesInitialized=$true
 }
 
 function Show-PMMStructuredCandidates {
@@ -118,4 +112,18 @@ function Add-PMMCaseAreaContext([string]$CaseId){
             Add-PMMAIIOCaseModReference $CaseId ([string]$row.Path) 'FULL_PAK'|Out-Null
         }
     }
+}
+
+function Initialize-PMMCaseClientSelector {
+    if($Script:PMMAIIOCaseUI.ContainsKey('CmbClient')){return}
+    $transport=Get-PMMAIIOCaseControl 'CmbTransport';$row=$transport.Parent
+    $label=[Windows.Controls.TextBlock]::new();$label.Text=L 'AI client' 'Cliente IA';$label.VerticalAlignment='Center';$label.Margin=[Windows.Thickness]::new(8,0,3,0)
+    $combo=[Windows.Controls.ComboBox]::new();$combo.Width=180;$combo.DisplayMemberPath='Label';$combo.SelectedValuePath='Value'
+    $combo.ItemsSource=@([pscustomobject]@{Label='ChatGPT Desktop';Value='CHATGPT'},[pscustomobject]@{Label=(L 'Other MCP client' 'Otro cliente MCP');Value='EXTERNAL'},[pscustomobject]@{Label=(L 'Codex console' 'Codex por consola');Value='CODEX'})
+    $combo.SelectedValue='EXTERNAL';$Script:PMMAIIOCaseUI['CmbClient']=$combo
+    $group=[Windows.Controls.StackPanel]::new();$group.Orientation='Horizontal';$group.Margin=[Windows.Thickness]::new(0,2,4,2)
+    [void]$group.Children.Add($label);[void]$group.Children.Add($combo)
+    $at=$row.Children.IndexOf($transport)+1;$row.Children.Insert($at,$group)
+    (Get-PMMAIIOCaseControl 'BtnCancel').Add_Click({$case=Get-PMMAIIOSelectedCase;if($case -and (Get-PMMCaseClient $case) -eq 'CHATGPT'){Cancel-PMMDesktopDispatch $case.CaseId}})
+    $combo.Add_SelectionChanged({if(-not $Script:PMMEditorLoading -and -not $Script:PMMCaseRefreshing){(Get-PMMAIIOCaseControl 'CmbTransport').SelectedValue='MCP'};Update-PMMAIIOTransportButton})
 }

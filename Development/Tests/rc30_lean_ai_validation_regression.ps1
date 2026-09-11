@@ -16,7 +16,7 @@ function Body([string]$Start,[string]$End) {
   return $Bootstrap.Substring($a,$b-$a)
 }
 
-Require ([string]$Manifest.buildId -eq 'PMM-v1.3.1-MOD-CREATION-PREVIEW') 'Current build identity mismatch while preserving the RC30 regression.'
+Require ([string]$Manifest.buildId -eq 'PMM-v1.3.1ModCreator') 'Current build identity mismatch while preserving the RC30 regression.'
 Require ([string]$Manifest.releaseCandidate -eq '1.3.1-mod-creation-preview') 'Current candidate identity mismatch while preserving the RC30 regression.'
 Require (-not[bool]$Manifest.aiioRemoteUploadEnabled) 'Remote upload must remain disabled.'
 

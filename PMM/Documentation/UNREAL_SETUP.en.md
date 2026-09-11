@@ -12,7 +12,7 @@ The additional-100-main-inventory-slots PAK is still unproven in game. Installin
 
 ## 2. Open PMM's tools
 
-Open Mod Creation → Tools. Select Detect installed tools before installing. Components have separate states; Locate accepts an existing folder, executable or compatible package.
+Open Settings → Installations. Select Detect installed tools before installing. Components have separate states; Locate accepts an existing folder, executable or compatible package.
 
 Accept starts the proposed installations. Choose persistent permission for the PMM catalog or ask each time; Cancel grants no permission. Permission can be revoked. Official account, license and Windows prompts remain interactive.
 
@@ -107,3 +107,9 @@ Original vendor metadata may retain the original download location. PMM locates 
 - [Audiokinetic Launcher Unreal integration](https://www.audiokinetic.com/en/public-library/Launcher_2025.2.0.5346/?id=unreal_engine&source=InstallGuide)
 - [Kit prerequisites](https://pwmodding.wiki/docs/developers/palworld-modding-kit/prerequisites)
 - [Kit installation](https://pwmodding.wiki/docs/developers/palworld-modding-kit/installation)
+
+## Centralized permissions and settings
+
+In Settings → Installations, Change permissions switches between asking each time and authorizing future catalog requests. Accept saves the choice without installing anything; Cancel preserves the previous mode. Cancelling jobs is separate. Pending consent is also handled while this tab is hidden.
+
+Settings contains General, AI/MCP, Installations, and the existing Mods & Merge, Mod Creation and Help options. Each relevant workspace has an Options shortcut. Cases retain separate IDs and histories even when their titles match.

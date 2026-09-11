@@ -23,6 +23,8 @@ function ConvertTo-PMMMCPNativeArgument([string]$Value) {
     return ('"'+$escaped+'"')
 }
 function Invoke-PMMMCPClient([string]$CaseId) {
+    $target=Get-PMMMCPCase $CaseId
+    if((Get-PMMCaseClient $target) -ne 'CODEX'){return 'Available via MCP. Continue in the selected Desktop or external client.'}
     $client=Get-PMMMCPClient
     if(-not $client){return 'Available via MCP. Connect local Codex in AI Settings or use an external MCP client.'}
     $case=Get-PMMMCPCase $CaseId

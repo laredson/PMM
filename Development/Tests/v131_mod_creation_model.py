@@ -31,7 +31,7 @@ def body(text: str, name: str) -> str:
 def validate_identity_and_ui() -> None:
     manifest = json.loads(read("Resources/Metadata/RELEASE_MANIFEST.json"))
     assert manifest["version"] == "1.3.1"
-    assert manifest["buildId"] == "PMM-v1.3.1-MOD-CREATION-PREVIEW"
+    assert manifest["buildId"] == "PMM-v1.3.1ModCreator"
     assert manifest["releaseCandidate"] == "1.3.1-mod-creation-preview"
     assert manifest["aiioCapabilitySet"] == "PMM_CAPABILITIES_V2"
     assert manifest["aiioModCreationCandidateSchema"] == "PMM_MOD_CREATION_CANDIDATE_V1"
@@ -174,7 +174,7 @@ def validate_docs() -> None:
     assert (ROOT / "Development/Docs/PMM_1_3_1_MOD_CREATION.md").is_file()
     current = (ROOT / "Development/AI/CURRENT_STATE.md").read_text(encoding="utf-8-sig")
     continuation = (ROOT / "Development/AI/AI_CONTINUE_HERE.md").read_text(encoding="utf-8-sig")
-    assert "PMM-v1.3.1-MOD-CREATION-PREVIEW" in current
+    assert "PMM-v1.3.1ModCreator" in current
     assert "TEST_THIS_BUILD_1_3_1_MOD_CREATION.txt" in continuation
 
 

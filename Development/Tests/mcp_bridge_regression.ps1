@@ -59,7 +59,7 @@ try{
     Assert ($hello.result.protocolVersion -eq '2025-11-25') 'MCP handshake'
     Send @{jsonrpc='2.0';method='notifications/initialized'}
     $catalog=Request 'tools/list' @{}
-    Assert ($catalog.result.tools.Count -eq 31) 'Thirty-one declared bounded tools'
+    Assert ($catalog.result.tools.Count -eq 34 -and $catalog.result.tools.name -contains 'pmm_connection_check') 'Thirty-four declared bounded tools including Desktop pairing'
     $empty=Get-ResultData (Call 'pmm_cases_list')
     Assert ($empty.cases -is [array] -and $empty.cases.Count -eq 0) 'Zero cases remains an array'
     $case=Get-ResultData (Call 'pmm_case_create' @{title='MCP test';description='Compatibility request';type='COMPATIBILITY'})

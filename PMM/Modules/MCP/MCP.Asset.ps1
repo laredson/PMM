@@ -21,7 +21,7 @@ function Invoke-PMMMCPAssetInspect($Arguments) {
     $mapping=Resolve-PMMMCPPath $Script:Root 'Resources\Mappings\Mappings.usmap'
     $mappingHash=(Get-FileHash $mapping).Hash.ToLowerInvariant()
     $readerIdentity=(@(Get-ChildItem (Split-Path $reader -Parent) -File -Filter *.dll | Sort-Object Name | ForEach-Object{$_.Name+":"+(Get-FileHash $_.FullName).Hash}) -join "|")
-    $signature=($mode+'|UE5_1|'+$mappingHash+'|'+$readerIdentity+'|'+(@($family.Parts|ForEach-Object{$_.RelativePath+'|'+$_.Sha256}) -join '|'))
+    $signature=('inspect-v2|'+$query+'|'+$mode+'|UE5_1|'+$mappingHash+'|'+$readerIdentity+'|'+(@($family.Parts|ForEach-Object{$_.RelativePath+'|'+$_.Sha256}) -join '|'))
     $sha=[Security.Cryptography.SHA256]::Create()
     try{$key=([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes($signature)))).Replace('-','').ToLowerInvariant()}finally{$sha.Dispose()}
     $dir=Resolve-PMMMCPPath (Get-PMMMCPRoot) ('Inspection\'+$key)
@@ -54,11 +54,26 @@ function Invoke-PMMMCPAssetInspect($Arguments) {
                 for($i=0;$i -lt $Value.Count;$i++){Write-InspectionLeaves $Value[$i] ($Path+'/'+$i) $Context ($Depth+1)}
             }else{
                 $counter.value++;if($counter.value -gt 250000){throw 'Asset has too many values for inspection.'}
-                $row=@{path=$Path;name=$Context;value=$Value}|ConvertTo-Json -Compress -Depth 5
+                $row=@{path=$Path;name=$Context;value=$Value;scope=$inspectionScope}|ConvertTo-Json -Compress -Depth 5
                 $writer.WriteLine($row)
             }
         }
-        try{Write-InspectionLeaves $data '' '' 0}finally{$writer.Dispose()}
+        $inspectionScope=''
+        try{
+            # Filter complete rows/exports before flattening, retaining original JSON pointers.
+            $collection=if($mode -eq 'datatable'){'rows'}else{'Exports'}
+            if($query -and $data.PSObject.Properties.Name -contains $collection){
+                $units=@($data.$collection)
+                for($i=0;$i -lt $units.Count;$i++){
+                    $unit=$units[$i]
+                    $serialized=ConvertTo-Json -InputObject $unit -Depth 100 -Compress
+                    if($serialized.IndexOf($query,[StringComparison]::OrdinalIgnoreCase) -ge 0){
+                        $inspectionScope=$query
+                        Write-InspectionLeaves $unit ('/'+$collection+'/'+$i) '' 0
+                    }
+                }
+            }else{Write-InspectionLeaves $data '' '' 0}
+        }finally{$writer.Dispose()}
         Move-Item -LiteralPath ($records+'.tmp') -Destination $records -Force
     }
     $page=[Collections.Generic.List[object]]::new();$total=0;$pageBytes=0

@@ -85,7 +85,7 @@ if ([string]$manifest.version -ne '1.3.1') { Fail 'Manifest version must be 1.3.
 if ([int]$manifest.mergePlanSchema -ne 18) { Fail 'Manifest merge-plan schema must be 18.' }
 if ([int]$manifest.buildManifestSchema -ne 9) { Fail 'Manifest build-manifest schema must be 9.' }
 if ([string]$manifest.releaseCandidate -ne '1.3.1-mod-creation-preview') { Fail 'Manifest 1.3.1 Mod Creation identity mismatch.' }
-if ([string]$manifest.buildId -ne 'PMM-v1.3.1-MOD-CREATION-PREVIEW') { Fail 'Manifest 1.3.1 Mod Creation build ID mismatch.' }
+if ([string]$manifest.buildId -ne 'PMM-v1.3.1ModCreator') { Fail 'Manifest 1.3.1 Mod Creation build ID mismatch.' }
 if ([int]$manifest.bundledThemeCount -ne 11) { Fail 'Manifest bundled-theme count must be 11.' }
 if ([int]$manifest.officialThemeChoiceCount -ne 13) { Fail 'Manifest official-theme choice count must be 13.' }
 if ([string]$manifest.runtime.executable -ne 'Engine/PMMRuntime.exe') { Fail 'Runtime manifest path mismatch.' }

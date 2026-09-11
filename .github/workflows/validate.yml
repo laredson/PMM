@@ -62,3 +62,11 @@ jobs:
         shell: pwsh
         run: |
           ./PMM/PMM.exe runtime-self-test
+
+      - name: Desktop binding, background snapshots and independent cases
+        shell: powershell
+        run: |
+          ./Development/Tests/desktop_binding_regression.ps1
+          ./Development/Tests/desktop_snapshot_regression.ps1
+          ./Development/Tests/workspaces_dependencies_regression.ps1 -Language en
+          ./Development/Tests/workspaces_dependencies_regression.ps1 -Language es

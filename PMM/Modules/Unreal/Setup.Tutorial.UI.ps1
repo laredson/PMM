@@ -3,6 +3,7 @@ function Show-PMMSetupTutorial {
     $language=L 'en' 'es'
     $path=Join-Path $Script:Root ('Documentation\UNREAL_SETUP.'+$language+'.md')
     $text=[IO.File]::ReadAllText($path,[Text.Encoding]::UTF8)
+    $text+="`n`n"+[IO.File]::ReadAllText((Join-Path $Script:Root ('Documentation\CHATGPT_SETUP.'+$language+'.md')),[Text.Encoding]::UTF8)
     $v=New-PMMThemedDialog (L 'Optional tools installation tutorial' 'Tutorial de instalacion de herramientas opcionales')
     $v.window.Width=860
     $v.window.Height=[Math]::Min(720,[Windows.SystemParameters]::WorkArea.Height*0.9)

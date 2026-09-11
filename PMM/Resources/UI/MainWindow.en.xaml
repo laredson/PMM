@@ -415,7 +415,7 @@
     </Border>
 
     <TabControl x:Name="MainTabs" Grid.Row="1" Margin="0,10,0,8" Background="{DynamicResource CardBackground}" Foreground="{DynamicResource PrimaryText}">
-      <TabItem Header="Mods &amp; Merge">
+      <TabItem Header="Mods &amp; Merge" x:Name="TabMerge">
         <Grid Margin="8">
           <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="ColLibrary" Width="2*" MinWidth="290" MaxWidth="520"/>
@@ -844,7 +844,7 @@
                 </Grid>
               </Grid>
             </TabItem>
-            <TabItem Header="Feedback &amp; Knowledge">
+            <TabItem Header="Feedback &amp; Knowledge" x:Name="TabHelpFeedback">
               <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="12" MaxWidth="1100">
                 <TextBlock Text="Create inspectable files for manual sharing. Nothing is uploaded in this release; the disabled upload control marks the future connection point." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="2,0,2,8"/>
                 <Border Style="{StaticResource SummaryCard}"><StackPanel>
@@ -866,12 +866,12 @@
                 <Border Style="{StaticResource SummaryCard}" Margin="3,8,3,3"><StackPanel><TextBlock Text="Storage and recoverability" FontSize="15" FontWeight="SemiBold"/><TextBlock x:Name="TxtAIHelpStorageSummary" TextWrapping="Wrap" Foreground="{DynamicResource MutedText}" Margin="0,3,0,0"/><TextBlock Text="Interrupted operations" FontWeight="SemiBold" Margin="0,8,0,3"/><ListBox x:Name="LstAIHelpInterrupted" DisplayMemberPath="Display" MinHeight="60" MaxHeight="150"/><WrapPanel Margin="0,7,0,0"><Button x:Name="BtnAIHelpRefreshKnowledge" Content="Refresh"/><Button x:Name="BtnAIHelpCleanup" Content="Review disposable cleanup"/></WrapPanel></StackPanel></Border>
               </StackPanel></ScrollViewer>
             </TabItem>
-            <TabItem Header="Color scheme editor"><Grid Margin="10"><Grid.ColumnDefinitions><ColumnDefinition Width="285"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*" MinWidth="430"/></Grid.ColumnDefinitions>
+            <TabItem Header="Color scheme editor" x:Name="TabHelpTheme"><Grid Margin="10"><Grid.ColumnDefinitions><ColumnDefinition Width="285"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*" MinWidth="430"/></Grid.ColumnDefinitions>
               <Border Background="{DynamicResource CardAltBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6" Padding="10"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><TextBlock Text="Create or continue" FontSize="15" FontWeight="SemiBold"/><ComboBox x:Name="CmbThemeEditorSource" Grid.Row="1" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,7,0,0"/><Button x:Name="BtnThemeEditorNew" Grid.Row="2" Content="Create new from selected" Margin="0,5,0,7"/><ListBox x:Name="LstThemeDrafts" Grid.Row="3" DisplayMemberPath="Display"/><WrapPanel Grid.Row="4" Margin="0,7,0,0"><Button x:Name="BtnThemeEditorLoad" Content="Load draft"/><Button x:Name="BtnThemeEditorDelete" Content="Delete draft"/></WrapPanel></Grid></Border>
               <GridSplitter Grid.Column="1" Width="8" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext"/>
               <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="4"><TextBlock Text="Color scheme editor" FontSize="17" FontWeight="SemiBold"/><TextBlock Text="Every named brush keeps a required fallback color and may use a packaged PNG/JPEG image. Images are copied into the draft; external paths and URLs are forbidden." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,7"/><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="150"/></Grid.ColumnDefinitions><TextBox x:Name="TxtThemeEditorName" ToolTip="Scheme name"/><TextBox x:Name="TxtThemeEditorId" Grid.Column="2" ToolTip="Lowercase scheme ID"/><ComboBox x:Name="CmbThemeEditorBase" Grid.Column="4"/></Grid><Border x:Name="BrdThemeEditorPreview" Background="{DynamicResource CardBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6" Padding="9" Margin="0,8,0,8"><StackPanel><TextBlock Text="Live preview uses the current whole-window theme after Preview. Save or install only when validation passes." TextWrapping="Wrap"/><WrapPanel Margin="0,6,0,0"><Button Content="Normal button" IsHitTestVisible="False"/><Button Content="Disabled button" IsEnabled="False"/><TextBox Width="180" Text="Input / selected colors" IsReadOnly="True"/></WrapPanel></StackPanel></Border><StackPanel x:Name="PnlThemeEditorRows"/><TextBlock Text="Create with AI (offline ZIP)" FontWeight="SemiBold" Margin="0,10,0,3"/><TextBox x:Name="TxtThemeEditorPrompt" Height="80" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" ToolTip="Describe the visual direction for an external AI"/><WrapPanel Margin="0,7,0,0"><Button x:Name="BtnThemeEditorSave" Content="Save draft"/><Button x:Name="BtnThemeEditorPreview" Content="Preview"/><Button x:Name="BtnThemeEditorRevert" Content="Revert preview"/><Button x:Name="BtnThemeEditorInstall" Content="Install locally" FontWeight="SemiBold"/><Button x:Name="BtnThemeEditorExport" Content="Export JSON/ZIP"/><Button x:Name="BtnThemeEditorCreateAI" Content="Create with AI"/><Button x:Name="BtnThemeEditorImportAI" Content="Import AI theme..."/></WrapPanel><TextBlock x:Name="TxtThemeEditorStatus" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,8,0,0"/></StackPanel></ScrollViewer>
             </Grid></TabItem>
-            <TabItem Header="Settings">
+            <TabItem Header="Settings" x:Name="TabAISettings">
               <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="12" MaxWidth="1100">
                 <TextBlock Text="Choose how the local AI &amp; Help module records real failures. No provider or upload connection is configured here." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="2,0,2,8"/>
 <Border Style="{StaticResource SummaryCard}"><StackPanel><TextBlock Text="Local MCP bridge (preview)" FontSize="15" FontWeight="SemiBold"/><TextBlock Text="Connect an AI client to this PMM installation. Enabling shares AIIO case summaries, staged files and current Vanilla reference through bounded tools. Returned files remain inactive. Review them before building or deploying. Connect local Codex below to process published requests automatically." TextWrapping="Wrap" Margin="0,7,0,0"/><WrapPanel Margin="0,8,0,0"><Button x:Name="BtnMCPEnable" Content="Enable and prepare connection" Margin="0,0,8,0"/><Button x:Name="BtnMCPDisable" Content="Disable MCP" Margin="0,0,8,0"/><Button x:Name="BtnMCPOpen" Content="Connection and staged files"/></WrapPanel><WrapPanel Margin="0,8,0,0"><Button x:Name="BtnMCPConnectCodex" Content="Use local Codex" Margin="0,0,8,0"/><Button x:Name="BtnMCPExternal" Content="External client only"/></WrapPanel><TextBlock Text="Local Codex uses your existing sign-in and account usage. Responses appear in the case for review." TextWrapping="Wrap" Margin="0,7,0,0"/><TextBlock x:Name="TxtMCPClientStatus" TextWrapping="Wrap" Margin="0,7,0,0"/><TextBlock x:Name="TxtMCPStatus" TextWrapping="Wrap" Margin="0,7,0,0"/></StackPanel></Border>
@@ -916,7 +916,7 @@
           </Grid>
         </Grid>
       </TabItem>
-      <TabItem Header="Settings">
+      <TabItem Header="Settings" x:Name="TabSettings">
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
           <StackPanel Margin="14" MaxWidth="1100" HorizontalAlignment="Stretch">
             <Grid Margin="0,0,0,8">
@@ -1012,16 +1012,18 @@
               </StackPanel>
             </Border>
 
-            <Separator Margin="0,8"/>
+            <Border x:Name="PnlLibrarySettings" Style="{StaticResource SummaryCard}"><StackPanel><Separator Margin="0,8"/>
             <TextBlock Text="Portable library" FontSize="16" FontWeight="SemiBold"/>
             <TextBox x:Name="TxtLibraryPath" IsReadOnly="True" Margin="0,5" HorizontalAlignment="Stretch"/>
             <Button x:Name="BtnOpenLibrary" Content="Open library" HorizontalAlignment="Left"/>
 
-            <Separator Margin="0,12"/>
+            </StackPanel></Border>
+            <Border x:Name="PnlBaseDependencySettings" Style="{StaticResource SummaryCard}"><StackPanel><Separator Margin="0,12"/>
             <TextBlock Text="Dependencies" FontSize="16" FontWeight="SemiBold"/>
             <TextBlock Text="Start checks dependencies automatically and prepares/downloads only what is missing. This button forces a manual repair." TextWrapping="Wrap" Margin="0,4,0,6" Foreground="{DynamicResource MutedText}"/>
             <Button x:Name="BtnSetupDeps" Content="Prepare / repair dependencies" HorizontalAlignment="Left"/>
 
+            </StackPanel></Border>
             <Separator Margin="0,12"/>
             <TextBlock Text="Recent log — support file: Workspace\Logs\PalModMerger.log" FontSize="16" FontWeight="SemiBold"/>
             <TextBox x:Name="TxtLog" Height="280" HorizontalAlignment="Stretch" IsReadOnly="True" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="12"/>

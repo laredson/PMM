@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "PMM"
-EXPECTED_BUILD = "PMM-v1.3.1-MOD-CREATION-PREVIEW"
+EXPECTED_BUILD = "PMM-v1.3.1ModCreator"
 XAML_NS = "http://schemas.microsoft.com/winfx/2006/xaml"
 X_NAME = f"{{{XAML_NS}}}Name"
 

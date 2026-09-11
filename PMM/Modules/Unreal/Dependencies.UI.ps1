@@ -1,3 +1,5 @@
+. (Join-Path $PSScriptRoot 'Dependency.Permissions.UI.ps1')
+. (Join-Path $PSScriptRoot 'Dependencies.Snapshot.ps1')
 . (Join-Path $PSScriptRoot 'Setup.Tutorial.UI.ps1')
 . (Join-Path $PSScriptRoot 'Dependency.Locations.UI.ps1')
 
@@ -15,7 +17,7 @@ function Show-PMMInstallConsent($Job){
     $card.SetResourceReference([Windows.Controls.Border]::BackgroundProperty,'CardBackground');$card.SetResourceReference([Windows.Controls.Border]::BorderBrushProperty,'CardBorder')
     $content=[Windows.Controls.StackPanel]::new();$card.Child=$content;[void]$v.body.Children.Add($card)
     $label=[Windows.Controls.TextBlock]::new();$label.TextWrapping='Wrap'
-    $names=@(Get-PMMDependencyDefinitions|Where-Object{$Job.component -eq 'all' -or $_.id -eq $Job.component}|ForEach-Object{$_.name+' '+$_.version})
+    $names=@(Get-PMMDependencyDefinitions|Where-Object{($Job.component -eq 'all' -and $_.id -ne 'chatgpt') -or $_.id -eq $Job.component}|ForEach-Object{$_.name+' '+$_.version})
     $label.Text=(L 'PMM proposes installing: ' 'PMM propone instalar: ')+($names -join ', ')
     [void]$content.Children.Add($label)
     $all=[Windows.Controls.RadioButton]::new();$all.Content=L 'Install everything needed without asking again' 'Instalar todo lo necesario sin volver a preguntar';$all.GroupName='Permission';$all.IsChecked=$true;$all.Margin=[Windows.Thickness]::new(0,18,0,8)
@@ -34,9 +36,22 @@ function Show-PMMInstallConsent($Job){
     return $state
 }
 function New-PMMDependencyPanel {
+    $root=[Windows.Controls.Grid]::new();$root.Margin=[Windows.Thickness]::new(12)
+    $left=[Windows.Controls.ColumnDefinition]::new();$left.Width=[Windows.GridLength]::new(1,[Windows.GridUnitType]::Star)
+    $right=[Windows.Controls.ColumnDefinition]::new();$right.Width=[Windows.GridLength]::new(1,[Windows.GridUnitType]::Star);$right.MaxWidth=620
+    [void]$root.ColumnDefinitions.Add($left);[void]$root.ColumnDefinitions.Add($right)
     $scroll=[Windows.Controls.ScrollViewer]::new();$scroll.VerticalScrollBarVisibility='Auto'
-    $panel=[Windows.Controls.StackPanel]::new();$panel.Margin=[Windows.Thickness]::new(16);$scroll.Content=$panel
-    $title=[Windows.Controls.TextBlock]::new();$title.Text=L 'Optional modding tools' 'Herramientas opcionales de modding';$title.FontSize=22;$title.Margin=[Windows.Thickness]::new(0,0,0,14);[void]$panel.Children.Add($title)
+    $panel=[Windows.Controls.StackPanel]::new();$panel.Margin=[Windows.Thickness]::new(4,4,20,4);$scroll.Content=$panel;[void]$root.Children.Add($scroll)
+    $Script:PMMDependencyHelpPanel=$panel
+    $card=[Windows.Controls.Border]::new();$card.Padding=[Windows.Thickness]::new(14);$card.CornerRadius=[Windows.CornerRadius]::new(8);$card.BorderThickness=[Windows.Thickness]::new(1)
+    $card.SetResourceReference([Windows.Controls.Border]::BackgroundProperty,'CardBackground');$card.SetResourceReference([Windows.Controls.Border]::BorderBrushProperty,'CardBorder')
+    [Windows.Controls.Grid]::SetColumn($card,1);[void]$root.Children.Add($card)
+    $listScroll=[Windows.Controls.ScrollViewer]::new();$listScroll.VerticalScrollBarVisibility='Auto';$card.Child=$listScroll
+    $list=[Windows.Controls.StackPanel]::new();$list.Margin=[Windows.Thickness]::new(0,0,8,0);$listScroll.Content=$list
+    $heading=[Windows.Controls.TextBlock]::new();$heading.Text=L 'Installations and status' 'Instalaciones y estado';$heading.FontSize=20;$heading.Margin=[Windows.Thickness]::new(0,0,0,12);[void]$list.Children.Add($heading)
+    $title=[Windows.Controls.TextBlock]::new();$title.Text=L 'Optional tools and AI clients' 'Herramientas y clientes IA opcionales';$title.FontSize=22;$title.Margin=[Windows.Thickness]::new(0,0,0,14);[void]$panel.Children.Add($title)
+    $Script:PMMDependencyPolicyLabel=[Windows.Controls.TextBlock]::new();$Script:PMMDependencyPolicyLabel.TextWrapping='Wrap';[void]$panel.Children.Add($Script:PMMDependencyPolicyLabel);Update-PMMDependencyPolicyLabel
+    $permission=[Windows.Controls.Button]::new();$permission.Content=L 'Change permissions' 'Cambiar permisos';$permission.HorizontalAlignment='Left';$permission.Margin=[Windows.Thickness]::new(0,6,0,10);$permission.Add_Click({try{Show-PMMDependencyPermissions}catch{Handle-UIError $_ 'Permissions'}});[void]$panel.Children.Add($permission)
     $tutorial=[Windows.Controls.Button]::new();$tutorial.Content=L 'Installation tutorial' 'Tutorial de instalacion';$tutorial.HorizontalAlignment='Left';$tutorial.Margin=[Windows.Thickness]::new(0,0,0,14)
     $tutorial.Add_Click({try{Show-PMMSetupTutorial}catch{Handle-UIError $_ 'Tutorial'}});[void]$panel.Children.Add($tutorial)
     $guide=[Windows.Controls.TextBlock]::new();$guide.TextWrapping='Wrap';$guide.Margin=[Windows.Thickness]::new(0,0,0,14)
@@ -57,12 +72,13 @@ function New-PMMDependencyPanel {
     $Script:PMMDependencySelectedJob=''
     $Script:PMMDependencyLabels=@{}
     foreach($d in Get-PMMDependencyDefinitions){
-        $row=[Windows.Controls.DockPanel]::new();$row.Margin=[Windows.Thickness]::new(0,5,0,5)
+        $row=[Windows.Controls.StackPanel]::new();$row.Margin=[Windows.Thickness]::new(0,6,0,12)
+        $actions=[Windows.Controls.WrapPanel]::new();$actions.Margin=[Windows.Thickness]::new(0,6,0,0)
         $button=[Windows.Controls.Button]::new();$button.Content=L 'Install / complete' 'Instalar / completar';$button.Tag=$d.id;$button.MinWidth=155
-        [Windows.Controls.DockPanel]::SetDock($button,'Right');[void]$row.Children.Add($button)
+        $button.Margin=[Windows.Thickness]::new(0,0,8,0);[void]$actions.Children.Add($button)
         if($d.id -in @('unreal','wwise','wwiseintegration')){
             $locate=[Windows.Controls.Button]::new();$locate.Content=L 'Locate...' 'Localizar...';$locate.Tag=$d.id;$locate.Margin=[Windows.Thickness]::new(8,0,8,0)
-            [Windows.Controls.DockPanel]::SetDock($locate,'Right');[void]$row.Children.Add($locate)
+            [void]$actions.Children.Add($locate)
             $locate.Add_Click({param($sender,$args)
                 $Script:PMMDependencyModal=$true
                 try{$result=Show-PMMDependencyLocation ([string]$sender.Tag);if($result){$Script:PMMDependencySelectedJob='';Start-PMMDependencyScan}}catch{Handle-UIError $_ 'Locate'}finally{$Script:PMMDependencyModal=$false}
@@ -73,40 +89,55 @@ function New-PMMDependencyPanel {
         $button.Add_Click({param($sender,$eventArgs)
             try{if($sender.Content -eq (L 'Open' 'Abrir')){Open-PMMDependencyComponent ([string]$sender.Tag);return};$case=Get-PMMAIIOSelectedCase;$caseId='';if($case){$caseId=$case.CaseId};$job=Request-PMMDependencyInstall ([string]$sender.Tag) $caseId;$Script:PMMDependencySelectedJob=$job.id;$Script:PMMDependencyStatus.Text=$job.status}catch{Handle-UIError $_ 'Dependencies'}
         })
-        [void]$panel.Children.Add($row)
+        [void]$row.Children.Add($actions);[void]$list.Children.Add($row)
     }
-    $Script:PMMDependencyStatus=[Windows.Controls.TextBlock]::new();$Script:PMMDependencyStatus.TextWrapping='Wrap';$Script:PMMDependencyStatus.Margin=[Windows.Thickness]::new(0,16,0,0);[void]$panel.Children.Add($Script:PMMDependencyStatus)
+    $Script:PMMDependencyStatus=[Windows.Controls.TextBlock]::new();$Script:PMMDependencyStatus.TextWrapping='Wrap';$Script:PMMDependencyStatus.Margin=[Windows.Thickness]::new(0,16,0,0);[void]$list.Children.Add($Script:PMMDependencyStatus)
     $buttons=[Windows.Controls.WrapPanel]::new()
-    foreach($entry in @(@('detect',(L 'Detect installed tools' 'Detectar herramientas instaladas')),@('all',(L 'Install missing components' 'Instalar componentes pendientes')),@('revoke',(L 'Ask before installing again' 'Volver a preguntar antes de instalar')),@('cancel',(L 'Cancel pending installations' 'Cancelar instalaciones pendientes')))){
+    foreach($entry in @(@('detect',(L 'Detect installed tools' 'Detectar herramientas instaladas')),@('all',(L 'Install missing components' 'Instalar componentes pendientes')),@('cancel',(L 'Cancel pending installations' 'Cancelar instalaciones pendientes')))){
         $b=[Windows.Controls.Button]::new();$b.Content=$entry[1];$b.Tag=$entry[0];$b.Margin=[Windows.Thickness]::new(0,10,8,0)
         $b.Add_Click({param($sender,$eventArgs)
             try{
                 switch([string]$sender.Tag){
                     'detect' {$Script:PMMDependencySelectedJob='';Start-PMMDependencyScan}
                     'all' {$requested=Request-PMMDependencyInstall 'all';$Script:PMMDependencySelectedJob=$requested.id}
-                    'revoke' {Set-PMMDependencyPolicy 'ask';$Script:PMMDependencyStatus.Text=L 'Installation permission revoked.' 'Permiso de instalacion revocado.'}
-                    'cancel' {foreach($f in @(Get-ChildItem (Join-Path (Get-PMMDependencyRoot) 'Jobs') -Filter *.json -ErrorAction SilentlyContinue)){$j=Read-PMMMCPJson $f.FullName;if($j.operation -eq 'install' -and $j.status -in @('QUEUED','RUNNING','AWAITING_CONSENT','WAITING_EXTERNAL')){Cancel-PMMDependencyInstall $j.id|Out-Null}}}
+                    'permissions' {Show-PMMDependencyPermissions}
+                    'cancel' {foreach($j in @((Get-PMMDependencySnapshot).jobs)){if($j.operation -eq 'install' -and $j.status -in @('QUEUED','RUNNING','AWAITING_CONSENT','WAITING_EXTERNAL')){Cancel-PMMDependencyInstall $j.id|Out-Null}}}
                 }
             }catch{Handle-UIError $_ 'Dependencies'}
         })
         [void]$buttons.Children.Add($b)
     }
-    [void]$panel.Children.Add($buttons)
+    [void]$list.Children.Add($buttons)
     $Script:PMMDependencyModal=$false;$Script:PMMDependencyScan=''
     Start-PMMDependencyScan
+    if(Get-Variable PMMDependencyTimer -Scope Script -ErrorAction SilentlyContinue){$Script:PMMDependencyTimer.Stop()}
+    $Script:PMMDependencyPanel=$root
     $Script:PMMDependencyTimer=[Windows.Threading.DispatcherTimer]::new()
     $Script:PMMDependencyTimer.Interval=[TimeSpan]::FromSeconds(2)
     $Script:PMMDependencyTimer.Add_Tick({Update-PMMDependencyPanel})
     $Script:PMMDependencyTimer.Start()
-    $Window.Add_Closed({$Script:PMMDependencyTimer.Stop()})
-    return $scroll
+    $Window.Add_Closed({$Script:PMMDependencyTimer.Stop();Stop-PMMDependencySnapshot})
+    return $root
 }
 function Update-PMMDependencyPanel {
     if($Script:PMMDependencyModal){return}
     try{
+        $snapshot=Get-PMMDependencySnapshot
+        if(-not $snapshot){return}
+        foreach($pending in @($snapshot.jobs|Where-Object {$_.status -eq 'AWAITING_CONSENT'})){
+            $current=Read-PMMMCPJson (Get-PMMDependencyJobPath $pending.id)
+            if($current.status -ne 'AWAITING_CONSENT'){continue}
+            $Script:PMMDependencyModal=$true
+            try{$decision=Show-PMMInstallConsent $current;if($decision.accepted){Approve-PMMDependencyInstall $current.id $decision.mode}else{Cancel-PMMDependencyInstall $current.id|Out-Null}}
+            finally{$Script:PMMDependencyModal=$false;Update-PMMDependencyPolicyLabel}
+            return
+        }
+        if(-not $Script:PMMDependencyPanel.IsVisible){return}
+        Update-PMMDependencyPolicyLabel
         $catalog=Join-Path (Get-PMMDependencyRoot) 'catalog.json'
         if(Test-Path $catalog){
-            $c=Read-PMMMCPJson $catalog
+                if(-not $snapshot.catalog){return}
+            $c=$snapshot.catalog
             foreach($r in $c.components){
                 if(-not $Script:PMMDependencyLabels.ContainsKey($r.id)){continue}
                 $view=$Script:PMMDependencyLabels[$r.id]
@@ -125,20 +156,14 @@ function Update-PMMDependencyPanel {
             }
         }
         $scan=Read-PMMMCPJson (Get-PMMDependencyJobPath $Script:PMMDependencyScan)
-        if($scan.status -notin @('QUEUED','RUNNING') -and ((-not(Test-Path $catalog)) -or (Get-Item $catalog).LastWriteTimeUtc -lt [DateTime]::UtcNow.AddSeconds(-30))){Start-PMMDependencyScan}
-        $jobs=@(Get-ChildItem (Join-Path (Get-PMMDependencyRoot) 'Jobs') -Filter *.json|Sort-Object LastWriteTime -Descending|ForEach-Object{Read-PMMMCPJson $_.FullName}|Where-Object{$_.operation -eq 'install'})
+        if($scan.status -notin @('QUEUED','RUNNING') -and ((-not(Test-Path $catalog)) -or (Get-Item $catalog).LastWriteTimeUtc -lt [DateTime]::UtcNow.AddMinutes(-5))){Start-PMMDependencyScan}
+        $jobs=@($snapshot.jobs|Where-Object {$_.status -ne 'AWAITING_CONSENT'})
         $selected=@($jobs|Where-Object{$_.id -eq $Script:PMMDependencySelectedJob}|Select-Object -First 1)
-        $pending=@($jobs|Where-Object{$_.status -eq 'AWAITING_CONSENT'})
-        if($pending.Count){$jobs=$pending}elseif($selected.Count){$jobs=$selected}else{
+        if($selected.Count){$jobs=$selected}else{
             $active=@($jobs|Where-Object{$_.status -in @('RUNNING','QUEUED')}|Select-Object -First 1)
             if($active.Count){$jobs=$active}else{$jobs=@($jobs|Select-Object -First 1)}
         }
         foreach($job in $jobs){
-            if($job.status -eq 'AWAITING_CONSENT'){
-                $Script:PMMDependencyModal=$true
-                try{$decision=Show-PMMInstallConsent $job;if($decision.accepted){Approve-PMMDependencyInstall $job.id $decision.mode}else{Cancel-PMMDependencyInstall $job.id|Out-Null}}finally{$Script:PMMDependencyModal=$false}
-                break
-            }
             $Script:PMMDependencyStatus.Text=$job.status+' - '+$job.message
             break
         }

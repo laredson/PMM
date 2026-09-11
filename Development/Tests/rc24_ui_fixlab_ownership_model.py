@@ -93,7 +93,7 @@ for filename in ("MainWindow.xaml", "MainWindow.en.xaml", "MainWindow.es.xaml"):
         raise SystemExit(f"Localized XAML control parity mismatch in {filename}")
 
 manifest = json.loads(read("Resources/Metadata/RELEASE_MANIFEST.json"))
-expected = "PMM-v1.3.1-MOD-CREATION-PREVIEW"
+expected = "PMM-v1.3.1ModCreator"
 if manifest.get("buildId") != expected:
     raise SystemExit("Unexpected current build ID while checking RC24 invariants")
 if manifest.get("releaseCandidate") != "1.3.1-mod-creation-preview":

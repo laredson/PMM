@@ -75,12 +75,26 @@ try{
         }
     }
     $rows=@(Get-PMMDependencyCatalog)
-    $pending=@($rows|Where-Object{-not $_.installed -and ($job.component -eq 'all' -or $_.id -eq $job.component)})
+    $pending=@($rows|Where-Object{-not $_.installed -and (($job.component -eq 'all' -and $_.id -ne 'chatgpt') -or $_.id -eq $job.component)})
     $external=$false;$vsDone=$false;$audioOpened=$false;$audioState=''
     foreach($component in $pending){
         Check-InstallCancellation
         Report-Install 'RUNNING' ('Preparing '+$component.name)
         switch($component.id){
+            'chatgpt' {
+                $appInstaller=$null
+                try{$appInstaller=Get-AppxPackage -Name Microsoft.DesktopAppInstaller -ErrorAction Stop | Select-Object -First 1}catch{}
+                $winget=if($appInstaller){Join-Path $appInstaller.InstallLocation 'winget.exe'}else{''}
+                $installed=$false
+                if($winget -and (Test-Path $winget)){
+                    $sig=Get-AuthenticodeSignature -LiteralPath $winget
+                    if($sig.Status -ne 'Valid' -or -not $sig.SignerCertificate -or $sig.SignerCertificate.Subject -notmatch 'Microsoft'){throw 'WinGet signature rejected.'}
+                    $p=Start-Process $winget -ArgumentList 'install --id 9PLM9XGG6VKS --exact --source msstore --silent --accept-package-agreements --accept-source-agreements --disable-interactivity' -WindowStyle Hidden -PassThru
+                    try{$deadline=[DateTime]::UtcNow.AddMinutes(30);while(-not $p.WaitForExit(1000)){Check-InstallCancellation;if([DateTime]::UtcNow -gt $deadline){throw 'ChatGPT installation still running after 30 minutes. Check Microsoft Store before retrying.'}};$installed=$p.ExitCode -eq 0}finally{$p.Dispose()}
+                }
+                Check-InstallCancellation
+                if(-not $installed){Start-Process 'ms-windows-store://pdp/?ProductId=9PLM9XGG6VKS';$external=$true}
+            }
             {$_ -in @('visualstudio','windowssdk')} {
                 if(-not $vsDone){
                     # An elevated installer may hide its executable path. In that case wait
@@ -146,7 +160,7 @@ try{
             }
         }
     }
-    $remaining=@(Get-PMMDependencyCatalog|Where-Object{-not $_.installed -and ($job.component -eq 'all' -or $_.id -eq $job.component)})
+    $remaining=@(Get-PMMDependencyCatalog|Where-Object{-not $_.installed -and (($job.component -eq 'all' -and $_.id -ne 'chatgpt') -or $_.id -eq $job.component)})
     if($remaining.Count -and $audioState -eq 'OFFLINE_SESSION_OPEN'){Report-Install 'WAITING_EXTERNAL' 'The Audiokinetic Launcher is running in offline-install mode. Let installation finish, close that launcher window, then press Install / complete again to open the connected launcher. / Finaliza la instalacion, cierra el launcher offline y pulsa Instalar / completar de nuevo.'}
     elseif($remaining.Count -eq 1 -and $remaining[0].id -eq 'wwiseintegration'){Report-Install 'WAITING_EXTERNAL' ('Audiokinetic Launcher > Unreal Engine > Download > Offline integration files > 2021.1.11. Save to: '+(Get-PMMWwiseIntegrationDownloadRoot))}
     elseif($remaining.Count){Report-Install 'WAITING_EXTERNAL' ('Complete official installer/launcher steps: '+(($remaining|ForEach-Object{$_.name}) -join ', '))}

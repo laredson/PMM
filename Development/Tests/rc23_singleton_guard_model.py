@@ -46,7 +46,7 @@ for name, text in (("LibraryService", library), ("MergeEngine", merge), ("Bootst
         raise SystemExit(f"Conditional pipeline can unwrap a guarded collection in {name}: {match.group(0)}")
 
 manifest = json.loads(read("Resources/Metadata/RELEASE_MANIFEST.json"))
-expected = "PMM-v1.3.1-MOD-CREATION-PREVIEW"
+expected = "PMM-v1.3.1ModCreator"
 if manifest.get("buildId") != expected:
     raise SystemExit("Unexpected current build ID while checking the preserved RC23 guard")
 if manifest.get("releaseCandidate") != "1.3.1-mod-creation-preview":

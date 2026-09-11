@@ -12,7 +12,7 @@ El caso «super inventory», 100 espacios adicionales en el inventario principal
 
 ## 2. Abre las herramientas de PMM
 
-Ve a Mod Creation → Tools (Herramientas). Usa Detectar herramientas instaladas antes de instalar. Cada componente tiene estado propio; Localizar permite indicar una carpeta, ejecutable o paquete compatible.
+Ve a Settings → Instalaciones. Usa Detectar herramientas instaladas antes de instalar. Cada componente tiene estado propio; Localizar permite indicar una carpeta, ejecutable o paquete compatible.
 
 Aceptar la propuesta de instalación inicia los componentes indicados. Puedes autorizar instalaciones futuras del catálogo o preguntar cada vez; Cancelar no concede permiso. La autorización se puede revocar. Los pasos oficiales de cuenta, licencia y permisos de Windows siguen correspondiendo al usuario.
 
@@ -107,3 +107,9 @@ Los metadatos originales del fabricante pueden conservar la ubicación de descar
 - [Integración Unreal en Audiokinetic Launcher](https://www.audiokinetic.com/en/public-library/Launcher_2025.2.0.5346/?id=unreal_engine&source=InstallGuide)
 - [Requisitos del kit](https://pwmodding.wiki/docs/developers/palworld-modding-kit/prerequisites)
 - [Instalación del kit](https://pwmodding.wiki/docs/developers/palworld-modding-kit/installation)
+
+## Permisos y opciones centralizados
+
+En Settings → Instalaciones, Cambiar permisos permite alternar entre preguntar en cada instalación y autorizar las solicitudes futuras del catálogo. Aceptar guarda la elección sin instalar nada; Cancelar conserva el estado anterior. Cancelar trabajos es una acción separada. Las solicitudes pendientes de consentimiento también se atienden con esta pestaña oculta.
+
+Settings reúne General, IA/MCP, Instalaciones y los ajustes específicos de Mods & Merge, Mod Creation y Help. Opciones, dentro de cada sección correspondiente, abre su apartado. Los casos conservan identificadores e historial independientes, aunque tengan el mismo título.

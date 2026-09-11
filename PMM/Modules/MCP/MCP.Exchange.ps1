@@ -18,8 +18,9 @@ function Get-PMMMCPReplyView($Case) {
     if($status -eq 'PROCESSING' -and [DateTime]::Parse($e.expiresUtc).ToUniversalTime() -lt [DateTime]::UtcNow){$status='INTERRUPTED'}
     return [ordered]@{requestId=$r.requestId;status=$status;message=$e.message;response=$e.response;updatedUtc=$e.updatedUtc;runtime='UNPROVEN'}
 }
-function Invoke-PMMMCPExchangeTool([string]$Name,$Arguments) {
+function Invoke-PMMMCPExchangeToolCore([string]$Name,$Arguments) {
     $c=Get-PMMMCPCase $Arguments.caseId
+    if((Get-PMMCaseClient $c) -eq 'CHATGPT'){$dispatch=Get-PMMDesktopDispatch $c.CaseId;if($dispatch -and $dispatch.requestId -eq $Arguments.requestId -and $dispatch.phase -eq 'CANCELLED'){throw 'Desktop request cancelled in PMM. Publish a follow-up to continue.'}}
     $view=ConvertTo-PMMMCPCase $c
     if(-not $view.mcpRequest -or $view.mcpRequest.requestId -cne $Arguments.requestId){throw 'Request is stale or unpublished. Read the current case again.'}
     $path=Get-PMMMCPExchangePath $Arguments.requestId
@@ -38,3 +39,13 @@ function Invoke-PMMMCPExchangeTool([string]$Name,$Arguments) {
     return (Get-PMMMCPReplyView $c)
 }
 
+
+function Invoke-PMMMCPExchangeTool([string]$Name,$Arguments) {
+    $path=Get-PMMMCPExchangePath $Arguments.requestId
+    [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($path))
+    $lock=$null
+    try{
+        try{$lock=[IO.File]::Open(($path+'.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{throw 'This request is being updated. Retry after reading the case.'}
+        return (Invoke-PMMMCPExchangeToolCore $Name $Arguments)
+    }finally{if($lock){$lock.Dispose()}}
+}

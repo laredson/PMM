@@ -54,6 +54,7 @@ foreach($mode in @('HANDOFF','AUTO')){
     Assert ($LASTEXITCODE -eq 0 -and $result.Status -eq 'Complete' -and $result.ZipPath -eq '' -and $result.Message -match 'MCP') ('Background '+$mode+' publishes without ZIP')
 }
 Assert (@(Get-ChildItem (Get-PMMAIIOCasePath $c.CaseId) -Recurse -Filter *.zip).Count -eq 0) 'No ZIP created for MCP case'
+function L([string]$English,[string]$Spanish){return $English}
 Add-Type -AssemblyName PresentationFramework,PresentationCore,WindowsBase
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.CaseWorkspace.UI.ps1')
 $combo=[Windows.Controls.ComboBox]::new()

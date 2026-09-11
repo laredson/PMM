@@ -5,7 +5,7 @@
 - Product: **Palworld Manager Merger**
 - Creator: **laredson**
 - Candidate: **v1.3.1 Mod Creation preview**
-- Build ID: `PMM-v1.3.1-MOD-CREATION-PREVIEW`
+- Build ID: `PMM-v1.3.1ModCreator`
 - Base commit: `9886c4fcb58654c81894f429a60bba5a704af6de`
 - Runnable authority: `PMM/`
 - Native executables: unchanged from the accepted RC21 binary lineage

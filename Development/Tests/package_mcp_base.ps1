@@ -1,4 +1,4 @@
-param([string]$Repository=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
+param([string]$Repository=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))),[string]$PackageName='')
 Set-StrictMode -Version 2.0
 $ErrorActionPreference='Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem,System.IO.Compression
@@ -22,7 +22,10 @@ foreach($line in Get-Content (Join-Path $app 'Resources\Metadata\SHA256SUMS.txt'
 $inventory='Resources/Metadata/SHA256SUMS.txt'
 Copy-Item (Join-Path $app $inventory) (Join-Path $stage $inventory)
 $expected[$inventory]=(Get-FileHash (Join-Path $stage $inventory)).Hash.ToLowerInvariant()
-$zip=Join-Path $output ('PMM-1.3.1-MCP-0.5.0-BASE-'+[DateTime]::Now.ToString('yyyyMMdd-HHmmss')+'.zip')
+if(-not $PackageName){$PackageName='PMM-1.3.1-MCP-0.5.0-BASE-'+[DateTime]::Now.ToString('yyyyMMdd-HHmmss')+'.zip'}
+if($PackageName -notmatch '^[A-Za-z0-9._-]+\.zip$'){throw 'Invalid package filename.'}
+$zip=Join-Path $output $PackageName
+if(Test-Path -LiteralPath $zip){throw 'Output ZIP already exists.'}
 $archive=[IO.Compression.ZipFile]::Open($zip,[IO.Compression.ZipArchiveMode]::Create)
 try{
     foreach($relative in @($expected.Keys|Sort-Object)){

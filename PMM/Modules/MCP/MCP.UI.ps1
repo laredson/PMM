@@ -28,13 +28,13 @@ if($open){$open.Add_Click({
 . (Join-Path $Script:Root 'Modules\MCP\MCP.Client.ps1')
 function Update-PMMMCPClientStatus {
     $text=$Window.FindName('TxtMCPClientStatus')
-    if($text){try{$text.Text=if(Get-PMMMCPClient){'Local Codex connected. Publish to MCP or AUTO starts an AI run using your signed-in account.'}else{'External client mode: publishing waits for an AI to read and answer through MCP.'}}catch{$text.Text=$_.Exception.Message}}
+    if($text){try{$text.Text=if(Get-PMMMCPClient){'Codex console configured. Only cases targeting Codex console start this runner; Desktop and other MCP clients remain separate.'}else{'External client mode: publishing waits for an AI to read and answer through MCP.'}}catch{$text.Text=$_.Exception.Message}}
 }
 Update-PMMMCPClientStatus
 $connect=$Window.FindName('BtnMCPConnectCodex')
-if($connect){$connect.Add_Click({try{Set-PMMMCPClient $true;Set-PMMMCPEnabled $true;Update-PMMMCPClientStatus}catch{Handle-UIError $_ 'Codex'}})}
+if($connect){$connect.Content=L 'Configure Codex console' 'Configurar Codex por consola';$connect.Add_Click({try{Set-PMMMCPClient $true;Set-PMMMCPEnabled $true;Update-PMMMCPClientStatus}catch{Handle-UIError $_ 'Codex'}})}
 $external=$Window.FindName('BtnMCPExternal')
-if($external){$external.Add_Click({try{Set-PMMMCPClient $false;Update-PMMMCPClientStatus}catch{Handle-UIError $_ 'Codex'}})}
+if($external){$external.Content=L 'Other MCP client' 'Otro cliente MCP';$external.Add_Click({try{Set-PMMMCPClient $false;Update-PMMMCPClientStatus}catch{Handle-UIError $_ 'Codex'}})}
 . (Join-Path $Script:Root 'Modules\MCP\MCP.Reply.UI.ps1')
 if(-not(Get-Variable PMMMMCPReplyTimer -Scope Script -ErrorAction SilentlyContinue)){
     $Script:PMMMMCPReplyTimer=[Windows.Threading.DispatcherTimer]::new()
