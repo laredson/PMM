@@ -85,7 +85,7 @@ function Test-PMMAIIOResponseArchiveEnvelope([string]$ZipPath) {
   }finally{$archive.Dispose()}
 }
 
-function Test-PMMAIIOCapabilityRequest($Request,[hashtable]$Seen) {
+function Test-PMMAIIOCapabilityRequest($Request,[hashtable]$Seen,$Session) {
   if(-not$Request){throw 'AI response contains an empty data request.'}
   $capability=[string]$Request.capability
   if([string]::IsNullOrWhiteSpace($capability)){try{$capability=[string]$Request.type}catch{}}
@@ -104,6 +104,21 @@ function Test-PMMAIIOCapabilityRequest($Request,[hashtable]$Seen) {
     if([string]::IsNullOrWhiteSpace($providerName)){throw 'extract_provider_asset requires providerName from the exact current Unsupported case.'}
     if($providerName.Length -gt 260 -or $providerName.IndexOfAny([char[]]@([char]0,[char]10,[char]13,[char]47,[char]92)) -ge 0){throw 'extract_provider_asset contains an unsafe providerName.'}
   }elseif($providerName){throw ('providerName is not valid for capability '+$capability+'.')}
+  $query='';try{$query=[string]$Request.query}catch{}
+  if([string]::IsNullOrWhiteSpace($query) -and $capability -eq 'query_game_reference'){$query=$logicalPath}
+  if($query){
+    $query=$query.Trim()
+    if($query.Length -gt 256 -or $query.IndexOfAny([char[]]@([char]0,[char]10,[char]13)) -ge 0){throw ('Unsafe or oversized query for '+$capability+'.')}
+  }
+  [int]$maximumResults=100;try{if($Request.maximumResults){$maximumResults=[int]$Request.maximumResults}}catch{$maximumResults=100}
+  if($maximumResults -lt 1 -or $maximumResults -gt 200){throw 'maximumResults must be between 1 and 200.'}
+  [int]$maximumFamilies=12;try{if($Request.maximumFamilies){$maximumFamilies=[int]$Request.maximumFamilies}}catch{$maximumFamilies=12}
+  if($maximumFamilies -lt 1 -or $maximumFamilies -gt 32){throw 'maximumFamilies must be between 1 and 32.'}
+  if($capability -eq 'query_game_reference' -and [string]::IsNullOrWhiteSpace($query)){throw 'query_game_reference requires a focused query string.'}
+  if($capability -in @('extract_game_reference_asset','extract_reference_neighborhood')){
+    if(-not$Session -or [string]$Session.TaskType -ne 'CREATE_MOD'){throw ($capability+' is available only inside a CREATE_MOD AIIO project.')}
+    if([string]::IsNullOrWhiteSpace($logicalPath) -or [IO.Path]::GetExtension($logicalPath) -ine '.uasset'){throw ($capability+' requires one exact Game Reference .uasset logicalPath.')}
+  }
   [int64]$maximum=0
   try{$maximum=[int64]$Request.maximumExpectedBytes}catch{$maximum=0}
   if($maximum -lt 0 -or $maximum -gt 536870912){throw ('Requested data budget is invalid for '+$capability+'.')}
@@ -111,14 +126,14 @@ function Test-PMMAIIOCapabilityRequest($Request,[hashtable]$Seen) {
   $id=Get-PMMStableTextId ('AIIO_REQUEST|'+$canonical)
   if($Seen.ContainsKey($id)){throw ('Duplicate AI data request: '+$id)}
   $Seen[$id]=$true
-  return [pscustomobject]@{RequestId=$id;Capability=$capability;LogicalPath=$logicalPath;ProviderName=$providerName;Reason=[string]$Request.reason;Required=$(try{[bool]$Request.required}catch{$true});MaximumExpectedBytes=$maximum;Original=$Request;Status='Pending'}
+  return [pscustomobject]@{RequestId=$id;Capability=$capability;LogicalPath=$logicalPath;ProviderName=$providerName;Query=$query;MaximumResults=$maximumResults;MaximumFamilies=$maximumFamilies;Reason=[string]$Request.reason;Required=$(try{[bool]$Request.required}catch{$true});MaximumExpectedBytes=$maximum;Original=$Request;Status='Pending'}
 }
 
 function Get-PMMAIIOCandidateManifestFromArchive($Archive,[string]$CandidatePath) {
   $prefix=$CandidatePath.Replace([char]92,[char]47).Trim([char]47)
   if([string]::IsNullOrWhiteSpace($prefix) -or -not$prefix.StartsWith('solutions/',[StringComparison]::OrdinalIgnoreCase) -or -not(Test-PMMAIIOZipEntryName $prefix)){throw 'Candidate paths must be safe and below solutions/.'}
   $matches=[Collections.Generic.List[object]]::new()
-  foreach($name in @('solution.json','candidate.json','full-pak-solution.json','development-patch.json')){
+  foreach($name in @('solution.json','candidate.json','full-pak-solution.json','development-patch.json','mod-creation.json')){
     $path=$prefix+'/'+$name
     $doc=Read-PMMAIIOZipJsonEntry $Archive $path 2097152
     if($doc){$matches.Add([pscustomobject]@{Path=$path;Root=$prefix;Document=$doc})}
@@ -128,9 +143,9 @@ function Get-PMMAIIOCandidateManifestFromArchive($Archive,[string]$CandidatePath
   return $matches[0]
 }
 
-function Test-PMMAIIOCandidateManifest($Candidate,$Manifest,[string]$SessionId,[array]$AllowedCaseIds) {
+function Test-PMMAIIOCandidateManifest($Candidate,$Manifest,[string]$SessionId,[array]$AllowedCaseIds,$Session) {
   $schema=[string]$Manifest.schema
-  if($schema -notin @('PMM_MANUAL_SOLUTION_V1','PMM_AIIO_CANDIDATE_V2','PMM_FULL_PAK_SOLUTION_V1','PMM_DEVELOPMENT_PATCH_V1','PMM_THEME_AI_RESPONSE_V1')){throw ('Unsupported AI candidate schema: '+$schema)}
+  if($schema -notin @('PMM_MANUAL_SOLUTION_V1','PMM_AIIO_CANDIDATE_V2','PMM_FULL_PAK_SOLUTION_V1','PMM_DEVELOPMENT_PATCH_V1','PMM_THEME_AI_RESPONSE_V1','PMM_MOD_CREATION_CANDIDATE_V1')){throw ('Unsupported AI candidate schema: '+$schema)}
   $caseIds=[Collections.Generic.List[string]]::new()
   try{foreach($id in @($Manifest.caseIds)){if($id){$caseIds.Add([string]$id)}}}catch{}
   try{if($Manifest.caseId){$caseIds.Add([string]$Manifest.caseId)}}catch{}
@@ -151,9 +166,11 @@ function Test-PMMAIIOCandidateManifest($Candidate,$Manifest,[string]$SessionId,[
     if([string]::IsNullOrWhiteSpace([string]$Manifest.baseVersion)){throw 'Development patch is missing baseVersion.'}
     if(-not$Manifest.baseFileHashes){throw 'Development patch is missing exact baseFileHashes.'}
   }
+  $modCreation=$null
+  if($schema -eq 'PMM_MOD_CREATION_CANDIDATE_V1'){$modCreation=Test-PMMAIIOModCreationManifest $Manifest $Session}
   $declaredId='';try{$declaredId=[string]$Candidate.solutionId}catch{}
   if(-not$declaredId){try{$declaredId=[string]$Manifest.solutionId}catch{}}
-  return [pscustomobject]@{Schema=$schema;DeclaredSolutionId=$declaredId;CaseIds=@($caseIds.ToArray()|Sort-Object -Unique);SessionId=$SessionId}
+  return [pscustomobject]@{Schema=$schema;DeclaredSolutionId=$declaredId;CaseIds=@($caseIds.ToArray()|Sort-Object -Unique);SessionId=$SessionId;ModCreation=$modCreation}
 }
 
 function Copy-PMMAIIOArchivePrefix($Archive,[string]$Prefix,[string]$Destination) {
@@ -204,6 +221,10 @@ function Test-PMMAIIOStagedCandidate([string]$Root,$Info) {
       if([IO.Path]::GetFileNameWithoutExtension($member.Name) -cne $family){throw 'Manual solution cooked files must belong to one exact cooked family.'}
     }
   }
+  if([string]$Info.Schema -eq 'PMM_MOD_CREATION_CANDIDATE_V1'){
+    $manifest=Get-Content -LiteralPath (Join-Path $Root 'mod-creation.json') -Raw -Encoding UTF8|ConvertFrom-Json -ErrorAction Stop
+    [void](Test-PMMAIIOModCreationCandidateTree $Root $manifest)
+  }
   $hashRows=[Collections.Generic.List[object]]::new()
   foreach($file in $files|Sort-Object FullName){$hashRows.Add([pscustomobject]@{RelativePath=$file.FullName.Substring($Root.Length).TrimStart([char]92,[char]47).Replace([char]92,[char]47);Bytes=[int64]$file.Length;Sha256=(Get-Sha256 $file.FullName)})}
   $solutionId=Get-PMMStableTextId ('AIIO_CANDIDATE_V2|'+(($hashRows|ConvertTo-Json -Depth 6 -Compress)))
@@ -237,7 +258,7 @@ function Import-PMMAIIOResponseZip {
     New-Item -ItemType Directory -Force -Path $stage|Out-Null
     Set-PMMTransientStageOwner $stage 'AIIOImportResponse'
     $seen=@{};$requests=[Collections.Generic.List[object]]::new()
-    foreach($request in @($response.requests)){$requests.Add((Test-PMMAIIOCapabilityRequest $request $seen))}
+    foreach($request in @($response.requests)){$requests.Add((Test-PMMAIIOCapabilityRequest $request $seen $session))}
     $allowedCaseIds=@($session.CaseIds|ForEach-Object{[string]$_})
     $candidateRows=[Collections.Generic.List[object]]::new();$pending=[Collections.Generic.List[object]]::new()
     $candidateIds=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
@@ -250,7 +271,7 @@ function Import-PMMAIIOResponseZip {
         if([string]::IsNullOrWhiteSpace($candidatePath)){try{$candidatePath=[string]$candidate.candidatePath}catch{}}
         $manifestInfo=Get-PMMAIIOCandidateManifestFromArchive $archive $candidatePath
         if(-not$declaredCandidateRoots.Add(([string]$manifestInfo.Root).TrimEnd([char]47))){throw ('AI response declares the same candidate path more than once: '+[string]$manifestInfo.Root)}
-        $info=Test-PMMAIIOCandidateManifest $candidate $manifestInfo.Document $sessionId $allowedCaseIds
+        $info=Test-PMMAIIOCandidateManifest $candidate $manifestInfo.Document $sessionId $allowedCaseIds $session
         $candidateStage=Join-Path $stage ('candidate_'+[guid]::NewGuid().ToString('N'))
         Copy-PMMAIIOArchivePrefix $archive ([string]$manifestInfo.Root) $candidateStage
         $proof=Test-PMMAIIOStagedCandidate $candidateStage $info
@@ -258,7 +279,8 @@ function Import-PMMAIIOResponseZip {
         if(-not$candidateIds.Add([string]$proof.SolutionId)){throw ('AI response declares the same candidate bytes more than once: '+[string]$proof.SolutionId)}
         $dest=Join-Path (Get-PMMAIIOSessionPath $sessionId) ('candidates\'+[string]$proof.SolutionId)
         $candidateAlreadyExists=Test-Path -LiteralPath $dest -PathType Container
-        $candidateRecord=[ordered]@{Schema='PMM_AIIO_CANDIDATE_RECORD_V1';SolutionId=[string]$proof.SolutionId;InputSchema=[string]$info.Schema;CaseIds=@($info.CaseIds);Status='StructurallyAccepted';RuntimeStatus='RuntimeUnproven';Origin='AIIO_EXTERNAL';RelativePath=('candidates/'+[string]$proof.SolutionId);Bytes=[int64]$proof.Bytes;Files=@($proof.Files);ImportedUtc=[DateTime]::UtcNow.ToString('o');UsagePolicy=$(if([string]$info.Schema -eq 'PMM_FULL_PAK_SOLUTION_V1'){'PERSONAL_COMPATIBILITY_USE_ONLY'}else{'PMM_STAGED_CANDIDATE'})}
+        $usagePolicy=if([string]$info.Schema -eq 'PMM_FULL_PAK_SOLUTION_V1'){'PERSONAL_COMPATIBILITY_USE_ONLY'}elseif([string]$info.Schema -eq 'PMM_MOD_CREATION_CANDIDATE_V1'){'STANDALONE_MOD_CREATION_UNPROVEN'}else{'PMM_STAGED_CANDIDATE'}
+        $candidateRecord=[ordered]@{Schema='PMM_AIIO_CANDIDATE_RECORD_V1';SolutionId=[string]$proof.SolutionId;InputSchema=[string]$info.Schema;CaseIds=@($info.CaseIds);Status='StructurallyAccepted';RuntimeStatus='RuntimeUnproven';Origin='AIIO_EXTERNAL';RelativePath=('candidates/'+[string]$proof.SolutionId);Bytes=[int64]$proof.Bytes;Files=@($proof.Files);ImportedUtc=[DateTime]::UtcNow.ToString('o');UsagePolicy=$usagePolicy}
         $pending.Add([pscustomobject]@{Stage=$candidateStage;Destination=$dest;AlreadyExists=$candidateAlreadyExists;Record=[pscustomobject]$candidateRecord;SolutionId=[string]$proof.SolutionId})
       }
       # response.json plus the exact declared candidate roots are the complete
@@ -424,10 +446,12 @@ function Get-PMMAIIOCandidateRecords([string]$SessionId) {
       $record=Get-Content -LiteralPath $recordPath -Raw -Encoding UTF8|ConvertFrom-Json
       if([string]$record.Schema -ne 'PMM_AIIO_CANDIDATE_RECORD_V1' -or [string]$record.SolutionId -ne $dir.Name){continue}
       $canUse=([string]$record.InputSchema -eq 'PMM_MANUAL_SOLUTION_V1' -and [string]$record.Status -ne 'AcceptedExperimental' -and @($record.CaseIds|Where-Object{$_}).Count -eq 1)
+      $canBuildStandalone=([string]$record.InputSchema -eq 'PMM_MOD_CREATION_CANDIDATE_V1' -and [string]$record.Status -ne 'ModBuiltUnproven')
       $display=('{0} | {1} | {2}' -f [string]$record.InputSchema,[string]$record.Status,([string]$record.SolutionId).Substring(0,[Math]::Min(12,([string]$record.SolutionId).Length)))
       $record|Add-Member -NotePropertyName Root -NotePropertyValue $dir.FullName -Force
       $record|Add-Member -NotePropertyName RecordPath -NotePropertyValue $recordPath -Force
       $record|Add-Member -NotePropertyName CanUseInMerge -NotePropertyValue $canUse -Force
+      $record|Add-Member -NotePropertyName CanBuildStandalone -NotePropertyValue $canBuildStandalone -Force
       $record|Add-Member -NotePropertyName Display -NotePropertyValue $display -Force
       $rows.Add($record)
     }catch{Write-PMMLog ('Ignored invalid AIIO candidate record '+$recordPath+': '+$_.Exception.Message)}
@@ -514,9 +538,11 @@ function Get-PMMAIIOPendingRequests([string]$SessionId) {
   try{$set=Get-Content -LiteralPath $path -Raw -Encoding UTF8|ConvertFrom-Json;return @($set.Requests|Where-Object{[string]$_.Status -eq 'Pending'})}catch{return @()}
 }
 
-function Export-PMMAIIORequestedData($Request,[string]$Destination) {
+function Export-PMMAIIORequestedData($Request,[string]$Destination,[string]$SessionId) {
   New-Item -ItemType Directory -Force -Path $Destination|Out-Null
   $cap=[string]$Request.Capability
+  $session=Get-PMMAIIOSession $SessionId
+  if(-not$session){throw ('AIIO requested-data session was not found: '+$SessionId)}
   switch($cap){
     'read_pmm_log' {Get-PMMAIIOSanitizedLogWindow -MaximumLines 500|Set-Content -LiteralPath (Join-Path $Destination 'pmm-log-sanitized.txt') -Encoding UTF8;break}
     'extract_relevant_log_window' {Get-PMMAIIOSanitizedLogWindow -MaximumLines 1000|Set-Content -LiteralPath (Join-Path $Destination 'pmm-log-sanitized.txt') -Encoding UTF8;break}
@@ -536,8 +562,16 @@ function Export-PMMAIIORequestedData($Request,[string]$Destination) {
       Write-PMMAIIOJsonAtomic (Join-Path $Destination 'fixlab-summary.json') ([ordered]@{Schema='PMM_FIXLAB_SUMMARY_V1';BuiltOutputs=$rows}) 25;break
     }
     'query_game_reference' {
-      $families=@();try{$families=@(Get-PMMGameReferenceFamilies|Select-Object -First 500|ForEach-Object{[pscustomobject]@{LogicalPath=[string]$_.LogicalPath;RelativePath=[string]$_.RelativePath;Bytes=[int64]$_.Bytes;Sha256=[string]$_.Sha256}})}catch{}
-      Write-PMMAIIOJsonAtomic (Join-Path $Destination 'game-reference-index.json') ([ordered]@{Schema='PMM_GAME_REFERENCE_QUERY_V1';Query=[string]$Request.LogicalPath;Families=$families}) 35;break
+      $families=@(Search-PMMAIIOGameReferenceFamilies -Query ([string]$Request.Query) -MaximumResults ([int]$Request.MaximumResults))
+      Write-PMMAIIOJsonAtomic (Join-Path $Destination 'game-reference-index.json') ([ordered]@{Schema='PMM_GAME_REFERENCE_QUERY_V2';Query=[string]$Request.Query;MaximumResults=[int]$Request.MaximumResults;Returned=$families.Count;GameReference=(Get-PMMAIIOGameReferenceProof -RequireCurrent);Families=$families}) 45;break
+    }
+    'extract_game_reference_asset' {
+      if([string]$session.TaskType -ne 'CREATE_MOD'){throw 'Exact Game Reference extraction requires a CREATE_MOD project.'}
+      [void](Export-PMMAIIOGameReferenceAsset -LogicalPath ([string]$Request.LogicalPath) -Destination $Destination -MaximumBytes ([int64]$Request.MaximumExpectedBytes));break
+    }
+    'extract_reference_neighborhood' {
+      if([string]$session.TaskType -ne 'CREATE_MOD'){throw 'Game Reference neighborhood extraction requires a CREATE_MOD project.'}
+      [void](Export-PMMAIIOGameReferenceNeighborhood -LogicalPath ([string]$Request.LogicalPath) -Destination $Destination -MaximumFamilies ([int]$Request.MaximumFamilies) -MaximumBytes ([int64]$Request.MaximumExpectedBytes));break
     }
     {$_ -in @('extract_vanilla_asset','extract_provider_asset','extract_asset_family')} {
       $plan=Read-PMMMergePlan;$cases=@(Get-PMMAIIOCurrentCases $plan);$match=@($cases|Where-Object{[string]$_.Asset -ceq [string]$Request.LogicalPath}|Select-Object -First 1)
@@ -583,7 +617,7 @@ function New-PMMAIIOPendingDataHandoff {
     $i=0
     foreach($request in $requests){
       $i++;$dest=Join-Path $stage ('data\request-{0:D3}-{1}' -f $i,[string]$request.RequestId)
-      Export-PMMAIIORequestedData $request $dest
+      Export-PMMAIIORequestedData $request $dest $SessionId
       [int64]$actualBytes=0;foreach($file in @(Get-ChildItem -LiteralPath $dest -Recurse -File -ErrorAction SilentlyContinue)){$actualBytes+=[int64]$file.Length}
       if([int64]$request.MaximumExpectedBytes -gt 0 -and $actualBytes -gt [int64]$request.MaximumExpectedBytes){throw ('Requested data exceeded the declared per-request budget for '+[string]$request.Capability+'.')}
     }

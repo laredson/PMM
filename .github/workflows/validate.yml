@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - '1.3.0final'
+      - '1.3.1-*'
       - 'dev/**'
       - 'release/**'
   pull_request:
@@ -29,6 +30,11 @@ jobs:
         shell: pwsh
         run: |
           ./Development/Scripts/validation/Validate-v1.3.ps1 -Quiet
+
+      - name: Materialize WPF window and AUTO template
+        shell: powershell
+        run: |
+          ./Development/Tests/wpf_xaml_runtime_regression.ps1
 
       - name: Run RC21 static smoke contract
         shell: pwsh
@@ -56,3 +62,11 @@ jobs:
         shell: pwsh
         run: |
           ./PMM/PMM.exe runtime-self-test
+
+      - name: Desktop binding, background snapshots and independent cases
+        shell: powershell
+        run: |
+          ./Development/Tests/desktop_binding_regression.ps1
+          ./Development/Tests/desktop_snapshot_regression.ps1
+          ./Development/Tests/workspaces_dependencies_regression.ps1 -Language en
+          ./Development/Tests/workspaces_dependencies_regression.ps1 -Language es

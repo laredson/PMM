@@ -591,3 +591,5 @@ function Stop-PalworldForDeployment {
     else{throw (Get-PMMText 'Palworld did not close within the configured timeout. Close it manually or enable forced close.' 'Palworld no se cerro dentro del tiempo configurado. Cierralo manualmente o activa el cierre forzado.')}
   }
 }
+
+. (Join-Path $PSScriptRoot 'Dialogs.ps1')

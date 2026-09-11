@@ -1,0 +1,18 @@
+{
+  "schema": "PMM_UNREAL_PROFILE_V1",
+  "engineMajor": 5,
+  "engineMinor": 1,
+  "preferredPatch": 1,
+  "kitCommit": "e6632458b97af0083eb81715775651b08104ef6a",
+  "kitUrl": "https://codeload.github.com/localcc/PalworldModdingKit/zip/e6632458b97af0083eb81715775651b08104ef6a",
+  "kitSha256": "9a13bf315b5e11587c9706ba9c6f4a370bfbbdde29509540b2d992665c79e993",
+  "wwiseVersion": "2021.1.11",
+  "msvcPrefix": "14.38.",
+  "urls": {
+    "epic": "https://www.unrealengine.com/download",
+    "visualStudio": "https://aka.ms/vs/17/release/vs_community.exe",
+    "dotnet": "https://dotnet.microsoft.com/en-us/download/dotnet/6.0",
+    "wwise": "https://www.audiokinetic.com/download/",
+    "guide": "https://pwmodding.wiki/docs/developers/palworld-modding-kit/prerequisites"
+  }
+}

@@ -52,6 +52,7 @@ Set-PMMHostStartupState 'startup:UI-script-loading'
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.SessionService.ps1')
 . (Join-Path $Script:Root 'Modules\Saves\SaveActivityService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.DiagnosticService.ps1')
+. (Join-Path $Script:Root 'Modules\AIIO\AIIO.ModCreationService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.ResponseService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.ArtifactService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.ValidationService.ps1')
@@ -153,8 +154,8 @@ $controlNames = @(
   'MainTabs','TabFixLab','BtnFixLabOpenRoot','CmbFixLabJob','BtnFixLabRefreshJobs','BtnFixLabOpenJob','LstFixLabPrimaryMods','BtnFixLabUseLibraryMod','BtnFixLabBrowsePrimary','TxtFixLabPrimary',
   'LstFixLabRelated','BtnFixLabAddRelated','BtnFixLabRemoveRelated','TxtFixLabGameReference','BtnFixLabBuildReference','BtnFixLabOpenReference','BtnFixLabAnalyze','TxtFixLabAnalysis','DgFixLabPakInventory','CmbFixLabRecipe','CmbFixLabVariant','TxtFixLabVariantDescription','BtnFixLabCreateHandoff','TxtFixLabBuildState','BtnFixLabBuild','BtnFixLabRebuild','TxtFixLabResult','BtnFixLabOpenOutput','BtnFixLabAddOutputToLibrary',
   'BtnFixLabDiscover','BtnFixLabRefreshDashboard','LstFixLabCandidates','TxtFixLabCandidate','BtnFixLabIgnoreSource','BtnFixLabDeleteSource','LstFixLabBackups','BtnFixLabRevertBackup','BtnFixLabOpenBackupFolder','LstFixLabBuiltFixes','BtnFixLabApplyBuilt','BtnFixLabRepair','TxtFixLabRepairState','TxtFixLabRepairProgress','PrgFixLabRepair','TxtFixLabGameReferenceProgress','PrgFixLabGameReference','BrdFixLabBadge','TxtFixLabBadge','BrdFixLabNotice','TxtFixLabNotice','BtnFixLabDismissNotice','TxtFixLabCandidateCount','TxtFixLabBackupCount','TxtFixLabBuiltCount','TxtFixLabIgnoredCount','BtnFixLabClearIgnored','TxtFixLabLegacySource','TxtFixLabModules','TxtFixLabOutputSize','ExpFixLabSource','ExpFixLabConfigure','ExpFixLabBuild','ExpFixLabOutputs','ExpFixLabBackups','ExpFixLabAdvanced',
-  'TabAIHelp','BrdAIHelpBadge','TxtAIHelpBadge','AIHelpTabs','LstAIHelpDiagnostics','BtnAIHelpRefresh','BtnAIHelpNewCase','BtnAIHelpPrepareDiagnostic','PnlAIHelpSelectedCase','PnlAIHelpNewCase','TxtAIHelpSelectedCaseTitle','TxtAIHelpSelectedCaseMeta','TxtAIHelpSelectedCaseDescription','CmbAIHelpDiagnosticType','TxtAIHelpDiagnosticTitle','TxtAIHelpDiagnosticDescription','ChkAIHelpIncludePalLog','BtnAIHelpCreateCase','BtnAIHelpCreateAndPrepareCase','BtnAIHelpCancelNewCase','TxtAIHelpDiagnosticStatus',
-  'LstAIIOSessions','LstAIIOCandidates','TxtAIIOCandidateStatus','BtnAIIOOpenWorkspace','BtnAIIOArchive','BtnAIIOOpenCandidate','BtnAIIOUseCandidate','CmbAIIOType','TxtAIIOTitle','TxtAIIODescription','CmbAIOTargetKind','TxtAIOTargetId','BtnAIIONewSession','BtnAIIOPrepare','BtnAIIOImportResponse','BtnAIIOContinue','TxtAIIOStatus',
+  'TabAIHelp','BrdAIHelpBadge','TxtAIHelpBadge','AIHelpTabs','LstAIHelpDiagnostics','BtnAIHelpRefresh','BtnAIHelpNewCase','BtnAIHelpNewModProject','BtnAIHelpPrepareDiagnostic','PnlAIHelpSelectedCase','PnlAIHelpNewCase','TxtAIHelpSelectedCaseTitle','TxtAIHelpSelectedCaseMeta','TxtAIHelpSelectedCaseDescription','CmbAIHelpDiagnosticType','TxtAIHelpDiagnosticTitle','TxtAIHelpDiagnosticDescription','ChkAIHelpIncludePalLog','BtnAIHelpCreateCase','BtnAIHelpCreateAndPrepareCase','BtnAIHelpCancelNewCase','TxtAIHelpDiagnosticStatus',
+  'LstAIIOSessions','LstAIIOCandidates','TxtAIIOCandidateStatus','BtnAIIOOpenWorkspace','BtnAIIOOpenHandoff','BtnAIIOArchive','BtnAIIOOpenCandidate','BtnAIIOUseCandidate','CmbAIIOType','TxtAIIOTitle','TxtAIIODescription','CmbAIOTargetKind','TxtAIOTargetId','BtnAIIONewSession','BtnAIIOPrepare','BtnAIIOImportResponse','BtnAIIOContinue','TxtAIIOStatus',
   'CmbAIHelpFeedbackType','TxtAIHelpFeedbackTitle','TxtAIHelpFeedbackComments','CmbAIHelpFeedbackBuild','BtnAIHelpCreateFeedback','BtnAIHelpGenerateFeedback','BtnAIHelpOpenFeedback','BtnAIHelpUploadFeedback','TxtAIHelpFeedbackStatus',
   'TxtAIHelpKnowledgeSummary','BtnAIHelpOpenKnowledge','TxtAIHelpStorageSummary','LstAIHelpInterrupted','BtnAIHelpRefreshKnowledge','BtnAIHelpCleanup','ChkAIIOAutoCreateErrorCases','TxtAIIOSettingsStatus',
   'CmbThemeEditorSource','BtnThemeEditorNew','LstThemeDrafts','BtnThemeEditorLoad','BtnThemeEditorDelete','TxtThemeEditorName','TxtThemeEditorId','CmbThemeEditorBase','BrdThemeEditorPreview','PnlThemeEditorRows','TxtThemeEditorPrompt','BtnThemeEditorSave','BtnThemeEditorPreview','BtnThemeEditorRevert','BtnThemeEditorInstall','BtnThemeEditorExport','BtnThemeEditorCreateAI','BtnThemeEditorImportAI','TxtThemeEditorStatus',
@@ -204,7 +205,7 @@ try {
 $Script:ThemeOptionButtons=[System.Collections.Generic.List[object]]::new()
 $Script:CustomSoundOptionButtons=[System.Collections.Generic.List[object]]::new()
 $Script:PendingSoundSelections=@{}
-$Script:ActiveThemeId='pmm-crystal'
+$Script:ActiveThemeId=''
 $Script:ActiveThemeColorFlow=$null
 $Script:ActiveThemeDefinition=$null
 $Script:ThemeFallbackNotice=''
@@ -384,7 +385,7 @@ function Get-PMMCustomSoundDefinitions {
 function Get-PMMSoundProfileDefinitions {
   return @(
     [pscustomobject]@{Id='Auto';Label=(L 'Auto - workflow finished' 'Auto - flujo terminado');Description=(L 'Played once when an automatic workflow really finishes. If Run Palworld after Deploy is enabled, it plays after Palworld is launched; otherwise after Deploy.' 'Suena una vez cuando termina realmente un flujo automatico. Si Iniciar Palworld tras Deploy esta activado, suena despues de iniciar Palworld; si no, despues de Deploy.')},
-    [pscustomobject]@{Id='SemiAuto';Label=(L 'Semiauto - each AUTO step' 'Semiauto - cada paso de AUTO');Description=(L 'Optional short sound after each completed step while AUTO/Auto ON is still running.' 'Sonido corto opcional despues de cada paso completado mientras AUTO/Auto ON sigue ejecutandose.')},
+    [pscustomobject]@{Id='SemiAuto';Label=(L 'Semiauto - each AUTO step' 'Semiauto - cada paso de AUTO');Description=(L 'Optional short sound after each completed step while AUTO/SemiAUTO is still running.' 'Sonido corto opcional despues de cada paso completado mientras AUTO/SemiAUTO sigue ejecutandose.')},
     [pscustomobject]@{Id='Manual';Label=(L 'Manual - completed action' 'Manual - accion completada');Description=(L 'Played after a manually-started workflow action completes. Start Palworld by itself never plays this sound.' 'Suena cuando termina una accion del flujo iniciada manualmente. Iniciar Palworld por si solo nunca reproduce este sonido.')},
     [pscustomobject]@{Id='Attention';Label=(L 'Attention required' 'Atencion requerida');Description=(L 'Optional notification when PMM is waiting for a real user decision, such as choosing a Fix Lab output or resolving a compatibility decision.' 'Aviso opcional cuando PMM espera una decision real del usuario, como elegir una salida de Fix Lab o resolver una decision de compatibilidad.')},
     [pscustomobject]@{Id='Error';Label=(L 'Error' 'Error');Description=(L 'Short alert when PMM reports an operation error.' 'Alerta corta cuando PMM informa de un error de operacion.')}
@@ -545,7 +546,9 @@ function Apply-PMMTheme([string]$Theme='',[switch]$Force) {
   }
   if($definition.Count -eq 0){$definition=@($definitions|Where-Object{[string]$_.Id -eq 'Night'}|Select-Object -First 1);$Script:ThemeFallbackNotice=L 'PMM Crystal is unavailable; the emergency Night palette is active.' 'PMM Crystal no esta disponible; esta activa la paleta de emergencia Noche.'}
   $resolvedId=[string]$definition[0].Id
-  if(-not$Force -and -not[bool]$Script:ThemePreviewActive -and -not[string]::IsNullOrWhiteSpace([string]$Script:ActiveThemeId) -and [string]$Script:ActiveThemeId -ieq $resolvedId){return}
+  # An id alone is not proof that its brushes were installed. At startup the
+  # selected id is known before any theme definition has been applied.
+  if(-not$Force -and -not[bool]$Script:ThemePreviewActive -and $Script:ActiveThemeDefinition -and -not[string]::IsNullOrWhiteSpace([string]$Script:ActiveThemeId) -and [string]$Script:ActiveThemeId -ieq $resolvedId){return}
   Apply-PMMThemeDefinition $definition[0]
 }
 
@@ -770,10 +773,31 @@ function Refresh-PMMAIIOCandidates([string]$SessionId) {
   Update-PMMAIIOCandidateSelection
 }
 
+function Update-PMMAIIOHandoffButton {
+  if(-not$Script:BtnAIIOOpenHandoff){return}
+  $path='';$session=Get-PMMSelectedAIIOSession
+  if($session){try{$path=[string](Get-PMMAIIOLatestHandoffPath ([string]$session.SessionId))}catch{$path=''}}
+  $Script:BtnAIIOOpenHandoff.Tag=$path
+  $Script:BtnAIIOOpenHandoff.IsEnabled=(-not[bool]$Script:AIIOBusy -and -not[string]::IsNullOrWhiteSpace($path))
+  $Script:BtnAIIOOpenHandoff.ToolTip=if($path){(L 'Show the latest request ZIP for this exchange in Explorer.' 'Mostrar en el Explorador el ultimo ZIP de peticion de este intercambio.')}else{(L 'This exchange does not have a handoff ZIP yet.' 'Este intercambio aun no tiene un ZIP handoff.')}
+}
+
 function Update-PMMAIIOCandidateSelection {
   $row=$Script:LstAIIOCandidates.SelectedItem
-  if(-not$row){$Script:BtnAIIOOpenCandidate.IsEnabled=$false;$Script:BtnAIIOUseCandidate.IsEnabled=$false;$Script:TxtAIIOCandidateStatus.Text=L 'No staged candidate is selected.' 'No hay ningun candidato en staging seleccionado.';return}
+  if(-not$row){$Script:BtnAIIOOpenCandidate.IsEnabled=$false;$Script:BtnAIIOUseCandidate.IsEnabled=$false;$Script:BtnAIIOUseCandidate.Content=L 'Use candidate in Merge...' 'Usar candidato en Merge...';$Script:TxtAIIOCandidateStatus.Text=L 'No staged candidate is selected.' 'No hay ningun candidato en staging seleccionado.';return}
   $Script:BtnAIIOOpenCandidate.IsEnabled=$true
+  if([string]$row.InputSchema -eq 'PMM_MOD_CREATION_CANDIDATE_V1'){
+    $Script:BtnAIIOUseCandidate.Content=L 'Build standalone PAK...' 'Crear PAK independiente...'
+    $Script:BtnAIIOUseCandidate.IsEnabled=(-not[bool]$Script:AIIOBusy -and [bool]$row.CanBuildStandalone)
+    if([string]$row.Status -eq 'ModBuiltUnproven'){
+      $path='';try{$path=[string]$row.BuiltPak.Path}catch{}
+      $Script:TxtAIIOCandidateStatus.Text=((L 'Standalone mod built locally and left undeployed. Runtime status: UNPROVEN. Test it in Palworld before contributing Knowledge. Output: {0}' 'Mod independiente creado localmente y dejado sin desplegar. Estado runtime: UNPROVEN. Pruebalo en Palworld antes de aportar Knowledge. Salida: {0}') -f $path)
+    }else{
+      $Script:TxtAIIOCandidateStatus.Text=L 'The cooked-tree candidate passed structural, hash and current GameReference checks. It is still untrusted and inactive. Build creates a standalone PAK locally; PMM will not deploy it.' 'El candidato cooked-tree supero las comprobaciones estructurales, de hashes y de la GameReference vigente. Sigue sin ser confiable ni estar activo. Crear genera un PAK independiente local; PMM no lo desplegara.'
+    }
+    return
+  }
+  $Script:BtnAIIOUseCandidate.Content=L 'Use candidate in Merge...' 'Usar candidato en Merge...'
   $current=$false
   if([bool]$row.CanUseInMerge){try{$ids=@($row.CaseIds|ForEach-Object{[string]$_}|Where-Object{$_});$current=($ids.Count -eq 1 -and -not[string]::IsNullOrWhiteSpace((Get-PMMAIIOCurrentReviewFolderForCaseId $ids[0])))}catch{$current=$false}}
   $Script:BtnAIIOUseCandidate.IsEnabled=(-not[bool]$Script:AIIOBusy -and [bool]$row.CanUseInMerge -and $current)
@@ -814,6 +838,7 @@ function Refresh-PMMAIIOSessions {
   $pending=0;if($hasSession -and -not$busy){try{$pending=@(Get-PMMAIIOPendingRequests $activeSessionId).Count}catch{$pending=0}}
   $Script:BtnAIIOContinue.IsEnabled=(-not$busy -and $hasSession -and $pending -gt 0)
   if($busy){$Script:BtnAIIOUseCandidate.IsEnabled=$false}
+  Update-PMMAIIOHandoffButton
 }
 
 function Refresh-PMMAIHelpUi([switch]$EnsureUnsupported,[switch]$All) {
@@ -824,12 +849,10 @@ function Refresh-PMMAIHelpUi([switch]$EnsureUnsupported,[switch]$All) {
     # Analyze may introduce a new Unsupported set after the tab was opened once;
     # AIHelpLoaded must not suppress creation/reuse of that exact session.
     if($EnsureUnsupported){try{[void](Get-PMMAIIOUnsupportedSession)}catch{Write-PMMLog ('AIIO Unsupported session warning: '+$_.Exception.Message)}}
-    $tab=0;try{$tab=[int]$Script:AIHelpTabs.SelectedIndex}catch{$tab=0}
-    if($All -or $tab -eq 0){Refresh-PMMAIHelpDiagnostics}
-    if($All -or $tab -eq 1){Refresh-PMMAIIOSessions}
-    if($All -or $tab -eq 2){Refresh-PMMAIHelpFeedback;Refresh-PMMAIHelpKnowledge;$Script:BtnAIHelpCleanup.IsEnabled=-not[bool]$Script:AIIOBusy}
-    if($All -or $tab -eq 3){Refresh-PMMThemeEditorCatalog}
-    if($All -or $tab -eq 4){$Script:BtnAIHelpCleanup.IsEnabled=-not[bool]$Script:AIIOBusy}
+    $tab='CASES';try{$tab=[string]$Script:AIHelpTabs.SelectedItem.Tag}catch{}
+    if($All -or $tab -eq 'CASES'){Refresh-PMMAIHelpDiagnostics;Refresh-PMMAIIOSessions}
+    if($All -or $tab -eq 'FEEDBACK'){Refresh-PMMAIHelpFeedback;Refresh-PMMAIHelpKnowledge;$Script:BtnAIHelpCleanup.IsEnabled=-not[bool]$Script:AIIOBusy}
+    if($All -or $tab -eq 'THEME'){Refresh-PMMThemeEditorCatalog}
     Refresh-PMMAIHelpBadge
     $Script:AIHelpLoaded=$true
   }finally{$Script:AIHelpUiRefreshing=$false}
@@ -880,7 +903,7 @@ function Show-PMMThemeImageOptions($Entry) {
   $overlay=[System.Windows.Forms.TextBox]::new();$overlay.Left=270;$overlay.Top=176;$overlay.Width=210;$overlay.Text=if(Test-PMMThemeHexColor ([string]$Entry.overlay)){[string]$Entry.overlay}else{'#00000000'}
   foreach($control in @($stretch,$align,$tile,$opacity,$overlay)){[void]$form.Controls.Add($control)}
   $ok=[System.Windows.Forms.Button]::new();$ok.Text='OK';$ok.Left=300;$ok.Top=220;$ok.Width=85;$ok.DialogResult=[System.Windows.Forms.DialogResult]::OK;$cancel=[System.Windows.Forms.Button]::new();$cancel.Text=L 'Cancel' 'Cancelar';$cancel.Left=395;$cancel.Top=220;$cancel.Width=85;$cancel.DialogResult=[System.Windows.Forms.DialogResult]::Cancel;[void]$form.Controls.Add($ok);[void]$form.Controls.Add($cancel);$form.AcceptButton=$ok;$form.CancelButton=$cancel
-  if($form.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK){return $null}
+  if((Show-PMMStyledDialog $form) -ne [System.Windows.Forms.DialogResult]::OK){return $null}
   if(-not(Test-PMMThemeHexColor ([string]$overlay.Text))){throw 'Overlay color must be #RRGGBB or #RRGGBBAA.'}
   return [pscustomobject]@{stretch=[string]$stretch.SelectedItem;alignment=[string]$align.SelectedItem;tileMode=[string]$tile.SelectedItem;opacity=([double]$opacity.Value/100.0);overlay=([string]$overlay.Text).ToUpperInvariant()}
 }
@@ -1019,7 +1042,7 @@ function Show-PMMBuildValidationDialog([string]$CurrentStatus) {
   $buttonWidth=230;$buttonGap=14;$totalWidth=($choices.Count*$buttonWidth)+([Math]::Max(0,$choices.Count-1)*$buttonGap);$left=[int](($clientWidth-$totalWidth)/2)
   foreach($choice in $choices){$button=[System.Windows.Forms.Button]::new();$button.Text=[string]$choice.Label;$button.Tag=[string]$choice.Result;$button.Left=$left;$button.Top=126;$button.Width=$buttonWidth;$button.Height=76;$button.Font=[System.Drawing.Font]::new('Segoe UI Semibold',12);$button.AutoEllipsis=$false;$button.UseMnemonic=$false;$button.Add_Click({param($sender,$e)$form.Tag=[string]$sender.Tag;$form.Close()});[void]$form.Controls.Add($button);$buttons.Add($button);if([string]$choice.Result -eq 'CANCEL'){$form.CancelButton=$button};$left+=$buttonWidth+$buttonGap}
   $note=[System.Windows.Forms.Label]::new();$note.Left=28;$note.Top=250;$note.Width=984;$note.Height=70;$note.Font=[System.Drawing.Font]::new('Segoe UI',11);$note.Text=L 'The result is recorded locally against a deterministic buildId. It is not uploaded.' 'El resultado se registra localmente contra un buildId determinista. No se sube.'
-  [void]$form.Controls.Add($label);[void]$form.Controls.Add($note);[void]$form.ShowDialog();return [string]$form.Tag
+  [void]$form.Controls.Add($label);[void]$form.Controls.Add($note);[void](Show-PMMStyledDialog $form);return [string]$form.Tag
 }
 
 function Show-PMMValidationContributionDialog {
@@ -1028,7 +1051,7 @@ function Show-PMMValidationContributionDialog {
   $yes=[System.Windows.Forms.Button]::new();$yes.Text=L 'Yes, open feedback' 'Si, abrir feedback';$yes.Left=122;$yes.Top=164;$yes.Width=245;$yes.Height=72;$yes.Font=[System.Drawing.Font]::new('Segoe UI Semibold',12);$yes.DialogResult=[System.Windows.Forms.DialogResult]::Yes
   $later=[System.Windows.Forms.Button]::new();$later.Text=L 'Not now' 'Ahora no';$later.Left=393;$later.Top=164;$later.Width=245;$later.Height=72;$later.Font=[System.Drawing.Font]::new('Segoe UI Semibold',12);$later.DialogResult=[System.Windows.Forms.DialogResult]::No
   $form.Controls.AddRange(@($label,$yes,$later));$form.AcceptButton=$yes;$form.CancelButton=$later
-  return ($form.ShowDialog() -eq [System.Windows.Forms.DialogResult]::Yes)
+  return ((Show-PMMStyledDialog $form) -eq [System.Windows.Forms.DialogResult]::Yes)
 }
 
 # Action-required hint duration: 0 disables the popup, 1..120 are seconds,
@@ -1453,12 +1476,12 @@ function Register-PMMFixLabHandlers {
     try{
       $candidate=Get-PMMFixLabSelectedCandidate;if(-not$candidate){return}
       $warning=L 'Ignore Fix Lab for this exact legacy source hash? PMM will allow Analyze/AUTO to continue with the unfixed mod under your responsibility. You can clear ignored repairs from Advanced.' 'Ignorar Fix Lab para este hash exacto del mod antiguo? PMM permitira continuar Analyze/AUTO con el mod sin reparar bajo tu responsabilidad. Puedes borrar los ignorados desde Advanced.'
-      if([System.Windows.MessageBox]::Show($warning,(L 'Ignore repair warning' 'Ignorar aviso de reparacion'),[System.Windows.MessageBoxButton]::YesNo,[System.Windows.MessageBoxImage]::Warning) -ne [System.Windows.MessageBoxResult]::Yes){return}
+      if((Show-PMMThemedMessage @($warning,(L 'Ignore repair warning' 'Ignorar aviso de reparacion'),'YesNo')) -ne [System.Windows.MessageBoxResult]::Yes){return}
       [void](Ignore-PMMFixLabCandidate $candidate)
       $Script:FixLabSelectedRecipeId='';$Script:FixLabSelectedVariantId='';$Script:FixLabNoticeDismissed=$true
       Refresh-PMMFixLabUI
       $live=@(Get-PMMFixLabDiscoveryCandidates);$Script:FixLabCachedAttentionCandidates=@($live);Set-PMMFixLabAttentionVisual $live ''
-      $Script:MainTabs.SelectedIndex=0
+      $Script:MainTabs.SelectedItem=$Script:PMMMergeTab
       $Script:TxtStatus.Text=L 'Fix Lab warning ignored for this exact source. Next action: Analyze.' 'Aviso de Fix Lab ignorado para esta fuente exacta. Siguiente accion: Analyze.'
       Close-PMMRequiredActionPopup;$Script:RequiredActionSignature='';Update-PMMGuidedActionState
       if([bool]$Script:TglAutoMode.IsChecked){Start-PMMAutoPipeline;Invoke-PMMAutoContinue}
@@ -1581,7 +1604,7 @@ function Register-PMMFixLabHandlers {
       $live=@(Get-PMMFixLabDiscoveryCandidates);$Script:FixLabCachedAttentionCandidates=@($live);$Script:FixLabNoticeDismissed=$true
       try{Set-PMMFixLabAttentionVisual $live ''}catch{}
       Close-PMMRequiredActionPopup;$Script:RequiredActionSignature=''
-      $Script:MainTabs.SelectedIndex=0
+      $Script:MainTabs.SelectedItem=$Script:PMMMergeTab
       Update-PMMGuidedActionState
       Notify-PMMWorkflowStepComplete
     }catch{if(Test-PMMCancellationError $_){Set-PMMOperationResult 'FixLab' (L 'Apply Fix cancelled. Transaction rolled back.' 'Aplicar Fix cancelado. La transaccion se revirtio.');Stop-PMMAutoPipeline}else{Handle-UIError $_ (L 'Apply Fix' 'Aplicar Fix')}}
@@ -1593,7 +1616,7 @@ function Register-PMMFixLabHandlers {
   $Script:BtnFixLabRevertBackup.Add_Click({
     try{
       $row=$Script:LstFixLabBackups.SelectedItem;if(-not$row){return}
-      $answer=[System.Windows.MessageBox]::Show((L 'Restore the original legacy mod? PMM will remove/archive the applied repair and restore the original source to both the PMM library and Palworld ~mods. The deployed compatibility merge will not be changed.' 'Restaurar el mod antiguo original? PMM retirara/archivara el fix aplicado y restaurara la fuente original tanto en la biblioteca PMM como en ~mods de Palworld. El merge de compatibilidad desplegado no se modificara.'),(L 'Restore original mod' 'Restaurar mod original'),[System.Windows.MessageBoxButton]::YesNo,[System.Windows.MessageBoxImage]::Warning)
+      $answer=Show-PMMThemedMessage @((L 'Restore the original legacy mod? PMM will remove/archive the applied repair and restore the original source to both the PMM library and Palworld ~mods. The deployed compatibility merge will not be changed.' 'Restaurar el mod antiguo original? PMM retirara/archivara el fix aplicado y restaurara la fuente original tanto en la biblioteca PMM como en ~mods de Palworld. El merge de compatibilidad desplegado no se modificara.'),(L 'Restore original mod' 'Restaurar mod original'),'YesNo')
       if($answer -ne [System.Windows.MessageBoxResult]::Yes){return}
       [void](Restore-PMMFixLabCase ([string]$row.CaseId))
       Refresh-UI;Check-PMMExternalModChanges -Force;Refresh-PMMFixLabUI
@@ -1822,6 +1845,7 @@ function Update-PMMCancelButtonState {
 
 function Stop-PMMAutoPipeline([string]$Reason='') {
   $Script:AutoPipelineActive=$false
+  if($Script:BtnAutoRun){$Script:BtnAutoRun.Tag='Idle'}
   $Script:AutoOneShotActive=$false
   $Script:AutoStepInProgress=$false
   $Script:AutoFixLabPresentedRecipeId=''
@@ -1861,6 +1885,7 @@ function Start-PMMAutoPipeline {
   if(-not$wasActive){$Script:AutoFixLabPresentedRecipeId='';$Script:AutoLastWorkflowKey='';$Script:AutoReferenceStartRecipeId=''}
   $Script:CancelRequested=$false
   $Script:AutoPipelineActive=$true
+  if($Script:BtnAutoRun){$Script:BtnAutoRun.Tag='Running'}
   Ensure-PMMAutoWorkflowTimer
   $Script:AutoWorkflowTimer.Start()
   Update-PMMCancelButtonState
@@ -1897,6 +1922,13 @@ function Update-PMMUniversalProgressText([string]$Operation,[string]$Message,[bo
   $Script:TxtOperationProgress.Text=$text
 }
 
+function Get-PMMProgressAnimationInterval([bool]$CatchUp) {
+  # Natural presentation pacing: catch-up uses 0.1-0.5 s per point, while
+  # ordinary visual progress advances by one point every 0.5-2.0 s.
+  if($CatchUp){return [double](Get-Random -Minimum 100 -Maximum 501)}
+  return [double](Get-Random -Minimum 500 -Maximum 2001)
+}
+
 function Ensure-PMMProgressAnimationTimer {
   if($Script:ProgressAnimationTimer){if(-not$Script:ProgressAnimationTimer.IsEnabled){$Script:ProgressAnimationTimer.Start()};return}
   $timer=[System.Windows.Threading.DispatcherTimer]::new([System.Windows.Threading.DispatcherPriority]::Background)
@@ -1912,8 +1944,10 @@ function Ensure-PMMProgressAnimationTimer {
           if(($now-[datetime]$state.LastStepUtc).TotalMilliseconds -ge [double]$state.IntervalMs){
             $state.Displayed=[Math]::Min([double]$state.Target,[double]$state.Displayed+1.0)
             $state.LastStepUtc=$now
+            $catchUp=([double]$state.Displayed -lt [double]$state.CatchUpFloor)
+            $state.IntervalMs=Get-PMMProgressAnimationInterval $catchUp
             $state.Bar.Value=[double]$state.Displayed
-            if([string]$key -eq 'Universal'){Update-PMMUniversalProgressText ([string]$state.Operation) ([string]$state.Message) $false}
+            if($key -eq 'Universal'){Update-PMMUniversalProgressText ([string]$state.Operation) ([string]$state.Message) $false}
           }
         }
       }
@@ -1937,48 +1971,54 @@ function Set-PMMSmoothedProgressBar {
   $Bar.Minimum=0;$Bar.Maximum=100;$Bar.IsIndeterminate=[bool]$Indeterminate
   if($Indeterminate){
     [void]$Script:ProgressAnimationStates.Remove($Key)
-    # Every indeterminate phase is a new real operation boundary. Clearing the
-    # stale percentage here lets the first known target animate from zero rather
-    # than inheriting the previous operation's 100%.
+    # Every indeterminate phase is a new real operation boundary. Clear stale
+    # presentation so the first known target begins visually at zero.
     $Bar.Value=0
     return 0.0
   }
-
-  # Floor is deliberate: presentation can lag real work, but can never claim a
-  # percentage the worker has not reached.
   $target=[Math]::Floor([Math]::Max(0.0,[Math]::Min(100.0,$TargetPercent)))
-  # Completion is a real operation boundary, not an interval to animate. If
-  # 100% were left to catch up one point at a time, the next workflow step
-  # could already be running while the previous bar still looked busy.
+  # Completion remains an exact boundary. Once the worker proves 100%, do not
+  # leave the previous operation visually busy while the workflow moves on.
   if($target -ge 100.0){
     [void]$Script:ProgressAnimationStates.Remove($Key)
     $Bar.Value=100.0
     if($Key -eq 'Universal'){Update-PMMUniversalProgressText $Operation $Message $false}
     return 100.0
   }
+
   $state=$null;if($Script:ProgressAnimationStates.ContainsKey($Key)){$state=$Script:ProgressAnimationStates[$Key]}
   if(-not$state -or ([string]$state.Operation -ne $Operation -and -not[string]::IsNullOrWhiteSpace($Operation))){
-    # A missing state or changed operation is a real presentation boundary.
-    # Never inherit a stale 100% from the preceding worker; animate the first
-    # known range from zero (except a 0/1% acknowledgement).
-    $start=if($target -le 1){$target}else{0.0}
-    $state=[pscustomobject]@{Bar=$Bar;Displayed=[double]$start;Target=[double]$target;IntervalMs=250.0;LastStepUtc=[DateTime]::UtcNow;Operation=$Operation;Message=$Message}
+    # A new real operation always starts at zero. The current worker report is
+    # a hard ceiling, never a value the animation may exceed.
+    $state=[pscustomobject]@{
+      Bar=$Bar;Displayed=0.0;Target=[double]$target;CatchUpFloor=0.0
+      IntervalMs=(Get-PMMProgressAnimationInterval $false);LastStepUtc=[DateTime]::UtcNow
+      Operation=$Operation;Message=$Message
+    }
     $Script:ProgressAnimationStates[$Key]=$state
   }else{
-    # If real work advances again while the display is still catching up, snap
-    # only to the previous proven target and animate the newly reported range.
     $priorTarget=[double]$state.Target
-    if($target -gt $priorTarget -and [double]$state.Displayed -lt $priorTarget){$state.Displayed=$priorTarget}
-    if($target -lt [double]$state.Displayed -or $target -eq 0){$state.Displayed=$target}
-    $state.Target=$target;$state.Operation=$Operation;$state.Message=$Message
-    # Repeated status messages at the same percentage must not keep postponing
-    # the next visual step. Restart the pacing window only for a real target change.
-    if($target -ne $priorTarget){$state.LastStepUtc=[DateTime]::UtcNow}
+    # Within one operation, noisy/stale reports may not move the presentation
+    # backwards. A true new operation is handled by reset/indeterminate or by
+    # an Operation identity change above.
+    if($target -lt $priorTarget){$target=$priorTarget}
+    if($target -gt $priorTarget){
+      # The old worker target is now a proven floor. If presentation lagged
+      # behind it, catch up quickly (0.1-0.5 s/point), then return to the slow
+      # 0.5-2.0 s/point pace toward the new worker ceiling.
+      $state.CatchUpFloor=[Math]::Max([double]$state.CatchUpFloor,$priorTarget)
+      $state.Target=[double]$target
+      $state.LastStepUtc=[DateTime]::UtcNow
+      $state.IntervalMs=Get-PMMProgressAnimationInterval ([double]$state.Displayed -lt [double]$state.CatchUpFloor)
+    }else{
+      $state.Target=[double]$target
+    }
+    $state.Operation=$Operation;$state.Message=$Message;$state.Bar=$Bar
   }
-  $gap=[Math]::Max(0.0,[double]$state.Target-[double]$state.Displayed)
-  if($gap -gt 0){$state.IntervalMs=[Math]::Max(50.0,[Math]::Min(500.0,3000.0/$gap))}
+
   $Bar.Value=[double]$state.Displayed
-  if($gap -gt 0){Ensure-PMMProgressAnimationTimer}
+  if([double]$state.Displayed -lt [double]$state.Target){Ensure-PMMProgressAnimationTimer}
+  if($Key -eq 'Universal'){Update-PMMUniversalProgressText $Operation $Message $false}
   return [double]$state.Displayed
 }
 
@@ -2784,7 +2824,7 @@ function Invoke-PMMAutoContinue {
         if((Get-PMMNextWorkflowAction) -eq 'Detect'){Stop-PMMAutoPipeline (L 'Auto paused: choose a valid Steam or Palworld folder to continue.' 'Auto pausado: elige una carpeta valida de Steam o Palworld para continuar.')}
       }
       'ImportGameMods' { Reset-PMMOperationCancellation;Invoke-PMMButtonClick $Script:BtnImportGameMods }
-      'ImportFiles' { Stop-PMMAutoPipeline (L 'Auto paused: choose the mod files/folder to import, then press AUTO again (or enable Auto ON).' 'Auto pausado: elige los archivos/carpeta de mods que quieres importar y despues pulsa AUTO de nuevo (o activa Auto ON).') }
+      'ImportFiles' { Stop-PMMAutoPipeline (L 'Auto paused: choose the mod files/folder to import, then press AUTO again (or enable SemiAUTO).' 'Auto pausado: elige los archivos/carpeta de mods que quieres importar y despues pulsa AUTO de nuevo (o activa SemiAUTO).') }
       'FixLabOpen' {
         if(-not $Script:FixLabLoaded){[void](Initialize-PMMFixLabFeature)}
         if($Script:FixLabLoaded){Refresh-PMMFixLabUI}
@@ -2844,7 +2884,7 @@ function Show-Info([string]$Message) {
 
 function Show-Error([string]$Message) {
   try{Play-PMMSoundEvent 'Error'}catch{}
-  [System.Windows.MessageBox]::Show($Message,'Palworld Manager Merger',[System.Windows.MessageBoxButton]::OK,[System.Windows.MessageBoxImage]::Error) | Out-Null
+  Show-PMMThemedMessage @($Message,'Palworld Manager Merger','OK') | Out-Null
 }
 
 function Get-PMMUiNumber($Config,[string]$Property,[double]$Default,[double]$Minimum,[double]$Maximum) {
@@ -3010,7 +3050,7 @@ function Reset-PMMLayout {
 }
 
 function Confirm([string]$Message) {
-  return ([System.Windows.MessageBox]::Show($Message,'Palworld Manager Merger',[System.Windows.MessageBoxButton]::YesNo,[System.Windows.MessageBoxImage]::Question) -eq [System.Windows.MessageBoxResult]::Yes)
+  return ((Show-PMMThemedMessage @($Message,'Palworld Manager Merger','YesNo')) -eq [System.Windows.MessageBoxResult]::Yes)
 }
 
 Apply-PMMLayoutFromConfig
@@ -3206,7 +3246,7 @@ function Set-PMMAIIOBusy([bool]$Busy) {
   if($Busy){
     Reset-PMMGuidedActionStyles
     $Script:BtnOpenAIHandoff.IsEnabled=$false
-    foreach($button in @($Script:BtnAIIONewSession,$Script:BtnAIIOPrepare,$Script:BtnAIIOImportResponse,$Script:BtnAIIOContinue,$Script:BtnAIIOArchive,$Script:BtnAIIOUseCandidate,$Script:BtnAIHelpCleanup)){$button.IsEnabled=$false}
+    foreach($button in @($Script:BtnAIIONewSession,$Script:BtnAIIOPrepare,$Script:BtnAIIOImportResponse,$Script:BtnAIIOContinue,$Script:BtnAIIOOpenHandoff,$Script:BtnAIIOArchive,$Script:BtnAIIOUseCandidate,$Script:BtnAIHelpCleanup)){$button.IsEnabled=$false}
     $Script:BtnScan.IsEnabled=$false
     $Script:BtnImport.IsEnabled=$false
     $Script:BtnImportGameMods.IsEnabled=$false
@@ -3304,7 +3344,7 @@ function Stop-PMMBackgroundOperation([switch]$Silent) {
   $Script:BackgroundOperationOnFailure=$null
   if($kind -eq 'Analyze'){Set-PMMAnalyzeBusy $false}
   elseif($kind -eq 'Build'){Set-PMMBuildBusy $false}
-  elseif($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh')){Set-PMMAIIOBusy $false}
+  elseif($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh')){Set-PMMAIIOBusy $false}
   elseif($kind -eq 'FixLabBuild'){Set-PMMFixLabBusy $false}
   if(-not$Silent -and -not[string]::IsNullOrWhiteSpace($kind)){
     $Script:TxtStatus.Text=(L ($kind+' stopped.') ($kind+' detenido.'))
@@ -3336,7 +3376,7 @@ function Complete-PMMBackgroundOperation {
     # finish cleanly before the next guided action is highlighted.
     if($kind -eq 'Analyze'){Set-PMMAnalyzeProgress 1 1 (L 'Analyze complete.' 'Analisis terminado.')}
     elseif($kind -eq 'Build'){Set-PMMBuildProgress 1 1 (L 'Build complete.' 'Build terminado.')}
-    elseif($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh')){Set-PMMAIIOProgress 1 1 (L 'AIIO operation complete.' 'Operacion AIIO terminada.')}
+    elseif($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh')){Set-PMMAIIOProgress 1 1 (L 'AIIO operation complete.' 'Operacion AIIO terminada.')}
     elseif($kind -eq 'FixLabBuild'){Set-PMMFixLabProgress 1 1 (L 'Fix Lab repair build complete.' 'Build de reparacion Fix Lab terminado.')}
     try{
       if($successCallback){& $successCallback $result}
@@ -3348,7 +3388,7 @@ function Complete-PMMBackgroundOperation {
       (L ($kind+' worker stopped without a valid result.') ('El proceso '+$kind+' termino sin un resultado valido.'))
     }
     Write-PMMLog ('Background '+$kind+' failed: '+$message)
-    $failureOperation=if($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh')){'AIIO'}elseif($kind -eq 'FixLabBuild'){'FixLab'}else{$kind}
+    $failureOperation=if($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh')){'AIIO'}elseif($kind -eq 'FixLabBuild'){'FixLab'}else{$kind}
     Set-PMMOperationFailure $failureOperation $message
     try{
       if($failureCallback){& $failureCallback $message}else{Show-Error $message}
@@ -3360,7 +3400,7 @@ function Complete-PMMBackgroundOperation {
   # next real step, avoiding a one-frame stale highlight between operations.
   if($kind -eq 'Analyze'){Set-PMMAnalyzeBusy $false}
   elseif($kind -eq 'Build'){Set-PMMBuildBusy $false}
-  elseif($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh')){Set-PMMAIIOBusy $false}
+  elseif($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh')){Set-PMMAIIOBusy $false}
   elseif($kind -eq 'FixLabBuild'){Set-PMMFixLabBusy $false}
 
   if($result -and [bool]$result.Success -and @('Analyze','Build','FixLabBuild') -contains $kind){Notify-PMMWorkflowStepComplete}
@@ -3382,7 +3422,7 @@ function Complete-PMMBackgroundOperation {
 
 function Start-PMMBackgroundOperation {
   param(
-    [Parameter(Mandatory=$true)][ValidateSet('Analyze','Build','AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh','FixLabBuild')][string]$Operation,
+    [Parameter(Mandatory=$true)][ValidateSet('Analyze','Build','AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','FixLabBuild')][string]$Operation,
     [switch]$Force,
     [switch]$AllowOversize,
     [ValidateSet('ConflictGroups')][string]$Mode='ConflictGroups',
@@ -3396,9 +3436,9 @@ function Start-PMMBackgroundOperation {
     [scriptblock]$OnFailure=$null
   )
 
-  if($Operation -in @('AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate') -and -not(Test-PMMAIIOSessionId $SessionId)){throw ($Operation+' requires a valid persistent AIIO session id.')}
+  if($Operation -in @('AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild') -and -not(Test-PMMAIIOSessionId $SessionId)){throw ($Operation+' requires a valid persistent AIIO session id.')}
   if($Operation -eq 'AIIOImportResponse' -and -not(Test-Path -LiteralPath $InputZip -PathType Leaf)){throw 'AIIO response ZIP was not found.'}
-  if($Operation -eq 'AIIOUseCandidate' -and $SolutionId -notmatch '^[a-f0-9]{64}$'){throw 'AIIO candidate solution id is invalid.'}
+  if($Operation -in @('AIIOUseCandidate','AIIOModBuild') -and $SolutionId -notmatch '^[a-f0-9]{64}$'){throw 'AIIO candidate solution id is invalid.'}
   if(-not(Request-PMMProcessingSlot $Operation)){return $false}
   Reset-PMMOperationCancellation
 
@@ -3434,11 +3474,11 @@ function Start-PMMBackgroundOperation {
     if(-not[string]::IsNullOrWhiteSpace($FixLabRecipeId)){$args+=' -FixLabRecipeId "'+$FixLabRecipeId+'"'}
     if(-not[string]::IsNullOrWhiteSpace($FixLabVariantId)){$args+=' -FixLabVariantId "'+$FixLabVariantId+'"'}
   }
-  if($Operation -in @('AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate')){
+  if($Operation -in @('AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild')){
     $args+=' -SessionId "'+$SessionId+'"'
   }
   if($Operation -eq 'AIIOImportResponse'){$args+=' -InputZip "'+$InputZip+'"'}
-  if($Operation -eq 'AIIOUseCandidate'){$args+=' -SolutionId "'+$SolutionId+'"'}
+  if($Operation -in @('AIIOUseCandidate','AIIOModBuild')){$args+=' -SolutionId "'+$SolutionId+'"'}
   if($Force){$args+=' -Force'}
   if($AllowOversize){$args+=' -AllowOversize'}
 
@@ -3450,13 +3490,14 @@ function Start-PMMBackgroundOperation {
     Set-PMMBuildBusy $true
     Set-PMMBuildProgress 0 0 (L 'Starting Build in the background...' 'Iniciando Build en segundo plano...') -Indeterminate
     $Script:TxtStatus.Text=L 'Building compatibility patch in the background...' 'Creando parche de compatibilidad en segundo plano...'
-  }elseif($Operation -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh')){
+  }elseif($Operation -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh')){
     Set-PMMAIIOBusy $true
     $message=switch($Operation){
       'AIHandoff' {L 'Creating one AI handoff for all current Unsupported cases...' 'Creando una unica entrega para IA con todos los casos no soportados...'}
       'AIIOPendingData' {L 'Preparing only the validated data requested for this session...' 'Preparando solo los datos validados pedidos para esta sesion...'}
       'AIIOImportResponse' {L 'Validating and staging the untrusted AI response...' 'Validando y dejando en staging la respuesta IA no confiable...'}
       'AIIOUseCandidate' {L 'Revalidating the selected candidate against the exact current case...' 'Revalidando el candidato contra el caso actual exacto...'}
+      'AIIOModBuild' {L 'Building the selected standalone mod locally; it will remain undeployed...' 'Creando localmente el mod independiente seleccionado; quedara sin desplegar...'}
       'AIIOArtifactRefresh' {L 'Refreshing the local artifact inventory...' 'Actualizando el inventario local de artefactos...'}
       default {L 'Preparing the selected persistent AIIO session...' 'Preparando la sesion AIIO persistente seleccionada...'}
     }
@@ -3473,7 +3514,7 @@ function Start-PMMBackgroundOperation {
     try{$Script:BackgroundOperationProcess.PriorityClass=[System.Diagnostics.ProcessPriorityClass]::BelowNormal}catch{}
     Write-PMMLog ('Background processing worker started: '+$Operation+' | pid='+[string]$Script:BackgroundOperationProcess.Id+' | host='+$hostExe)
   }catch{
-    if($Operation -eq 'Analyze'){Set-PMMAnalyzeBusy $false}elseif($Operation -eq 'Build'){Set-PMMBuildBusy $false}elseif($Operation -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh')){Set-PMMAIIOBusy $false}else{Set-PMMFixLabBusy $false}
+    if($Operation -eq 'Analyze'){Set-PMMAnalyzeBusy $false}elseif($Operation -eq 'Build'){Set-PMMBuildBusy $false}elseif($Operation -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh')){Set-PMMAIIOBusy $false}else{Set-PMMFixLabBusy $false}
     $Script:BackgroundOperationKind=''
     $Script:BackgroundOperationFixLabJobId=''
     Remove-Item -LiteralPath $job -Recurse -Force -ErrorAction SilentlyContinue
@@ -3492,7 +3533,7 @@ function Start-PMMBackgroundOperation {
             Set-PMMAnalyzeProgress ([int]$progress.Current) ([int]$progress.Total) ([string]$progress.Message) -Indeterminate:([bool]$progress.Indeterminate)
           }elseif([string]$progress.Operation -eq 'Build'){
             Set-PMMBuildProgress ([int]$progress.Current) ([int]$progress.Total) ([string]$progress.Message) -Indeterminate:([bool]$progress.Indeterminate)
-          }elseif([string]$progress.Operation -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOArtifactRefresh')){
+          }elseif([string]$progress.Operation -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh')){
             Set-PMMAIIOProgress ([int]$progress.Current) ([int]$progress.Total) ([string]$progress.Message) -Indeterminate:([bool]$progress.Indeterminate)
           }elseif([string]$progress.Operation -eq 'FixLabBuild'){
             if($progress.PSObject.Properties.Name -contains 'JobId' -and -not[string]::IsNullOrWhiteSpace([string]$progress.JobId)){$Script:BackgroundOperationFixLabJobId=[string]$progress.JobId}
@@ -4484,7 +4525,7 @@ function Refresh-UI {
     $volume=50;try{$volume=[int]$cfg.CompletionVolume}catch{};$volume=[Math]::Max(0,[Math]::Min(100,$volume))
     $Script:SldCompletionVolume.Value=$volume;$Script:TxtCompletionVolume.Text=($volume.ToString()+'%')
     $autoErrorCases=$true;try{$autoErrorCases=[bool]$cfg.AIIOAutoCreateErrorCases}catch{};$Script:ChkAIIOAutoCreateErrorCases.IsChecked=$autoErrorCases
-    $Script:TxtAIIOSettingsStatus.Text=L 'Local-only mode. PMM never uploads automatically; sharing remains an explicit manual action.' 'Modo solo local. PMM nunca sube nada automaticamente; compartir sigue siendo una accion manual explicita.'
+    $Script:TxtAIIOSettingsStatus.Text=L 'PMM never uploads on its own. If MCP is enabled, a connected client can request scoped data.' 'PMM no sube datos por su cuenta. Si habilitas MCP, un cliente conectado puede solicitar datos limitados.'
   }finally{$Script:UiSettingsRefreshing=$false}
 
   $sourceMods=@(Get-LibraryMods)
@@ -4614,7 +4655,7 @@ function Select-PalworldInstallation([array]$Paths) {
   $ok = New-Object System.Windows.Forms.Button; $ok.Text = 'OK'; $ok.Left = 575; $ok.Top = 300; $ok.Width = 80; $ok.DialogResult = [System.Windows.Forms.DialogResult]::OK
   $cancel = New-Object System.Windows.Forms.Button; $cancel.Text = L 'Cancel' 'Cancelar'; $cancel.Left = 665; $cancel.Top = 300; $cancel.Width = 85; $cancel.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
   $form.Controls.AddRange(@($label,$list,$ok,$cancel)); $form.AcceptButton = $ok; $form.CancelButton = $cancel
-  if ($form.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK) { return $null }
+  if ((Show-PMMStyledDialog $form) -ne [System.Windows.Forms.DialogResult]::OK) { return $null }
   return [string]$list.SelectedItem
 }
 
@@ -4630,7 +4671,7 @@ function Handle-UIError($ErrorRecord,[string]$Action,[switch]$NoDiagnostic) {
     if($create -and -not$NoDiagnostic){
       $case=Register-PMMAutomaticErrorCase -Title $Action -Message $message
       Refresh-PMMAIHelpDiagnostics;Refresh-PMMAIHelpBadge;[void](Select-PMMSelectorItemId $Script:LstAIHelpDiagnostics 'CaseId' ([string]$case.CaseId))
-      $Script:MainTabs.SelectedItem=$Script:TabAIHelp;$Script:AIHelpTabs.SelectedIndex=0
+      $Script:MainTabs.SelectedItem=$Script:TabAIHelp;$Script:AIHelpTabs.SelectedItem=$Script:PMMHelpCaseTab
       $Script:TxtAIHelpDiagnosticStatus.Text=((L 'PMM recorded this error in diagnostic case {0}. Repeated identical failures reuse the same case.' 'PMM registro este error en el caso de diagnostico {0}. Los fallos identicos repetidos reutilizan el mismo caso.') -f [string]$case.CaseId)
     }
   }catch{Write-PMMLog ('Could not route the error into AI & Help: '+$_.Exception.Message)}
@@ -4684,7 +4725,7 @@ function Show-PMMGameDetectionFallback {
   $game.Add_Click({$form.Tag='Palworld';$form.Close()})
   $cancel.Add_Click({$form.Tag='Cancel';$form.Close()})
   $form.Controls.AddRange(@($label,$steam,$game,$cancel));$form.CancelButton=$cancel
-  [void]$form.ShowDialog()
+  [void](Show-PMMStyledDialog $form)
   return [string]$form.Tag
 }
 
@@ -4726,6 +4767,15 @@ function Save-UiSettings {
   try{$cfg.CompletionVolume=[int][Math]::Round([double]$Script:SldCompletionVolume.Value)}catch{}
   Save-PMMConfig $cfg
   Save-PMMLayoutSettings
+}
+
+function Save-PMMAutoPreferences {
+  # AUTO controls commit immediately. Keep them isolated from Settings values
+  # that deliberately remain a draft until the user presses Apply changes.
+  $cfg=Get-PMMConfig
+  $cfg.AutoMode=[bool]$Script:TglAutoMode.IsChecked
+  $cfg.AutoIncludePlay=[bool]$Script:ChkAutoPlay.IsChecked
+  Save-PMMConfig $cfg
 }
 
 function Save-PMMAIHelpSettings {
@@ -4789,12 +4839,12 @@ $Script:BtnPlay.Add_Click({try{Start-Palworld}catch{Handle-UIError $_ (L 'Start 
 
 $Script:TglAutoMode.Add_Click({
   try{
-    $enabled=[bool]$Script:TglAutoMode.IsChecked;Save-UiSettings
-    if(-not$enabled){Stop-PMMAutoPipeline (L 'Auto ON is disabled. Manual actions perform one workflow step per click.' 'Auto ON esta desactivado. Las acciones manuales hacen un paso del flujo por clic.')}
-    else{$Script:TxtStatus.Text=L 'Auto ON armed. The next workflow action you start manually will continue through the remaining safe steps.' 'Auto ON preparado. La siguiente accion del flujo que inicies manualmente continuara por los pasos seguros restantes.';Update-PMMCancelButtonState}
+    $enabled=[bool]$Script:TglAutoMode.IsChecked;Save-PMMAutoPreferences
+    if(-not$enabled){Stop-PMMAutoPipeline (L 'SemiAUTO is disabled. Manual actions perform one workflow step per click.' 'SemiAUTO esta desactivado. Las acciones manuales hacen un paso del flujo por clic.')}
+    else{$Script:TxtStatus.Text=L 'SemiAUTO armed. The next workflow action you start manually will continue through the remaining safe steps.' 'SemiAUTO preparado. La siguiente accion del flujo que inicies manualmente continuara por los pasos seguros restantes.';Update-PMMCancelButtonState}
   }catch{Handle-UIError $_ (L 'Automatic mode' 'Modo automatico')}
 })
-$Script:ChkAutoPlay.Add_Click({try{Save-UiSettings;Update-PMMGuidedActionState}catch{}})
+$Script:ChkAutoPlay.Add_Click({try{Save-PMMAutoPreferences;Update-PMMGuidedActionState}catch{}})
 $Script:BtnAutoRun.Add_Click({
   try{
     Start-PMMAutoPipeline -OneShot
@@ -5307,7 +5357,7 @@ function Update-PMMValidatedPatchRow($Entry,$Summary) {
 function Open-PMMValidationFeedbackForPatch($Patch) {
   if(-not$Patch){return}
   $Script:MainTabs.SelectedItem=$Script:TabAIHelp
-  $Script:AIHelpTabs.SelectedIndex=2
+  $Script:AIHelpTabs.SelectedItem=$Script:PMMHelpFeedbackTab
   Refresh-PMMAIHelpFeedback -Force
   [void](Select-PMMSelectorItemId $Script:CmbAIHelpFeedbackBuild 'Key' ([string]$Patch.Name))
   $Script:CmbAIHelpFeedbackType.SelectedValue='MERGE_COMMENT'
@@ -5580,7 +5630,6 @@ $Script:BtnOpenReview.Add_Click({
 
 $Script:BtnBuild.Add_Click({
   try {
-    Save-UiSettings
     Save-DecisionGridToPlan
     $plan=Read-PMMMergePlan
 
@@ -5617,7 +5666,6 @@ $Script:BtnDeploy.Add_Click({
   Reset-PMMOperationCancellation
   if([bool]$Script:TglAutoMode.IsChecked){Start-PMMAutoPipeline}
   try{
-    Save-UiSettings
     Save-DecisionGridToPlan
     $preview=Get-PMMDeploymentPreview
     Write-PMMLog ('Deploy preflight: '+($preview -replace "(`r`n|`n|`r)",' | '))
@@ -5739,7 +5787,7 @@ function Complete-PMMAIIOPendingDataUi($Result,[string]$SessionId) {
 
 function Complete-PMMAIIOCandidateAnalyzeUi($Result) {
   Refresh-UI
-  $Script:MainTabs.SelectedIndex=0
+  $Script:MainTabs.SelectedItem=$Script:PMMMergeTab
 }
 
 function Start-PMMAIIOCandidateAnalyze {
@@ -5754,9 +5802,137 @@ function Complete-PMMAIIOUseCandidateUi($Result,[string]$SessionId) {
   [void]$Window.Dispatcher.BeginInvoke([System.Windows.Threading.DispatcherPriority]::ContextIdle,{Start-PMMAIIOCandidateAnalyze})
 }
 
+function Complete-PMMAIIOModBuildUi($Result,[string]$SessionId) {
+  Select-PMMAIIOUiSession $SessionId
+  $Script:TxtAIIOStatus.Text=((L 'Standalone mod built: {0}. It was not deployed or published. Runtime remains UNPROVEN until you test it in Palworld. If shared, its description must include: {1}' 'Mod independiente creado: {0}. No se desplego ni publico. El runtime sigue UNPROVEN hasta que lo pruebes en Palworld. Si se comparte, su descripcion debe incluir: {1}') -f [string]$Result.OutputPath,[string]$Result.RequiredPublicDescription)
+  if(-not[string]::IsNullOrWhiteSpace([string]$Result.OutputPath)){Start-Process explorer.exe -ArgumentList ('/select,"'+[string]$Result.OutputPath+'"')}
+}
+
+function Show-PMMModCreationProjectDialog {
+  # This dialog belongs to the WPF application. Dynamic layout is required:
+  # Windows text scaling may grow typography independently from physical DPI.
+  # Fixed WinForms coordinates made labels overlap and pushed actions offscreen.
+  $dialogMarkup=@'
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Width="780" MinWidth="620" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResizeWithGrip"
+        ShowInTaskbar="False" FontFamily="Segoe UI" FontSize="14"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <Grid Margin="24">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+      <TextBlock x:Name="TxtModProjectHeading" Grid.Row="0" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap"/>
+      <TextBlock x:Name="TxtModProjectIntro" Grid.Row="1" Margin="0,6,0,18" TextWrapping="Wrap" Foreground="{DynamicResource MutedText}"/>
+      <TextBlock x:Name="LblModProjectTitle" Grid.Row="2" FontWeight="SemiBold" Margin="0,0,0,5"/>
+      <TextBox x:Name="TxtModProjectTitle" Grid.Row="3" MinHeight="34" VerticalContentAlignment="Center"/>
+      <TextBlock x:Name="LblModProjectIdea" Grid.Row="4" FontWeight="SemiBold" Margin="0,15,0,5"/>
+      <TextBox x:Name="TxtModProjectIdea" Grid.Row="5" MinHeight="170" MaxHeight="280"
+               AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+      <TextBlock x:Name="LblModProjectTarget" Grid.Row="6" FontWeight="SemiBold" Margin="0,15,0,5" TextWrapping="Wrap"/>
+      <TextBox x:Name="TxtModProjectTarget" Grid.Row="7" MinHeight="34" VerticalContentAlignment="Center"/>
+      <Border Grid.Row="8" Margin="0,15,0,0" Padding="10,8" CornerRadius="6"
+              Background="{DynamicResource CardAltBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1">
+        <TextBlock x:Name="TxtModProjectReference" TextWrapping="Wrap" Foreground="{DynamicResource MutedText}"/>
+      </Border>
+      <TextBlock x:Name="TxtModProjectValidation" Grid.Row="9" Margin="0,9,0,0" TextWrapping="Wrap"
+                 Foreground="#B91C1C" FontWeight="SemiBold" Visibility="Collapsed"/>
+      <Grid Grid.Row="10" Margin="0,18,0,0">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+          <Button x:Name="BtnModProjectCancel" MinWidth="110" IsCancel="True"/>
+          <Button x:Name="BtnModProjectSave" MinWidth="135"/>
+          <Button x:Name="BtnModProjectPrepare" MinWidth="145" IsDefault="True" FontWeight="SemiBold"/>
+        </StackPanel>
+      </Grid>
+    </Grid>
+  </ScrollViewer>
+</Window>
+'@
+  [xml]$dialogXaml=$dialogMarkup
+  $dialogReader=[System.Xml.XmlNodeReader]::new($dialogXaml)
+  try{$form=[Windows.Markup.XamlReader]::Load($dialogReader)}finally{$dialogReader.Dispose()}
+
+  # Window-local PMM resources keep the modal legible in every installed theme.
+  foreach($key in @($Window.Resources.Keys)){try{$form.Resources[$key]=$Window.Resources[$key]}catch{}}
+  try{$form.Background=$form.Resources['CardBackground'];$form.Foreground=$form.Resources['PrimaryText']}catch{}
+  try{$form.Owner=$Window}catch{}
+  try{$form.Icon=$Window.Icon}catch{}
+  $work=[System.Windows.SystemParameters]::WorkArea
+  $form.MaxWidth=[Math]::Max(520.0,[double]$work.Width-48.0)
+  $form.MaxHeight=[Math]::Max(480.0,[double]$work.Height-48.0)
+  $form.MinWidth=[Math]::Min(620.0,[double]$form.MaxWidth)
+  $form.Width=[Math]::Min(780.0,[double]$form.MaxWidth)
+  $form.Title=L 'New standalone mod project' 'Nuevo proyecto independiente de mod'
+
+  $heading=$form.FindName('TxtModProjectHeading');$heading.Text=L 'Describe the mod you want to create' 'Describe el mod que quieres crear'
+  $intro=$form.FindName('TxtModProjectIntro');$intro.Text=L 'PMM creates a local AIIO exchange. An external AI may query your indexed Vanilla GameReference and ask PMM for exact, bounded asset families. Returned files stay inactive until you inspect and explicitly build them.' 'PMM crea un intercambio AIIO local. Una IA externa puede consultar tu GameReference Vanilla indexada y pedir a PMM familias exactas y acotadas. Los archivos devueltos quedan inactivos hasta que los inspecciones y los crees expresamente.'
+  $titleLabel=$form.FindName('LblModProjectTitle');$titleLabel.Text=L 'Project title' 'Titulo del proyecto'
+  $title=$form.FindName('TxtModProjectTitle')
+  $ideaLabel=$form.FindName('LblModProjectIdea');$ideaLabel.Text=L 'What should the mod do?' 'Que debe hacer el mod?'
+  $idea=$form.FindName('TxtModProjectIdea')
+  $targetLabel=$form.FindName('LblModProjectTarget');$targetLabel.Text=L 'Optional exact asset or search hint (for example: BP_PlayerBase)' 'Asset exacto o pista de busqueda opcional (por ejemplo: BP_PlayerBase)'
+  $target=$form.FindName('TxtModProjectTarget')
+  $reference=$form.FindName('TxtModProjectReference')
+  try{$proof=Get-PMMAIIOGameReferenceProof;$reference.Text=((L 'Vanilla GameReference: {0} ({1} indexed families)' 'GameReference Vanilla: {0} ({1} familias indexadas)') -f [string]$proof.Status,[int]$proof.FamilyCount)}catch{$reference.Text=L 'Vanilla GameReference status could not be read.' 'No se pudo leer el estado de la GameReference Vanilla.'}
+  $validation=$form.FindName('TxtModProjectValidation')
+  $cancel=$form.FindName('BtnModProjectCancel');$cancel.Content=L 'Cancel' 'Cancelar'
+  $save=$form.FindName('BtnModProjectSave');$save.Content=L 'Save project' 'Guardar proyecto'
+  $prepare=$form.FindName('BtnModProjectPrepare');$prepare.Content=L 'Create AI ZIP' 'Crear ZIP IA'
+  try{
+    [System.Windows.Automation.AutomationProperties]::SetName($title,[string]$titleLabel.Text)
+    [System.Windows.Automation.AutomationProperties]::SetName($idea,[string]$ideaLabel.Text)
+    [System.Windows.Automation.AutomationProperties]::SetName($target,[string]$targetLabel.Text)
+  }catch{}
+
+  $complete={
+    param([bool]$Prepare)
+    $projectTitle=([string]$title.Text).Trim();$description=([string]$idea.Text).Trim();$hint=([string]$target.Text).Trim()
+    if([string]::IsNullOrWhiteSpace($projectTitle)){
+      $validation.Text=L 'Enter a project title.' 'Introduce un titulo de proyecto.'
+      $validation.Visibility=[System.Windows.Visibility]::Visible
+      [void]$title.Focus();return
+    }
+    if([string]::IsNullOrWhiteSpace($description)){
+      $validation.Text=L 'Describe what the mod should do.' 'Describe que debe hacer el mod.'
+      $validation.Visibility=[System.Windows.Visibility]::Visible
+      [void]$idea.Focus();return
+    }
+    $form.Tag=[pscustomobject]@{Title=$projectTitle;Description=$description;TargetHint=$hint;Prepare=$Prepare}
+    $form.DialogResult=$true
+  }.GetNewClosure()
+  $saveHandler={& $complete $false}.GetNewClosure()
+  $prepareHandler={& $complete $true}.GetNewClosure()
+  $focusHandler={[void]$title.Focus()}.GetNewClosure()
+  $save.Add_Click($saveHandler)
+  $prepare.Add_Click($prepareHandler)
+  $form.Add_ContentRendered($focusHandler)
+
+  $result=(Show-PMMStyledDialog $form)
+  if($result -ne $true){return $null}
+  return $form.Tag
+}
+
 $Script:BtnAIHelpRefresh.Add_Click({try{Refresh-PMMAIHelpDiagnostics;Refresh-PMMAIHelpBadge;$Script:TxtAIHelpDiagnosticStatus.Text=L 'Cases refreshed.' 'Casos actualizados.'}catch{Handle-UIError $_ (L 'Refresh AI assistance' 'Actualizar ayuda IA')}})
 $Script:LstAIHelpDiagnostics.Add_SelectionChanged({try{if(-not[bool]$Script:AIHelpUiRefreshing){$Script:AIHelpNewCaseMode=$false;Update-PMMAIHelpDiagnosticSelection}}catch{}})
 $Script:BtnAIHelpNewCase.Add_Click({try{Set-PMMAIHelpNewCaseMode $true -Clear;try{$Script:TxtAIHelpDiagnosticTitle.Focus()|Out-Null}catch{}}catch{Handle-UIError $_ (L 'Open new AI assistance case' 'Abrir nuevo caso de ayuda IA')}})
+$Script:BtnAIHelpNewModProject.Add_Click({
+  try{
+    $project=Show-PMMModCreationProjectDialog;if(-not$project){return}
+    $targets=@();if(-not[string]::IsNullOrWhiteSpace([string]$project.TargetHint)){$targets=@([pscustomobject]@{Kind='GameReferenceSearchHint';Id=[string]$project.TargetHint;UserSuspects=$false;CauseConfirmed=$false})}
+    $session=New-PMMAIIOSession -Title ([string]$project.Title) -Description ([string]$project.Description) -TaskType CREATE_MOD -TargetKind GameReference -TargetId ([string]$project.TargetHint) -SelectedTargets $targets
+    $sessionId=[string]$session.SessionId;Select-PMMAIIOUiSession $sessionId;$Script:AIHelpTabs.SelectedItem=$Script:PMMHelpCaseTab
+    if([bool]$project.Prepare){$done={param($result) Complete-PMMAIIOPrepareUi $result $sessionId $true}.GetNewClosure();[void](Start-PMMBackgroundOperation -Operation AIIOPrepare -SessionId $sessionId -OnSuccess $done)}
+    else{$Script:TxtAIIOStatus.Text=((L 'Standalone mod project saved locally: {0}. It has not been uploaded.' 'Proyecto independiente de mod guardado localmente: {0}. No se ha subido.') -f $sessionId)}
+  }catch{Handle-UIError $_ (L 'Create standalone mod project' 'Crear proyecto independiente de mod')}
+})
 $Script:BtnAIHelpCancelNewCase.Add_Click({try{Set-PMMAIHelpNewCaseMode $false}catch{}})
 $Script:BtnAIHelpRefreshKnowledge.Add_Click({try{$done={param($result) Refresh-PMMAIHelpKnowledge;Refresh-PMMAIHelpBadge};[void](Start-PMMBackgroundOperation -Operation AIIOArtifactRefresh -OnSuccess $done)}catch{Handle-UIError $_ (L 'Refresh Knowledge and storage' 'Actualizar Knowledge y almacenamiento')}})
 function New-PMMAIHelpCaseFromUi {
@@ -5786,7 +5962,7 @@ $Script:BtnAIHelpPrepareDiagnostic.Add_Click({
     $session=Get-PMMAIIOSessionForDiagnostic ([string]$case.CaseId)
     if(-not$session){$session=New-PMMAIIOSessionFromDiagnostic $case}
     $sessionId=[string]$session.SessionId
-    Select-PMMAIIOUiSession $sessionId;$Script:AIHelpTabs.SelectedIndex=1
+    Select-PMMAIIOUiSession $sessionId;$Script:AIHelpTabs.SelectedItem=$Script:PMMHelpCaseTab
     if([string]$session.Status -ne 'Draft'){
       $Script:TxtAIIOStatus.Text=((L 'This diagnostic already uses session {0} ({1}). PMM opened the existing session instead of creating another one.' 'Este diagnostico ya usa la sesion {0} ({1}). PMM abrio la sesion existente en lugar de crear otra.') -f $sessionId,[string]$session.Status)
       return
@@ -5800,6 +5976,7 @@ $Script:LstAIIOSessions.Add_SelectionChanged({
     if([bool]$Script:AIHelpUiRefreshing){return}
     $session=Get-PMMSelectedAIIOSession
     if($session){Refresh-PMMAIIOCandidates ([string]$session.SessionId);$Script:TxtAIIOStatus.Text=((L 'Session {0} - {1} - iteration {2}. Returned candidates remain staged until you explicitly review and act.' 'Sesion {0} - {1} - iteracion {2}. Los candidatos devueltos quedan en staging hasta que los revises y actues expresamente.') -f [string]$session.SessionId,[string]$session.Status,[int]$session.Iteration)}
+    Update-PMMAIIOHandoffButton
   }catch{}
 })
 $Script:LstAIIOCandidates.Add_SelectionChanged({try{Update-PMMAIIOCandidateSelection}catch{}})
@@ -5839,7 +6016,7 @@ $Script:BtnAIIOImportResponse.Add_Click({
     if([string]$hint.Kind -eq 'ThemeResponse'){
       $result=Import-PMMThemeAIResponse $zipPath
       $Script:ActiveThemeDraft=$result.Draft;Refresh-PMMThemeEditorCatalog -Force;$Script:LstThemeDrafts.SelectedValue=[string]$result.Draft.DraftId;Show-PMMThemeDraft $result.Draft
-      $Script:AIHelpTabs.SelectedIndex=3
+      $Script:AIHelpTabs.SelectedItem=$Script:PMMHelpThemeTab
       $Script:TxtThemeEditorStatus.Text=((L 'Standalone AI theme validated into draft {0}. It remains uninstalled until you review and explicitly install it.' 'Tema IA independiente validado como borrador {0}. Sigue sin instalar hasta que lo revises y lo instales expresamente.') -f [string]$result.Draft.Name)
       return
     }
@@ -5863,11 +6040,20 @@ $Script:BtnAIIOContinue.Add_Click({
 })
 $Script:BtnAIIOArchive.Add_Click({try{$session=Get-PMMSelectedAIIOSession;if(-not$session){return};if(Confirm ((L 'Archive session {0}? Its history and artifacts remain on disk.' 'Archivar la sesion {0}? Su historial y artefactos seguiran guardados.') -f [string]$session.SessionId)){Set-PMMAIIOSessionArchived ([string]$session.SessionId) $true|Out-Null;Refresh-PMMAIHelpUi}}catch{Handle-UIError $_ (L 'Archive AIIO session' 'Archivar sesion AIIO')}})
 $Script:BtnAIIOOpenWorkspace.Add_Click({try{$session=Get-PMMSelectedAIIOSession;$path=if($session){Get-PMMAIIOSessionPath ([string]$session.SessionId)}else{Get-PMMPath 'AIIO'};Start-Process explorer.exe -ArgumentList ('"'+$path+'"')}catch{Handle-UIError $_ (L 'Open AI workspace' 'Abrir espacio de IA')}})
+$Script:BtnAIIOOpenHandoff.Add_Click({try{$session=Get-PMMSelectedAIIOSession;if(-not$session){throw (L 'Select an AI exchange first.' 'Selecciona primero un intercambio IA.')};$path=[string](Get-PMMAIIOLatestHandoffPath ([string]$session.SessionId));if([string]::IsNullOrWhiteSpace($path)){throw (L 'The selected exchange does not have an available handoff ZIP.' 'El intercambio seleccionado no tiene un ZIP handoff disponible.')};Start-Process explorer.exe -ArgumentList ('/select,"'+$path+'"')}catch{Handle-UIError $_ (L 'Open latest AI handoff' 'Abrir ultimo handoff IA')}})
 $Script:BtnAIIOOpenCandidate.Add_Click({try{$row=$Script:LstAIIOCandidates.SelectedItem;if(-not$row){return};Start-Process explorer.exe -ArgumentList ('"'+[string]$row.Root+'"')}catch{Handle-UIError $_ (L 'Inspect AI candidate' 'Inspeccionar candidato IA')}})
 $Script:BtnAIIOUseCandidate.Add_Click({
   try{
     $session=Get-PMMSelectedAIIOSession;$row=$Script:LstAIIOCandidates.SelectedItem
     if(-not$session -or -not$row){throw (L 'Select a session and candidate.' 'Selecciona una sesion y un candidato.')}
+    if([string]$row.InputSchema -eq 'PMM_MOD_CREATION_CANDIDATE_V1'){
+      $warning=L "Build this standalone mod candidate?`n`nPMM will verify the staged bytes again, require the exact current Vanilla GameReference identity, run a read-only AssetReader probe on every returned asset header, pack only the declared cooked tree plus inert PMM attribution metadata, and verify every PAK entry. The PAK will remain local, undeployed, unpublished and runtime UNPROVEN.`n`nYou must test it in Palworld. If you share or publish it, its public description must include: This mod was created with PMM assistance.`n`nContinue?" "Crear este candidato de mod independiente?`n`nPMM volvera a verificar los bytes en staging, exigira la identidad exacta de la GameReference Vanilla vigente, ejecutara una prueba de solo lectura con AssetReader sobre cada cabecera devuelta, empaquetara solo el arbol cooked declarado mas metadatos inertes de atribucion PMM y verificara cada entrada del PAK. El PAK quedara local, sin desplegar, sin publicar y runtime UNPROVEN.`n`nDebes probarlo en Palworld. Si lo compartes o publicas, su descripcion publica debe incluir: This mod was created with PMM assistance.`n`nContinuar?"
+      if(-not(Confirm $warning)){return}
+      $sessionId=[string]$session.SessionId;$solutionId=[string]$row.SolutionId
+      $done={param($result) Complete-PMMAIIOModBuildUi $result $sessionId}.GetNewClosure()
+      [void](Start-PMMBackgroundOperation -Operation AIIOModBuild -SessionId $sessionId -SolutionId $solutionId -OnSuccess $done)
+      return
+    }
     $warning=L "Use this returned cooked-family candidate in Merge?`n`nPMM will revalidate the exact current case, source hashes, ZIP paths, cooked-family topology, output hashes and a read-only AssetReader parse. This cannot prove gameplay semantics. The candidate remains experimental and runtime UNPROVEN until you test the resulting exact build in Palworld.`n`nNothing will be deployed automatically. Continue?" "Usar este candidato cooked devuelto en Merge?`n`nPMM volvera a validar el caso exacto vigente, hashes fuente, rutas ZIP, topologia de la familia cooked, hashes de salida y una lectura con AssetReader. Esto no puede demostrar la semantica de gameplay. El candidato seguira experimental y runtime UNPROVEN hasta probar el build exacto en Palworld.`n`nNo se desplegara nada automaticamente. Continuar?"
     if(-not(Confirm $warning)){return}
     $sessionId=[string]$session.SessionId;$solutionId=[string]$row.SolutionId
@@ -5941,7 +6127,7 @@ $Script:BtnBuildGameReference.Add_Click({
       $question=L 'Rebuild the local Game Reference now? This reads Pal-Windows.pak in the background and replaces only PMM Workspace\GameReference. Palworld is never modified.' 'Volver a crear Game Reference local? Esto lee Pal-Windows.pak en segundo plano y solo sustituye PMM Workspace\GameReference. Palworld no se modifica.'
       if(-not(Confirm $question)){return}
     }
-    # Game Reference is itself a workflow step. With Auto ON, a manual click
+    # Game Reference is itself a workflow step. With SemiAUTO, a manual click
     # arms continuation; with one-shot AUTO already running, it preserves that
     # run and completion resumes from the new reference state.
     if(-not$Script:AutoPipelineActive -and [bool]$Script:TglAutoMode.IsChecked){Start-PMMAutoPipeline}
@@ -5967,7 +6153,7 @@ $Script:BtnExportKnowledgeContribution.Add_Click({
       $ok=New-Object System.Windows.Forms.Button;$ok.Text='OK';$ok.Left=650;$ok.Top=305;$ok.Width=75;$ok.DialogResult=[System.Windows.Forms.DialogResult]::OK
       $cancel=New-Object System.Windows.Forms.Button;$cancel.Text=L 'Cancel' 'Cancelar';$cancel.Left=735;$cancel.Top=305;$cancel.Width=85;$cancel.DialogResult=[System.Windows.Forms.DialogResult]::Cancel
       $form.Controls.AddRange(@($label,$list,$ok,$cancel));$form.AcceptButton=$ok;$form.CancelButton=$cancel
-      if($form.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK){return};$chosen=$list.SelectedItem
+      if((Show-PMMStyledDialog $form) -ne [System.Windows.Forms.DialogResult]::OK){return};$chosen=$list.SelectedItem
     }
     if(-not$chosen){return}
     $warning=L "Only create a runtime contribution after you tested this exact imported solution in Palworld and the expected behaviors worked. Mark this case as a user-reported runtime PASS and package it for maintainer/community validation?`n`nThe package can contain the original AIIO handoff, returned solution and validation/runtime evidence. Whole source mod PAKs are not copied into it. Send it to the PMM maintainer/approved private intake.`n`nThis does NOT auto-authorize a Knowledge recipe on this PC." "Crea una contribucion runtime solo despues de probar esta solucion importada exacta dentro de Palworld y confirmar los comportamientos esperados. Marcar este caso como PASS runtime reportado por el usuario y empaquetarlo para validacion comunitaria/mantenedor?`n`nEl paquete puede contener la entrega AIIO original, la solucion devuelta y la evidencia de validacion/runtime. No se copian PAK fuente completos dentro del paquete. Envialo al mantenedor/servicio privado aprobado de PMM.`n`nEsto NO autoriza automaticamente una receta Knowledge en este PC."
@@ -6016,7 +6202,6 @@ $Script:ExternalModsTimer.Start()
 $Window.Add_Closing({
   try { if($Script:ExternalModsTimer){$Script:ExternalModsTimer.Stop()} } catch {}
   try { Save-DecisionGridToPlan -Silent } catch {}
-  try { Save-UiSettings } catch {}
   try { Save-PMMLayoutSettings } catch {}
   try { Stop-PMMBackgroundOperation -Silent } catch {}
   try { Stop-PMMGameReferenceBuild -Silent } catch {}
@@ -6077,6 +6262,10 @@ Refresh-UI
 if (-not $autoDepsOk) {
   Show-Info (L 'Some dependencies are still unavailable. Restart PMM.exe or use Settings > Prepare / repair dependencies.' 'Aun faltan algunas dependencias. Reinicia PMM.exe o usa Configuracion > Preparar / reparar dependencias.')
 }
+. (Join-Path $Script:Root 'Modules\MCP\MCP.UI.ps1')
+. (Join-Path $Script:Root 'Modules\Unreal\Dependencies.UI.ps1')
+. (Join-Path $Script:Root 'Modules\AIIO\AIIO.Workspaces.UI.ps1')
+Initialize-PMMWorkspaces
 $uiExitState='Normal'
 try {
   [void]$Window.ShowDialog()

@@ -1,4 +1,4 @@
-# Palworld Manager Merger v1.3.0 — User Guide
+# Palworld Manager Merger v1.3.1 — User Guide
 
 **Guided workflow:** PMM highlights only the next useful stage: **Import -> Fix Lab when required -> Analyze -> Build -> Deploy -> Play**. The color is state-derived. During Import/Analyze/Build/Deploy the highlighted button itself becomes a progress surface, while the persistent progress bar under Build/Deploy keeps the last percentage/result until another operation starts.
 
@@ -22,7 +22,7 @@ PMM is both a Palworld PAK mod manager and a compatibility merger. It keeps a lo
 
 ## Header and Palworld paths
 
-The branded main header uses the larger transparent PMM mark, the three-line **PALWORLD / MANAGER / MERGER** name and its subtitle. On wide windows branding and actions occupy equal halves; at narrow widths actions stack below branding. The installation-status card is the header Detect action: enabled when attention is required and disabled after validation. The same header keeps **Auto ON**, **Run Palworld after Deploy**, one-shot **AUTO**, **Open game folder**, **Open mods folder**, and **Start Palworld** together. The full installation path, persistent detection/change controls, manual **Choose Steam folder** / **Choose Palworld folder** controls, and diagnostics live in **Settings**. **Open mods folder** opens or creates `Pal\Content\Paks\~mods`.
+The branded main header uses the larger transparent PMM mark, the three-line **PALWORLD / MANAGER / MERGER** name and its subtitle. On wide windows branding and actions occupy equal halves; at narrow widths actions stack below branding. The installation-status card is the header Detect action: enabled when attention is required and disabled after validation. The same header keeps **SemiAUTO**, **Run Palworld after Deploy**, one-shot **AUTO**, **Open game folder**, **Open mods folder**, and **Start Palworld** together. The full installation path, persistent detection/change controls, manual **Choose Steam folder** / **Choose Palworld folder** controls, and diagnostics live in **Settings**. **Open mods folder** opens or creates `Pal\Content\Paks\~mods`.
 
 ## Manager-only mode
 
@@ -47,13 +47,15 @@ PMM may keep several patches, for example different choices from a conflict. An 
 - **Delete selected** is immediate: it removes the imported copy from PMM and the exact same hash from Palworld `~mods` if it is deployed there. A same-name file with a different SHA-256 blocks the delete. Any deployed PMM compatibility merge and sidecar are preserved until you explicitly change them in **Compatibility patches**; Analyze freshness is invalidated so PMM can explain the new source state.
 - Deploy does not blindly delete unrelated PAKs PMM has never managed.
 
-## Saves
+## World Save
 
-The **Saves** tab can create world backups and restore a selected backup. PMM creates a safety backup before replacing a world during restore. Keep independent backups for important worlds as well.
+The **World Save** tab can create world backups and restore a selected backup. PMM creates a safety backup before replacing a world during restore. Keep independent backups for important worlds as well.
 
 ## AI & Help and local-first AIIO
 
-**AI & Help** contains four areas: bounded diagnostics, persistent AIIO repair/tasks, local Knowledge/recovery, and the color-scheme editor. **Prepare for AI** creates a local ZIP for you to send manually. PMM has no AI-provider login and performs no automatic upload. A returned ZIP is untrusted data: scripts, executable content, unsafe paths and nested archives are rejected, and candidates remain staged until inspected.
+**AI & Help** contains bounded assistance, persistent AIIO repair/mod-creation tasks, Feedback & Knowledge, reception of returned work, and the color-scheme editor. **Prepare for AI** creates a local ZIP for you to send manually. PMM has no AI-provider login and performs no automatic upload. A returned ZIP is untrusted data: scripts, executable content, unsafe paths and nested archives are rejected, and candidates remain staged until inspected.
+
+For a new standalone mod, choose **New mod project**, describe the intended behavior and optionally provide an exact asset/family hint. A `CREATE_MOD` session may request bounded families from the current Game Reference. After importing a response, PMM can expose **Build standalone PAK...** only when the candidate declares a safe cooked tree and exact hashes. The output stays in the AIIO session workspace as `LOCAL_BUILD_UNPROVEN`; it is never installed, deployed or published automatically. Its PAK contains inert `created using PMM` metadata. If you publish the mod, its description must include: **This mod was created with PMM assistance.**
 
 Only an exact current `PMM_MANUAL_SOLUTION_V1` cooked-family candidate may expose **Use candidate in Merge**. Confirmation forces Analyze; it never starts Build or Deploy. Build validation and feedback history are local and deterministic. See `AI_HANDOFF_AND_KNOWLEDGE.md`.
 
@@ -74,6 +76,8 @@ In **Settings**, **Build / refresh Game Reference** maintains a local, version-a
 AIIO handoff creation does not require this cache. When you explicitly create a handoff,
 AIIO re-extracts the exact conflicting Vanilla file/family and the exact counterparts from
 each involved source PAK, then places them in separate origin folders in one bundle.
+If you close the Explorer window, select the exchange in **AI reception** and press
+**Open latest handoff** to show its most recent request ZIP again.
 
 After PMM accepts an AI/manual solution and you have actually tested it successfully in
 Palworld, Settings -> **Create tested contribution...** creates one evidence ZIP that can
@@ -97,7 +101,7 @@ The selection controls directly below **Mod library** apply to imported mods. Ct
 
 ### Automatic mode and Cancel
 
-**ColorFlow and AUTO use the same workflow state machine.** The order is `Detect (only if needed) -> Import -> [Fix Lab when required: Game Reference -> output choice -> Repair -> Apply Fix] -> Analyze -> Build Merge -> Deploy -> Play ready`. **Auto ON** is persistent continuation: when it is checked, a flow action you start manually continues through the remaining safe steps. The header **AUTO** button is a separate one-shot command that runs the remaining safe workflow once without enabling Auto ON. AUTO may import the known Palworld `~mods` source directly; arbitrary file/folder import still pauses for user selection. After a current deployment, ColorFlow illuminates **Start Palworld** and shows **Everything is ready to play.** **Run Palworld after Deploy** controls only automatic launch and remains off by default.
+**ColorFlow and AUTO use the same workflow state machine.** The order is `Detect (only if needed) -> Import -> [Fix Lab when required: Game Reference -> output choice -> Repair -> Apply Fix] -> Analyze -> Build Merge -> Deploy -> Play ready`. **SemiAUTO** is persistent continuation: when it is checked, a flow action you start manually continues through the remaining safe steps. The header **AUTO** button is a separate one-shot command that runs the remaining safe workflow once without enabling SemiAUTO. AUTO may import the known Palworld `~mods` source directly; arbitrary file/folder import still pauses for user selection. After a current deployment, ColorFlow illuminates **Start Palworld** and shows **Everything is ready to play.** **Run Palworld after Deploy** controls only automatic launch and remains off by default.
 
 If PMM recognizes an exact legacy/broken-mod identity with Fix Lab knowledge, Fix Lab becomes the next ColorFlow/AUTO state **before normal Analyze**. If the recipe requires Current Game Reference and it is not current, AUTO builds it directly in the background. One repair output may be auto-selected; multiple outputs stop at **Choose output**. After Repair and **Apply Fix**, Fix Lab is considered resolved and the next shared state is normal **Analyze**. Ignore this legacy mod suppresses that exact source hash under the user's responsibility.
 
@@ -120,9 +124,9 @@ When a supported Fix Lab case needs Current Game Reference, PMM starts/builds th
 
 ### AUTO while Fix Lab builds Game Reference
 
-If a detected repair needs Game Reference, AUTO first invokes the **same canonical Build / refresh Game Reference command used by the Settings button**, before any Fix Lab tab navigation. This deliberately avoids a second AUTO-only launch path. When AUTO first encounters that Fix Lab case it opens **Fix Lab once** so the case/output choice is visible. After that initial presentation, tab navigation belongs to the user: moving to Settings or another tab while Game Reference builds is never undone by the watchdog. The same progress bar/state is shown in both Settings and Fix Lab. For a repair with several outputs, choose the output whenever you want while the reference is building; AUTO resumes as soon as both the reference and your choice are ready. A Game Reference build started manually also resumes an already-running AUTO chain when it completes; with Auto ON, starting Game Reference manually arms continuation just like any other workflow step.
+If a detected repair needs Game Reference, AUTO first invokes the **same canonical Build / refresh Game Reference command used by the Settings button**, before any Fix Lab tab navigation. This deliberately avoids a second AUTO-only launch path. When AUTO first encounters that Fix Lab case it opens **Fix Lab once** so the case/output choice is visible. After that initial presentation, tab navigation belongs to the user: moving to Settings or another tab while Game Reference builds is never undone by the watchdog. The same progress bar/state is shown in both Settings and Fix Lab. For a repair with several outputs, choose the output whenever you want while the reference is building; AUTO resumes as soon as both the reference and your choice are ready. A Game Reference build started manually also resumes an already-running AUTO chain when it completes; with SemiAUTO, starting Game Reference manually arms continuation just like any other workflow step.
 
-Successful steps no longer use informational OK popups. **Settings** provides independent Color scheme and Sound event controls, built-in and custom sounds, and a 0-100% volume slider (50% default). The two microwave profiles remain distinct: **Microwave finish** and **3 beeps**. Manual workflow steps use the Manual profile; AUTO/Auto ON uses the configured Auto/Semiauto profiles.
+Successful steps no longer use informational OK popups. **Settings** provides independent Color scheme and Sound event controls, built-in and custom sounds, and a 0-100% volume slider (50% default). The two microwave profiles remain distinct: **Microwave finish** and **3 beeps**. Manual workflow steps use the Manual profile; AUTO/SemiAUTO uses the configured Auto/Semiauto profiles.
 
 
 ### Appearance
@@ -136,7 +140,7 @@ Appearance, action-hint duration, completion sound and volume are staged in Sett
 
 New installations default to **PMM Crystal** while upgrades preserve a valid existing choice. Settings separates **Color scheme** and **Completion sound** into independent lists. **Add schemes (JSON/ZIP)...** accepts one or several `PMM_COLOR_SCHEME_V1` JSON files or a bounded ZIP and stores only validated user schemes in `Workspace\Themes`; **Add sound...** copies a WAV/MP3/WMA into `Workspace\Sounds`. Press **Apply changes** to commit theme, ColorFlow hint duration, sound and volume without restarting PMM. **Restore defaults**, placed beside Apply at the upper right, stages PMM Crystal, a 5-second hint, 50% volume and the RC19 sound-profile defaults without changing language, paths, library or user data; press Apply to save them.
 
-The Saves tab now has two collapsible right-side panes: **Selected save** and **PMM backups made**. Selecting a backup shows its date, archive size, expanded size, file count and simple delta against the current save. Restore uses the selected PMM backup and creates a safety backup before replacing the live world.
+The World Save tab has two collapsible right-side panes: **Selected save** and **PMM backups made**. Selecting a backup shows its date, archive size, expanded size, file count and simple delta against the current save. Restore uses the selected PMM backup and creates a safety backup before replacing the live world.
 
 
 ### Sound events

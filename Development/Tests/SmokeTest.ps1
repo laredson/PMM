@@ -18,6 +18,7 @@ Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc26_semantic_compatib
 Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc28_validation_runtime_regression.ps1') -PathType Leaf) 'RC28 Windows PowerShell validation/runtime regression exists'
 Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc28_validation_runtime_regression_model.py') -PathType Leaf) 'RC28 cross-platform validation/runtime model exists'
 Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc29_aihelp_feedback_ui_regression.ps1') -PathType Leaf) 'RC29 Windows PowerShell AI & Help/feedback/UI regression exists'
+Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\wpf_xaml_runtime_regression.ps1') -PathType Leaf) 'WPF XAML runtime materialization regression exists'
 Assert-PMM (Test-Path (Join-Path $Root 'Development\Tests\rc29_aihelp_feedback_ui_model.py') -PathType Leaf) 'RC29 cross-platform AI & Help/feedback/UI model exists'
 Assert-PMM (@(Get-ChildItem -LiteralPath $App -File -Force).Count -eq 1) 'PMM root exposes only one file'
 Assert-PMM (-not(Test-Path (Join-Path $App 'Workspace'))) 'Workspace is not shipped'
@@ -69,11 +70,14 @@ Assert-PMM (@($idx.entries|Where-Object{[string]$_.kind -eq 'production-recipe' 
 $recipe=Get-Content (Join-Path $App 'CKL/Stable/production-recipes.json') -Raw|ConvertFrom-Json
 Assert-PMM (@($recipe.recipes|Where-Object{$_.production.enabled}).Count -eq 1) 'Stable CKL has exactly one automatic production recipe'
 
+$manifestBytes=[IO.File]::ReadAllBytes((Join-Path $App 'Resources/Metadata/RELEASE_MANIFEST.json'))
+$manifestHasBom=($manifestBytes.Length -ge 3 -and $manifestBytes[0] -eq 0xEF -and $manifestBytes[1] -eq 0xBB -and $manifestBytes[2] -eq 0xBF)
+Assert-PMM (-not $manifestHasBom) 'Native release manifest is UTF-8 without BOM'
 $manifest=Get-Content (Join-Path $App 'Resources/Metadata/RELEASE_MANIFEST.json') -Raw|ConvertFrom-Json
-Assert-PMM ([string]$manifest.version -eq '1.3.0') 'Manifest version 1.3.0'
+Assert-PMM ([string]$manifest.version -eq '1.3.1') 'Manifest version 1.3.1'
 Assert-PMM ([int]$manifest.mergePlanSchema -eq 18) 'Merge plan schema 18'
 Assert-PMM ([int]$manifest.buildManifestSchema -eq 9) 'Build manifest schema 9'
-Assert-PMM ([string]$manifest.buildId -eq 'PMM-v1.3.0-RC30-LEAN-AI-VALIDATION-FLOW') 'RC30 build identity'
+Assert-PMM ([string]$manifest.buildId -eq 'PMM-v1.3.1ModCreator') 'PMM 1.3.1 Mod Creation build identity'
 Assert-PMM ([string]$manifest.runtime.executable -eq 'Engine/PMMRuntime.exe') 'Runtime new path'
 Assert-PMM ([string]$manifest.aiioModule -eq 'Modules/AIIO/AIIO.ps1') 'AIIO new path'
 Assert-PMM ([string]$manifest.ckl.catalog -eq 'CKL/Catalog/case-index.json') 'Manifest CKL catalog path'

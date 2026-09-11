@@ -16,7 +16,7 @@ All schemes must pass PMM's real-surface 4.5:1 contrast matrix. Invalid user def
 ## Sound event profiles
 
 - **Auto**: once when the complete automatic workflow ends.
-- **Semiauto**: after each completed AUTO/Auto ON step when enabled.
+- **Semiauto**: after each completed AUTO/SemiAUTO step when enabled.
 - **Manual**: after a manually started workflow action; Start Palworld alone is silent.
 - **Attention required**: deduplicated notification for a real human decision.
 - **Error**: operation-error alert.
