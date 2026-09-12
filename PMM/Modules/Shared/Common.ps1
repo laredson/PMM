@@ -1,4 +1,5 @@
-﻿<#
+﻿. (Join-Path $PSScriptRoot 'LongPaths.ps1')
+<#
 Common.ps1 - shared configuration, logging, dependencies and process safety.
 All other PowerShell modules may call these helpers. Keep this file free of UI
 controls so the core can later be reused by a CLI or another front-end.
@@ -136,20 +137,12 @@ function Clear-PMMTransientArtifacts {
     }
     $grCurrent=Join-Path $gameReferenceRoot 'current'
     $grPrevious=Join-Path $gameReferenceRoot '_previous'
-    if(-not$activeGameReferenceBuild){
-      if(-not(Test-Path -LiteralPath $grCurrent -PathType Container) -and (Test-Path -LiteralPath $grPrevious -PathType Container)){
-        try{Move-Item -LiteralPath $grPrevious -Destination $grCurrent -ErrorAction Stop}catch{}
-      }elseif((Test-Path -LiteralPath $grCurrent -PathType Container) -and (Test-Path -LiteralPath $grPrevious -PathType Container)){
-        Remove-Item -LiteralPath $grPrevious -Recurse -Force -ErrorAction SilentlyContinue
-      }
-      # Root state.json is only a small publication pointer/cache. If a crash hit
-      # between folder swap and metadata copy, reconstruct it from current.
-      $currentState=Join-Path $grCurrent 'state.json'
-      if(Test-Path -LiteralPath $currentState -PathType Leaf){Copy-Item -LiteralPath $currentState -Destination (Join-Path $gameReferenceRoot 'state.json') -Force -ErrorAction SilentlyContinue}
+    if(-not$activeGameReferenceBuild -and (Get-Command Repair-PMMGameReferencePublication -ErrorAction SilentlyContinue)){
+      try{Repair-PMMGameReferencePublication}catch{Write-PMMLog ('Game Reference recovery pending: '+$_.Exception.Message)}
     }
     foreach($incoming in @(Get-ChildItem -LiteralPath $gameReferenceRoot -Directory -Filter '_incoming_*' -ErrorAction SilentlyContinue)){
       if(-not(Test-PMMTransientStageActive $incoming.FullName)){
-        Remove-Item -LiteralPath $incoming.FullName -Recurse -Force -ErrorAction SilentlyContinue
+        try{Remove-PMMDirectory $incoming.FullName $gameReferenceRoot}catch{Write-PMMLog ('Reference stage cleanup deferred: '+$_.Exception.Message)}
         Remove-PMMTransientStageOwner $incoming.FullName
       }
     }
@@ -410,7 +403,11 @@ function Get-PMMRecentLog {
   return ''
 }
 
-function Get-Sha256([string]$Path){(Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToLowerInvariant()}
+function Get-Sha256([string]$Path){
+  if($Path.Length -lt 248){return (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToLowerInvariant()}
+  $stream=Open-PMMFile $Path;$sha=[Security.Cryptography.SHA256]::Create()
+  try{return ([BitConverter]::ToString($sha.ComputeHash($stream)).Replace('-','').ToLowerInvariant())}finally{$sha.Dispose();$stream.Dispose()}
+}
 
 function Get-PMMDependencyCoreVersion { return '0.9.0' }
 
@@ -509,7 +506,7 @@ function Test-PMMManagedRuntimeHashes($Manifest) {
 
 function Test-PMMDependencies {
   $repak=Get-PMMRepakExecutablePath
-  $mapping=Get-PMMMappingsPath
+  $mapping=Get-PMMBundledMappingsPath
   $core=Join-PMMPath 'Engine' 'PMMCore\pmmcore.dll'
   $manifest=Get-PMMReleaseManifest
   $expectedRepak='';$expectedMappings='';$expectedOodle=''

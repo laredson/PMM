@@ -1,4 +1,4 @@
-<#
+﻿<#
 AIIO diagnostics service
 ========================
 
@@ -151,6 +151,7 @@ function New-PMMDiagnosticCase {
     LastOccurredUtc=[DateTime]::UtcNow.ToString('o')
   }
   Write-PMMAIIOJsonAtomic (Get-PMMDiagnosticCasePath $caseId) $case 70
+  if(Get-Command Sync-PMMDiagnosticToCase -ErrorAction SilentlyContinue){try{Sync-PMMDiagnosticToCase $case|Out-Null}catch{Write-PMMLog ('Diagnostic case registration failed: '+$_.Exception.Message)}}
   return $case
 }
 
@@ -180,6 +181,7 @@ function Register-PMMAutomaticErrorCase {
       $case|Add-Member -NotePropertyName LastOccurredUtc -NotePropertyValue $now -Force
       $case.UpdatedUtc=$now
       Write-PMMAIIOJsonAtomic $file.FullName $case 70
+      if(Get-Command Sync-PMMDiagnosticToCase -ErrorAction SilentlyContinue){Sync-PMMDiagnosticToCase $case|Out-Null}
       Write-PMMLog ('Reused automatic diagnostic case '+[string]$case.CaseId+' | occurrence='+[string]($count+1))
       return $case
     }catch{}

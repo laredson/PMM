@@ -1,4 +1,4 @@
-# Loaded after the active editor overrides; identity belongs to the loaded view.
+﻿# Loaded after the active editor overrides; identity belongs to the loaded view.
 $Script:PMMEditorCaseId=''
 $Script:PMMEditorLoading=$false
 $Script:PMMCaseRefreshing=$false
@@ -29,6 +29,7 @@ function Save-PMMAIIOCaseEditor {
             $changed=$true
         }
     }
+    if($changed -and $c){Update-PMMCaseContextRevision ([string]$c.CaseId)|Out-Null}
     return $changed
 }
 function Select-PMMCaseFromGrid {
@@ -72,6 +73,14 @@ function Select-PMMCaseLocation($c){
         $Script:PMMAreaSelections[$area]=$c.CaseId
         foreach($tab in $Script:MainTabs.Items){if($tab.Tag -eq $area){$Script:MainTabs.SelectedItem=$tab;break}}
         Switch-PMMCaseArea $area
+    }
+    foreach($mainTab in $Script:MainTabs.Items){
+      if([string]$mainTab.Tag -eq $area){
+        $Script:MainTabs.SelectedItem=$mainTab
+        if($mainTab.Content -is [Windows.Controls.TabControl]){foreach($subTab in $mainTab.Content.Items){if([string]$subTab.Tag -eq $area){$mainTab.Content.SelectedItem=$subTab;break}}}
+        elseif($area -eq 'HELP'){$Script:AIHelpTabs.SelectedItem=$Script:PMMHelpCaseTab}
+        break
+      }
     }
     $Script:PMMAreaSelections[$area]=$c.CaseId
     Refresh-PMMAIIOCaseList $c.CaseId

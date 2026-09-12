@@ -35,6 +35,11 @@ $c=New-PMMAIIOCase -Title 'Inspect test'
 Copy-Item (Join-Path $app 'Engine\AssetTools\*') (Join-Path $Script:Root 'Engine\AssetTools')
 Copy-Item (Join-Path $app 'Engine\repak.exe') (Join-Path $Script:Root 'Engine\repak.exe')
 $a=[pscustomobject]@{caseId=$c.CaseId;logicalPath=$asset;path='/Exports/0/Table/Data/0/Value/0/Value';expected='100';value='101'}
+$failed=$false
+try{Invoke-PMMMCPTool 'pmm_asset_edit' $a|Out-Null}catch{$failed=$true}
+if(-not$failed){throw 'Unbound edit accepted for a revisioned case.'}
+$view=Invoke-PMMMCPTool 'pmm_case_get' ([pscustomobject]@{caseId=$c.CaseId})
+$a|Add-Member -NotePropertyName evidenceRevision -NotePropertyValue $view.evidenceRevision
 $r=Invoke-PMMMCPTool 'pmm_asset_edit' $a
 if($r.status -ne 'EDITED'){throw 'Edit failed'}
 $b=[pscustomobject]@{caseId=$c.CaseId;candidateId=$r.candidateId}
@@ -45,9 +50,12 @@ if(@($items.candidates).Count -ne 1 -or $items.candidates[0].status -ne 'CANDIDA
 $a.expected='999';$failed=$false
 try{Invoke-PMMMCPTool 'pmm_asset_edit' $a|Out-Null}catch{$failed=$true}
 if(-not $failed){throw 'Wrong expected value accepted'}
+$savedRevision=$a.evidenceRevision;$a.evidenceRevision='EV-'+('f'*64);$a.expected='100';$failed=$false
+try{Invoke-PMMMCPTool 'pmm_asset_edit' $a|Out-Null}catch{$failed=$true}
+if(-not$failed){throw 'Stale evidence edit accepted.'};$a.evidenceRevision=$savedRevision
 $dir=Get-PMMMCPAssetCandidate $c.CaseId $r.candidateId
 [IO.File]::AppendAllText((Join-Path $dir ('cooked\'+$asset)),'tampered')
 $failed=$false
 try{Invoke-PMMMCPTool 'pmm_candidate_build' $b|Out-Null}catch{$failed=$true}
 if(-not $failed){throw 'Tampered candidate accepted'}
-'ASSET_EDIT_BUILD_PASS: isolated real DataTable, scalar edit, serialized export check, PAK readback hashes, stale-value rejection and tamper rejection. Not an inventory mod.'
+'ASSET_EDIT_BUILD_PASS: isolated real DataTable, scalar edit, serialized export check, PAK readback hashes, revision binding, stale-value rejection and tamper rejection. Not an inventory mod.'

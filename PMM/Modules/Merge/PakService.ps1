@@ -1,4 +1,5 @@
-﻿<#
+﻿. (Join-Path $PSScriptRoot '../Shared/LongPaths.ps1')
+<#
 PakService.ps1 - all direct interaction with repak
 ==================================================
 
@@ -165,8 +166,8 @@ function Get-PMMSafePakOutputPath([string]$OutRoot,[string]$LogicalPath) {
       throw ('Unsafe Windows device name in PAK logical path refused: '+$LogicalPath)
     }
   }
-  $rootFull=[IO.Path]::GetFullPath($OutRoot).TrimEnd([char]92,[char]47)
-  $candidate=[IO.Path]::GetFullPath((Join-Path $rootFull $logical.Replace([char]47,[char]92)))
+  $rootFull=(Get-PMMFullPath $OutRoot).TrimEnd([char]92,[char]47)
+  $candidate=Get-PMMFullPath ($rootFull+"\"+$logical.Replace([char]47,[char]92))
   $prefix=$rootFull+[IO.Path]::DirectorySeparatorChar
   if(-not$candidate.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)){
     throw ('PAK extraction path escapes its staging root: '+$LogicalPath)
@@ -285,13 +286,9 @@ function Get-PakEntry([string]$Pak, [string]$Entry, [string]$OutputFile) {
     throw "PAK not found:`n$Pak"
   }
 
-  $parent = Split-Path -Parent $OutputFile
-  if ($parent -and -not (Test-Path -LiteralPath $parent)) {
-    New-Item -ItemType Directory -Force -Path $parent | Out-Null
-  }
-  if (Test-Path -LiteralPath $OutputFile) {
-    Remove-Item -LiteralPath $OutputFile -Force -ErrorAction Stop
-  }
+  $OutputFile=Get-PMMFullPath $OutputFile
+  $parent=$OutputFile.Substring(0,$OutputFile.LastIndexOf([char]92))
+  New-PMMDirectory $parent
 
   # A healthy exact extraction is normally measured in milliseconds/seconds.
   # Keep the ceiling generous for slow disks and large cooked assets, but never
@@ -325,7 +322,7 @@ function Get-PakEntry([string]$Pak, [string]$Entry, [string]$OutputFile) {
     [void]$proc.Start()
     $started = $true
 
-    $fs = [IO.File]::Open($OutputFile,[IO.FileMode]::Create,[IO.FileAccess]::Write,[IO.FileShare]::None)
+    $fs = Open-PMMFile $OutputFile -Write
     try {
       # Start BOTH drains before waiting for process completion. This prevents
       # redirected stdout/stderr pipe backpressure from deadlocking repak.
@@ -355,7 +352,7 @@ function Get-PakEntry([string]$Pak, [string]$Entry, [string]$OutputFile) {
         # WaitForExit(Int32) confirms the process exited; the parameterless call
         # completes final process bookkeeping before ExitCode is inspected.
         [void]$proc.WaitForExit()
-        $copyTask.GetAwaiter().GetResult()
+        [void]$copyTask.GetAwaiter().GetResult()
         $err = [string]$errorTask.GetAwaiter().GetResult()
         $fs.Flush()
         $bytesWritten = [int64]$fs.Length
@@ -376,7 +373,7 @@ function Get-PakEntry([string]$Pak, [string]$Entry, [string]$OutputFile) {
       throw "repak get failed (exit $($proc.ExitCode)):`nPAK: $Pak`nEntry: $Entry`nOutput: $OutputFile`n`n$err"
     }
 
-    if (-not (Test-Path -LiteralPath $OutputFile -PathType Leaf)) {
+    if (-not (Test-PMMFile $OutputFile)) {
       throw "repak get did not create the expected file:`n$OutputFile"
     }
 
@@ -385,7 +382,7 @@ function Get-PakEntry([string]$Pak, [string]$Entry, [string]$OutputFile) {
     # Only unusually slow successes add a completion line.
     if($watch.Elapsed.TotalSeconds -ge 2.0){Write-PMMLog ("repak get SLOW success after {0:N2}s: {1} :: {2} | bytes={3}" -f $watch.Elapsed.TotalSeconds,$pakName,$Entry,$bytesWritten)}
   } catch {
-    Remove-Item -LiteralPath $OutputFile -Force -ErrorAction SilentlyContinue
+    try{Remove-PMMFile $OutputFile}catch{Write-PMMLog ('Partial extraction cleanup failed: '+$_.Exception.Message)}
     if (-not $timedOut) {
       Write-PMMLog ("repak get FAILED after {0:N2}s: {1} :: {2} | {3}" -f $watch.Elapsed.TotalSeconds,$pakName,$Entry,$_.Exception.Message)
     }
@@ -467,7 +464,7 @@ function Export-PakAssetFamilyExact([string]$Pak,[string]$RelativeUasset,[string
     $output = Get-PMMSafePakOutputPath $OutRoot $outputLogical
     [void](Get-PakEntry $Pak ([string]$entry) $output)
 
-    if (-not (Test-Path -LiteralPath $output -PathType Leaf)) {
+    if (-not (Test-PMMFile $output)) {
       throw "Exact extraction did not create the expected file:`n$outputLogical`nPAK: $Pak"
     }
 
@@ -475,7 +472,7 @@ function Export-PakAssetFamilyExact([string]$Pak,[string]$RelativeUasset,[string
     if ($ext -eq '.uasset') { $headerPath = $output }
   }
 
-  if (-not $headerPath -or -not (Test-Path -LiteralPath $headerPath -PathType Leaf)) {
+  if (-not $headerPath -or -not (Test-PMMFile $headerPath)) {
     # This should only be reachable if repak's index changes between list/get.
     # Keep detailed diagnostics because a missing header makes semantic diff
     # impossible and must never be interpreted as "no property conflicts".

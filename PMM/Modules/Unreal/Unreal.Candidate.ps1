@@ -1,4 +1,4 @@
-
+﻿
 function New-PMMUnrealCandidate([string]$CaseId,[string]$JobId,[string]$Project,$Environment,[string]$Cancel) {
     $registry=Read-PMMMCPJson (Join-Path $Project 'Saved\PMM\assets.json')
     $names=@($registry.PSObject.Properties|ForEach-Object{$_.Name}|Where-Object{$_ -ne 'PMMProbe'})
@@ -30,7 +30,7 @@ function New-PMMUnrealCandidate([string]$CaseId,[string]$JobId,[string]$Project,
             $records.Add(@{path=$rel;sha256=(Get-FileHash $to).Hash.ToLowerInvariant();bytes=(Get-Item $to).Length})
         }
         $probe=Resolve-PMMMCPPath $tree ('Pal/Content/PMM/'+$name+'.uasset')
-        Invoke-PMMBoundedProcess (Get-PMMMCPDotnet) @((Join-Path $Script:Root 'Engine\AssetReader\PMM.AssetReader.dll'),'probe','--asset',$probe,'--mappings',(Join-Path $Script:Root 'Resources\Mappings\Mappings.usmap'),'--engine','UE5_1') $candidate 60 $Cancel | Out-Null
+        Invoke-PMMBoundedProcess (Get-PMMMCPDotnet) @((Join-Path $Script:Root 'Engine\AssetReader\PMM.AssetReader.dll'),'probe','--asset',$probe,'--mappings',(Get-PMMMappingsPath),'--engine','UE5_1') $candidate 60 $Cancel | Out-Null
     }
     $pak=Resolve-PMMMCPPath $candidate ('PMM_'+$JobId.Substring(0,8)+'_P.pak')
     $repak=Resolve-PMMMCPPath $Script:Root 'Engine\repak.exe'

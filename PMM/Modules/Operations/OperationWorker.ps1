@@ -1,6 +1,6 @@
 ﻿param(
   [Parameter(Mandatory=$true)][string]$Root,
-  [Parameter(Mandatory=$true)][ValidateSet('Analyze','Build','AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','FixLabBuild')][string]$Operation,
+  [Parameter(Mandatory=$true)][ValidateSet('Analyze','Build','AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','FixLabBuild','MappingsImport')][string]$Operation,
   [Parameter(Mandatory=$true)][string]$ProgressPath,
   [Parameter(Mandatory=$true)][string]$ResultPath,
   [switch]$Force,
@@ -8,6 +8,7 @@
   [ValidateSet('ConflictGroups')][string]$Mode='ConflictGroups',
   [string]$SessionId='',
   [string]$InputZip='',
+  [string]$MappingsFile='',
   [string]$SolutionId='',
   [string]$FixLabJobId='',
   [string]$FixLabRecipeId='',
@@ -106,6 +107,7 @@ try{
   $journalId=Start-PMMJournalOperation -Kind $Operation -Target $journalTarget -Metadata ([ordered]@{Force=[bool]$Force;Mode=$Mode;WorkerProcessId=$PID;SessionId=$SessionId;SolutionId=$SolutionId})
 
   $startMessage=switch($Operation){
+    'MappingsImport' {'Selecting local mappings...'}
     'Analyze' {'Starting Analyze in background...'}
     'Build' {'Starting Build in background...'}
     'AIHandoff' {'Creating one AIIO handoff bundle for the current Unsupported set...'}
@@ -122,7 +124,10 @@ try{
 
   $resultText=''
   $extra=[ordered]@{}
-  if($Operation -eq 'Analyze'){
+  if($Operation -eq 'MappingsImport'){
+    $selection=Import-PMMLocalMappings $MappingsFile
+    $resultText='Mappings selected ('+[string]$selection.Mode+'). Run Analyze again.'
+  }elseif($Operation -eq 'Analyze'){
     $result=Invoke-PMMScan -Force:$Force
     if($result -and $result.PSObject.Properties.Name -contains 'Summary'){$resultText=[string]$result.Summary}else{$resultText='Analyze completed.'}
   }elseif($Operation -eq 'Build'){

@@ -1,4 +1,4 @@
-param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
+﻿param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
@@ -86,6 +86,6 @@ $reversed=[pscustomobject]@{AutomaticResolutions=@([pscustomobject]@{
   ExpectedProviders=@($analysis.Asset.AutomaticResolutions[0].ExpectedProviders[1],$analysis.Asset.AutomaticResolutions[0].ExpectedProviders[0])
 })}
 Assert-RC26 ((Get-PMMAutomaticResolutionSignature $stored) -ceq (Get-PMMAutomaticResolutionSignature $reversed)) 'Automatic-resolution signature depends on provider serialization order.'
-Assert-RC26 ((Get-PMMPlanSchemaVersion) -eq 18) 'RC26 Analyze plan schema is not 18.'
+Assert-RC26 ((Get-PMMPlanSchemaVersion) -eq 19) 'Analyze plan schema must invalidate pre-1.0.4-layout plans.'
 
 Write-Output 'RC26_SEMANTIC_COMPATIBILITY_REGRESSION_OK'

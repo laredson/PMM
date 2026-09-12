@@ -58,16 +58,16 @@
   },
   "product": "Palworld Manager Merger",
   "acronym": "PMM",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "releaseDate": "2026-09-11",
   "creator": "laredson",
   "license": "MIT",
   "pmmCoreVersion": "0.9.0",
-  "mergePlanSchema": 18,
+  "mergePlanSchema": 19,
   "repakVersion": "0.2.3",
   "repakSha256": "fcd538e5994b9bb833622d425ae346f4e0692f02d4b0025114a559f9b6286022",
   "mappingsSha256": "604550ba90faab1e394c2789f38eeff625493d3729c2d7f6a6058bfedb90a67b",
-  "releaseBasis": "PMM 1.3.1 Mod Creation starts from the published v1.3.0 Stable tree and adds a separate AIIO CREATE_MOD workflow. It can query the current local Vanilla GameReference, export only exact hash-bound families or a bounded deterministic neighborhood, stage a self-describing cooked-tree response as untrusted data and build a standalone _P.pak only after explicit confirmation. The result is never deployed, published or promoted to Knowledge automatically and remains runtime UNPROVEN until tested in Palworld.",
+  "releaseBasis": "1.3.1 baseline c849942a42e8c8a58d7cc2840017bcf4afaf42b6 with persistent case integration, local mapping selection, read-only reader diagnostics and reference extraction/recovery repairs. The 1.4.0-ReUI redesign is not included.",
   "aiContinuationEntrypoint": "repository Development/AI/AI_CONTINUE_HERE.md",
   "developerHandoff": "repository Development/AI/AI_CONTINUE_HERE.md",
   "runtimeEvidence": "repository Development/Docs/Validation/RUNTIME_PROVEN_COMPATIBILITY.md",
@@ -103,7 +103,7 @@
     "Engine/PMMCore/pmmcore.dll": "557884cce643d9ae70b67e89ed6bd3e8b6f7020382e25e6c219ff5ac283f38aa",
     "Engine/PMMCore/pmmcore.deps.json": "6de1c6e255a87cfcab8f83ea7003a8174a0d4f67deab58b06c0a6712b1eb131f",
     "Engine/PMMCore/pmmcore.runtimeconfig.json": "28329cf08f6505e73806b17558b187c02f0c1c516fe47ebfb7a013d082aaa306",
-    "Engine/AssetReader/PMM.AssetReader.dll": "ec1dbfca7681f33912b44116445aea896a8b254d5b38e6ce75ef00a233966bcc",
+    "Engine/AssetReader/PMM.AssetReader.dll": "15b226b1dad2e32fded53d2ea52fbf7b038dba3d977ed2908a41424f43633be8",
     "Engine/AssetReader/PMM.AssetReader.deps.json": "1f03a4bd8ba2f035c90b9fc6bb542ecffb5ab0a213970e0481618d30be4978f0",
     "Engine/AssetReader/PMM.AssetReader.runtimeconfig.json": "28329cf08f6505e73806b17558b187c02f0c1c516fe47ebfb7a013d082aaa306",
     "Engine/AssetReader/UAssetAPI.dll": "4048337707660c7c3d810b37747049c85c228d0ed602112685098047bd59dbab",
@@ -114,8 +114,8 @@
   "dotnetRuntimeInventorySha256": "8b2f4fe11635f18fa419d5e4fedad456bc7c3d7395272ee91e89b62e3ac72ed0",
   "gameReferenceBackgroundWorker": "Modules/GameReference/GameReferenceWorker.ps1",
   "gameReferenceProgressUi": "Shared normal Settings + Fix Lab progress bars plus both Game Reference buttons as ColorFlow progress surfaces. AUTO invokes the canonical Settings Game Reference command before Fix Lab navigation; output choice may be highlighted concurrently while the worker runs.",
-  "releaseCandidate": "1.3.1-mod-creation-preview",
-  "buildId": "PMM-v1.3.1ModCreator",
+  "releaseCandidate": "1.3.2-cases-repair",
+  "buildId": "PMM-v1.3.2-cases-repair",
   "buildIdentityFile": "Resources/Metadata/BUILD_ID.txt",
   "uiContract": "Public tabs are Mods & Merge, FIX LAB, AI & Help, World Save and Settings. Fresh size is 1460x900 and the normal minimum is 900x600; startup clamps to the Windows work area in device-independent pixels. Branding and action areas occupy equal header halves. Header actions are ordered Detect/status, folder/Play controls, then SemiAUTO/AUTO. SemiAUTO arms continuation after a manually started workflow action; the wider AUTO button runs the remaining safe workflow once and uses an idle-only sparkle treatment. AI & Help contains five focused subtabs: AI assistance, AI reception, Feedback & Knowledge, color-scheme editor and AI settings. AI assistance exposes separate diagnostic-case and standalone-mod-project entry points. Normal Settings also owns Vanilla Game Reference. General Settings follows the Sound events architecture by separating official PMM schemes from a bordered user-scheme collection. ColorFlow ends by highlighting Play as optional readiness without an action-required popup.",
   "bundledThemeCount": 11,
@@ -388,7 +388,7 @@
     "synchronousOperations": "cooperative cancellation via progress callbacks and cancel-aware external archive processes",
     "deployPolicy": "verified rollback when cancellation occurs after managed-file commit begins"
   },
-  "testProfile": "v1.3.1-mod-creation-contract-game-reference-scope-untrusted-staging-explicit-local-build-no-auto-deploy-plus-rc30-regression-preservation",
+  "testProfile": "1.3.2 case identity/revisions/transports; PS5.1 WPF; restrictive long-path extraction and rollback; local mappings and current-game semantic analysis. No game-runtime claim.",
   "validationDialog": "DPI-aware fixed modal with a 1040 x 360 client surface, 230 x 76 answer buttons and a second explicit Knowledge-contribution prompt after PASS/PASS_RECONFIRMED.",
   "backgroundCadence": "No permanent 500 ms UI-responsiveness diagnostic. External ~mods metadata heartbeat runs every 60 seconds only while the main window is active, visible and no processing operation is running. Analyze/Build/AIIO/GameReference progress polling exists only for the lifetime of its child worker.",
   "actionRequiredHints": {
@@ -429,7 +429,7 @@
     "targetBroker": "native PMMRuntime/PMMEngine operation subcommands",
     "uiHeavyWorkAllowed": false
   },
-  "release": "PMM v1.3.1 Mod Creation preview",
+  "release": "PMM v1.3.2 Cases and compatibility repair",
   "fixLabEngineVersion": "0.2.0-variant-recipes",
   "fixLabRecipeSchema": "PMM_FIXLAB_VARIANT_RECIPE_V2",
   "fixLabCase001VariantCount": 5,
@@ -477,7 +477,7 @@
       "PackageChoice",
       "any result containing a decision row"
     ],
-    "exactPlanReuse": "Only a schema-18 plan with zero decision rows and exclusively the safe cached modes may be reused, and only when source, priority, mappings, vanilla and compatibility-rule signatures still match.",
+    "exactPlanReuse": "Only a schema-19 plan with zero decision rows and exclusively the safe cached modes may be reused, and only when source, priority, mappings, vanilla and compatibility-rule signatures still match.",
     "effectivePatchReuse": "Automatic schema-9 patches persist every analyzed shared-asset topology proof. When only unrelated unique PAKs change, current shared topology plus exact provider hashes can reuse the patch before expensive adapters. KnownRecipeAuto also requires pinned RecipeId/output provider and exact output evidence. DataTable automatic compatibility rules require an identical stored rule signature. Both forms require an unchanged production-recipe library hash. Older plans and manifests without those proofs re-enter normal Analyze. If the fast proof is unavailable, normal Analyze runs and then compares the complete effective patch recipe before deciding whether Build is necessary.",
     "forceAnalyze": "Force bypasses exact-plan and group-result reuse; PAK fingerprints still prevent stale indexes."
   },
@@ -508,11 +508,33 @@
     "format": "transparent RGBA PNG",
     "pixelSize": "512x512"
   },
-  "releaseName": "1.3.1ModCreator",
+  "releaseName": "1.3.2",
   "releaseValidation": {
-    "programRegression": "PASS: cases/settings en+es, Desktop pairing, snapshots, MCP bridge/transport/exchange/inspection/edit and WPF XAML",
+    "programRegression": "PASS: PS5.1 case revisions/origins/transports, complete bootstrap EN/ES, WPF runtime, local mapping selection, reference extraction/recovery and reader parity. Detailed counts in Development/Docs/Validation/PMM_1_3_2_REPAIR_VALIDATION.md.",
     "gameRuntime": "NOT_VERIFIED",
     "freeAccount": "NOT_VERIFIED",
     "inventoryModIncluded": false
-  }
+  },
+  "caseContractVersion": 4,
+  "localMappings": {
+    "selection": "Workspace/State/mappings-selection.json",
+    "content": "Workspace/Mappings/<sha256>.usmap",
+    "bundledFallback": true,
+    "redistributed": false,
+    "requiresReanalysis": true
+  },
+  "assetReaderRepair": {
+    "version": "0.3",
+    "readOnly": true,
+    "sourceParity": "32 cooked families, exact export JSON and DataTable parity with baseline and shipped binary; dependencies preserved",
+    "semanticReadability": "Decoded or Partial; opaque exports never prove DataTable support"
+  },
+  "dataTableCurrentLayoutTransfer": {
+    "schema": "PMM_DATATABLE_CURRENT_LAYOUT_TRANSFER_V1",
+    "policy": "Exact mappings, current Vanilla and complete provider hashes; recover byte-exact historical baseline, transfer only historical mod deltas onto current cooked data, preserve current-only fields. No full UAsset.Write.",
+    "validatedRows": 753,
+    "validatedProperties": 68523,
+    "runtimeProven": false
+  },
+  "nativeDiagnosticLogging": "Large PMMCore output is retained in Workspace/Logs/EngineReports with a summary in the main log; returned native output remains complete."
 }

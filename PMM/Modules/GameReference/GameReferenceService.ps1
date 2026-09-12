@@ -1,4 +1,6 @@
-﻿<#
+﻿. (Join-Path $PSScriptRoot '../Shared/LongPaths.ps1')
+. (Join-Path $PSScriptRoot '../Shared/Persistence.ps1')
+<#
 Palworld Manager Merger v1.3.0 - local Vanilla Game Reference Library
 ===================================================================
 
@@ -106,12 +108,13 @@ function Get-PMMGameReferenceState {
   if([string]::IsNullOrWhiteSpace([string]$identity.PakPath)){$same=$false;$reason='Configured Palworld installation has no Pal-Windows.pak.'}
   elseif([string]$state.ScopeVersion -ne [string]$identity.ScopeVersion){$same=$false;$reason='Reference extraction scope changed.'}
   elseif(-not [string]::IsNullOrWhiteSpace([string]$state.SourcePak) -and [string]$state.SourcePak -ine [string]$identity.PakPath){$same=$false;$reason='Configured Palworld installation changed.'}
-  elseif(([string]$state.MappingsSha256).ToLowerInvariant() -ne ([string]$identity.MappingsSha256).ToLowerInvariant()){$same=$false;$reason='Mappings changed since this reference was built.'}
   elseif([int64]$state.SourcePakSize -ne [int64]$identity.PakSize){$same=$false;$reason='Pal-Windows.pak size changed.'}
   elseif([string]$state.SourcePakLastWriteUtc -ne [string]$identity.PakLastWriteUtc){$same=$false;$reason='Pal-Windows.pak timestamp changed.'}
+  $mappingsMatch=([string]$state.MappingsSha256 -ieq [string]$identity.MappingsSha256)
+  if($same){$reason='Extracted files match the configured game. Semantic decoding is validated separately for each asset and the selected mappings.'}
   $status=if($same){'Current'}else{'Stale'}
   return [pscustomobject]@{
-    Status=$status;Reason=$reason;FamilyCount=[int]$state.ExtractedFamilyCount;FileCount=[int]$state.ExtractedFileCount;
+    Status=$status;Reason=$reason;ExtractionFreshness=$status;MappingsMatch=$mappingsMatch;SemanticReadability='PerAssetValidationRequired';FamilyCount=[int]$state.ExtractedFamilyCount;FileCount=[int]$state.ExtractedFileCount;
     Bytes=[int64]$state.ExtractedBytes;CreatedUtc=[string]$state.CreatedUtc;Identity=$identity;State=$state
   }
 }
@@ -173,7 +176,7 @@ function Get-PMMGameReferenceRawIncludeRoot([array]$SelectedRows,[string]$Normal
 function Write-PMMGameReferenceFamilyIndex([string]$CookedRoot,[string]$IndexRoot) {
   New-Item -ItemType Directory -Force -Path $IndexRoot|Out-Null
   $groups=@{}
-  foreach($file in @(Get-ChildItem -LiteralPath $CookedRoot -File -Recurse -ErrorAction Stop)){
+  foreach($file in @(Get-PMMFiles $CookedRoot -Recurse)){
     $rel=$file.FullName.Substring($CookedRoot.Length).TrimStart([char]92,[char]47).Replace([char]92,[char]47)
     $ext=[IO.Path]::GetExtension($rel).ToLowerInvariant()
     if($ext -notin @('.uasset','.uexp','.ubulk','.uptnl')){continue}
@@ -199,7 +202,7 @@ function Write-PMMGameReferenceFamilyIndex([string]$CookedRoot,[string]$IndexRoo
       $parts.Add([pscustomobject]@{Extension=[string]$part.Extension;RelativePath=[string]$part.RelativePath;Size=$size;Sha256=$hash})
       if([string]$part.Extension -eq '.uasset'){$header=[string]$part.RelativePath}
     }
-    if([string]::IsNullOrWhiteSpace($header)){$header=([string]$groups[$key][0].RelativePath)}
+    if([string]::IsNullOrWhiteSpace($header)){throw ('Incomplete cooked family has no .uasset header: '+$key)}
     $tokens=Get-PMMReferenceTokens $key
     $obj=[ordered]@{Schema='PMM_GAME_REFERENCE_FAMILY_V1';FamilyKey=$key;Asset=$header;Bytes=[int64](($parts.ToArray()|Measure-Object Size -Sum).Sum);Parts=$parts.ToArray();Tokens=$tokens}
     $lines.Add(($obj|ConvertTo-Json -Depth 12 -Compress))
@@ -207,6 +210,26 @@ function Write-PMMGameReferenceFamilyIndex([string]$CookedRoot,[string]$IndexRoo
   $familiesPath=Join-Path $IndexRoot 'families.jsonl'
   $lines.ToArray()|Set-Content -LiteralPath $familiesPath -Encoding UTF8
   return [pscustomobject]@{FamilyCount=$groups.Count;FileCount=$fileCount;Bytes=$totalBytes;FamiliesPath=$familiesPath}
+}
+
+function Repair-PMMGameReferencePublication {
+  $root=Get-PMMGameReferenceRoot;$old=Join-Path $root '_previous';$current=Get-PMMGameReferenceCurrentRoot
+  if(-not(Test-PMMDirectory $old)){return}
+  $oldState=Join-Path $old 'state.json'
+  if(-not(Test-PMMFile $oldState)){throw 'Previous reference lacks state.json; preserve it for manual recovery.'}
+  $prior=Get-Content -LiteralPath $oldState -Raw|ConvertFrom-Json
+  if(Test-PMMDirectory $current){
+    $published=Get-PMMGameReferenceStatePath;$local=Join-Path $current 'state.json'
+    if((Test-PMMFile $published) -and (Test-PMMFile $local) -and (Get-Sha256 $published) -eq (Get-Sha256 $local)){
+      [void](Archive-PMMGameReferenceVersion $old (Get-Content -LiteralPath $local -Raw|ConvertFrom-Json));return
+    }
+    # Preserve the interrupted new version for inspection before restoring the prior one.
+    $quarantine=Join-Path $root ('_interrupted_'+[guid]::NewGuid().ToString('N'))
+    Move-PMMDirectory $current $quarantine
+  }
+  Move-PMMDirectory $old $current
+  Write-PMMJsonAtomic -Path (Get-PMMGameReferenceStatePath) -Value $prior -Depth 12
+  Write-PMMLog 'Recovered the previous complete Game Reference after an interrupted publication.'
 }
 
 function Build-PMMGameReferenceLibrary {
@@ -224,9 +247,11 @@ function Build-PMMGameReferenceLibrary {
   }
   $incoming=Join-Path $root ('_incoming_'+[guid]::NewGuid().ToString('N'))
   $cooked=Join-Path $incoming 'cooked';$index=Join-Path $incoming 'index'
-  New-Item -ItemType Directory -Force -Path $cooked,$index|Out-Null
-  Set-PMMTransientStageOwner $incoming 'GameReference'
+  $previousMoved=$false;$incomingPublished=$false;$publicationCommitted=$false
   try{
+    Repair-PMMGameReferencePublication
+    New-PMMDirectory $cooked;New-PMMDirectory $index
+    Set-PMMTransientStageOwner $incoming 'GameReference'
     Report-PMMGameReferenceProgress -Current 5 -Total 100 -Message 'Reading Pal-Windows.pak index...' -Indeterminate
     Write-PMMLog ('Game Reference: reading Pal-Windows.pak index once: '+$pak)
     $allEntries=@(Get-PakEntriesCached $pak)
@@ -286,7 +311,7 @@ function Build-PMMGameReferenceLibrary {
     # handoffs cannot accidentally pick an unindexed/unintended file.
     $selectedPaths=[System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
     foreach($row in $selected){[void]$selectedPaths.Add([string]$row.Normalized)}
-    $extractedFiles=@(Get-ChildItem -LiteralPath $cooked -File -Recurse -ErrorAction SilentlyContinue)
+    $extractedFiles=@(Get-PMMFiles $cooked -Recurse)
     $pruneDone=0;$pruneTotal=[Math]::Max(1,$extractedFiles.Count)
     foreach($file in $extractedFiles){
       $pruneDone++
@@ -295,7 +320,7 @@ function Build-PMMGameReferenceLibrary {
         Report-PMMGameReferenceProgress -Current $pct -Total 100 -Message ("Normalizing extracted files ({0}/{1})..." -f $pruneDone,$pruneTotal)
       }
       $rel=Normalize-PMMReferenceLogicalPath ($file.FullName.Substring($cooked.Length).TrimStart([char]92,[char]47))
-      if(-not$selectedPaths.Contains($rel)){Remove-Item -LiteralPath $file.FullName -Force -ErrorAction SilentlyContinue}
+      if(-not$selectedPaths.Contains($rel)){Remove-PMMFile $file.FullName}
     }
 
     # Exact fallback is reserved only for entries the bulk extraction genuinely
@@ -303,7 +328,7 @@ function Build-PMMGameReferenceLibrary {
     $missing=[System.Collections.Generic.List[object]]::new()
     foreach($row in $selected){
       $dest=Join-Path $cooked (([string]$row.Normalized).Replace([char]47,[char]92))
-      if(-not(Test-Path -LiteralPath $dest -PathType Leaf)){$missing.Add($row)}
+      if(-not(Test-PMMFile $dest)){$missing.Add($row)}
     }
     if($missing.Count -gt 0){
       Write-PMMLog ('Game Reference: bulk extraction missed '+$missing.Count+' entries; using exact fallback only for them.')
@@ -317,6 +342,12 @@ function Build-PMMGameReferenceLibrary {
       }
     }
 
+    foreach($row in $selected){
+      $dest=Get-PMMSafePakOutputPath $cooked ([string]$row.Normalized)
+      if(-not(Test-PMMFile $dest)){throw ('Reference extraction did not produce required entry: '+[string]$row.Normalized)}
+    }
+    $afterIdentity=Get-PMMGameReferenceQuickIdentity
+    if($identity.PakSize -ne $afterIdentity.PakSize -or $identity.PakLastWriteUtc -ne $afterIdentity.PakLastWriteUtc -or $identity.MappingsSha256 -ne $afterIdentity.MappingsSha256){throw 'Palworld or mappings changed while Game Reference was being built. Retry when the update has finished.'}
     Report-PMMGameReferenceProgress -Current 82 -Total 100 -Message 'Indexing and hashing extracted Vanilla families...'
     $indexStats=Write-PMMGameReferenceFamilyIndex $cooked $index
     $versionPath=Get-PMMMetadataPath 'VERSION.txt'
@@ -328,23 +359,24 @@ function Build-PMMGameReferenceLibrary {
       PakIndexEntryCount=$allEntries.Count;SelectedEntryCount=$selected.Count;ExtractedFamilyCount=[int]$indexStats.FamilyCount;
       ExtractedFileCount=[int]$indexStats.FileCount;ExtractedBytes=[int64]$indexStats.Bytes;Status='Current'
     }
-    $state|ConvertTo-Json -Depth 12|Set-Content -LiteralPath (Join-Path $incoming 'state.json') -Encoding UTF8
+    Write-PMMJsonAtomic -Path (Join-Path $incoming 'state.json') -Value $state -Depth 12
 
     Report-PMMGameReferenceProgress -Current 97 -Total 100 -Message 'Publishing Game Reference atomically...'
     $current=Get-PMMGameReferenceCurrentRoot
     $old=Join-Path $root '_previous'
-    Remove-Item -LiteralPath $old -Recurse -Force -ErrorAction SilentlyContinue
-    if(Test-Path -LiteralPath $current -PathType Container){Move-Item -LiteralPath $current -Destination $old}
-    Move-Item -LiteralPath $incoming -Destination $current
+    if(Test-PMMDirectory $old){throw 'Previous reference publication requires recovery before a new swap.'}
+    if(Test-PMMDirectory $current){Move-PMMDirectory $current $old;$previousMoved=$true}
+    Move-PMMDirectory $incoming $current;$incomingPublished=$true
     # Publish the small root metadata only after the new current folder exists.
     # Keep _previous until metadata publication succeeds so a failed rebuild can
     # restore the previous complete reference instead of leaving a half-swap.
-    Copy-Item -LiteralPath (Join-Path $current 'state.json') -Destination (Get-PMMGameReferenceStatePath) -Force
+    Write-PMMJsonAtomic -Path (Get-PMMGameReferenceStatePath) -Value $state -Depth 12
+    $publicationCommitted=$true
     # PMM 1.3: retain prior extracted references when the underlying game/mappings
     # identity changed. Future Fix Lab/AIIO comparisons can use them without
     # downloading/extracting the same historical evidence again. Settings will
     # expose manual cleanup; identical rebuilds are discarded automatically.
-    if(Test-Path -LiteralPath $old -PathType Container){[void](Archive-PMMGameReferenceVersion $old $state)}
+    if(Test-PMMDirectory $old){try{[void](Archive-PMMGameReferenceVersion $old $state)}catch{Write-PMMLog ('Reference published; prior version cleanup deferred: '+$_.Exception.Message)}}
     Remove-PMMTransientStageOwner $incoming
     $Script:PMMGameReferenceFamilyCache=$null;$Script:PMMGameReferenceFamilyCacheStamp=''
     Write-PMMLog ('Game Reference built: '+$indexStats.FamilyCount+' families, '+$indexStats.FileCount+' files, '+$indexStats.Bytes+' bytes.')
@@ -352,20 +384,20 @@ function Build-PMMGameReferenceLibrary {
     return Get-PMMGameReferenceState
   }catch{
     $buildError=$_.Exception
-    Remove-Item -LiteralPath $incoming -Recurse -Force -ErrorAction SilentlyContinue
+    try{Remove-PMMDirectory $incoming $root}catch{Write-PMMLog ('Could not remove incomplete reference: '+$_.Exception.Message)}
     Remove-PMMTransientStageOwner $incoming
     try{
       $current=Get-PMMGameReferenceCurrentRoot;$old=Join-Path (Get-PMMGameReferenceRoot) '_previous'
-      if(Test-Path -LiteralPath $old -PathType Container){
-        Remove-Item -LiteralPath $current -Recurse -Force -ErrorAction SilentlyContinue
-        Move-Item -LiteralPath $old -Destination $current
-        if(Test-Path -LiteralPath (Join-Path $current 'state.json') -PathType Leaf){Copy-Item -LiteralPath (Join-Path $current 'state.json') -Destination (Get-PMMGameReferenceStatePath) -Force}
-      }elseif(Test-Path -LiteralPath $current -PathType Container){
+      if(-not$publicationCommitted -and $previousMoved -and (Test-PMMDirectory $old)){
+        if($incomingPublished){Remove-PMMDirectory $current $root}
+        Move-PMMDirectory $old $current
+        if(Test-Path -LiteralPath (Join-Path $current 'state.json') -PathType Leaf){Write-PMMJsonAtomic -Path (Get-PMMGameReferenceStatePath) -Value (Get-Content -LiteralPath (Join-Path $current 'state.json') -Raw|ConvertFrom-Json) -Depth 12}
+      }elseif(-not$publicationCommitted -and $incomingPublished -and (Test-PMMDirectory $current)){
         # First-build failure after the swap: do not advertise a partial library.
-        Remove-Item -LiteralPath $current -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-PMMDirectory $current $root
         Remove-Item -LiteralPath (Get-PMMGameReferenceStatePath) -Force -ErrorAction SilentlyContinue
       }
-    }catch{}
+    }catch{Write-PMMLog ('Reference rollback requires recovery: '+$_.Exception.Message)}
     Write-PMMLog ('Game Reference build failed: '+$buildError.Message)
     Report-PMMGameReferenceProgress -Current 100 -Total 100 -Message ('Game Reference build failed: '+$buildError.Message)
     throw $buildError
@@ -468,11 +500,10 @@ function Copy-PMMGameReferenceFamilyToHandoff($Family,[string]$StageRoot) {
   foreach($part in @($Family.Parts)){
     $rel=[string]$part.RelativePath
     $src=Join-Path $cookedRoot ($rel.Replace([char]47,[char]92))
-    if(-not(Test-Path -LiteralPath $src -PathType Leaf)){throw ('Game Reference family part is missing: '+$rel)}
+    if(-not(Test-PMMFile $src)){throw ('Game Reference family part is missing: '+$rel)}
     if((Get-Sha256 $src) -ne ([string]$part.Sha256).ToLowerInvariant()){throw ('Game Reference family hash changed: '+$rel)}
     $dst=Join-Path $StageRoot ('references\Vanilla\'+$rel.Replace([char]47,[char]92))
-    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dst)|Out-Null
-    Copy-Item -LiteralPath $src -Destination $dst -Force
+    Copy-PMMFile $src $dst
     $copied.Add([pscustomobject]@{RelativePath=$rel;Size=[int64]$part.Size;Sha256=[string]$part.Sha256})
   }
   return $copied.ToArray()
@@ -561,7 +592,7 @@ function Add-PMMGameReferenceToHandoff([string]$StageRoot,$Case,[array]$Provider
   [ordered]@{Schema='PMM_HANDOFF_REFERENCE_REASONS_V1';CaseId=[string]$Case.CaseId;References=$reasonRows.ToArray()}|ConvertTo-Json -Depth 20|Set-Content -LiteralPath (Join-Path $refDir 'reference-reasons.json') -Encoding UTF8
   [ordered]@{
     Schema='PMM_HANDOFF_GAME_REFERENCE_CONTEXT_V1';CaseId=[string]$Case.CaseId;ReferenceStateSchema='PMM_GAME_REFERENCE_STATE_V1';
-    ScopeVersion=[string]$state.State.ScopeVersion;MappingsSha256=[string]$state.State.MappingsSha256;SourcePakSize=[int64]$state.State.SourcePakSize;
+    ScopeVersion=[string]$state.State.ScopeVersion;MappingsSha256=[string]$state.Identity.MappingsSha256;SourcePakSize=[int64]$state.State.SourcePakSize;
     SourcePakLastWriteUtc=[string]$state.State.SourcePakLastWriteUtc;PakIndexSha256=[string]$state.State.PakIndexSha256;
     ReferenceFamilyCount=$selected.Count;ReferenceBytes=$bytes;SelectionDepth=2;SelectionPolicy='deterministic-exact-token-and-knowledge-neighborhood-v1';
     Safety='Supporting Vanilla evidence only. Reference selection never authorizes a merge.'
@@ -593,15 +624,15 @@ function Archive-PMMGameReferenceVersion([string]$Folder,$NewState=$null) {
   try{if(Test-Path -LiteralPath $statePath -PathType Leaf){$old=Get-Content -LiteralPath $statePath -Raw|ConvertFrom-Json}}catch{}
   if($old -and $NewState){
     $same=(([string]$old.PakIndexSha256).ToLowerInvariant() -eq ([string]$NewState.PakIndexSha256).ToLowerInvariant() -and ([string]$old.MappingsSha256).ToLowerInvariant() -eq ([string]$NewState.MappingsSha256).ToLowerInvariant() -and [int64]$old.SourcePakSize -eq [int64]$NewState.SourcePakSize -and [string]$old.SourcePakLastWriteUtc -eq [string]$NewState.SourcePakLastWriteUtc)
-    if($same){Remove-Item -LiteralPath $Folder -Recurse -Force -ErrorAction SilentlyContinue;return ''}
+    if($same){Remove-PMMDirectory $Folder (Get-PMMGameReferenceRoot);return ''}
   }
   $key=Get-PMMGameReferenceVersionKey $old;$dest=Join-Path (Get-PMMGameReferenceVersionsRoot) $key
   if(Test-Path -LiteralPath $dest -PathType Container){
     # An identical indexed version is already retained. Keep the existing copy.
-    Remove-Item -LiteralPath $Folder -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-PMMDirectory $Folder (Get-PMMGameReferenceRoot)
     return $dest
   }
-  Move-Item -LiteralPath $Folder -Destination $dest
+  Move-PMMDirectory $Folder $dest
   Write-PMMLog ('Game Reference retained historical version: '+$key)
   return $dest
 }
@@ -610,7 +641,7 @@ function Get-PMMGameReferenceVersions {
   $rows=[System.Collections.Generic.List[object]]::new();$root=Get-PMMGameReferenceVersionsRoot
   foreach($d in @(Get-ChildItem -LiteralPath $root -Directory -ErrorAction SilentlyContinue|Sort-Object Name)){
     $s=$null;try{$p=Join-Path $d.FullName 'state.json';if(Test-Path -LiteralPath $p -PathType Leaf){$s=Get-Content -LiteralPath $p -Raw|ConvertFrom-Json}}catch{}
-    [int64]$bytes=0;try{$bytes=[int64]((Get-ChildItem -LiteralPath $d.FullName -File -Recurse -ErrorAction SilentlyContinue|Measure-Object Length -Sum).Sum)}catch{}
+    [int64]$bytes=0;try{$bytes=[int64]((Get-PMMFiles $d.FullName -Recurse|Measure-Object Length -Sum).Sum)}catch{}
     $rows.Add([pscustomobject]@{Id=$d.Name;Path=$d.FullName;CreatedUtc=if($s){[string]$s.CreatedUtc}else{''};PakIndexSha256=if($s){[string]$s.PakIndexSha256}else{''};MappingsSha256=if($s){[string]$s.MappingsSha256}else{''};SourcePakSize=if($s){[int64]$s.SourcePakSize}else{0};Bytes=$bytes})
   }
   return $rows.ToArray()
@@ -619,7 +650,7 @@ function Get-PMMGameReferenceVersions {
 function Remove-PMMGameReferenceVersion([string]$Id) {
   if([string]::IsNullOrWhiteSpace($Id) -or $Id -notmatch '^[A-Za-z0-9_.-]+$'){throw 'Unsafe Game Reference version id.'}
   $p=Join-Path (Get-PMMGameReferenceVersionsRoot) $Id
-  if(Test-Path -LiteralPath $p -PathType Container){Remove-Item -LiteralPath $p -Recurse -Force;Write-PMMLog ('Game Reference historical version deleted by user/action: '+$Id)}
+  if(Test-Path -LiteralPath $p -PathType Container){Remove-PMMDirectory $p (Get-PMMGameReferenceVersionsRoot);Write-PMMLog ('Game Reference historical version deleted by user/action: '+$Id)}
 }
 
 function Ensure-PMMGameReferenceFamilies {

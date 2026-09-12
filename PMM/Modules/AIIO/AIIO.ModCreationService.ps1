@@ -1,4 +1,4 @@
-<#
+﻿<#
 AIIO standalone mod-creation service
 ====================================
 
@@ -29,7 +29,7 @@ function Get-PMMAIIOGameReferenceProof {
     Reason=[string]$reference.Reason
     ScopeVersion=$(if($state){[string]$state.ScopeVersion}else{[string]$reference.Identity.ScopeVersion})
     PakIndexSha256=$(if($state){[string]$state.PakIndexSha256}else{''})
-    MappingsSha256=$(if($state){[string]$state.MappingsSha256}else{[string]$reference.Identity.MappingsSha256})
+    MappingsSha256=[string]$reference.Identity.MappingsSha256
     SourcePakSize=$(if($state){[int64]$state.SourcePakSize}else{[int64]$reference.Identity.PakSize})
     SourcePakLastWriteUtc=$(if($state){[string]$state.SourcePakLastWriteUtc}else{[string]$reference.Identity.PakLastWriteUtc})
     FamilyCount=[int]$reference.FamilyCount

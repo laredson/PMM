@@ -1,4 +1,4 @@
-param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
+﻿param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 $Root=[IO.Path]::GetFullPath($Root)
@@ -39,7 +39,7 @@ $xaml=Read 'PMM/Resources/UI/MainWindow.xaml'
 Assert-PMM ($merge -notmatch 'Compress-Archive') 'Analyze/MergeEngine does not use Compress-Archive'
 Assert-PMM ($merge -notmatch 'source-paks') 'Analyze/MergeEngine does not package whole PAKs'
 Assert-PMM ($merge -match 'Write-PMMAIHandoff request redirected to review metadata only') 'Legacy handoff shim is metadata-only'
-foreach($m in @('Get-PMMPlanSchemaVersion { return 18 }','PMM_ANALYZE_GROUP_CACHE_V2','AnalyzeGroupsV2','Try-PMMReuseCurrentAnalyzePlan','KnowledgeRulesSha256=')){Assert-PMM ($merge -match [regex]::Escape($m)) ('RC26 Analyze cache: '+$m)}
+foreach($m in @('Get-PMMPlanSchemaVersion { return 19 }','PMM_ANALYZE_GROUP_CACHE_V2','AnalyzeGroupsV2','Try-PMMReuseCurrentAnalyzePlan','KnowledgeRulesSha256=')){Assert-PMM ($merge -match [regex]::Escape($m)) ('RC26 Analyze cache: '+$m)}
 foreach($m in @('Get-PMMFastPatchReuseCandidate','Set-PMMPlanEquivalentPatch','AnalyzedSharedAssets=@(','ProductionRecipesSha256=','SchemaVersion=9','PatchReuseKind=''EffectiveConflictSet''')){Assert-PMM ($merge -match [regex]::Escape($m)) ('RC23 effective patch reuse: '+$m)}
 foreach($m in @('Test-PMMPatchPlanCompatible','Test-PMMPlanCurrentForPatchCompatibility','Test-PMMPatchRuntimeCompatible','Test-PMMKnownRecipeAssetCompatible','Get-PMMProductionRecipeLibrarySha256','Keep an actual Object[] for zero, one or many matches')){Assert-PMM ($library -match [regex]::Escape($m)) ('RC23 patch proof: '+$m)}
 foreach($m in @('Get-PMMAutomaticResolutionSignature','knowledgeAuthorizedAssets','KnowledgeRulesSha256')){Assert-PMM ($library -match [regex]::Escape($m)) ('RC26 semantic patch proof: '+$m)}
@@ -74,10 +74,10 @@ $manifestBytes=[IO.File]::ReadAllBytes((Join-Path $App 'Resources/Metadata/RELEA
 $manifestHasBom=($manifestBytes.Length -ge 3 -and $manifestBytes[0] -eq 0xEF -and $manifestBytes[1] -eq 0xBB -and $manifestBytes[2] -eq 0xBF)
 Assert-PMM (-not $manifestHasBom) 'Native release manifest is UTF-8 without BOM'
 $manifest=Get-Content (Join-Path $App 'Resources/Metadata/RELEASE_MANIFEST.json') -Raw|ConvertFrom-Json
-Assert-PMM ([string]$manifest.version -eq '1.3.1') 'Manifest version 1.3.1'
-Assert-PMM ([int]$manifest.mergePlanSchema -eq 18) 'Merge plan schema 18'
+Assert-PMM ([string]$manifest.version -eq '1.3.2') 'Manifest version 1.3.2'
+Assert-PMM ([int]$manifest.mergePlanSchema -eq 19) 'Merge plan schema 19'
 Assert-PMM ([int]$manifest.buildManifestSchema -eq 9) 'Build manifest schema 9'
-Assert-PMM ([string]$manifest.buildId -eq 'PMM-v1.3.1ModCreator') 'PMM 1.3.1 Mod Creation build identity'
+Assert-PMM ([string]$manifest.buildId -eq 'PMM-v1.3.2-cases-repair') 'PMM 1.3.2 repair build identity'
 Assert-PMM ([string]$manifest.runtime.executable -eq 'Engine/PMMRuntime.exe') 'Runtime new path'
 Assert-PMM ([string]$manifest.aiioModule -eq 'Modules/AIIO/AIIO.ps1') 'AIIO new path'
 Assert-PMM ([string]$manifest.ckl.catalog -eq 'CKL/Catalog/case-index.json') 'Manifest CKL catalog path'

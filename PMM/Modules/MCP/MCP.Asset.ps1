@@ -1,4 +1,4 @@
-
+﻿
 function Get-PMMMCPVerifiedFamily([string]$LogicalPath,[string]$CaseId) {
     $all=@();try{$all=@(Get-PMMMCPReferenceFamilies)}catch{if(-not $CaseId){throw}}
     $family=@($all | Where-Object { $_.Asset -ieq $LogicalPath })
@@ -18,7 +18,7 @@ function Invoke-PMMMCPAssetInspect($Arguments) {
     $mode='properties';$query='';$offset=0;$limit=40
     foreach($p in $Arguments.PSObject.Properties){switch($p.Name){mode{$mode=$p.Value}query{$query=$p.Value}offset{$offset=[int]$p.Value}limit{$limit=[int]$p.Value}}}
     $reader=Resolve-PMMMCPPath $Script:Root 'Engine\AssetReader\PMM.AssetReader.dll'
-    $mapping=Resolve-PMMMCPPath $Script:Root 'Resources\Mappings\Mappings.usmap'
+    $mapping=Get-PMMMCPMappingsPath
     $mappingHash=(Get-FileHash $mapping).Hash.ToLowerInvariant()
     $readerIdentity=(@(Get-ChildItem (Split-Path $reader -Parent) -File -Filter *.dll | Sort-Object Name | ForEach-Object{$_.Name+":"+(Get-FileHash $_.FullName).Hash}) -join "|")
     $signature=('inspect-v2|'+$query+'|'+$mode+'|UE5_1|'+$mappingHash+'|'+$readerIdentity+'|'+(@($family.Parts|ForEach-Object{$_.RelativePath+'|'+$_.Sha256}) -join '|'))
