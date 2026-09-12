@@ -1,4 +1,4 @@
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="PMM - Palworld Manager Merger v1.3.1"
         Width="1460" Height="900" MinWidth="900" MinHeight="600"
@@ -163,8 +163,14 @@
               <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="AutoRunBorder" Property="Background" Value="{DynamicResource ButtonHover}"/></Trigger>
               <Trigger Property="IsEnabled" Value="False"><Setter TargetName="SparkleLayer" Property="Visibility" Value="Collapsed"/><Setter Property="Opacity" Value="0.72"/></Trigger>
               <Trigger Property="Tag" Value="Running"><Setter TargetName="SparkleLayer" Property="Visibility" Value="Collapsed"/></Trigger>
-              <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                <BeginStoryboard>
+              <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                  <Condition Binding="{Binding IsVisible, RelativeSource={RelativeSource Self}}" Value="True"/>
+                  <Condition Binding="{Binding Source={x:Static SystemParameters.ClientAreaAnimation}}" Value="True"/>
+                  <Condition Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="Idle"/>
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.EnterActions>
+                <BeginStoryboard Name="AutoSparkles">
                   <Storyboard>
                     <DoubleAnimation Storyboard.TargetName="SparkleMove1" Storyboard.TargetProperty="X" From="-30" To="420" Duration="0:0:6" RepeatBehavior="Forever"/>
                     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="AutoSparkle1" Storyboard.TargetProperty="Opacity" Duration="0:0:6" RepeatBehavior="Forever">
@@ -180,7 +186,9 @@
                     </DoubleAnimationUsingKeyFrames>
                   </Storyboard>
                 </BeginStoryboard>
-              </EventTrigger>
+                              </MultiDataTrigger.EnterActions>
+                <MultiDataTrigger.ExitActions><RemoveStoryboard BeginStoryboardName="AutoSparkles"/></MultiDataTrigger.ExitActions>
+              </MultiDataTrigger>
             </ControlTemplate.Triggers>
           </ControlTemplate>
         </Setter.Value>
@@ -874,7 +882,7 @@
           </TabControl>
         </Grid>
       </TabItem>
-      <TabItem Header="Guardado del mundo">
+      <TabItem Header="Guardado del mundo" x:Name="TabSaves">
         <Grid Margin="10">
           <Grid.ColumnDefinitions><ColumnDefinition Width="1.05*" MinWidth="360"/><ColumnDefinition Width="6"/><ColumnDefinition Width="*" MinWidth="430"/></Grid.ColumnDefinitions>
           <GroupBox Header="Mundos"><ListBox x:Name="LstSaves" DisplayMemberPath="Display"/></GroupBox>

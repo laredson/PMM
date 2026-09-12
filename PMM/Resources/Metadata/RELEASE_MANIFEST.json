@@ -1,4 +1,18 @@
 {
+  "localWorkbenchPreview": {
+    "included": true,
+    "status": "local-development-preview",
+    "caseContractVersion": 4,
+    "moduleContractVersion": 1,
+    "moduleManifest": "Modules/modules.json",
+    "spaces": ["Play", "Create"],
+    "knowledgeExchange": "local export/import only; imported candidates remain pending",
+    "communityReceiverEnabled": false,
+    "nativeBinariesRebuilt": false,
+    "nativeSourceParity": "NOT_VERIFIED",
+    "palworldValidation": "NOT_VERIFIED",
+    "releaseIdentity": "existing 1.3.1 identity retained; this preview is not a new published release"
+  },
   "chatgptDesktopPreview": {
     "included": true,
     "optional": true,

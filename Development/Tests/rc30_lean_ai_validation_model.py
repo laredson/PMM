@@ -15,6 +15,7 @@ import re
 import xml.etree.ElementTree as ET
 
 from pathlib import Path
+from source_reader import read_source
 
 
 
@@ -36,7 +37,7 @@ X_NAME = f"{{{XAML_NS}}}Name"
 
 def read(relative: str) -> str:
 
-    return (APP / relative).read_text(encoding="utf-8-sig")
+    return read_source(APP / relative, APP)
 
 
 
@@ -202,7 +203,7 @@ def validate_routed_selection_and_targeted_refresh() -> None:
 
     main_tabs = event_block(bootstrap, "$Script:MainTabs.Add_SelectionChanged", "$Script:AIHelpTabs.Add_SelectionChanged")
 
-    ai_tabs = event_block(bootstrap, "$Script:AIHelpTabs.Add_SelectionChanged", "# ---------------------------------------------------------------------------\n# Guided workflow")
+    ai_tabs = event_block(bootstrap, "$Script:AIHelpTabs.Add_SelectionChanged", "# Guided workflow button colors + in-button progress.")
 
     assert "$e.OriginalSource -ne $sender" in main_tabs
 

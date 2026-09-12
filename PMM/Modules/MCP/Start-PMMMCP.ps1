@@ -1,4 +1,4 @@
-param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))),[string]$CaseId='')
+﻿param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))),[string]$CaseId='')
 Set-StrictMode -Version 2.0
 $ErrorActionPreference='Stop'
 $ProgressPreference='SilentlyContinue'
@@ -24,6 +24,8 @@ foreach($pair in @(
 foreach($module in @('Shared\Paths.ps1','Shared\Common.ps1','GameReference\GameReferenceService.ps1','AIIO\AIIO.SessionService.ps1','AIIO\AIIO.ModCreationService.ps1','AIIO\AIIO.CaseWorkspaceService.ps1')){
     . (Join-Path $Script:Root ('Modules\'+$module)) | Out-Null
 }
+. (Join-Path $Script:Root 'Modules\Operations\ModuleRuntime.ps1')
+Initialize-PMMModuleRuntime -Root $Script:Root | Out-Null
 Add-Type -TypeDefinition @'
 using System;
 using System.IO;
@@ -89,10 +91,17 @@ while($true){
                 if(@($params.PSObject.Properties | ForEach-Object { $_.Name }) -notcontains 'name' -or $params.name -isnot [string]){throw 'Tool name is required.'}
                 $arguments=[pscustomobject]@{}
                 if(@($params.PSObject.Properties | ForEach-Object { $_.Name }) -contains 'arguments'){$arguments=$params.arguments}
+                $moduleLease=$null;$operationGate=$null
                 try{
+                    $moduleLease=Start-PMMModuleOperation ('MCP:'+ [string]$params.name)
+                    if([string]$params.name -in @('pmm_asset_edit','pmm_candidate_build','pmm_asset_prepare','pmm_reference_export','pmm_artifact_put')){
+                        $cache=Resolve-PMMMCPPath $Script:Root 'Workspace\Cache';[void][IO.Directory]::CreateDirectory($cache)
+                        $gatePath=Resolve-PMMMCPPath $cache 'PMM.background-operation.lock'
+                        try{$operationGate=[IO.File]::Open($gatePath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{throw 'Another PMM processing operation is running; retry after it finishes.'}
+                    }
                     $value=Invoke-PMMMCPTool $params.name $arguments
                     $result=@{content=@(@{type='text';text=($value | ConvertTo-Json -Depth 30 -Compress)});isError=$false}
-                }catch{$result=@{content=@(@{type='text';text=$_.Exception.Message});isError=$true}}
+                }catch{$result=@{content=@(@{type='text';text=$_.Exception.Message});isError=$true}}finally{if($operationGate){$operationGate.Dispose()};if($moduleLease){Complete-PMMModuleOperation $moduleLease.Id}}
             }
             default {$code=-32601;throw 'Method not found.'}
         }

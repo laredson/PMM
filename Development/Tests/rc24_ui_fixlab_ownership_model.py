@@ -7,6 +7,7 @@ import json
 import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from source_reader import read_source
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -14,7 +15,7 @@ APP = ROOT / "PMM"
 
 
 def read(relative: str) -> str:
-    return (APP / relative).read_text(encoding="utf-8-sig")
+    return read_source(APP / relative, APP)
 
 
 def function_body(text: str, name: str) -> str:

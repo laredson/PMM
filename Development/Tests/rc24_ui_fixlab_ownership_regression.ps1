@@ -1,7 +1,8 @@
-param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
+﻿param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot 'SourceReader.ps1')
 $Root=[IO.Path]::GetFullPath($Root)
 $App=Join-Path $Root 'PMM'
 
@@ -22,7 +23,7 @@ function Get-FunctionText([string]$Path,[string]$Name){
 $fixPath=Join-Path $App 'Modules\FixLab\FixLabService.ps1'
 $libraryPath=Join-Path $App 'Modules\Library\LibraryService.ps1'
 $mergePath=Join-Path $App 'Modules\Merge\MergeEngine.ps1'
-$bootstrap=Read-App 'Modules\Bootstrap\Start-PalModMerger.ps1'
+$bootstrap=Read-PMMTestSource -Path (Join-Path $App 'Modules/Bootstrap/Start-PalModMerger.ps1') -AppRoot $App
 $mergeEngine=Get-Content -LiteralPath $mergePath -Raw -Encoding UTF8
 $deployFix=Get-FunctionText $fixPath 'Deploy-PMMFixLabBuiltOutput'
 $restoreFix=Get-FunctionText $fixPath 'Restore-PMMFixLabCase'

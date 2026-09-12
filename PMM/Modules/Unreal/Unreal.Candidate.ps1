@@ -1,5 +1,8 @@
-
+﻿
 function New-PMMUnrealCandidate([string]$CaseId,[string]$JobId,[string]$Project,$Environment,[string]$Cancel) {
+    $jobRequest=Read-PMMMCPJson (Join-Path (Get-PMMUnrealJobPath $CaseId $JobId) 'request.json')
+    $evidenceRevision=[string](Get-PMMCaseValue $jobRequest 'EvidenceRevisionId' '')
+    Assert-PMMCaseResponseRevision $CaseId $evidenceRevision|Out-Null
     $registry=Read-PMMMCPJson (Join-Path $Project 'Saved\PMM\assets.json')
     $names=@($registry.PSObject.Properties|ForEach-Object{$_.Name}|Where-Object{$_ -ne 'PMMProbe'})
     if(-not $names.Count){throw 'Create at least one user asset before cooking a candidate.'}
@@ -39,7 +42,7 @@ function New-PMMUnrealCandidate([string]$CaseId,[string]$JobId,[string]$Project,
     $actual=@(Get-Content $listing.stdout|Where-Object{$_}|Sort-Object)
     $expected=@($records|ForEach-Object{$_.path}|Sort-Object)
     if(($actual -join '|') -cne ($expected -join '|')){throw 'PAK entry validation failed.'}
-    $manifest=@{schema='PMM_GENERATED_MOD_CANDIDATE_V1';caseId=$CaseId;candidateId=$JobId;origin='unreal-authored';recipeScriptSha256=(Get-FileHash (Join-Path $Script:Root 'Modules\Unreal\editor_bridge.py')).Hash.ToLowerInvariant();sourceFamilies=@();generatedSources=$sources.ToArray();files=$records.ToArray();engineVersion=$Environment.engineVersion;kitCommit=$Environment.kitCommit;pakFile=[IO.Path]::GetFileName($pak);pakSha256=(Get-FileHash $pak).Hash.ToLowerInvariant();status='VALIDATED_CANDIDATE';runtime='UNPROVEN';deployed=$false;createdUtc=[DateTime]::UtcNow.ToString('o')}
+    $manifest=@{schema='PMM_GENERATED_MOD_CANDIDATE_V1';EvidenceRevisionId=$evidenceRevision;caseId=$CaseId;candidateId=$JobId;origin='unreal-authored';recipeScriptSha256=(Get-FileHash (Join-Path $Script:Root 'Modules\Unreal\editor_bridge.py')).Hash.ToLowerInvariant();sourceFamilies=@();generatedSources=$sources.ToArray();files=$records.ToArray();engineVersion=$Environment.engineVersion;kitCommit=$Environment.kitCommit;pakFile=[IO.Path]::GetFileName($pak);pakSha256=(Get-FileHash $pak).Hash.ToLowerInvariant();status='VALIDATED_CANDIDATE';runtime='UNPROVEN';deployed=$false;createdUtc=[DateTime]::UtcNow.ToString('o')}
     Write-PMMUnrealJson (Join-Path $candidate 'candidate.json') $manifest
     return @{candidateId=$JobId;status='VALIDATED_CANDIDATE';runtime='UNPROVEN';pakSha256=$manifest.pakSha256;files=$records.Count}
 }

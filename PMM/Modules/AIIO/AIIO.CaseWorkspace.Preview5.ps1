@@ -1,4 +1,4 @@
-<# AIIO Case Workspace preview 5 runtime corrections.
+﻿<# AIIO Case Workspace preview 5 runtime corrections.
    - Work orders may create a brand-new case and therefore case.caseId is optional.
    - Other descriptive fields are optional and receive sane defaults under StrictMode.
    - Bring the generated handoff back to the foreground when possible. #>
@@ -30,15 +30,22 @@ function Import-PMMAIIOWorkOrder([string]$Path,$Doc,[switch]$Trusted,[switch]$Au
   $transport=[string](Get-PMMAIIOV5Value $caseDoc 'transport' 'AUTO')
 
   $case=$null
+  $createdHere=$false
   if(Test-PMMAIIOCaseId $requestedCaseId){$case=Get-PMMAIIOCase $requestedCaseId}
   if(-not$case){
     $hit=@(Get-PMMAIIOCases|Where-Object{[string](Get-PMMAIIOV5Value $_ 'WorkOrderId' '') -eq $workOrderId}|Select-Object -First 1)
     if($hit.Count -gt 0){$case=$hit[0]}
   }
   if(-not$case){
+    $createdHere=$true
     $case=New-PMMAIIOCase -Title $title -Type $type -Description $description -Transport $transport -WorkOrderId $workOrderId -NoInitialStep
   }
 
+  $boundRevision=''
+  if($createdHere -and $case.PSObject.Properties['CurrentEvidenceRevision']){$boundRevision=[string]$case.CurrentEvidenceRevision}
+  elseif(Get-Command Assert-PMMCaseResponseRevision -ErrorAction SilentlyContinue){
+    $boundRevision=Assert-PMMCaseResponseRevision ([string]$case.CaseId) ([string](Get-PMMAIIOV5Value $caseDoc 'evidenceRevision' (Get-PMMAIIOV5Value $Doc 'evidenceRevision' ''))) ([string](Get-PMMAIIOV5Value $caseDoc 'legacyReviewCaseId' ''))
+  }
   $caseRoot=Get-PMMAIIOCasePath ([string]$case.CaseId)
   $inbox=Join-Path $caseRoot 'inbox'
   $copy=Join-Path $inbox ([IO.Path]::GetFileName($Path))
@@ -66,6 +73,7 @@ function Import-PMMAIIOWorkOrder([string]$Path,$Doc,[switch]$Trusted,[switch]$Au
       Id=[guid]::NewGuid().ToString('N')
       Action=$name.Trim().ToLowerInvariant()
       Status='Pending'
+      EvidenceRevision=$boundRevision
       Original=$rawAction
       ImportRoot=$import
     })

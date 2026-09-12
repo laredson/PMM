@@ -1,3 +1,4 @@
+﻿. (Join-Path $PSScriptRoot '..\Cases\CaseService.ps1')
 . (Join-Path $PSScriptRoot 'Dependency.Locations.ps1')
 
 function Get-PMMUnrealRoot {return (Resolve-PMMMCPPath $Script:Root 'Workspace\Unreal')}
@@ -108,6 +109,8 @@ function Start-PMMUnrealJob([string]$Operation,$Arguments) {
     $e=Get-PMMUnrealEnvironment
     if(-not $e.enabled){throw 'Optional Unreal integration is disabled. PMM base tools remain available.'}
     if(-not $e.readyToPrepare){throw ('Unreal prerequisites missing: '+($e.missing -join ', '))}
+    $caseContract=Get-PMMCaseContract (Get-PMMMCPCase $Arguments.caseId)
+    $evidenceRevision=[string]$caseContract.CurrentEvidenceRevision
     $project=Get-PMMUnrealProject $Arguments.caseId
     if($Operation -ne 'prepare'){
         $verified=Resolve-PMMMCPPath $project 'verified.json'
@@ -117,7 +120,7 @@ function Start-PMMUnrealJob([string]$Operation,$Arguments) {
     }
     $id=[guid]::NewGuid().ToString('N');$dir=Resolve-PMMMCPPath (Get-PMMUnrealRoot) ('Jobs\'+$id)
     [void][IO.Directory]::CreateDirectory($dir)
-    Write-PMMAIIOJsonAtomic (Join-Path $dir 'request.json') @{caseId=$Arguments.caseId;operation=$Operation;arguments=$Arguments;jobId=$id} 12
+    Write-PMMAIIOJsonAtomic (Join-Path $dir 'request.json') @{caseId=$Arguments.caseId;operation=$Operation;arguments=$Arguments;jobId=$id;EvidenceRevisionId=$evidenceRevision} 12
     Write-PMMAIIOJsonAtomic (Join-Path $dir 'status.json') @{status='QUEUED';message='Starting Unreal operation';verified=$false} 8
     $ps=Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
     $worker=Resolve-PMMMCPPath $Script:Root 'Modules\Unreal\Unreal.Worker.ps1'

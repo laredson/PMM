@@ -1,4 +1,4 @@
-# Loaded after the active editor overrides; identity belongs to the loaded view.
+﻿# Loaded after the active editor overrides; identity belongs to the loaded view.
 $Script:PMMEditorCaseId=''
 $Script:PMMEditorLoading=$false
 $Script:PMMCaseRefreshing=$false
@@ -27,6 +27,14 @@ function Save-PMMAIIOCaseEditor {
             $c|Add-Member -NotePropertyName AIClient -NotePropertyValue $choice -Force
             Add-PMMAIIOCaseStep $c 'CLIENT_CHANGED' ('AI client: '+$choice) 'CREATE_HANDOFF' @() $null|Out-Null
             $changed=$true
+        }
+    }
+    if($changed -and $c -and (Get-Command Update-PMMCaseContextRevision -ErrorAction SilentlyContinue)){
+        $previousRevision=[string](Get-PMMCaseValue $c 'CurrentEvidenceRevision' '')
+        $revision=Update-PMMCaseContextRevision ([string]$c.CaseId)
+        if($revision -cne $previousRevision){
+            $c=Get-PMMAIIOCase ([string]$c.CaseId)
+            Add-PMMAIIOCaseStep $c 'CONTEXT_EVIDENCE' 'Case objective or references changed.' ([string]$c.NextAction) @() ([ordered]@{EvidenceRevision=$revision})|Out-Null
         }
     }
     return $changed

@@ -1,4 +1,4 @@
-. (Join-Path $PSScriptRoot 'AIIO.CaseNavigation.UI.ps1')
+﻿. (Join-Path $PSScriptRoot 'AIIO.CaseNavigation.UI.ps1')
 . (Join-Path $PSScriptRoot '../Shared/Settings.Workspaces.UI.ps1')
 
 # One reusable editor with per-area selection; no case files are moved.
@@ -75,7 +75,7 @@ function Initialize-PMMWorkspaces {
     $main.Items.Insert($main.Items.IndexOf($help),$creation)
     Initialize-PMMSettingsWorkspaces
     $main.Add_SelectionChanged({
-        if($_.OriginalSource -ne $Script:MainTabs){return}
+        if($_.OriginalSource -ne $Script:MainTabs -or -not $Script:MainTabs.SelectedItem){return}
         $tag=[string]$Script:MainTabs.SelectedItem.Tag
         if($tag -in @('MERGE','FIX','CREATE','HELP')){Switch-PMMCaseArea $tag}
     })

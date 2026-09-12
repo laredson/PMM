@@ -1,4 +1,4 @@
-
+﻿
 param([string]$Root,[string]$JobId)
 Set-StrictMode -Version 2.0
 # Load the utility module from this host, not an inherited PowerShell 7 module path.
@@ -6,6 +6,11 @@ Import-Module (Join-Path $PSHOME 'Modules\Microsoft.PowerShell.Utility\Microsoft
 $ErrorActionPreference='Stop'
 $Script:Root=[IO.Path]::GetFullPath($Root)
 . (Join-Path $Root 'Modules\MCP\MCP.Service.ps1')
+$Script:PMMPaths=[ordered]@{App=$Root;Workspace=(Join-Path $Root 'Workspace');State=(Join-Path $Root 'Workspace\State');Cache=(Join-Path $Root 'Workspace\Cache');AIIO=(Join-Path $Root 'Workspace\AIIO');AIIOSessions=(Join-Path $Root 'Workspace\AIIO\Sessions');Mods=(Join-Path $Root 'Workspace\Mods');GameReference=(Join-Path $Root 'Workspace\GameReference')}
+foreach($module in @('Shared\Paths.ps1','Shared\Persistence.ps1','Library\LibraryService.ps1','Knowledge/Knowledge.Service.ps1','Tools/Tools.Service.ps1','Operations\ModuleRuntime.ps1')){
+    . (Join-Path $Root ('Modules\'+$module))|Out-Null
+}
+
 . (Join-Path $Root 'Modules\AIIO\AIIO.SessionService.ps1')
 . (Join-Path $Root 'Modules\AIIO\AIIO.CaseWorkspaceService.ps1')
 . (Join-Path $Root 'Modules\Unreal\Unreal.Service.ps1')
@@ -15,9 +20,14 @@ if($JobId -cnotmatch '^[a-f0-9]{32}$'){throw 'Invalid job ID'}
 $job=Resolve-PMMMCPPath (Get-PMMUnrealRoot) ('Jobs\'+$JobId)
 $request=Read-PMMMCPJson (Join-Path $job 'request.json')
 $cancel=Resolve-PMMMCPPath $job 'cancel'
-$lock=$null
+$lock=$null;$globalOperationLock=$null;$moduleLease=$null
 function Report([string]$Text){Write-PMMAIIOJsonAtomic (Join-Path $job 'status.json') @{status='RUNNING';message=$Text;verified=$false} 8}
 try{
+    Initialize-PMMModuleRuntime -Root $Root|Out-Null
+    Report 'Waiting for the PMM operation slot...'
+    $globalOperationLock=Enter-PMMToolBackgroundLock -CancelPath $cancel
+    $moduleLease=Start-PMMModuleOperation ('Unreal:'+[string]$request.operation)
+    Assert-PMMCaseResponseRevision $request.caseId ([string](Get-PMMCaseValue $request 'EvidenceRevisionId' ''))|Out-Null
     if(-not(Get-PMMMCPEnabled)){throw 'MCP disabled'}
     $e=Get-PMMUnrealEnvironment
     if(-not $e.enabled -or -not $e.readyToPrepare){throw 'Unreal environment unavailable.'}
@@ -63,6 +73,7 @@ try{
         Report 'Cooking only PMM-authored content for Windows...'
         Invoke-PMMBoundedProcess $editor @($uproject,'-run=cook','-targetplatform=Windows',('-CookDir='+ (Join-Path $project 'Content\PMM')),'-unattended','-nop4','-nosplash','-NoSound','-UTF8Output') $job 3600 $cancel | Out-Null
         $candidate=New-PMMUnrealCandidate $request.caseId $JobId $project $e $cancel
+        [void]@(Sync-PMMGeneratedCandidateLibrary $request.caseId)
         Write-PMMAIIOJsonAtomic (Join-Path $job 'status.json') @{status='COMPLETE';message='Cooked candidate validated; no game deployment.';verified=$true;candidate=$candidate} 12
     }else{
         $payload=@{operation=$request.operation}
@@ -101,6 +112,8 @@ try{
         Write-PMMAIIOJsonAtomic (Join-Path $job 'status.json') @{status='COMPLETE';message='Unreal editor operation verified.';verified=$true;result=$r;runtime='UNPROVEN'} 12
     }
 }catch{
+    $failureMessage=$_.Exception.Message
     $state=if(Test-Path $cancel){'CANCELLED'}else{'FAILED'}
-    Write-PMMAIIOJsonAtomic (Join-Path $job 'status.json') @{status=$state;message=$_.Exception.Message;verified=$false} 12
-}finally{if($lock){$lock.Dispose()}}
+    try{Register-PMMKnowledgeCandidate -CaseId $request.caseId -CandidateId ('unreal-attempt-'+$JobId) -EvidenceRevisionId ([string](Get-PMMCaseValue $request 'EvidenceRevisionId' '')) -TechnicalStatus Rejected -Objective ([string]$request.operation) -Outcome $state|Out-Null}catch{}
+    Write-PMMAIIOJsonAtomic (Join-Path $job 'status.json') @{status=$state;message=$failureMessage;verified=$false} 12
+}finally{if($moduleLease){Complete-PMMModuleOperation $moduleLease.Id};if($globalOperationLock){$globalOperationLock.Dispose()};if($lock){$lock.Dispose()}}

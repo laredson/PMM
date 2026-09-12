@@ -1,7 +1,8 @@
-param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
+﻿param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot 'SourceReader.ps1')
 $Root=[IO.Path]::GetFullPath($Root)
 $App=Join-Path $Root 'PMM'
 
@@ -48,7 +49,7 @@ try{
   Assert-RC29 ([string]$record.Sharing.Mode -ceq 'ManualOnly') 'Feedback is not manual-only.'
   Assert-RC29 (-not[bool]$record.Sharing.UploadAttempted -and -not[bool]$record.Sharing.UploadAvailable) 'Feedback unexpectedly enables upload.'
 
-  $bootstrap=Get-Content -LiteralPath (Join-Path $App 'Modules\Bootstrap\Start-PalModMerger.ps1') -Raw -Encoding UTF8
+  $bootstrap=Read-PMMTestSource -Path (Join-Path $App 'Modules/Bootstrap/Start-PalModMerger.ps1') -AppRoot $App
   Assert-RC29 ($bootstrap -notmatch [regex]::Escape('$Script:LstAIIOSessions.SelectedValue')) 'AIIO callback still writes ListBox.SelectedValue.'
   Assert-RC29 ($bootstrap -notmatch [regex]::Escape('$Script:LstAIHelpDiagnostics.SelectedValue')) 'Diagnostic callback still writes ListBox.SelectedValue.'
   foreach($marker in @('Complete-PMMAIIOPrepareUi','Repair-PMMDuplicateDiagnosticSessions','Register-PMMAutomaticErrorCase','PMM_USER_FEEDBACK_V1')){Assert-RC29 (($bootstrap+(Get-Content -LiteralPath (Join-Path $App 'Modules\AIIO\AIIO.ValidationService.ps1') -Raw)) -match [regex]::Escape($marker)) ('Missing RC29 marker: '+$marker)}

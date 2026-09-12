@@ -1,4 +1,4 @@
-<#
+﻿<#
 AIIO.ps1 - AI handoff input/output packaging for Palworld Manager Merger.
 
 AIIO is intentionally separate from Analyze. Analyze produces exact review cases
@@ -399,20 +399,20 @@ function Export-PMMAIIOAssetSources($Item,[string]$StageRoot,[array]$Mods,[hasht
           }
           if($expected.Count -ne 1 -or -not$exists){throw ('AIIO Vanilla cooked-family topology changed after Analyze ('+$ext+'): '+$asset)}
           Test-PMMAIIOExtractedPart $path $expected[0] ('Vanilla '+$asset+$ext)
-          $item=Get-Item -LiteralPath $path
-          $RawBytes.Value+=[int64]$item.Length
+          $sourceFileInfo=Get-Item -LiteralPath $path
+          $RawBytes.Value+=[int64]$sourceFileInfo.Length
           Assert-PMMAIIOWithinBudget $RawBytes.Value $AllowOversize
-          $vanillaFiles.Add([pscustomobject]@{LogicalPath=((Get-PakLogicalStem $asset)+$ext);Part=$ext;Size=[int64]$item.Length;Sha256=(Get-Sha256 $path)})
+          $vanillaFiles.Add([pscustomobject]@{LogicalPath=((Get-PakLogicalStem $asset)+$ext);Part=$ext;Size=[int64]$sourceFileInfo.Length;Sha256=(Get-Sha256 $path)})
         }
       }else{
         $path=Export-VanillaFileExact $asset $vanillaRoot
         $expected=@($expectedInputs|Where-Object{[string]$_.Role -eq 'Vanilla'})
         if($expected.Count -ne 1 -or -not$path){throw ('AIIO Vanilla plain-file availability/topology changed after Analyze: '+$asset)}
         Test-PMMAIIOExtractedPart $path $expected[0] ('Vanilla '+$asset)
-        $item=Get-Item -LiteralPath $path
-        $RawBytes.Value+=[int64]$item.Length
+        $sourceFileInfo=Get-Item -LiteralPath $path
+        $RawBytes.Value+=[int64]$sourceFileInfo.Length
         Assert-PMMAIIOWithinBudget $RawBytes.Value $AllowOversize
-        $vanillaFiles.Add([pscustomobject]@{LogicalPath=$asset;Part=[IO.Path]::GetExtension($asset).ToLowerInvariant();Size=[int64]$item.Length;Sha256=(Get-Sha256 $path)})
+        $vanillaFiles.Add([pscustomobject]@{LogicalPath=$asset;Part=[IO.Path]::GetExtension($asset).ToLowerInvariant();Size=[int64]$sourceFileInfo.Length;Sha256=(Get-Sha256 $path)})
       }
       $sourceRows.Add([pscustomobject]@{Role='Vanilla';Name='Vanilla';Asset=$asset;Files=$vanillaFiles.ToArray()})
     }catch{
@@ -457,20 +457,20 @@ function Export-PMMAIIOAssetSources($Item,[string]$StageRoot,[array]$Mods,[hasht
         }
         if($expected.Count -ne 1 -or -not$exists){throw ('AIIO provider cooked-family topology changed after Analyze ('+$ext+'): '+[string]$providerName+' / '+$asset)}
         Test-PMMAIIOExtractedPart $path $expected[0] ([string]$providerName+' '+$asset+$ext)
-        $item=Get-Item -LiteralPath $path
-        $RawBytes.Value+=[int64]$item.Length
+        $sourceFileInfo=Get-Item -LiteralPath $path
+        $RawBytes.Value+=[int64]$sourceFileInfo.Length
         Assert-PMMAIIOWithinBudget $RawBytes.Value $AllowOversize
-        $providerFiles.Add([pscustomobject]@{LogicalPath=((Get-PakLogicalStem $asset)+$ext);Part=$ext;Size=[int64]$item.Length;Sha256=(Get-Sha256 $path)})
+        $providerFiles.Add([pscustomobject]@{LogicalPath=((Get-PakLogicalStem $asset)+$ext);Part=$ext;Size=[int64]$sourceFileInfo.Length;Sha256=(Get-Sha256 $path)})
       }
     }else{
       $path=Export-PakFileExact ([string]$mod.Path) $asset $providerRoot
       $expected=@($expectedInputs|Where-Object{[string]$_.Role -eq 'Provider' -and [string]$_.Provider -eq [string]$providerName})
       if($expected.Count -ne 1){throw ('AIIO plain-file provider topology changed after Analyze: '+[string]$providerName+' / '+$asset)}
       Test-PMMAIIOExtractedPart $path $expected[0] ([string]$providerName+' '+$asset)
-      $item=Get-Item -LiteralPath $path
-      $RawBytes.Value+=[int64]$item.Length
+      $sourceFileInfo=Get-Item -LiteralPath $path
+      $RawBytes.Value+=[int64]$sourceFileInfo.Length
       Assert-PMMAIIOWithinBudget $RawBytes.Value $AllowOversize
-      $providerFiles.Add([pscustomobject]@{LogicalPath=$asset;Part=[IO.Path]::GetExtension($asset).ToLowerInvariant();Size=[int64]$item.Length;Sha256=(Get-Sha256 $path)})
+      $providerFiles.Add([pscustomobject]@{LogicalPath=$asset;Part=[IO.Path]::GetExtension($asset).ToLowerInvariant();Size=[int64]$sourceFileInfo.Length;Sha256=(Get-Sha256 $path)})
     }
     $sourceRows.Add([pscustomobject]@{Role='Provider';Name=[string]$providerName;Folder=$folder;PakSha256=[string]$mod.Hash;PakBytes=[int64]$mod.Size;Asset=$asset;Files=$providerFiles.ToArray()})
   }

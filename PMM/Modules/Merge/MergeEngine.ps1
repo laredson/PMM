@@ -2019,6 +2019,7 @@ function Invoke-PMMScan {
       $report | ConvertTo-Json -Depth 40 | Set-Content -LiteralPath (Get-PMMLastScanPath) -Encoding UTF8
       Write-PMMLog "Analyze short-circuit: PMM patch is current. $($currentPatch.Name)"
       Invoke-PMMProgress 2 2 (Get-PMMText 'Analyze complete - compatibility patch is current.' 'Analisis terminado - el parche de compatibilidad esta al dia.')
+      if(Get-Command Sync-PMMCasesFromAnalysis -ErrorAction SilentlyContinue){Sync-PMMCasesFromAnalysis -Plan $plan -Completed|Out-Null}
       return [pscustomobject]@{Summary=$summary;Shared=$assetCount;Binary=0;Semantic=0;Relocatable=0;Decisions=0;Unsupported=0;Identical=0;AlreadyPatched=$true;ActivePatch=$currentPatch.Name}
     }
   }
@@ -2073,6 +2074,7 @@ function Invoke-PMMScan {
       $summary=(Get-PMMText 'Reused {0}: the effective conflict participants and output recipe are unchanged ({1}). No new Build is needed.' 'Reutilizado {0}: los participantes efectivos de conflicto y la receta de salida no han cambiado ({1}). No hace falta otro Build.') -f [string]$patch.Name,$state
       Write-PMMLog ('Analyze effective-conflict-set patch reuse; expensive adapters skipped. '+[string]$patch.Name)
       Invoke-PMMProgress 2 2 (Get-PMMText 'Analyze complete - existing compatibility patch reused.' 'Analisis terminado - se reutilizo el parche de compatibilidad existente.')
+      if(Get-Command Sync-PMMCasesFromAnalysis -ErrorAction SilentlyContinue){Sync-PMMCasesFromAnalysis -Plan $plan -Completed|Out-Null}
       return [pscustomobject]@{Summary=$summary;Shared=$shared.Count;Binary=$binary;Semantic=$semantic;Relocatable=$relocatable;Experimental=0;Decisions=0;Unsupported=0;Identical=$identical;AlreadyPatched=$true;ActivePatch=[string]$patch.Name;PackageChoicePendingReanalysis=$false;EffectiveConflictSetReuse=$true}
     }
   }
@@ -2180,6 +2182,11 @@ function Invoke-PMMScan {
     }else{
       Write-PMMLog "Analyze complete. $summary"
       Invoke-PMMProgress $totalSteps $totalSteps (Get-PMMText 'Analyze complete.' 'Analisis terminado.')
+    }
+    # Only completed and persisted Analyze results publish investigation cases.
+    if(Get-Command Sync-PMMCasesFromAnalysis -ErrorAction SilentlyContinue){
+      Sync-PMMCasesFromAnalysis -Plan $plan -Completed|Out-Null
+      Write-PMMMergePlan $plan
     }
     return [pscustomobject]@{Summary=$summary;Shared=$sharedTotal;Binary=$binary;Semantic=$semantic;Relocatable=$relocatable;Experimental=$experimental;Decisions=$decisions;Unsupported=$unsupported;Identical=$identical;AlreadyPatched=($null -ne $equivalentPatch);ActivePatch=$(if($equivalentPatch){[string]$equivalentPatch.Name}else{''});PackageChoicePendingReanalysis=$false;EffectiveConflictSetReuse=($null -ne $equivalentPatch)}
   } finally {

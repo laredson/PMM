@@ -111,7 +111,7 @@ function Get-PMMGameReferenceState {
   elseif([string]$state.SourcePakLastWriteUtc -ne [string]$identity.PakLastWriteUtc){$same=$false;$reason='Pal-Windows.pak timestamp changed.'}
   $status=if($same){'Current'}else{'Stale'}
   return [pscustomobject]@{
-    Status=$status;Reason=$reason;FamilyCount=[int]$state.ExtractedFamilyCount;FileCount=[int]$state.ExtractedFileCount;
+    ReferenceFreshness=$status;SemanticReadability='NotValidated';SemanticReason='Freshness describes extracted reference files only; each semantic adapter must validate the requested family.';Status=$status;Reason=$reason;FamilyCount=[int]$state.ExtractedFamilyCount;FileCount=[int]$state.ExtractedFileCount;
     Bytes=[int64]$state.ExtractedBytes;CreatedUtc=[string]$state.CreatedUtc;Identity=$identity;State=$state
   }
 }

@@ -70,3 +70,18 @@ jobs:
           ./Development/Tests/desktop_snapshot_regression.ps1
           ./Development/Tests/workspaces_dependencies_regression.ps1 -Language en
           ./Development/Tests/workspaces_dependencies_regression.ps1 -Language es
+
+      - name: Play Create contracts, recovery and local knowledge (Windows PowerShell 5.1)
+        shell: powershell
+        run: |
+          ./Development/Tests/architecture_contract_regression.ps1
+          ./Development/Tests/cases_v4_regression.ps1
+          ./Development/Tests/module_runtime_regression.ps1
+          ./Development/Tests/persistence_recovery_regression.ps1
+          ./Development/Tests/play_create_knowledge_regression.ps1
+          ./Development/Tests/play_create_tools_regression.ps1
+          ./Development/Tests/play_create_trial_regression.ps1
+          ./Development/Tests/workbench_actions_regression.ps1
+          ./Development/Tests/workbench_ui_regression.ps1 -Language en
+          ./Development/Tests/workbench_ui_regression.ps1 -Language es
+          ./Development/Tests/full_bootstrap_smoke.ps1

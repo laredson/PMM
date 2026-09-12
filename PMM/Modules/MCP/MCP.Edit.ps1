@@ -1,4 +1,4 @@
-
+﻿
 function Get-PMMMCPAssetCandidate([string]$CaseId,[string]$Id){
     [void](Get-PMMMCPCase $CaseId)
     if($Id -cnotmatch '^[a-f0-9]{32}$'){throw 'Invalid candidate ID.'}
@@ -11,6 +11,7 @@ function Get-PMMMCPFamilyRoot($Family){
 }
 function Assert-PMMMCPAssetCandidate($Manifest,[string]$CaseId,[string]$Id,[string]$Dir){
     if($Manifest.schema -ne 'PMM_STRUCTURED_ASSET_CANDIDATE_V1' -or $Manifest.caseId -cne $CaseId -or $Manifest.candidateId -cne $Id){throw 'Candidate ownership mismatch.'}
+    if(Get-Command Assert-PMMCaseResponseRevision -ErrorAction SilentlyContinue){Assert-PMMCaseResponseRevision $CaseId ([string](Get-PMMCaseValue $Manifest 'EvidenceRevisionId' ''))|Out-Null}
     if(@($Manifest.files).Count -eq 0 -or @($Manifest.edits).Count -eq 0){throw 'Empty candidate.'}
     foreach($file in $Manifest.files){
         $path=Resolve-PMMMCPPath (Join-Path $Dir 'cooked') $file.path
@@ -24,6 +25,8 @@ function Assert-PMMMCPAssetCandidate($Manifest,[string]$CaseId,[string]$Id,[stri
     }
 }
 function Edit-PMMMCPAsset($Arguments){
+    $evidenceRevision=''
+    if(Get-Command Assert-PMMCaseResponseRevision -ErrorAction SilentlyContinue){$evidenceRevision=Assert-PMMCaseResponseRevision ([string]$Arguments.caseId) ([string](Get-PMMCaseValue $Arguments 'evidenceRevision' ''))}
     if($Arguments.path.Length -gt 1024 -or $Arguments.expected.Length -gt 64 -or $Arguments.value.Length -gt 64){throw 'Edit argument exceeds limit.'}
     if($Arguments.expected -ceq $Arguments.value){throw 'No-op edits do not create candidates.'}
     $family=Get-PMMMCPVerifiedFamily $Arguments.logicalPath $Arguments.caseId
@@ -36,7 +39,7 @@ function Edit-PMMMCPAsset($Arguments){
         Assert-PMMMCPAssetCandidate $m $Arguments.caseId $id $dir
         if($m.edits.Count -ge 64){throw 'Candidate edit limit reached.'}
     }else{
-        $m=[pscustomobject]@{schema='PMM_STRUCTURED_ASSET_CANDIDATE_V1';caseId=$Arguments.caseId;candidateId=$id;sources=@();files=@();edits=@();status='EDITED';runtime='UNPROVEN';deployed=$false}
+        $m=[pscustomobject]@{schema='PMM_STRUCTURED_ASSET_CANDIDATE_V1';EvidenceRevisionId=$evidenceRevision;caseId=$Arguments.caseId;candidateId=$id;sources=@();files=@();edits=@();status='EDITED';runtime='UNPROVEN';deployed=$false}
     }
     $cooked=Resolve-PMMMCPPath $dir 'cooked'
     $header=Resolve-PMMMCPPath $cooked $family.Asset
@@ -90,6 +93,7 @@ function Build-PMMMCPAssetCandidate($Arguments){
     $m|Add-Member -NotePropertyName pakFile -NotePropertyValue ([IO.Path]::GetFileName($pak)) -Force
     $m|Add-Member -NotePropertyName pakSha256 -NotePropertyValue ((Get-FileHash $pak).Hash.ToLowerInvariant()) -Force
     Write-PMMAIIOJsonAtomic (Join-Path $dir 'candidate.json') $m 20
+    if(Get-Command Sync-PMMGeneratedCandidateLibrary -ErrorAction SilentlyContinue){Sync-PMMGeneratedCandidateLibrary ([string]$Arguments.caseId)|Out-Null}
     return @{candidateId=$Arguments.candidateId;status=$m.status;pakFile=$m.pakFile;sha256=$m.pakSha256;runtime='UNPROVEN';deployed=$false}
 }
 function Get-PMMMCPAssetCandidates([string]$CaseId){

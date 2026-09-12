@@ -1,4 +1,4 @@
-param([switch]$Quiet)
+﻿param([switch]$Quiet)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -131,7 +131,8 @@ if ($xamlNameSets.Count -eq 3) {
 }
 
 $bootstrapPath = Join-Path $App 'Modules\Bootstrap\Start-PalModMerger.ps1'
-$bootstrap = Get-Content -LiteralPath $bootstrapPath -Raw -Encoding UTF8
+. (Join-Path $Root 'Development\Tests\SourceReader.ps1')
+$bootstrap = Read-PMMTestSource -Path $bootstrapPath -AppRoot $App
 foreach ($marker in @('ImgPMMLogo','BtnRestoreDefaults','Everything is ready to play.','Ya está todo listo para jugar.','PMMLogo.png')) {
   if ($bootstrap -notmatch [regex]::Escape($marker)) { Fail ('Bootstrap marker missing: ' + $marker) }
 }

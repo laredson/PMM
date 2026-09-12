@@ -44,6 +44,8 @@ Initialize-PMMPaths $Script:Root|Out-Null
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.ResponseService.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.ArtifactService.ps1')
 . (Join-Path $Script:Root 'Modules\CKL\KnowledgeContributionService.ps1')
+. (Join-Path $Script:Root 'Modules\Workbench.Services.ps1') -Profile Worker
+Initialize-PMMModuleRuntime -Root $Script:Root | Out-Null
 if($Operation -eq 'FixLabBuild'){
   . (Join-Path $Script:Root 'Modules\FixLab\FixLabService.ps1')
 }
@@ -94,6 +96,7 @@ function Set-PMMFixLabProgress {
 
 $operationLockStream=$null
 $journalId=''
+$pmmModuleLease=$null
 try{
   # All heavy operations share one coherent Workspace/State snapshot. Serialize
   # them across separate PMM windows and workers. The WPF process remains free
@@ -102,6 +105,7 @@ try{
   try{$operationLockStream=[IO.File]::Open($operationLockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{
     throw 'Another PMM processing operation is already running for this installation.'
   }
+  $pmmModuleLease=Start-PMMModuleOperation $Operation
   $journalTarget=if($Operation -eq 'FixLabBuild'){$FixLabJobId}elseif($Operation -in @('AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild')){$SessionId}else{'Workspace'}
   $journalId=Start-PMMJournalOperation -Kind $Operation -Target $journalTarget -Metadata ([ordered]@{Force=[bool]$Force;Mode=$Mode;WorkerProcessId=$PID;SessionId=$SessionId;SolutionId=$SolutionId})
 
@@ -273,5 +277,5 @@ try{
   Stop-PMMLogSession 'Failed'
   exit 1
 }finally{
-  try{if($operationLockStream){$operationLockStream.Dispose()}}catch{}
+  try{if($pmmModuleLease){Complete-PMMModuleOperation $pmmModuleLease.Id};if($operationLockStream){$operationLockStream.Dispose()}}catch{}
 }

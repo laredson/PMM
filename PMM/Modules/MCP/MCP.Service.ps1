@@ -1,3 +1,5 @@
+﻿. (Join-Path $PSScriptRoot '../Cases/CaseService.ps1')
+. (Join-Path $PSScriptRoot '../Knowledge/Knowledge.Service.ps1')
 . (Join-Path $PSScriptRoot '../Unreal/Dependencies.Service.ps1')
 . (Join-Path $PSScriptRoot 'MCP.Archive.ps1')
 . (Join-Path $PSScriptRoot '..\Unreal\Unreal.Service.ps1')
@@ -52,6 +54,7 @@ function Get-PMMMCPCase([string]$CaseId) {
     $path=Resolve-PMMMCPPath $Script:Root ('Workspace\AIIO\Cases\'+$CaseId+'\case.json')
     if(-not(Test-Path -LiteralPath $path -PathType Leaf)){throw 'Case not found.'}
     $case=Read-PMMMCPJson $path
+    if(Get-Command Get-PMMCaseVisibleVersion -ErrorAction SilentlyContinue){$case=Get-PMMCaseVisibleVersion $case;if(-not$case){throw 'Case evidence publication is not complete.'}}
     if($case.Schema -ne $Script:PMMAIIOCaseSchema -or $case.CaseId -cne $CaseId){throw 'Invalid case identity.'}
     return $case
 }
@@ -65,7 +68,7 @@ function ConvertTo-PMMMCPCase($Case) {
         }
     }
     $mods=@();if($Case.PSObject.Properties.Name -contains 'References' -and $Case.References){$mods=@($Case.References.Mods|Select-Object -First 32|ForEach-Object{@{name=$_.Name;sha256=$_.Sha256;mode=$_.Mode}})}
-    return [ordered]@{referencedMods=$mods;caseId=$Case.CaseId;title=$Case.Title;type=$Case.Type;description=$Case.Description;transport=$Case.Transport;mcpRequest=$request;aiReply=(Get-PMMMCPReplyView $Case);status=$Case.Status;nextAction=$Case.NextAction;updatedUtc=$Case.UpdatedUtc}
+    return [ordered]@{evidenceRevision=[string](Get-PMMCaseValue $Case 'CurrentEvidenceRevision' '');referencedMods=$mods;caseId=$Case.CaseId;title=$Case.Title;type=$Case.Type;description=$Case.Description;transport=$Case.Transport;mcpRequest=$request;aiReply=(Get-PMMMCPReplyView $Case);status=$Case.Status;nextAction=$Case.NextAction;updatedUtc=$Case.UpdatedUtc}
 }
 function Get-PMMMCPArtifactDir([string]$CaseId) {
     [void](Get-PMMMCPCase $CaseId)
@@ -129,7 +132,7 @@ function Get-PMMMCPTools {
         @('pmm_unreal_cancel','Cancel one case-owned Unreal job.',@{caseId=$case;jobId=$str},@('caseId','jobId'),$false),
         @('pmm_unreal_candidates','List generated candidates and their current integrity, separate from game runtime proof.',@{caseId=$case},@('caseId'),$true),
 
-        @('pmm_asset_edit','Edit one parsed numeric or boolean property on an isolated copy. JSON pointer and expected JSON scalar are required. Rejects opaque exports; never deploys.',@{caseId=$case;logicalPath=@{type='string';minLength=1;maxLength=512};path=@{type='string';minLength=1;maxLength=1024};expected=@{type='string';minLength=1;maxLength=64};value=@{type='string';minLength=1;maxLength=64};candidateId=@{type='string';pattern='^[a-f0-9]{32}$'}},@('caseId','logicalPath','path','expected','value'),$false),
+        @('pmm_asset_edit','For a case with evidenceRevision, include that exact value from pmm_case_get. Edit one parsed numeric or boolean property on an isolated copy. JSON pointer and expected JSON scalar are required. Rejects opaque exports; never deploys.',@{caseId=$case;logicalPath=@{type='string';minLength=1;maxLength=512};path=@{type='string';minLength=1;maxLength=1024};expected=@{type='string';minLength=1;maxLength=64};value=@{type='string';minLength=1;maxLength=64};evidenceRevision=@{type='string';pattern='^EV-[a-f0-9]{64}$'};candidateId=@{type='string';pattern='^[a-f0-9]{32}$'}},@('caseId','logicalPath','path','expected','value'),$false),
         @('pmm_candidate_build','Build a PAK from verified structured edits. Re-read packed files and verify hashes. Does not prove game behavior or deploy.',@{caseId=$case;candidateId=@{type='string';pattern='^[a-f0-9]{32}$'}},@('caseId','candidateId'),$false),
         @('pmm_candidates_list','List structured candidates and their integrity state for this case.',@{caseId=$case},@('caseId'),$true),
         @('pmm_asset_inspect','Read cooked asset properties or DataTable values without Unreal. Use query to find named properties; paginate with nextOffset. Source is hash-verified current reference.',@{caseId=$case;logicalPath=@{type='string';minLength=1;maxLength=512};mode=@{type='string';enum=@('properties','datatable')};query=@{type='string';maxLength=128};offset=@{type='integer';minimum=0;maximum=250000};limit=@{type='integer';minimum=1;maximum=100}},@('caseId','logicalPath'),$true),

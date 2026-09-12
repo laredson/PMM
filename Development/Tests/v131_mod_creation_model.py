@@ -9,6 +9,7 @@ import re
 import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from source_reader import read_source
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -17,7 +18,7 @@ X_NAME = "{http://schemas.microsoft.com/winfx/2006/xaml}Name"
 
 
 def read(path: str) -> str:
-    return (APP / path).read_text(encoding="utf-8-sig")
+    return read_source(APP / path, APP)
 
 
 def body(text: str, name: str) -> str:

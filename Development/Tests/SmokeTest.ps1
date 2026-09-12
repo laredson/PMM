@@ -1,6 +1,7 @@
-param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
+﻿param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot 'SourceReader.ps1')
 $Root=[IO.Path]::GetFullPath($Root)
 $App=Join-Path $Root 'PMM'
 $fail=[System.Collections.Generic.List[string]]::new()
@@ -34,7 +35,7 @@ $common=Read 'PMM/Modules/Shared/Common.ps1'
 $aiio=Read 'PMM/Modules/AIIO/AIIO.ps1'
 $ckl=Read 'PMM/Modules/CKL/KnowledgeRecipeService.ps1'
 $contrib=Read 'PMM/Modules/CKL/KnowledgeContributionService.ps1'
-$bootstrap=Read 'PMM/Modules/Bootstrap/Start-PalModMerger.ps1'
+$bootstrap=Read-PMMTestSource -Path (Join-Path $App 'Modules/Bootstrap/Start-PalModMerger.ps1') -AppRoot $App
 $xaml=Read 'PMM/Resources/UI/MainWindow.xaml'
 Assert-PMM ($merge -notmatch 'Compress-Archive') 'Analyze/MergeEngine does not use Compress-Archive'
 Assert-PMM ($merge -notmatch 'source-paks') 'Analyze/MergeEngine does not package whole PAKs'

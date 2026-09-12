@@ -4,6 +4,8 @@ All other PowerShell modules may call these helpers. Keep this file free of UI
 controls so the core can later be reused by a CLI or another front-end.
 #>
 
+. (Join-Path $PSScriptRoot 'Persistence.ps1')
+
 # Start-PalModMerger.ps1 enables StrictMode before dot-sourcing this module.
 # Initialize the bundled-runtime verification cache before any function reads it.
 if (-not (Get-Variable -Name 'PMMBundledRuntimeInventoryVerified' -Scope Script -ErrorAction SilentlyContinue)) {
@@ -202,13 +204,17 @@ function Initialize-PMM {
     }
     if($changed){Save-PMMConfig $cfg}
   }
+  if(Get-Command Invoke-PMMDeploymentRecovery -ErrorAction SilentlyContinue){
+    $Script:PMMDeploymentRecoveryResults=@(Invoke-PMMDeploymentRecovery)
+    foreach($recovery in $Script:PMMDeploymentRecoveryResults){Write-PMMLog ('Deployment recovery: '+$recovery.State+' | '+$recovery.Error)}
+  }
   Clear-PMMTransientArtifacts
   Write-PMMLog 'Application initialized; transient staging cleanup complete.'
 }
 
 function Get-PMMConfigPath { Join-PMMPath 'State' 'config.json' }
-function Get-PMMConfig { Get-Content -LiteralPath (Get-PMMConfigPath) -Raw | ConvertFrom-Json }
-function Save-PMMConfig($Config){$Config|ConvertTo-Json -Depth 10|Set-Content -LiteralPath (Get-PMMConfigPath) -Encoding UTF8}
+function Get-PMMConfig { Read-PMMJsonFile -Path (Get-PMMConfigPath) -RecoverBackup }
+function Save-PMMConfig($Config){Write-PMMJsonAtomic -Path (Get-PMMConfigPath) -Value $Config -Depth 10}
 
 function Get-PMMText([string]$English,[string]$Spanish){
   $cfg=Get-PMMConfig

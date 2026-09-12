@@ -1,7 +1,8 @@
-param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
+﻿param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot 'SourceReader.ps1')
 $Root=[IO.Path]::GetFullPath($Root)
 $App=Join-Path $Root 'PMM'
 
@@ -60,7 +61,7 @@ try{
   Assert-RC28 ([string]$legacySnapshot.ManagedFiles[0].Name -ceq 'legacy.pak') 'Legacy managed path was not reduced to a safe filename.'
 }finally{Remove-Item -LiteralPath $fixtureRoot -Recurse -Force -ErrorAction SilentlyContinue}
 
-$bootstrap=Get-Content -LiteralPath (Join-Path $App 'Modules\Bootstrap\Start-PalModMerger.ps1') -Raw -Encoding UTF8
+$bootstrap=Read-PMMTestSource -Path (Join-Path $App 'Modules/Bootstrap/Start-PalModMerger.ps1') -AppRoot $App
 $candidateBody=[regex]::Match($bootstrap,'(?s)function Refresh-PMMAIIOCandidates\b.*?(?=\r?\nfunction Update-PMMAIIOCandidateSelection\b)').Value
 Assert-RC28 ($candidateBody -match [regex]::Escape('$rows=@()')) 'Candidate refresh does not initialize an actual array.'
 Assert-RC28 ($candidateBody -notmatch '\$rows\s*=\s*if\s*\(') 'Candidate refresh still assigns a collection through an unwrapping if expression.'

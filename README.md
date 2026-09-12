@@ -1,4 +1,4 @@
-# Palworld Manager Merger (PMM)
+﻿# Palworld Manager Merger (PMM)
 
 **PMM 1.3.1ModCreator — portable mod management and assisted mod creation.**
 
@@ -6,6 +6,17 @@ Download the program-only ZIP from the [latest release](https://github.com/lared
 
 Palworld Manager Merger is a local Palworld mod manager, compatibility analyzer/overlay builder and legacy-mod repair platform. It preserves source mods and creates only the compatibility overlay required by shared assets.
 
+## Current source: Jugar / Crear workbench
+
+This checkout implements the local workbench on the existing 1.3.1 native package. It is not a new published release. Start with [AGENTS.md](AGENTS.md), the [current architecture and UI contract](Development/Docs/Architecture/PMM_WORKBENCH_CONTRACT.md), and [implementation/validation state](Development/AI/WORKBENCH_STATE.md).
+
+- **Jugar:** library, known repairs, saves and history. Auto and manual ColorFlow use the same operation state. Successful unsupported analysis publishes persistent cases without contacting an AI.
+- **Crear:** a common case editor, resources, tools and local knowledge. Contextual repair/compatibility/query cases retain selected sources. ZIP export, MCP and clients share case identity and immutable evidence revisions.
+- Generated candidates remain disabled. Explicit trials revalidate current inputs and provenance before library activation; installation uses the common transactional deployment service.
+- Local versioned contribution import/export is available. This version has no community receiver and performs no automatic uploads.
+- Editable service modules support validated idle reload. UI initialization and native/contract changes require restart. Native source/binary parity and actual game validation remain separate work.
+
+The version-specific descriptions below document the published baseline; use the workbench guide and current contracts for this checkout's navigation.
 ## Repository layout
 
 - `PMM/` — complete portable application.

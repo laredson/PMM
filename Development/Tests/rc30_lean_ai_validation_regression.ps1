@@ -1,10 +1,11 @@
-param([string]$Root = '')
+﻿param([string]$Root = '')
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'SourceReader.ps1')
 if ([string]::IsNullOrWhiteSpace($Root)) { $Root = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..')) }
 $App = Join-Path $Root 'PMM'
-$Bootstrap = Get-Content -LiteralPath (Join-Path $App 'Modules\Bootstrap\Start-PalModMerger.ps1') -Raw -Encoding UTF8
+$Bootstrap = Read-PMMTestSource -Path (Join-Path $App 'Modules/Bootstrap/Start-PalModMerger.ps1') -AppRoot $App
 $Response = Get-Content -LiteralPath (Join-Path $App 'Modules\AIIO\AIIO.ResponseService.ps1') -Raw -Encoding UTF8
 $Manifest = Get-Content -LiteralPath (Join-Path $App 'Resources\Metadata\RELEASE_MANIFEST.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 

@@ -1,0 +1,53 @@
+{
+  "schema": "PMM_TOOL_ADAPTERS_V1",
+  "contractVersion": 1,
+  "adapters": [
+    {
+      "id": "scalar",
+      "version": "1.0.0",
+      "label": "Structured scalar editor",
+      "capabilities": [
+        "numeric-properties",
+        "boolean-properties",
+        "verified-pak-build"
+      ],
+      "unsupported": [
+        "opaque-exports",
+        "models",
+        "animations",
+        "arbitrary-code"
+      ],
+      "operations": {
+        "edit": "pmm_asset_edit",
+        "build": "pmm_candidate_build",
+        "prepare": "pmm_asset_prepare",
+        "inspect": "pmm_asset_inspect"
+      },
+      "execution": "bounded-worker",
+      "cancellation": "between-operations"
+    },
+    {
+      "id": "unreal",
+      "version": "1.0.0",
+      "label": "Unreal texture workshop",
+      "capabilities": [
+        "texture-import",
+        "texture-duplicate",
+        "texture-properties",
+        "windows-cook"
+      ],
+      "unsupported": [
+        "models",
+        "animations",
+        "general-gameplay-authoring"
+      ],
+      "operations": {
+        "prepare": "pmm_unreal_prepare",
+        "texture": "pmm_unreal_texture",
+        "cook": "pmm_unreal_cook"
+      },
+      "execution": "background-provider",
+      "cancellation": "cooperative"
+    }
+  ]
+}

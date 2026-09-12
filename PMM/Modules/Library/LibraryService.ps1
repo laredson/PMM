@@ -13,6 +13,9 @@ Preview 13 caches hashes by full path + size + LastWriteTimeUtc.  Replacing a
 file invalidates the cache naturally, while normal UI updates become cheap.
 #>
 
+. (Join-Path $PSScriptRoot '..\Shared\Persistence.ps1')
+. (Join-Path $PSScriptRoot '..\Operations\DeploymentRecovery.ps1')
+
 $Script:LibraryHashCache = @{}
 
 function Get-LibraryRoot {
@@ -56,8 +59,7 @@ function Write-PMMModPriorityOrder([array]$Names) {
     Updated=(Get-Date).ToString('o')
     OrderLowToHigh=@($Names|ForEach-Object{[string]$_})
   }
-  $state|ConvertTo-Json -Depth 8|Set-Content -LiteralPath $temp -Encoding UTF8
-  Move-Item -LiteralPath $temp -Destination $path -Force
+  Write-PMMJsonAtomic -Path $path -Value $state -Depth 8
 }
 
 function Get-PMMModPriorityOrder {
@@ -133,8 +135,7 @@ function Write-PMMMergeValidationRecords([array]$Records) {
   $path=Get-PMMMergeValidationPath
   $temp=$path+'.tmp'
   $normalized=@($Records|Where-Object{$_ -and -not[string]::IsNullOrWhiteSpace([string]$_.Hash)}|Sort-Object Hash -Unique)
-  ConvertTo-Json -InputObject @($normalized) -Depth 8|Set-Content -LiteralPath $temp -Encoding UTF8
-  Move-Item -LiteralPath $temp -Destination $path -Force
+  Write-PMMJsonAtomic -Path $path -Value @($normalized) -Depth 8
 }
 
 function Set-PMMMergeValidated($Patch) {
@@ -735,9 +736,7 @@ function Write-PMMPendingRemovalRecords([array]$Records){
   $normalized=@($Records|Where-Object{$_ -and (Test-PMMSafePakLeafName ([string]$_.Name))}|ForEach-Object{
     [pscustomobject]@{Name=[string]$_.Name;Hash=([string]$_.Hash).ToLowerInvariant()}
   }|Sort-Object Name -Unique)
-  $json=ConvertTo-Json -InputObject @($normalized) -Depth 5
-  Set-Content -LiteralPath $temp -Value $json -Encoding UTF8
-  Move-Item -LiteralPath $temp -Destination $path -Force
+  Write-PMMJsonAtomic -Path $path -Value @($normalized) -Depth 5
 }
 
 function Write-PMMPendingRemovals([array]$Names){
@@ -773,7 +772,7 @@ function Find-PMMLibraryMod([string]$Name) {
   return $null
 }
 
-function Set-PMMLibraryModEnabled([string]$Name,[bool]$Enabled) {
+function Set-PMMLibraryModEnabled([string]$Name,[bool]$Enabled,$TrialAuthorization=$null) {
   $mod=Find-PMMLibraryMod $Name
   if(-not$mod){throw (Get-PMMText "Mod not found in PMM library: $Name" "No se encontro el mod en la biblioteca PMM: $Name")}
   if([bool]$mod.Enabled -eq $Enabled){return}
@@ -784,6 +783,17 @@ function Set-PMMLibraryModEnabled([string]$Name,[bool]$Enabled) {
   New-Item -ItemType Directory -Force -Path $destRoot|Out-Null
   $destDir=Join-Path $destRoot $folderName
   if(Test-Path -LiteralPath $destDir){throw (Get-PMMText "Library destination already exists: $destDir" "Ya existe el destino en la biblioteca: $destDir")}
+  [void](Assert-PMMRecoveryPath $srcDir (Get-LibraryRoot))
+  [void](Assert-PMMRecoveryPath $destDir $destRoot -DirectChild)
+  if($Enabled){
+    if(Get-Command Assert-PMMGeneratedLibraryActivation -ErrorAction SilentlyContinue){Assert-PMMGeneratedLibraryActivation -Mod $mod -TrialAuthorization $TrialAuthorization|Out-Null}
+    else{
+      $generated=([string]$mod.Name -like 'PMM_Generated_*_P.pak')
+      $metadata=Join-Path $srcDir 'metadata.json'
+      if(Test-Path -LiteralPath $metadata -PathType Leaf){try{$entry=Read-PMMJsonFile $metadata;if(($entry.PSObject.Properties.Name -contains 'Generated') -and [bool]$entry.Generated){$generated=$true}}catch{}}
+      if($generated){throw 'Load the Knowledge service and use Try candidate to validate this generated mod before activation.'}
+    }
+  }
   Move-Item -LiteralPath $srcDir -Destination $destDir
   if($Enabled){Remove-PMMPendingRemoval $Name}
   Clear-PMMLibraryHashCache;Clear-PakEntryCache;Clear-PMMAnalysisState
@@ -1500,13 +1510,10 @@ function Get-PMMDeploymentStatePath { return (Join-PMMPath 'State' 'deployment-s
 function Read-PMMDeploymentState {
   $p=Get-PMMDeploymentStatePath
   if(-not(Test-Path -LiteralPath $p -PathType Leaf)){return $null}
-  try{return (Get-Content -LiteralPath $p -Raw|ConvertFrom-Json)}catch{return $null}
+  return (Read-PMMJsonFile -Path $p -RecoverBackup)
 }
 function Write-PMMDeploymentState($State){
-  $path=Get-PMMDeploymentStatePath
-  $temp=$path+'.tmp'
-  $State|ConvertTo-Json -Depth 20|Set-Content -LiteralPath $temp -Encoding UTF8
-  Move-Item -LiteralPath $temp -Destination $path -Force
+  Write-PMMJsonAtomic -Path (Get-PMMDeploymentStatePath) -Value $State -Depth 20
 }
 
 function Test-PMMModContainsOnlyAssetFamily($Mod,[string]$Asset) {
@@ -1611,6 +1618,7 @@ function Test-PMMPlanRequiresPatch($Plan) {
 }
 
 function Get-PMMDeploymentContext {
+  Assert-PMMDeploymentRecoveryComplete
   $cfg=Get-PMMConfig
   if(-not$cfg.GamePath){throw (Get-PMMText 'Detect or configure Palworld before Deploy.' 'Detecta o configura Palworld antes de Deploy.')}
   Ensure-GameModsFolder
@@ -1809,138 +1817,111 @@ function Remove-PMMOldDeploymentBackups([int]$Keep=3) {
   $root=Join-PMMPath 'Builds' 'DeploymentBackups'
   if(-not(Test-Path -LiteralPath $root -PathType Container)){return}
   $dirs=@(Get-ChildItem -LiteralPath $root -Directory -ErrorAction SilentlyContinue|Sort-Object LastWriteTimeUtc -Descending)
-  foreach($dir in @($dirs|Select-Object -Skip $Keep)){Remove-Item -LiteralPath $dir.FullName -Recurse -Force -ErrorAction SilentlyContinue}
+  $complete=@($dirs|Where-Object{try{$r=Read-PMMJsonFile (Join-Path $_.FullName 'transaction.json');[string]$r.State -in @('Committed','RolledBack','Aborted')}catch{$false}})
+  foreach($dir in @($complete|Select-Object -Skip $Keep)){
+    try{Assert-PMMRecoveryFlatDirectory $dir.FullName $root;Remove-Item -LiteralPath $dir.FullName -Recurse -Force -ErrorAction Stop}catch{Write-PMMLog ('Deployment backup retention warning: '+$_.Exception.Message)}
+  }
 }
 
 function Invoke-PMMDeploymentTransaction($Context,$Operations,$State,[scriptblock]$ProgressCallback=$null) {
   if(@($Operations.BlockingConflicts).Count -gt 0){throw (@($Operations.BlockingConflicts) -join "`n`n")}
-  $id=(Get-Date -Format 'yyyyMMdd_HHmmss')+'_'+[guid]::NewGuid().ToString('N').Substring(0,8)
-  $backupRoot=Join-Path (Join-PMMPath 'Builds' 'DeploymentBackups') $id
-  $stageRoot=Join-Path ([string]$Context.GameMods) ('.pmm-stage-'+$id)
-  New-Item -ItemType Directory -Force -Path $backupRoot,$stageRoot|Out-Null
-
-  $touched=[System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
-  foreach($a in @($Operations.RemoveActions)){[void]$touched.Add([string]$a.Path)}
-  foreach($a in @($Operations.CopyActions)){[void]$touched.Add([string]$a.Destination)}
-  $backupRecords=[System.Collections.Generic.List[object]]::new()
-  $stagedRecords=[System.Collections.Generic.List[object]]::new()
-  $commitStarted=$false
-  $statePath=Get-PMMDeploymentStatePath
-  $pendingPath=Get-PMMPendingRemovalPath
-  $oldStateExists=Test-Path -LiteralPath $statePath -PathType Leaf
-  $oldPendingExists=Test-Path -LiteralPath $pendingPath -PathType Leaf
-
+  $lock=Open-PMMDeploymentLock;$gameLock=$null;$transaction=$null;$manifestPath='';$stageRoot='';$committed=$false
   try{
-    # Phase 1: stage every desired file and verify hashes before touching ~mods.
-    $copyActions=@($Operations.CopyActions)
-    $copyIndex=0
+    Assert-PMMDeploymentRecoveryComplete
+    $gameMods=[IO.Path]::GetFullPath([string]$Context.GameMods).TrimEnd('\','/')
+    if($gameMods -ine ([IO.Path]::GetFullPath((Get-GameModsPath)).TrimEnd('\','/'))){throw 'Deployment context does not match the selected game installation.'}
+    $gameLockPath=Assert-PMMRecoveryPath (Join-Path $gameMods '.pmm-deployment.lock') $gameMods -DirectChild
+    $gameLock=[IO.File]::Open($gameLockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+    $id=(Get-Date -Format 'yyyyMMdd_HHmmss')+'_'+[guid]::NewGuid().ToString('N').Substring(0,8)
+    $backupRoot=Assert-PMMRecoveryPath (Join-Path (Get-PMMDeploymentBackupRoot) $id) (Get-PMMDeploymentBackupRoot) -DirectChild
+    $stageRoot=Assert-PMMRecoveryPath (Join-Path $gameMods ('.pmm-stage-'+$id)) $gameMods -DirectChild
+    $manifestPath=Join-Path $backupRoot 'transaction.json'
+    $touched=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+    foreach($action in @($Operations.RemoveActions)){[void]$touched.Add((Assert-PMMRecoveryPath ([string]$action.Path) $gameMods -DirectChild))}
+    foreach($action in @($Operations.CopyActions)){[void]$touched.Add((Assert-PMMRecoveryPath ([string]$action.Destination) $gameMods -DirectChild))}
+    [void][IO.Directory]::CreateDirectory($backupRoot);[void][IO.Directory]::CreateDirectory($stageRoot)
+    $transaction=[pscustomobject]@{Schema='PMM_DEPLOYMENT_TRANSACTION_V2';SchemaVersion=2;Id=$id;State='Preparing';CreatedUtc=[DateTime]::UtcNow.ToString('o');UpdatedUtc='';Step=-1;Workspace=(Get-PMMPath 'Workspace');GameMods=$gameMods;StageRoot=$stageRoot;Files=@();StateFiles=@();RollbackErrors=@();Error='';OwnerPid=$PID;OwnerStartedUtc=[Diagnostics.Process]::GetCurrentProcess().StartTime.ToUniversalTime().ToString('o')}
+    Save-PMMDeploymentCheckpoint $transaction $manifestPath 'Preparing'
+    $staged=[Collections.Generic.List[object]]::new();$files=[Collections.Generic.List[object]]::new();$states=[Collections.Generic.List[object]]::new()
+    $copyActions=@($Operations.CopyActions);$index=0
     foreach($action in $copyActions){
-      $copyIndex++
-      $stageBase=if($copyActions.Count -gt 0){0.15+(0.35*(($copyIndex-1)/[double]$copyActions.Count))}else{0.50}
-      $stageEnd=if($copyActions.Count -gt 0){0.15+(0.35*($copyIndex/[double]$copyActions.Count))}else{0.50}
-      Invoke-PMMProgressCallback $ProgressCallback $stageBase ((Get-PMMText 'Staging {0}...' 'Preparando {0}...') -f [string]$action.Name)
-      $stageName=([IO.Path]::GetFileName([string]$action.Destination))+'.pmmstage'
-      $stagePath=Join-Path $stageRoot $stageName
-      Copy-PMMFileWithProgress ([string]$action.Source) $stagePath $ProgressCallback $stageBase ([Math]::Max($stageBase,($stageEnd-0.01))) ((Get-PMMText 'Staging {0}...' 'Preparando {0}...') -f [string]$action.Name)
-      $stageHash=Get-Sha256 $stagePath
-      if($stageHash -ne [string]$action.ExpectedHash){throw "Deployment staging hash mismatch for $($action.Name): $stageHash != $($action.ExpectedHash)"}
-      $stagedRecords.Add([pscustomobject]@{Destination=[string]$action.Destination;Stage=$stagePath;ExpectedHash=[string]$action.ExpectedHash;Name=[string]$action.Name})
-      Invoke-PMMProgressCallback $ProgressCallback $stageEnd ((Get-PMMText 'Staged and verified {0}' 'Preparado y verificado {0}') -f [string]$action.Name)
+      $index++;$start=0.15+(0.35*(($index-1)/[double]$copyActions.Count));$end=0.15+(0.35*($index/[double]$copyActions.Count))
+      $dest=Assert-PMMRecoveryPath ([string]$action.Destination) $gameMods -DirectChild
+      $stagePath=Assert-PMMRecoveryPath (Join-Path $stageRoot ([IO.Path]::GetFileName($dest)+'.pmmstage')) $stageRoot -DirectChild
+      Copy-PMMFileWithProgress ([string]$action.Source) $stagePath $ProgressCallback $start $end ((Get-PMMText 'Staging {0}...' 'Preparando {0}...') -f [string]$action.Name)
+      if((Get-PMMRecoveryHash $stagePath) -ne [string]$action.ExpectedHash){throw ('Deployment staging hash mismatch for '+[string]$action.Name)}
+      $flush=[IO.File]::Open($stagePath,[IO.FileMode]::Open,[IO.FileAccess]::ReadWrite,[IO.FileShare]::Read);try{$flush.Flush($true)}finally{$flush.Dispose()}
+      $staged.Add([pscustomobject]@{Destination=$dest;Stage=$stagePath;ExpectedHash=[string]$action.ExpectedHash;Name=[string]$action.Name})
     }
-    Invoke-PMMProgressCallback $ProgressCallback 0.50 (Get-PMMText 'Staging complete. Creating rollback backups...' 'Preparacion terminada. Creando backups de rollback...')
-
-    # Phase 2: back up every existing file that the commit may replace/remove.
-    $touchedPaths=@($touched)
-    $touchIndex=0
-    foreach($path in $touchedPaths){
-      $touchIndex++
-      if(Test-Path -LiteralPath $path -PathType Leaf){
-        $backup=Join-Path $backupRoot (([IO.Path]::GetFileName($path))+'.before')
-        Copy-Item -LiteralPath $path -Destination $backup -Force
-        if((Get-Sha256 $backup) -ne (Get-Sha256 $path)){throw "Deployment backup verification failed for $path"}
-        $backupRecords.Add([pscustomobject]@{Original=$path;Backup=$backup})
+    Invoke-PMMProgressCallback $ProgressCallback 0.50 (Get-PMMText 'Creating verified rollback backups...' 'Creando copias verificadas para recuperar el despliegue...')
+    foreach($target in @($touched)){
+      $exists=[IO.File]::Exists($target);$backup='';$before=''
+      if($exists){
+        $backup=Join-Path $backupRoot ([IO.Path]::GetFileName($target)+'.before');[IO.File]::Copy($target,$backup)
+        $flush=[IO.File]::Open($backup,[IO.FileMode]::Open,[IO.FileAccess]::ReadWrite,[IO.FileShare]::Read);try{$flush.Flush($true)}finally{$flush.Dispose()}
+        $before=Get-PMMRecoveryHash $backup;if($before -ne (Get-PMMRecoveryHash $target)){throw 'Deployment source changed while backing up.'}
       }
-      if($touchedPaths.Count -gt 0){Invoke-PMMProgressCallback $ProgressCallback (0.50+(0.18*($touchIndex/[double]$touchedPaths.Count))) (Get-PMMText 'Creating verified rollback backup...' 'Creando backup de rollback verificado...')}
+      $new=@($staged|Where-Object{$_.Destination -ieq $target}|Select-Object -First 1)
+      $files.Add([pscustomobject]@{Target=$target;Existed=$exists;Backup=$backup;BeforeHash=$before;AfterHash=$(if($new.Count){[string]$new[0].ExpectedHash}else{''})})
     }
-    if($oldStateExists){Copy-Item -LiteralPath $statePath -Destination (Join-Path $backupRoot 'deployment-state.before.json') -Force}
-    if($oldPendingExists){Copy-Item -LiteralPath $pendingPath -Destination (Join-Path $backupRoot 'pending-removals.before.json') -Force}
-
-    [pscustomobject]@{
-      SchemaVersion=1;State='Prepared';Created=(Get-Date).ToString('o');GameMods=$Context.GameMods;
-      Touched=[string[]]$touched;Copies=@($Operations.CopyActions);Removals=@($Operations.RemoveActions);Backups=$backupRecords.ToArray();
-      DeploymentStateExisted=$oldStateExists;PendingRemovalsExisted=$oldPendingExists
-    }|ConvertTo-Json -Depth 20|Set-Content -LiteralPath (Join-Path $backupRoot 'transaction.json') -Encoding UTF8
-
-    Invoke-PMMProgressCallback $ProgressCallback 0.68 (Get-PMMText 'Rollback backup ready. Committing deployment...' 'Backup de rollback listo. Aplicando despliegue...')
-
-    # Phase 3: commit. Staged files live on the same volume as ~mods, so the
-    # final Move-Item is a same-volume rename rather than a long copy window.
-    $commitStarted=$true
-    foreach($action in @($Operations.RemoveActions)){if(Test-Path -LiteralPath ([string]$action.Path) -PathType Leaf){Remove-Item -LiteralPath ([string]$action.Path) -Force}}
-    $commitIndex=0
-    foreach($record in $stagedRecords){
-      $commitIndex++
-      if(Test-Path -LiteralPath ([string]$record.Destination) -PathType Leaf){Remove-Item -LiteralPath ([string]$record.Destination) -Force}
-      Move-Item -LiteralPath ([string]$record.Stage) -Destination ([string]$record.Destination) -Force
-      if($stagedRecords.Count -gt 0){Invoke-PMMProgressCallback $ProgressCallback (0.70+(0.12*($commitIndex/[double]$stagedRecords.Count))) ((Get-PMMText 'Committed {0}' 'Aplicado {0}') -f [string]$record.Name)}
+    foreach($pair in @(@('deployment-state.json',$State),@('pending-removals.json',@()))){
+      $target=Join-PMMPath 'State' ([string]$pair[0]);$exists=[IO.File]::Exists($target);$backup='';$before=''
+      if($exists){
+        $backup=Join-Path $backupRoot ([string]$pair[0]+'.before');[IO.File]::Copy($target,$backup)
+        $flush=[IO.File]::Open($backup,[IO.FileMode]::Open,[IO.FileAccess]::ReadWrite,[IO.FileShare]::Read);try{$flush.Flush($true)}finally{$flush.Dispose()}
+        $before=Get-PMMRecoveryHash $backup
+      }
+      $desired=Join-Path $stageRoot ([string]$pair[0]+'.new');Write-PMMJsonAtomic -Path $desired -Value $pair[1] -Depth 20
+      $states.Add([pscustomobject]@{Target=$target;Existed=$exists;Backup=$backup;BeforeHash=$before;AfterHash=(Get-PMMRecoveryHash $desired)})
     }
-
-    # Phase 4: verify committed bytes before recording deployment state.
-    $verifyIndex=0
-    foreach($record in $stagedRecords){
-      $verifyIndex++
-      if(-not(Test-Path -LiteralPath ([string]$record.Destination) -PathType Leaf)){throw "Deploy verification missing file: $($record.Destination)"}
-      $hash=Get-Sha256 ([string]$record.Destination)
-      if($hash -ne [string]$record.ExpectedHash){throw "Deploy verification hash mismatch for $($record.Name): $hash != $($record.ExpectedHash)"}
-      if($stagedRecords.Count -gt 0){Invoke-PMMProgressCallback $ProgressCallback (0.82+(0.15*($verifyIndex/[double]$stagedRecords.Count))) ((Get-PMMText 'Verified {0}' 'Verificado {0}') -f [string]$record.Name)}
+    $transaction.Files=$files.ToArray();$transaction.StateFiles=$states.ToArray()
+    Save-PMMDeploymentCheckpoint $transaction $manifestPath 'Prepared'
+    Invoke-PMMProgressCallback $ProgressCallback 0.68 (Get-PMMText 'Rollback backup ready. Committing deployment...' 'Copia de recuperacion lista. Aplicando despliegue...')
+    foreach($file in $transaction.Files){
+      if([bool]$file.Existed){if(-not[IO.File]::Exists($file.Target) -or (Get-PMMRecoveryHash $file.Target) -ne $file.BeforeHash){throw 'Deployment target changed after its verified backup; analyze again.'}}
+      elseif([IO.File]::Exists($file.Target)){throw 'A deployment target appeared after planning; analyze again.'}
     }
-    Invoke-PMMProgressCallback $ProgressCallback 0.97 (Get-PMMText 'Recording deployment state...' 'Guardando estado del despliegue...')
-    Write-PMMDeploymentState $State
-    Write-PMMPendingRemovalRecords @()
-    [pscustomobject]@{SchemaVersion=1;State='Committed';Completed=(Get-Date).ToString('o');GameMods=$Context.GameMods;Touched=[string[]]$touched;BackupCount=$backupRecords.Count}|ConvertTo-Json -Depth 10|Set-Content -LiteralPath (Join-Path $backupRoot 'transaction.json') -Encoding UTF8
-    Remove-Item -LiteralPath $stageRoot -Recurse -Force -ErrorAction SilentlyContinue
+    Save-PMMDeploymentCheckpoint $transaction $manifestPath 'Committing' 0
+    $index=0
+    foreach($action in @($Operations.RemoveActions)){
+      Save-PMMDeploymentCheckpoint $transaction $manifestPath 'Committing' $index
+      if([IO.File]::Exists([string]$action.Path)){[IO.File]::Delete([string]$action.Path)}
+      $index++;Save-PMMDeploymentCheckpoint $transaction $manifestPath 'Committing' $index
+    }
+    foreach($item in $staged){
+      Save-PMMDeploymentCheckpoint $transaction $manifestPath 'Committing' $index
+      if([IO.File]::Exists($item.Destination)){[IO.File]::Replace($item.Stage,$item.Destination,[NullString]::Value,$true)}else{[IO.File]::Move($item.Stage,$item.Destination)}
+      $index++;Save-PMMDeploymentCheckpoint $transaction $manifestPath 'Committing' $index
+      Invoke-PMMProgressCallback $ProgressCallback 0.80 ((Get-PMMText 'Committed {0}' 'Aplicado {0}') -f $item.Name)
+    }
+    Save-PMMDeploymentCheckpoint $transaction $manifestPath 'Verifying'
+    foreach($item in $staged){if(-not[IO.File]::Exists($item.Destination) -or (Get-PMMRecoveryHash $item.Destination) -ne $item.ExpectedHash){throw ('Deploy verification failed for '+$item.Name)}}
+    Save-PMMDeploymentCheckpoint $transaction $manifestPath 'WritingState'
+    Write-PMMDeploymentState $State;Write-PMMPendingRemovalRecords @()
+    Save-PMMDeploymentCheckpoint $transaction $manifestPath 'Committed'
+    $committed=$true
+    try{Assert-PMMRecoveryFlatDirectory $stageRoot $gameMods;Remove-Item -LiteralPath $stageRoot -Recurse -Force -ErrorAction Stop}catch{Write-PMMLog ('Committed deployment stage cleanup warning: '+$_.Exception.Message)}
     Remove-PMMOldDeploymentBackups 3
     return $backupRoot
   }catch{
-    $failure=$_.Exception.Message
-    $wasCancelled=($_.Exception -is [System.OperationCanceledException] -or $failure -eq 'PMM_OPERATION_CANCELLED')
-    $rollbackErrors=[System.Collections.Generic.List[string]]::new()
-    if($commitStarted){
-      Write-PMMLog ('Deploy commit failed; rolling back managed game-folder changes: '+$failure)
-      foreach($path in @($touched)){
-        try{if(Test-Path -LiteralPath $path -PathType Leaf){Remove-Item -LiteralPath $path -Force -ErrorAction Stop}}catch{$rollbackErrors.Add("remove current '$path': "+$_.Exception.Message)}
-      }
-      foreach($record in $backupRecords){
-        try{Copy-Item -LiteralPath ([string]$record.Backup) -Destination ([string]$record.Original) -Force -ErrorAction Stop}catch{$rollbackErrors.Add("restore '$($record.Original)': "+$_.Exception.Message)}
-      }
-      $oldStateBackup=Join-Path $backupRoot 'deployment-state.before.json'
+    $failure=$_.Exception.Message;$cancelled=($_.Exception -is [OperationCanceledException] -or $failure -eq 'PMM_OPERATION_CANCELLED')
+    if($transaction -and -not$committed){
+      $transaction.Error=$failure
       try{
-        if($oldStateExists){if(Test-Path -LiteralPath $oldStateBackup -PathType Leaf){Copy-Item -LiteralPath $oldStateBackup -Destination $statePath -Force -ErrorAction Stop}else{throw 'deployment-state backup is missing'}}
-        else{Remove-Item -LiteralPath $statePath -Force -ErrorAction SilentlyContinue}
-      }catch{$rollbackErrors.Add('restore deployment-state.json: '+$_.Exception.Message)}
-      $oldPendingBackup=Join-Path $backupRoot 'pending-removals.before.json'
-      try{
-        if($oldPendingExists){if(Test-Path -LiteralPath $oldPendingBackup -PathType Leaf){Copy-Item -LiteralPath $oldPendingBackup -Destination $pendingPath -Force -ErrorAction Stop}else{throw 'pending-removals backup is missing'}}
-        else{Remove-Item -LiteralPath $pendingPath -Force -ErrorAction SilentlyContinue}
-      }catch{$rollbackErrors.Add('restore pending-removals.json: '+$_.Exception.Message)}
-      try{
-        [pscustomobject]@{SchemaVersion=1;State=$(if($rollbackErrors.Count -eq 0){'RolledBack'}else{'RollbackIncomplete'});Failed=(Get-Date).ToString('o');Error=$failure;RollbackErrors=$rollbackErrors.ToArray()}|ConvertTo-Json -Depth 10|Set-Content -LiteralPath (Join-Path $backupRoot 'transaction.json') -Encoding UTF8
-      }catch{}
+        Save-PMMDeploymentCheckpoint $transaction $manifestPath ([string]$transaction.State) ([int]$transaction.Step)
+        $null=Repair-PMMDeploymentRecord -Path $manifestPath -GameMods $gameMods
+      }catch{throw ('Deployment failed; recovery is blocked and its full record is preserved at '+$manifestPath+'. Original error: '+$failure+'. Recovery: '+$_.Exception.Message)}
     }
-    Remove-Item -LiteralPath $stageRoot -Recurse -Force -ErrorAction SilentlyContinue
-    if($commitStarted -and $rollbackErrors.Count -gt 0){
-      $detail=($rollbackErrors.ToArray() -join "`n")
-      throw (Get-PMMText ("Deploy failed and automatic rollback was incomplete. Do not launch Palworld yet. Recovery data is preserved in: {0}`nOriginal error: {1}`nRollback errors:`n{2}" -f $backupRoot,$failure,$detail) ("Deploy fallo y el rollback automatico quedo incompleto. No inicies Palworld todavia. Los datos de recuperacion se conservaron en: {0}`nError original: {1}`nErrores de rollback:`n{2}" -f $backupRoot,$failure,$detail))
-    }
-    if($wasCancelled){throw [System.OperationCanceledException]::new('PMM_OPERATION_CANCELLED')}
-    $message=if($commitStarted){Get-PMMText 'Deploy failed after commit started, but PMM restored every managed game-folder file from its verified rollback backup.' 'Deploy fallo despues de iniciar el commit, pero PMM restauro todos los archivos gestionados de la carpeta del juego desde el backup verificado de rollback.'}else{Get-PMMText 'Deploy failed before any managed game-folder file was changed.' 'Deploy fallo antes de cambiar ningun archivo gestionado de la carpeta del juego.'}
-    throw ("$message`n`n$failure")
-  }
+    if($cancelled){throw [OperationCanceledException]::new('PMM_OPERATION_CANCELLED')}
+    throw ('Deployment failed; managed changes were restored when commit had begun. '+$failure)
+  }finally{if($gameLock){$gameLock.Dispose()};$lock.Dispose()}
 }
 
 function Deploy-PMMManagedState([scriptblock]$ProgressCallback=$null) {
-  $journal=''
+  $journal='';$processingGate=$null;$moduleLease=$null
   try{
+  try{$processingGate=[IO.File]::Open((Join-PMMPath 'Cache' 'PMM.background-operation.lock'),[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{throw 'Another PMM processing operation is running; finish it before deployment.'}
+  if(Get-Command Start-PMMModuleOperation -ErrorAction SilentlyContinue){$moduleLease=Start-PMMModuleOperation 'Deploy'}
   Invoke-PMMProgressCallback $ProgressCallback 0.02 (Get-PMMText 'Checking deployment state...' 'Comprobando estado del despliegue...')
   $context=Get-PMMDeploymentContext
   try{if(Get-Command Start-PMMJournalOperation -ErrorAction SilentlyContinue){$journal=Start-PMMJournalOperation -Kind Deploy -Target ([string]$context.GameMods) -Metadata ([ordered]@{ActiveMods=@($context.Active).Count;Patch=$(if($context.Patch){[string]$context.Patch.Name}else{''})})}}catch{Write-PMMLog ('Could not start common Deploy journal: '+$_.Exception.Message)}
@@ -1963,6 +1944,7 @@ function Deploy-PMMManagedState([scriptblock]$ProgressCallback=$null) {
     SuppressedAlternatives=@($context.Suppressed);
     Patch=$(if($context.Patch){[pscustomobject]@{Name=$context.Patch.Name;Hash=$context.Patch.Hash}}else{$null})
   }
+  if($moduleLease){$state|Add-Member -NotePropertyName ModuleSnapshot -NotePropertyValue $moduleLease.Snapshot}
   Invoke-PMMProgressCallback $ProgressCallback 0.14 (Get-PMMText 'Starting transactional deployment...' 'Iniciando despliegue transaccional...')
   if($journal){try{Write-PMMJournalStep -OperationId $journal -Kind Deploy -Step PlanValidated -Status Complete -Metadata ([ordered]@{Copies=@($ops.CopyActions).Count;Removals=@($ops.RemoveActions).Count})}catch{Write-PMMLog ('Could not update common Deploy journal after validation: '+$_.Exception.Message)}}
   $backupRoot=Invoke-PMMDeploymentTransaction $context $ops $state $ProgressCallback
@@ -1979,7 +1961,7 @@ function Deploy-PMMManagedState([scriptblock]$ProgressCallback=$null) {
   }catch{
     if($journal){try{Fail-PMMJournalOperation -OperationId $journal -Kind Deploy -Message $_.Exception.Message}catch{}}
     throw
-  }
+  }finally{if($processingGate){$processingGate.Dispose()};if($moduleLease){Complete-PMMModuleOperation $moduleLease.Id}}
 }
 
 function Import-PMMPatchBackup([string]$PakPath) {

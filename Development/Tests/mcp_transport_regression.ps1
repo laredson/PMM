@@ -1,4 +1,4 @@
-param([string]$Repository=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
+﻿param([string]$Repository=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))))
 Set-StrictMode -Version 2.0
 $ErrorActionPreference='Stop'
 $app=Join-Path $Repository 'PMM'
@@ -65,6 +65,6 @@ $Script:PMMAIIOCaseUI=@{CmbTransport=$combo;BtnHandoff=$button}
 $combo.SelectedValue='MCP';Update-PMMAIIOTransportButton
 Assert ($button.Content -eq 'Publish to MCP') 'MCP button wording'
 $combo.SelectedValue='MANUAL_ZIP';Update-PMMAIIOTransportButton
-Assert ($button.Content -eq 'Create handoff') 'Manual button wording'
+Assert ($button.Content -eq 'Export context ZIP') 'Manual context export button wording'
 Write-Output ("MCP_TRANSPORT_OK: {0} assertions" -f $script:assertions)
 

@@ -1,4 +1,4 @@
-<# AIIO Case Workspace preview 4.
+﻿<# AIIO Case Workspace preview 4.
    AUTO is a transaction over the editable case: save current edits, perform
    every available local action, then create the next handoff. Progress belongs
    in the case footer instead of occupying the step-navigation area. #>
@@ -182,7 +182,7 @@ function Show-PMMAIIONewCaseDialog {
 
   $script:PMMAIIONewCaseDialogResult=$null
   $cancel.Add_Click({$dialog.DialogResult=$false;$dialog.Close()})
-  $create.Add_Click({$map=@{'New Mod'='NEW_MOD';'Fix Mod'='FIX_MOD';'Compatibility'='COMPATIBILITY';'Undefined / Research'='UNDEFINED'};$script:PMMAIIONewCaseDialogResult=[pscustomobject]@{Title=[string]$title.Text;Type=[string]$map[[string]$type.SelectedItem];Description=[string]$description.Text};$dialog.DialogResult=$true;$dialog.Close()})
+  $create.Add_Click({$map=@{'New Mod'='NEW_MOD';'Fix Mod'='FIX_MOD';'Compatibility'='COMPATIBILITY';'Question / Research'='QUERY';'Undefined / Research'='UNDEFINED'};$script:PMMAIIONewCaseDialogResult=[pscustomobject]@{Title=[string]$title.Text;Type=[string]$map[[string]$type.SelectedItem];Description=[string]$description.Text};$dialog.DialogResult=$true;$dialog.Close()})
   $dialog.Content=$root;$title.Focus()|Out-Null
   $result=$null;if($dialog.ShowDialog() -eq $true){$result=$script:PMMAIIONewCaseDialogResult};$script:PMMAIIONewCaseDialogResult=$null;return $result
 }
