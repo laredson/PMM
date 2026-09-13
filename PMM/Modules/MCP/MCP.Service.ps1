@@ -157,6 +157,7 @@ function Get-PMMMCPTools {
         @('pmm_reference_search','Search current hydrated Game Reference. If unavailable call pmm_reference_prepare and poll status; no user action is needed.',@{query=$str},@('query'),$true),
         @('pmm_reference_export','Copy one current, hash-verified hydrated Vanilla family into this case. Maximum 64 MiB. Does not extract the full game.',@{caseId=$case;logicalPath=@{type='string';minLength=1;maxLength=512}},@('caseId','logicalPath'),$false)
     )
+    if(Get-Command Get-PMMAnalysisMCPDefinitions -ErrorAction SilentlyContinue){$defs+=@(Get-PMMAnalysisMCPDefinitions $case)}
     foreach($d in $defs){
         [pscustomobject]@{name=$d[0];description=$d[1];inputSchema=@{type='object';properties=$d[2];required=@($d[3]);additionalProperties=$false};annotations=@{readOnlyHint=$d[4];destructiveHint=$false;openWorldHint=$false}}
     }
@@ -189,8 +190,14 @@ function Invoke-PMMMCPTool([string]$Name,$Arguments) {
         if(@($Arguments.PSObject.Properties | ForEach-Object {$_.Name}) -contains 'caseId' -and $Arguments.caseId -cne $Script:PMMMCPScopeCase){throw 'This client is scoped to another case.'}
         if($Name -eq 'pmm_cases_list'){return @{cases=@((ConvertTo-PMMMCPCase (Get-PMMMCPCase $Script:PMMMCPScopeCase)));nextOffset=$null}}
     }
+    if($Name -in @('pmm_agent_next_stage','pmm_merge_start','pmm_known_solutions','pmm_deep_report','pmm_repair_get','pmm_repair_attempt','pmm_runtime_capabilities','pmm_update_stage','pmm_analysis_job','pmm_repair_stop')){return (Invoke-PMMAnalysisMCP $Name $Arguments)}
+    if((Get-Variable PMMMCPRepairSession -Scope Script -ErrorAction SilentlyContinue) -and $Script:PMMMCPRepairSession -and -not $definition[0].annotations.readOnlyHint){
+      $session=Get-PMMRepairSession $Script:PMMMCPRepairSession
+      $capability=if($Name -eq 'pmm_dependency_install'){'Dependencies'}elseif($Name -match '^pmm_(asset_edit|candidate_build|unreal_)'){'Build'}else{'Research'}
+      Assert-PMMRepairAuthorization $session.Id $session.CaseId $session.EvidenceRevision $capability|Out-Null
+    }
     if($Name -eq 'pmm_dependencies_status'){return @{components=@(Get-PMMDependencyCatalog);policy=(Get-PMMDependencyPolicy).mode}}
-    if($Name -eq 'pmm_dependency_install'){Write-PMMMCPAudit $Name 'REQUESTED';return (Request-PMMDependencyInstall $Arguments.component $Arguments.caseId)}
+    if($Name -eq 'pmm_dependency_install'){Write-PMMMCPAudit $Name 'REQUESTED';$repairId='';if(Get-Variable PMMMCPRepairSession -Scope Script -ErrorAction SilentlyContinue){$repairId=$Script:PMMMCPRepairSession};return (Request-PMMDependencyInstall $Arguments.component $Arguments.caseId $repairId)}
     if($Name -eq 'pmm_dependency_job'){return (Get-PMMDependencyJob $Arguments.jobId $Arguments.caseId)}
     if($Name -eq 'pmm_dependency_cancel'){[void](Get-PMMDependencyJob $Arguments.jobId $Arguments.caseId);return (Cancel-PMMDependencyInstall $Arguments.jobId)}
 
@@ -242,7 +249,15 @@ function Invoke-PMMMCPTool([string]$Name,$Arguments) {
         if($Name -in @('pmm_request_claim','pmm_request_progress','pmm_request_complete')){return (Invoke-PMMMCPExchangeTool $Name $Arguments)}
         switch -CaseSensitive ($Name){
             'pmm_asset_edit' {return (Edit-PMMMCPAsset $Arguments)}
-            'pmm_candidate_build' {return (Build-PMMMCPAssetCandidate $Arguments)}
+            'pmm_candidate_build' {
+              if((Get-Variable PMMMCPRepairSession -Scope Script -ErrorAction SilentlyContinue) -and $Script:PMMMCPRepairSession){
+                $dir=Get-PMMMCPAssetCandidate $Arguments.caseId $Arguments.candidateId
+                $manifest=Read-PMMMCPJson (Join-Path $dir 'candidate.json')
+                $fingerprint=Get-PMMAnalysisHash @($manifest.EvidenceRevisionId,$manifest.files,$manifest.edits)
+                Register-PMMRepairCandidate $Script:PMMMCPRepairSession $fingerprint $Arguments.candidateId|Out-Null
+              }
+              return (Build-PMMMCPAssetCandidate $Arguments)
+            }
             'pmm_candidates_list' {return @{candidates=@(Get-PMMMCPAssetCandidates $Arguments.caseId)}}
             'pmm_asset_inspect' {return (Invoke-PMMMCPAssetInspect $Arguments)}
             'pmm_archive_search' {return (Search-PMMMCPArchive $Arguments)}

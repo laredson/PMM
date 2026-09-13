@@ -1,4 +1,4 @@
-. (Join-Path $PSScriptRoot '../MCP/ChatGPT.Desktop.ps1')
+﻿. (Join-Path $PSScriptRoot '../MCP/ChatGPT.Desktop.ps1')
 . (Join-Path $PSScriptRoot 'Wwise.Offline.ps1')
 
 function Get-PMMDependencyRoot {return (Resolve-PMMMCPPath $Script:Root 'Workspace\Dependencies')}
@@ -50,7 +50,8 @@ function Start-PMMDependencyWorker([string]$Id){
     $p=Start-Process $exe -ArgumentList $args -WindowStyle Hidden -PassThru
     $p.Dispose()
 }
-function Request-PMMDependencyInstall([string]$Component,[string]$CaseId=''){
+function Request-PMMDependencyInstall([string]$Component,[string]$CaseId='',[string]$RepairSessionId=''){
+    if($RepairSessionId){$repair=Get-PMMRepairSession $RepairSessionId;Assert-PMMRepairAuthorization $RepairSessionId $CaseId $repair.EvidenceRevision Dependencies|Out-Null}
     if($CaseId){[void](Get-PMMMCPCase $CaseId)}
     if($Component -notin @('all')+@(Get-PMMDependencyDefinitions|ForEach-Object{$_.id})){throw 'Component is not in PMM catalog.'}
     $root=Get-PMMDependencyRoot;[void][IO.Directory]::CreateDirectory((Join-Path $root 'Jobs'))
@@ -66,9 +67,9 @@ function Request-PMMDependencyInstall([string]$Component,[string]$CaseId=''){
             }
         }
         $policy=Get-PMMDependencyPolicy
-        $auto=$policy.mode -eq 'automatic' -and $policy.catalogVersion -eq 1
+        $auto=($policy.mode -eq 'automatic' -and $policy.catalogVersion -eq 1) -or [bool]$RepairSessionId
         $id=[guid]::NewGuid().ToString('N')
-        $job=[pscustomobject]@{id=$id;operation='install';component=$Component;caseId=$CaseId;status=$(if($auto){'QUEUED'}else{'AWAITING_CONSENT'});message='Installation requested';automatic=$auto;cancel=$false;createdUtc=[DateTime]::UtcNow.ToString('o')}
+        $job=[pscustomobject]@{repairSessionId=$RepairSessionId;id=$id;operation='install';component=$Component;caseId=$CaseId;status=$(if($auto){'QUEUED'}else{'AWAITING_CONSENT'});message='Installation requested';automatic=$auto;cancel=$false;createdUtc=[DateTime]::UtcNow.ToString('o')}
         Write-PMMAIIOJsonAtomic (Get-PMMDependencyJobPath $id) $job 8
         if($auto){Start-PMMDependencyWorker $id}
         return $job

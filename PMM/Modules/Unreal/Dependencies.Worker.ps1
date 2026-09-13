@@ -1,4 +1,4 @@
-
+﻿
 param([string]$Root,[string]$JobId)
 Set-StrictMode -Version 2.0
 # Load the utility module from this host, not an inherited PowerShell 7 module path.
@@ -13,9 +13,14 @@ Import-Module (Join-Path $PSHOME 'Modules\Microsoft.PowerShell.Security\Microsof
 . (Join-Path $Root 'Modules\Unreal\Unreal.Install.ps1')
 $path=Get-PMMDependencyJobPath $JobId
 $job=Read-PMMMCPJson $path
+if($job.PSObject.Properties.Name -contains 'repairSessionId' -and $job.repairSessionId){. (Join-Path $Root 'Modules/Analysis/Services.ps1')}
 function Check-InstallCancellation{
     $current=Read-PMMMCPJson $path
     if($current.cancel){throw 'Installation request cancelled.'}
+    if($current.PSObject.Properties.Name -contains 'repairSessionId' -and $current.repairSessionId){
+      $s=Get-PMMRepairSession $current.repairSessionId
+      Assert-PMMRepairAuthorization $s.Id $current.caseId $s.EvidenceRevision Dependencies|Out-Null
+    }
 }
 function Report-Install([string]$State,[string]$Message){
     $current=Read-PMMMCPJson $path

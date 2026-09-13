@@ -1,0 +1,16 @@
+﻿# PMM 1.3.3 — Deep analysis preview
+
+Based on 1.3.2 commit 3e57247. Keeps the six-tab interface, case repairs, mappings handling and current-game table recovery.
+
+- Adds background deep analysis, explicit coverage, evidence filtering, JSON/HTML reports and selected-finding case creation/linking.
+- Adds Nexus/GitHub origin and variant checks, authorized staged downloads, preserved originals and proposed-set reanalysis.
+- Replaces ephemeral agent execution with persistent App Server case bindings, session permissions, retained attempts and cancellable merge/update jobs.
+- Selectively integrates the 1.4.0-ReUI service/presentation separation, module catalog, idle-compatible reload and durable deployment recovery. No 1.4.0 UI redesign is imported.
+- Keeps existing native binaries.
+- Adds account-aware AI routing: Luna/low/standard for routine work, explicit ceilings for Terra/Sol escalation, live model/effort acknowledgement, reported quota checks and a manual-chat path. API billing is a separate opt-in.
+
+The complete automatic game repair/test/isolation loop is **not accepted**. Shared desktop control is unavailable in the tested Windows runtime; game isolation and supervised world validation still require a validated adapter. These capabilities are explicitly gated.
+
+FasterMounts/RushRoar retains the 1.3.2 current-layout repair. EasyBreeding/NoCollision remains unsupported where current Blueprint schema coverage is insufficient. No Palworld launch or deployment was performed during development.
+
+Usage: [English](DEEP_ANALYSIS.en.md) · [Español](DEEP_ANALYSIS.es.md).

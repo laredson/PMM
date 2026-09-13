@@ -1,4 +1,4 @@
-param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))),[string]$CaseId='')
+﻿param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))),[string]$CaseId='',[string]$RepairSessionId='')
 Set-StrictMode -Version 2.0
 $ErrorActionPreference='Stop'
 $ProgressPreference='SilentlyContinue'
@@ -11,6 +11,7 @@ $wire=[Console]::Out
 $Script:Root=[IO.Path]::GetFullPath($Root)
 . (Join-Path $PSScriptRoot 'MCP.Service.ps1')
 $Script:PMMMCPScopeCase=$CaseId
+$Script:PMMMCPRepairSession=$RepairSessionId
 [void](Resolve-PMMMCPPath $Script:Root)
 # Do not run migration, dependency setup or WPF in the bridge.
 $Script:PMMPaths=[ordered]@{App=$Script:Root}
@@ -24,6 +25,9 @@ foreach($pair in @(
 foreach($module in @('Shared\Paths.ps1','Shared\Common.ps1','GameReference\GameReferenceService.ps1','AIIO\AIIO.SessionService.ps1','AIIO\AIIO.ModCreationService.ps1','AIIO\AIIO.CaseWorkspaceService.ps1')){
     . (Join-Path $Script:Root ('Modules\'+$module)) | Out-Null
 }
+. (Join-Path $Script:Root 'Modules/Analysis/Services.ps1') | Out-Null
+. (Join-Path $Script:Root 'Modules/Analysis/MCP.Analysis.ps1')
+. (Join-Path $Script:Root 'Modules/Workbench.Services.ps1') -Profile MCP | Out-Null
 Add-Type -TypeDefinition @'
 using System;
 using System.IO;
@@ -90,7 +94,8 @@ while($true){
                 $arguments=[pscustomobject]@{}
                 if(@($params.PSObject.Properties | ForEach-Object { $_.Name }) -contains 'arguments'){$arguments=$params.arguments}
                 try{
-                    $value=Invoke-PMMMCPTool $params.name $arguments
+                    $lease=Start-PMMModuleOperation $params.name
+                    try{$value=Invoke-PMMMCPTool $params.name $arguments}finally{if($lease){Complete-PMMModuleOperation $lease.Id}}
                     $result=@{content=@(@{type='text';text=($value | ConvertTo-Json -Depth 30 -Compress)});isError=$false}
                 }catch{$result=@{content=@(@{type='text';text=$_.Exception.Message});isError=$true}}
             }

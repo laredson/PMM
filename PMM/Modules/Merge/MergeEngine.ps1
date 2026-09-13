@@ -1796,7 +1796,7 @@ function Get-PMMOrderedManagedPatchCandidates {
     @{Expression={$_.Modified};Descending=$true})
 }
 
-function Set-PMMPlanEquivalentPatch($Plan,$Patch,[array]$Mods) {
+function Set-PMMPlanEquivalentPatch($Plan,$Patch,[array]$Mods,[switch]$NoPatchSelection) {
   if(-not$Plan -or -not$Patch){return $Plan}
   $patchedMods=@($Patch.PatchedMods|ForEach-Object{[string]$_}|Where-Object{$_}|Sort-Object -Unique)
   $values=[ordered]@{
@@ -1813,7 +1813,7 @@ function Set-PMMPlanEquivalentPatch($Plan,$Patch,[array]$Mods) {
     if($Plan.PSObject.Properties.Name -contains $kv.Key){$Plan.($kv.Key)=$kv.Value}else{$Plan|Add-Member -NotePropertyName $kv.Key -NotePropertyValue $kv.Value}
   }
   $Plan.DeploymentSuppressions=@(Get-PMMPatchDeploymentSuppressions $Mods $Patch $Plan)
-  try{Set-PMMSelectedPatchName ([string]$Patch.Name)}catch{}
+  if(-not$NoPatchSelection){try{Set-PMMSelectedPatchName ([string]$Patch.Name)}catch{}}
   return $Plan
 }
 
@@ -1849,7 +1849,7 @@ function ConvertTo-PMMReusePlanAsset($Asset) {
   }
 }
 
-function Get-PMMFastPatchReuseCandidate([array]$Mods,[array]$AnalysisMods,[array]$SharedGroups) {
+function Get-PMMFastPatchReuseCandidate([array]$Mods,[array]$AnalysisMods,[array]$SharedGroups,[switch]$NoPatchSelection) {
   <#
   Conservative pre-adapter reuse for automatic patches. A manifest proves every
   patched shared group; any remaining current group must either be covered by a
@@ -1941,7 +1941,7 @@ function Get-PMMFastPatchReuseCandidate([array]$Mods,[array]$AnalysisMods,[array
       AlreadyPatched=$false;ActivePatch='';PatchedMods=@();PackageChoicePendingReanalysis=$false;DeploymentSuppressions=@();Assets=$proofAssets.ToArray();Rows=@()
     }
     if(Test-PMMPatchPlanCompatible $patch $plan $Mods){
-      $plan=Set-PMMPlanEquivalentPatch $plan $patch $Mods
+      $plan=Set-PMMPlanEquivalentPatch $plan $patch $Mods -NoPatchSelection:$NoPatchSelection
       return [pscustomobject]@{Patch=$patch;Plan=$plan}
     }
   }
@@ -1949,7 +1949,7 @@ function Get-PMMFastPatchReuseCandidate([array]$Mods,[array]$AnalysisMods,[array
 }
 
 function Invoke-PMMScan {
-  param([switch]$Force)
+  param([switch]$Force,[switch]$NoPatchSelection)
   Assert-Repak
   Assert-PMMEngineReady
   $mods = @(Get-LibraryMods)
@@ -2098,7 +2098,7 @@ function Invoke-PMMScan {
 
   if(-not$Force -and $packageAssets.Count -eq 0 -and $packageRows.Count -eq 0){
     Invoke-PMMProgress 1 2 (Get-PMMText 'Checking whether the saved compatibility patch still covers the effective conflict set...' 'Comprobando si el parche guardado aun cubre el conjunto efectivo de conflictos...')
-    $fastReuse=Get-PMMFastPatchReuseCandidate $mods $analysisMods $shared
+    $fastReuse=Get-PMMFastPatchReuseCandidate $mods $analysisMods $shared -NoPatchSelection:$NoPatchSelection
     if($fastReuse){
       $plan=$fastReuse.Plan
       $patch=$fastReuse.Patch
@@ -2199,7 +2199,7 @@ function Invoke-PMMScan {
     $equivalentPatch=$null
     if(-not$Force){
       $equivalentPatch=Get-PMMPlanCompatibleManagedPatch $plan $mods
-      if($equivalentPatch){$plan=Set-PMMPlanEquivalentPatch $plan $equivalentPatch $mods}
+      if($equivalentPatch){$plan=Set-PMMPlanEquivalentPatch $plan $equivalentPatch $mods -NoPatchSelection:$NoPatchSelection}
     }
     Write-PMMMergePlan $plan
 
@@ -2456,8 +2456,15 @@ function ConvertTo-PMMPatchManifestAssetProof($Asset) {
 }
 
 function Build-PMMMerge {
-  param([ValidateSet('ConflictGroups')][string]$Mode='ConflictGroups')
+  param([ValidateSet('ConflictGroups')][string]$Mode='ConflictGroups',[string]$CandidateDirectory='')
   Assert-PMMEngineReady;Assert-Repak
+  if($CandidateDirectory){
+    $candidateRoot=[IO.Path]::GetFullPath($CandidateDirectory)
+    $workspace=[IO.Path]::GetFullPath((Get-PMMPath 'Workspace')).TrimEnd('\')+'\'
+    if(-not$candidateRoot.StartsWith($workspace,[StringComparison]::OrdinalIgnoreCase)){throw 'A candidate must remain inside the PMM workspace.'}
+    if(Test-Path -LiteralPath $candidateRoot){throw 'Candidate output already exists; preserve it and use its recorded result.'}
+    [void][IO.Directory]::CreateDirectory($candidateRoot)
+  }
   $mods=@(Get-LibraryMods);if($mods.Count -eq 0){throw(Get-PMMText 'The library contains no mods.' 'La biblioteca no contiene mods.')}
   $plan=Assert-PMMPlanMatchesLibrary $mods
   $transaction=Join-Path (Get-PMMPath 'Cache') ('Build_'+[guid]::NewGuid().ToString('N'));$outDir=Join-Path $transaction 'PatchRoot';New-Item -ItemType Directory -Force -Path $outDir|Out-Null
@@ -2481,7 +2488,7 @@ function Build-PMMMerge {
       return (Get-PMMText 'No compatibility overlay is needed; shared files are identical.' 'No hace falta overlay de compatibilidad; los archivos compartidos son identicos.')
     }
     Assert-OutputAssetFamiliesComplete $outDir
-    $stamp=Get-Date -Format 'yyyyMMdd_HHmmss';$name="zzzzzzzzzz_PMM_Merge_${stamp}_P.pak";$build=Join-Path (Join-PMMPath 'Builds' 'Current') $name
+    $stamp=Get-Date -Format 'yyyyMMdd_HHmmss';$name="zzzzzzzzzz_PMM_Merge_${stamp}_P.pak";$build=Join-Path $(if($CandidateDirectory){$candidateRoot}else{Join-PMMPath 'Builds' 'Current'}) $name
     $buildStep++
     Invoke-PMMBuildProgress $buildStep $buildTotal (Get-PMMText 'Packing output PAK...' 'Empaquetando el PAK de salida...')
     Pack-Pak $outDir $build;if(-not(Test-Pak $build)){throw 'Generated PAK failed index verification.'};Assert-PakAssetFamiliesComplete $build
@@ -2522,6 +2529,7 @@ function Build-PMMMerge {
     }
     $manifestPath=$build+'.manifest.json'
     $manifest|ConvertTo-Json -Depth 40|Set-Content -LiteralPath $manifestPath -Encoding UTF8
+    if(-not$CandidateDirectory){
     $previousRoot=Join-PMMPath 'Builds' 'Previous'
     New-Item -ItemType Directory -Force -Path $previousRoot|Out-Null
     foreach($old in @(Get-ChildItem (Join-PMMPath 'Builds' 'Current') -Filter 'zzzzzzzzzz_PMM_Merge_*_P.pak' -File -ErrorAction SilentlyContinue)){
@@ -2532,7 +2540,9 @@ function Build-PMMMerge {
       if(Test-Path -LiteralPath $oldSidecar -PathType Leaf){Move-Item $oldSidecar ($previousPak+'.manifest.json') -Force}
     }
     $cfg=Get-PMMConfig;$cfg.LastBuild=$name;if(-not($cfg.PSObject.Properties.Name -contains 'SelectedPatchName')){$cfg|Add-Member -NotePropertyName SelectedPatchName -NotePropertyValue ''};$cfg.SelectedPatchName=$name;Save-PMMConfig $cfg
+    }
     Invoke-PMMBuildProgress $buildTotal $buildTotal (Get-PMMText 'Build complete - ready to Deploy.' 'Build terminado - listo para Deploy.')
+    if($CandidateDirectory){return ('Compatibility candidate built: '+$build+'. Runtime unproven; selection and deployment unchanged.')}
     return((Get-PMMText "Compatibility overlay built locally:`n{0}`n`nShared assets reconciled: {1}`nPAK: {2:N1} KB`nSHA-256:`n{3}`n`nNo game files were changed. Press DEPLOY to synchronize active source mods and this patch to Palworld." "Overlay de compatibilidad creado localmente:`n{0}`n`nAssets compartidos reconciliados: {1}`nPAK: {2:N1} KB`nSHA-256:`n{3}`n`nNo se modifico ningun archivo del juego. Pulsa DEPLOY para sincronizar los mods fuente activos y este parche con Palworld.") -f $name,@($plan.Assets|Where-Object{$_.Mode -ne 'Identical'}).Count,((Get-Item $build).Length/1KB),(Get-Sha256 $build))
   }finally{
     Remove-Item -LiteralPath $transaction -Recurse -Force -ErrorAction SilentlyContinue

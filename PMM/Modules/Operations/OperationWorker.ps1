@@ -1,6 +1,6 @@
 ﻿param(
   [Parameter(Mandatory=$true)][string]$Root,
-  [Parameter(Mandatory=$true)][ValidateSet('Analyze','Build','AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','FixLabBuild','MappingsImport')][string]$Operation,
+  [Parameter(Mandatory=$true)][ValidateSet('Analyze','Build','AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','FixLabBuild','MappingsImport','DeepAnalysis','DeepCase','DeepSource','Recovery')][string]$Operation,
   [Parameter(Mandatory=$true)][string]$ProgressPath,
   [Parameter(Mandatory=$true)][string]$ResultPath,
   [switch]$Force,
@@ -9,6 +9,7 @@
   [string]$SessionId='',
   [string]$InputZip='',
   [string]$MappingsFile='',
+  [string]$RequestPath='',
   [string]$SolutionId='',
   [string]$FixLabJobId='',
   [string]$FixLabRecipeId='',
@@ -48,6 +49,7 @@ Initialize-PMMPaths $Script:Root|Out-Null
 if($Operation -eq 'FixLabBuild'){
   . (Join-Path $Script:Root 'Modules\FixLab\FixLabService.ps1')
 }
+. (Join-Path $Script:Root 'Modules/Workbench.Services.ps1') -Profile Worker
 Start-PMMLogSession ('Worker-'+$Operation)
 Initialize-PMM
 if($Operation -eq 'FixLabBuild'){Initialize-PMMFixLab}
@@ -94,18 +96,19 @@ function Set-PMMFixLabProgress {
 }
 
 $operationLockStream=$null
-$journalId=''
+$journalId='';$moduleLease=$null
 try{
   # All heavy operations share one coherent Workspace/State snapshot. Serialize
   # them across separate PMM windows and workers. The WPF process remains free
   # to navigate and render while this child owns the operation slot.
   $operationLockPath=Join-PMMPath 'Cache' 'PMM.background-operation.lock'
-  try{$operationLockStream=[IO.File]::Open($operationLockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{
+  if($Operation -ne 'Recovery'){try{$operationLockStream=[IO.File]::Open($operationLockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{
     throw 'Another PMM processing operation is already running for this installation.'
-  }
+  }}
   $journalTarget=if($Operation -eq 'FixLabBuild'){$FixLabJobId}elseif($Operation -in @('AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild')){$SessionId}else{'Workspace'}
   $journalId=Start-PMMJournalOperation -Kind $Operation -Target $journalTarget -Metadata ([ordered]@{Force=[bool]$Force;Mode=$Mode;WorkerProcessId=$PID;SessionId=$SessionId;SolutionId=$SolutionId})
 
+  $moduleLease=Start-PMMModuleOperation $Operation
   $startMessage=switch($Operation){
     'MappingsImport' {'Selecting local mappings...'}
     'Analyze' {'Starting Analyze in background...'}
@@ -124,7 +127,43 @@ try{
 
   $resultText=''
   $extra=[ordered]@{}
-  if($Operation -eq 'MappingsImport'){
+  if($Operation -eq 'Recovery'){
+    $recovered=@(Invoke-PMMDeploymentRecovery)
+    $blocked=@($recovered|Where-Object{-not$_.Recovered})
+    if($blocked.Count){throw (($blocked|ForEach-Object{$_.Error}) -join '; ')}
+    $resultText='Deployment recovery complete; external changes were preserved.'
+  }elseif($Operation -in @('DeepAnalysis','DeepCase','DeepSource')){
+    [void](Assert-PMMRecoveryPath $RequestPath (Join-PMMPath 'Cache' 'DeepRequests') -DirectChild)
+    $request=Read-PMMJsonFile $RequestPath
+    if($Operation -eq 'DeepAnalysis'){
+      $result=Invoke-PMMDeepAnalysis $request.Options
+      $extra['AnalysisId']=$result.Id;$extra['RepairSessionId']=$result.RepairSessionId
+      $resultText=$result.Summary
+    }elseif($Operation -eq 'DeepCase'){
+      $case=New-PMMCaseFromDeepAnalysis $request.AnalysisId @($request.FindingIds) ([string](Get-PMMAnalysisValue $request ExistingCaseId ''))
+      if(Get-PMMAnalysisValue $request StartRepair $false){
+        $options=$request.Options;$options.AutomaticSolution=$true
+        $session=New-PMMRepairSession $case.CaseId $options;Start-PMMRepairAgentJob $session.Id|Out-Null
+        $extra['RepairSessionId']=$session.Id
+        $viewPath=Join-Path (Get-PMMAnalysisPath $request.AnalysisId) 'view.json'
+        $view=Read-PMMJsonFile $viewPath;$view.CaseId=$case.CaseId;$view.RepairSessionId=$session.Id;Write-PMMJsonAtomic $viewPath $view -Depth 20
+      }
+      $extra['CaseId']=$case.CaseId;$resultText='Persistent case created: '+$case.CaseId
+    }elseif((Get-PMMAnalysisValue $request Action '') -eq 'RefreshAI'){
+      $client=$null
+      try{
+        $client=Start-PMMAppServer
+        Invoke-PMMAppServerRequest $client initialize @{clientInfo=@{name='pmm';version='1.3.3'};capabilities=@{experimentalApi=$true}}|Out-Null
+        Send-PMMAppServer $client initialized @{} -Notification
+        $capabilities=Get-PMMAICapabilities $client
+        $resultText='AI plan: '+$capabilities.Plan+'; '+$capabilities.Models.Count+' models. No inference request was sent.'
+      }finally{Stop-PMMAppServer $client}
+    }else{
+      $mod=Find-PMMLibraryMod $request.ModName
+      if(-not$mod){throw 'Mod no longer exists.'}
+      Set-PMMModOrigin $mod $request.Origin;$resultText='Update source saved. / Origen guardado.'
+    }
+  }elseif($Operation -eq 'MappingsImport'){
     $selection=Import-PMMLocalMappings $MappingsFile
     $resultText='Mappings selected ('+[string]$selection.Mode+'). Run Analyze again.'
   }elseif($Operation -eq 'Analyze'){
@@ -278,5 +317,6 @@ try{
   Stop-PMMLogSession 'Failed'
   exit 1
 }finally{
+  if($moduleLease){Complete-PMMModuleOperation $moduleLease.Id}
   try{if($operationLockStream){$operationLockStream.Dispose()}}catch{}
 }

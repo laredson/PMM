@@ -35,6 +35,8 @@ $aiio=Read 'PMM/Modules/AIIO/AIIO.ps1'
 $ckl=Read 'PMM/Modules/CKL/KnowledgeRecipeService.ps1'
 $contrib=Read 'PMM/Modules/CKL/KnowledgeContributionService.ps1'
 $bootstrap=Read 'PMM/Modules/Bootstrap/Start-PalModMerger.ps1'
+# 1.3.3 retains the original functions in presentation/workflow modules.
+foreach($part in @(Get-ChildItem (Join-Path $App 'Modules/Presentation') -Filter *.ps1 -File)+@(Get-ChildItem (Join-Path $App 'Modules/Workflow') -Filter *.ps1 -File)){$bootstrap+=[Environment]::NewLine+[IO.File]::ReadAllText($part.FullName)}
 $xaml=Read 'PMM/Resources/UI/MainWindow.xaml'
 Assert-PMM ($merge -notmatch 'Compress-Archive') 'Analyze/MergeEngine does not use Compress-Archive'
 Assert-PMM ($merge -notmatch 'source-paks') 'Analyze/MergeEngine does not package whole PAKs'
@@ -74,10 +76,10 @@ $manifestBytes=[IO.File]::ReadAllBytes((Join-Path $App 'Resources/Metadata/RELEA
 $manifestHasBom=($manifestBytes.Length -ge 3 -and $manifestBytes[0] -eq 0xEF -and $manifestBytes[1] -eq 0xBB -and $manifestBytes[2] -eq 0xBF)
 Assert-PMM (-not $manifestHasBom) 'Native release manifest is UTF-8 without BOM'
 $manifest=Get-Content (Join-Path $App 'Resources/Metadata/RELEASE_MANIFEST.json') -Raw|ConvertFrom-Json
-Assert-PMM ([string]$manifest.version -eq '1.3.2') 'Manifest version 1.3.2'
+Assert-PMM ([string]$manifest.version -eq '1.3.3') 'Manifest version 1.3.3'
 Assert-PMM ([int]$manifest.mergePlanSchema -eq 19) 'Merge plan schema 19'
 Assert-PMM ([int]$manifest.buildManifestSchema -eq 9) 'Build manifest schema 9'
-Assert-PMM ([string]$manifest.buildId -eq 'PMM-v1.3.2-cases-repair') 'PMM 1.3.2 repair build identity'
+Assert-PMM ([string]$manifest.buildId -eq 'PMM-v1.3.3-deep-analysis-preview') 'PMM 1.3.3 analysis build identity'
 Assert-PMM ([string]$manifest.runtime.executable -eq 'Engine/PMMRuntime.exe') 'Runtime new path'
 Assert-PMM ([string]$manifest.aiioModule -eq 'Modules/AIIO/AIIO.ps1') 'AIIO new path'
 Assert-PMM ([string]$manifest.ckl.catalog -eq 'CKL/Catalog/case-index.json') 'Manifest CKL catalog path'
