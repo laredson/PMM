@@ -14,3 +14,13 @@ The complete automatic game repair/test/isolation loop is **not accepted**. Shar
 FasterMounts/RushRoar retains the 1.3.2 current-layout repair. EasyBreeding/NoCollision remains unsupported where current Blueprint schema coverage is insufficient. No Palworld launch or deployment was performed during development.
 
 Usage: [English](DEEP_ANALYSIS.en.md) · [Español](DEEP_ANALYSIS.es.md).
+
+## Case entry hotfix
+
+- Right-click a library mod and choose **Create new case**. The dialog starts as a mod repair and attaches the selected PAKs with their full hashes. Multiple selections start a compatibility case.
+- GPTD is the default case destination. Creating a case does not start an AI request.
+- Explorer-launched PMM can discover the installed Codex desktop runtime without a task-specific PATH.
+- The case editor shows connection failures, current progress, the persisted AI response and a link to the same conversation. Cancel revokes the case repair session.
+- Retrying unchanged evidence reuses the existing session and preserves its limits. Empty repair cases explain that a PAK must first be attached.
+- The window title now reads the packaged version. Restart PMM after installing this hotfix.
+- No game runtime acceptance or shared Windows desktop control is claimed by these fixes.

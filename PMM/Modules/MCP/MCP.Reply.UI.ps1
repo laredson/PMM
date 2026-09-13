@@ -5,6 +5,15 @@ function Update-PMMMCPReplyUI {
     if(-not $panel){return}
     try{
         $case=Get-PMMAIIOSelectedCase
+        if($case -and (Get-Command Get-PMMCaseAgentView -ErrorAction SilentlyContinue) -and (Get-Command Update-PMMCaseAgentUI -ErrorAction SilentlyContinue)){
+            $agentView=Get-PMMCaseAgentView $case
+            if($agentView -and ($case.SelectedStep -le 0 -or $case.SelectedStep -eq $case.CurrentStep)){
+                Update-PMMCaseAgentUI $case $agentView
+                return
+            }
+        }
+        if($Script:PMMAIIOCaseUI.ContainsKey('BtnAgentOpen')){(Get-PMMAIIOCaseControl 'BtnAgentOpen').IsEnabled=$false}
+
         if(-not $case -or $case.Transport -ne 'MCP' -or ($case.SelectedStep -gt 0 -and $case.SelectedStep -lt $case.CurrentStep)){$panel.Visibility='Collapsed';return}
         $panel.Visibility='Visible'
         $status=Get-PMMAIIOCaseControl 'TxtMCPReplyStatus'

@@ -116,6 +116,8 @@ try {
   [xml]$xaml = Get-Content -LiteralPath $xamlPath -Raw -Encoding UTF8
   $reader = New-Object System.Xml.XmlNodeReader $xaml
   $Window = [Windows.Markup.XamlReader]::Load($reader)
+  $versionPath=Join-Path $Script:Root 'Resources/Metadata/VERSION.txt'
+  $Window.Title='PMM - Palworld Manager Merger v'+([IO.File]::ReadAllText($versionPath).Trim())
 } catch {
   [System.Windows.MessageBox]::Show(("XAML load failed:`n{0}`n`n{1}" -f $xamlPath,$_.Exception.Message),'Palworld Manager Merger',[System.Windows.MessageBoxButton]::OK,[System.Windows.MessageBoxImage]::Error) | Out-Null
   throw
@@ -1434,8 +1436,10 @@ if (-not $autoDepsOk) {
 . (Join-Path $Script:Root 'Modules\Unreal\Dependencies.UI.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.Workspaces.UI.ps1')
 Initialize-PMMWorkspaces
+Initialize-PMMLibraryCaseMenu
 Initialize-PMMDeepAnalysisUI
 . (Join-Path $Script:Root 'Modules/MCP/AppServer.UI.ps1')
+Initialize-PMMCaseAgentUI
 $uiExitState='Normal'
 try {
   [void]$Window.ShowDialog()

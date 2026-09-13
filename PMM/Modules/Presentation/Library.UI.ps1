@@ -992,3 +992,20 @@ function Invoke-PMMGameDetection([bool]$ShowNotFound=$true) {
   Refresh-UI
   return $false
 }
+function Select-PMMLibraryContextTarget($List,$Target) {
+  $row=[Windows.Controls.ItemsControl]::ContainerFromElement($List,$Target)
+  if($row -is [Windows.Controls.DataGridRow]){
+    if(-not$row.IsSelected){$List.SelectedItem=$row.Item}
+    [void]$row.Focus()
+  }else{$List.UnselectAll()}
+}
+function Initialize-PMMLibraryCaseMenu {
+  $menu=[Windows.Controls.ContextMenu]::new()
+  $create=[Windows.Controls.MenuItem]::new()
+  $create.Header=L 'Create new case...' 'Crear nuevo caso...'
+  $create.Add_Click({try{Invoke-PMMNewLibraryCaseUI}catch{Handle-UIError $_ (L 'Create mod case' 'Crear caso del mod')}})
+  [void]$menu.Items.Add($create)
+  $menu.Add_Opened({param($sender,$eventArgs)$sender.Items[0].IsEnabled=(@(Get-SelectedPMMLibraryEntries).Count -gt 0)})
+  $Script:LstMods.ContextMenu=$menu
+  $Script:LstMods.Add_PreviewMouseRightButtonDown({param($sender,$eventArgs)Select-PMMLibraryContextTarget $sender $eventArgs.OriginalSource})
+}

@@ -30,6 +30,10 @@ function Get-PMMArchiveContentProof([string]$Archive,[string]$ContentHash) {
 }
 function Assert-PMMRepairEvidenceCurrent($Session) {
   $revision=Get-PMMCaseEvidenceRevision $Session.CaseId
+  $case=Get-PMMAIIOCase $Session.CaseId
+  foreach($reference in @($case.References.Mods)){
+    if(-not[IO.File]::Exists($reference.Path) -or (Get-Sha256 $reference.Path) -cne $reference.Sha256){throw 'A referenced mod changed or disappeared. Refresh the case references before investigating.'}
+  }
   $evidence=Get-PMMAnalysisValue $revision Evidence $null
   if((Get-PMMAnalysisValue $evidence Kind '') -eq 'DeepAnalysis'){
     $reportPath=Join-Path (Get-PMMAnalysisPath $evidence.AnalysisId) 'report.json'

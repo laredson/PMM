@@ -2,8 +2,7 @@
     $path=Resolve-PMMMCPPath (Get-PMMMCPRoot) 'client.json'
     $executable=''
     if($Enabled){
-        $command=Get-Command codex.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
-        if(-not $command){throw 'Codex CLI is not installed or is not on PATH. Install/sign in to Codex first.'}
+        $command=Get-PMMCodexRuntime
         $executable=$command.Source
     }
     Write-PMMAIIOJsonAtomic $path @{schema='PMM_MCP_CLIENT_V1';enabled=$Enabled;executable=$executable} 5
@@ -25,7 +24,34 @@ function ConvertTo-PMMMCPNativeArgument([string]$Value) {
 function Invoke-PMMMCPClient([string]$CaseId) {
     if(-not(Get-PMMMCPClient)){return 'Available via MCP. Waiting for a connected AI to read the case.'}
     $options=New-PMMDeepAnalysisOptions;$options.AutomaticSolution=$true
-    $session=New-PMMRepairSession $CaseId $options
+    $session=Get-OrCreate-PMMCaseRepairSession $CaseId $options
     Start-PMMRepairAgentJob $session.Id|Out-Null
     return ('Persistent GPTD session started: '+$session.Id)
+}
+
+
+function Get-PMMCodexRuntime {
+    # Explorer-launched PMM does not inherit Codex's task-only PATH.
+    $configured=Join-Path (Get-PMMMCPRoot) 'client.json'
+    if(Test-Path -LiteralPath $configured){
+        $client=Read-PMMMCPJson $configured
+        $path=[string](Get-PMMCaseValue $client executable '')
+        if($path -and [IO.Path]::GetFileName($path) -ieq 'codex.exe' -and [IO.File]::Exists($path)){
+            return [pscustomobject]@{Source=[IO.Path]::GetFullPath($path);Discovery='Configured'}
+        }
+    }
+    $command=Get-Command codex.exe -CommandType Application -ErrorAction SilentlyContinue|Select-Object -First 1
+    if($command){return [pscustomobject]@{Source=$command.Source;Discovery='PATH'}}
+    $local=[Environment]::GetFolderPath('LocalApplicationData')
+    if($local){
+        $bin=Join-Path $local 'OpenAI/Codex/bin'
+        if(Test-Path -LiteralPath $bin -PathType Container){
+            $candidates=@(Get-ChildItem -LiteralPath $bin -Directory -ErrorAction SilentlyContinue|ForEach-Object{
+                $candidate=Join-Path $_.FullName 'codex.exe'
+                if([IO.File]::Exists($candidate)){Get-Item -LiteralPath $candidate}
+            }|Sort-Object LastWriteTimeUtc -Descending)
+            if($candidates.Count){return [pscustomobject]@{Source=$candidates[0].FullName;Discovery='Desktop runtime'}}
+        }
+    }
+    throw 'Codex runtime was not found in the configured location, PATH or desktop installation. Install/update Codex Desktop or select its codex.exe in the connection settings.'
 }

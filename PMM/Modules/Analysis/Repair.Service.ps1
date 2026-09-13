@@ -96,16 +96,26 @@ function Stop-PMMRepairSession([string]$Id) {
   return $s
 }
 function Start-PMMRepairAgentJob([string]$SessionId) {
-  $s=Get-PMMRepairSession $SessionId
-  if($s.OwnerPid){
-    $p=Get-Process -Id $s.OwnerPid -ErrorAction SilentlyContinue
-    if($p -and $p.StartTime.ToUniversalTime().ToString('o') -eq $s.OwnerStart){return $s}
-  }
-  $worker=Join-Path $Script:Root 'Modules/Analysis/Repair.Worker.ps1'
-  $arguments=@('-NoProfile','-ExecutionPolicy','Bypass','-File',$worker,'-Root',$Script:Root,'-SessionId',$SessionId)
-  $line=(@($arguments|ForEach-Object{ConvertTo-NativeQuotedArgument $_}) -join ' ')
-  $proc=Start-Process -FilePath (Join-Path $env:SystemRoot 'System32/WindowsPowerShell/v1.0/powershell.exe') -ArgumentList $line -WindowStyle Hidden -PassThru
-  return (Get-PMMRepairSession $SessionId)
+  $root=Get-PMMRepairSessionRoot $SessionId
+  $launchLock=Enter-PMMAnalysisLock (Join-Path $root 'launch.lock')
+  try{
+    $s=Get-PMMRepairSession $SessionId
+    if(Test-PMMRepairWorkerAlive $s){return $s}
+    Assert-PMMRepairAuthorization $SessionId $s.CaseId $s.EvidenceRevision Research|Out-Null
+    $s.Status='Starting';$s.LastMessage='Connecting to the configured AI runtime...';Save-PMMRepairSession $s
+    $worker=Join-Path $Script:Root 'Modules/Analysis/Repair.Worker.ps1'
+    $arguments=@('-NoProfile','-ExecutionPolicy','Bypass','-File',$worker,'-Root',$Script:Root,'-SessionId',$SessionId)
+    $line=(@($arguments|ForEach-Object{ConvertTo-NativeQuotedArgument $_}) -join ' ')
+    $run=[guid]::NewGuid().ToString('N')
+    $proc=Start-Process -FilePath (Join-Path $env:SystemRoot 'System32/WindowsPowerShell/v1.0/powershell.exe') -ArgumentList $line -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $root ($run+'.stdout.log')) -RedirectStandardError (Join-Path $root ($run+'.stderr.log'))
+    # The launch lock also gates the child handshake, so repeated clicks cannot race it.
+    $s=Get-PMMRepairSession $SessionId;$s.OwnerPid=$proc.Id;$s.OwnerStart=$proc.StartTime.ToUniversalTime().ToString('o');Save-PMMRepairSession $s
+    return $s
+  }catch{
+    $s=Get-PMMRepairSession $SessionId
+    if(-not$s.Revoked){$s.Status='Paused';$s.LastMessage=$_.Exception.Message;Save-PMMRepairSession $s}
+    throw
+  }finally{$launchLock.Dispose()}
 }
 
 function Save-PMMRepairProcedure([string]$SessionId,[string]$Kind,[array]$Outputs,$Procedure,[string]$StructuralStatus) {
@@ -153,4 +163,70 @@ function Get-PMMDeepKnowledgeContext([string]$CaseId) {
       [pscustomobject]@{Context=$context;AutomaticEligible=$false;Requirement='Provider identity is context only. The normal merge service must still prove current mappings, Vanilla and all cooked input parts.'}
     }
   }
+}
+
+
+function Test-PMMRepairWorkerAlive($Session) {
+  if(-not$Session.OwnerPid){return $false}
+  $process=Get-Process -Id $Session.OwnerPid -ErrorAction SilentlyContinue
+  return ($process -and $process.StartTime.ToUniversalTime().ToString('o') -eq $Session.OwnerStart)
+}
+function Get-PMMCaseRepairSession([string]$CaseId) {
+  $case=Get-PMMAIIOCase $CaseId
+  if(-not$case){return $null}
+  $path=Join-Path (Get-PMMAIIOCasePath $CaseId) 'active-agent-session.json'
+  if(Test-Path -LiteralPath $path){
+    $link=Read-PMMJsonFile $path
+    $session=Get-PMMRepairSession $link.SessionId
+    if($session.CaseId -cne $CaseId){throw 'Repair session belongs to another case.'}
+    return $session
+  }
+  # Read existing preview sessions once; keep all history, reuse the latest attempt.
+  $sessions=Join-PMMPath 'Workspace' 'RepairSessions'
+  if(-not(Test-Path -LiteralPath $sessions)){return $null}
+  $matches=@(Get-ChildItem -LiteralPath $sessions -Directory|ForEach-Object{
+    if($_.Name -match '^RS-[a-f0-9]{32}$'){
+      try{$s=Get-PMMRepairSession $_.Name;if($s.CaseId -ceq $CaseId){$s}}catch{}
+    }
+  }|Sort-Object CreatedUtc -Descending)
+  if($matches.Count){
+    $session=$matches[0]
+    return $session
+  }
+  return $null
+}
+function Get-OrCreate-PMMCaseRepairSession([string]$CaseId,$Options) {
+  $path=Join-Path (Get-PMMAIIOCasePath $CaseId) 'active-agent-session.json'
+  $lock=Enter-PMMAnalysisLock ($path+'.lock')
+  try{
+    $case=Get-PMMAIIOCase $CaseId
+    $prior=Get-PMMCaseRepairSession $CaseId
+    if($prior){
+      if(Test-PMMRepairWorkerAlive $prior){
+        if($prior.EvidenceRevision -cne $case.CurrentEvidenceRevision){throw 'Stop the current investigation before starting with changed evidence.'}
+        Write-PMMJsonAtomic $path @{SessionId=$prior.Id;CaseId=$CaseId;EvidenceRevision=$prior.EvidenceRevision}
+        return $prior
+      }
+      if(-not$prior.Revoked -and $prior.Status -notin @('Cancelled','Complete','Restored','RecoveryBlocked') -and $prior.EvidenceRevision -ceq $case.CurrentEvidenceRevision){
+        # Do not silently extend budgets or authorization on a repeated click.
+        Write-PMMJsonAtomic $path @{SessionId=$prior.Id;CaseId=$CaseId;EvidenceRevision=$prior.EvidenceRevision}
+        return $prior
+      }
+    }
+    $session=New-PMMRepairSession $CaseId $Options
+    Write-PMMJsonAtomic $path @{SessionId=$session.Id;CaseId=$CaseId;EvidenceRevision=$session.EvidenceRevision}
+    return $session
+  }finally{$lock.Dispose()}
+}
+function Get-PMMCaseAgentView($Case) {
+  $session=Get-PMMCaseRepairSession $Case.CaseId
+  if(-not$session){return $null}
+  $current=($session.EvidenceRevision -ceq $Case.CurrentEvidenceRevision)
+  $alive=Test-PMMRepairWorkerAlive $session
+  $status=[string]$session.Status;$message=[string]$session.LastMessage
+  if(-not$current){$status='Stale';$message='Case evidence changed. Start an investigation with the current references.'}
+  elseif($status -in @('Starting','Running') -and -not$alive){$status='Interrupted';$message='The worker stopped before completing. Retry continues this session; its evidence and conversation were preserved.'}
+  $response='';$responsePath=Join-Path (Get-PMMRepairSessionRoot $session.Id) 'agent-response.txt'
+  if([IO.File]::Exists($responsePath) -and (Get-Item -LiteralPath $responsePath).Length -le 1MB){$response=[IO.File]::ReadAllText($responsePath)}
+  return [pscustomobject]@{SessionId=$session.Id;CaseId=$Case.CaseId;Status=$status;Message=$message;Response=$response;ThreadId=$session.ThreadId;Running=($alive -and $status -in @('Starting','Running','NeedsInput'));Current=$current;Route=(Get-PMMAnalysisValue $session AIRoute $null)}
 }

@@ -59,9 +59,7 @@ function Invoke-PMMNewCaseUI {
     [void](Save-PMMAIIOCaseEditor)
     $d=Show-PMMAIIONewCaseDialog
     if(-not $d){return}
-    $binding=Get-PMMDesktopBinding
-    $transport='AUTO';$client=''
-    if($binding -and $binding.verifiedUtc -and (Get-PMMMCPEnabled)){$transport='MCP';$client='CHATGPT'}
+    $transport='MCP';$client='CHATGPT'
     $c=New-PMMAIIOCase -Title $d.Title -Type $d.Type -Description $d.Description -Transport $transport -AIClient $client
     Add-PMMCaseAreaContext $c.CaseId
     Select-PMMCaseLocation $c

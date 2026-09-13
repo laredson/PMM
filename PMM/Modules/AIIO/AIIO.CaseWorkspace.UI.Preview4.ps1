@@ -158,33 +158,49 @@ function Copy-PMMAIIOMainResourcesToDialogV4($Dialog){
 }
 
 function Show-PMMAIIONewCaseDialog {
-  $dialog=[Windows.Window]::new();$dialog.Title='New AIIO case';$dialog.Width=700;$dialog.Height=535;$dialog.ResizeMode='NoResize';$dialog.WindowStartupLocation='CenterOwner';try{$dialog.Owner=$Window}catch{};Copy-PMMAIIOMainResourcesToDialogV4 $dialog
+  param([string]$DefaultTitle='',[string]$DefaultType='',[array]$ReferenceNames=@())
+  $dialog=[Windows.Window]::new();$dialog.Title=L 'Create new case' 'Crear nuevo caso'
+  $dialog.Width=700;$dialog.SizeToContent='Height';$dialog.MaxHeight=760;$dialog.ResizeMode='CanResize';$dialog.MinWidth=480
+  $dialog.WindowStartupLocation='CenterOwner';try{$dialog.Owner=$Window}catch{};Copy-PMMAIIOMainResourcesToDialogV4 $dialog
   $dialog.Background=Get-PMMAIIODialogBrush 'AppBackground' ([Windows.Media.Brushes]::WhiteSmoke);$dialog.Foreground=Get-PMMAIIODialogBrush 'PrimaryText' ([Windows.Media.Brushes]::Black);$dialog.FontFamily='Segoe UI';$dialog.FontSize=13
-
-  $root=[Windows.Controls.StackPanel]::new();$root.Margin=[Windows.Thickness]::new(22)
-  $heading=[Windows.Controls.TextBlock]::new();$heading.Text='Create AIIO case';$heading.FontSize=22;$heading.FontWeight='SemiBold';$heading.Margin=[Windows.Thickness]::new(0,0,0,4);[void]$root.Children.Add($heading)
-  $intro=[Windows.Controls.TextBlock]::new();$intro.Text='Create the persistent workspace. Type, goal and references can still be changed later.';$intro.TextWrapping='Wrap';$intro.Foreground=Get-PMMAIIODialogBrush 'MutedText' ([Windows.Media.Brushes]::DimGray);$intro.Margin=[Windows.Thickness]::new(0,0,0,16);[void]$root.Children.Add($intro)
-
-  $card=[Windows.Controls.Border]::new();$card.Background=Get-PMMAIIODialogBrush 'CardBackground' ([Windows.Media.Brushes]::White);$card.BorderBrush=Get-PMMAIIODialogBrush 'CardBorder' ([Windows.Media.Brushes]::LightGray);$card.BorderThickness=[Windows.Thickness]::new(1);$card.CornerRadius=[Windows.CornerRadius]::new(7);$card.Padding=[Windows.Thickness]::new(16);[void]$root.Children.Add($card)
-  $form=[Windows.Controls.StackPanel]::new();$card.Child=$form
-
-  [void]$form.Children.Add((New-PMMAIIODialogLabel 'Title' $true));$title=[Windows.Controls.TextBox]::new();$title.MinHeight=32;Set-PMMAIIODialogInputStyle $title;[void]$form.Children.Add($title)
-  $typeLabel=New-PMMAIIODialogLabel 'Case type' $true;$typeLabel.Margin=[Windows.Thickness]::new(0,12,0,4);[void]$form.Children.Add($typeLabel)
-  $type=[Windows.Controls.ComboBox]::new();$type.MinHeight=32;$type.Width=280;$type.HorizontalAlignment='Left';[void]$type.Items.Add('New Mod');[void]$type.Items.Add('Fix Mod');[void]$type.Items.Add('Compatibility');[void]$type.Items.Add('Undefined / Research');$area=Get-Variable PMMCaseArea -Scope Script -ValueOnly -ErrorAction SilentlyContinue;$type.SelectedIndex=switch($area){'FIX'{1};'MERGE'{2};'HELP'{3};default{0}};[void]$form.Children.Add($type)
-  $hint=[Windows.Controls.TextBlock]::new();$hint.Text='New Mod creates something new; Fix Mod targets one mod; Compatibility can target several; Undefined / Research stays open-ended.';$hint.TextWrapping='Wrap';$hint.Margin=[Windows.Thickness]::new(0,5,0,0);$hint.Foreground=Get-PMMAIIODialogBrush 'MutedText' ([Windows.Media.Brushes]::DimGray);[void]$form.Children.Add($hint)
-  $descLabel=New-PMMAIIODialogLabel 'Description / goal' $true;$descLabel.Margin=[Windows.Thickness]::new(0,12,0,4);[void]$form.Children.Add($descLabel)
-  $description=[Windows.Controls.TextBox]::new();$description.AcceptsReturn=$true;$description.TextWrapping='Wrap';$description.VerticalScrollBarVisibility='Auto';$description.Height=105;Set-PMMAIIODialogInputStyle $description;[void]$form.Children.Add($description)
-
+  $scroll=[Windows.Controls.ScrollViewer]::new();$scroll.VerticalScrollBarVisibility='Auto'
+  $root=[Windows.Controls.StackPanel]::new();$root.Margin=[Windows.Thickness]::new(22);$scroll.Content=$root
+  $heading=[Windows.Controls.TextBlock]::new();$heading.Text=$dialog.Title;$heading.FontSize=22;$heading.FontWeight='SemiBold';[void]$root.Children.Add($heading)
+  $intro=[Windows.Controls.TextBlock]::new();$intro.Text=L 'Choose the goal. The case keeps its references and conversation; creating it does not send an AI request.' 'Indica el objetivo. El caso conserva sus referencias y conversacion; crearlo no envia una peticion a la IA.';$intro.TextWrapping='Wrap';$intro.Margin=[Windows.Thickness]::new(0,6,0,12);[void]$root.Children.Add($intro)
+  if($ReferenceNames.Count){
+    $refs=[Windows.Controls.TextBlock]::new();$refs.Text=(L 'Attached mods: ' 'Mods adjuntos: ')+($ReferenceNames -join ', ');$refs.TextWrapping='Wrap';$refs.MaxHeight=90;$refs.Margin=[Windows.Thickness]::new(0,0,0,12);[void]$root.Children.Add($refs)
+  }
+  [void]$root.Children.Add((New-PMMAIIODialogLabel (L 'Title' 'Titulo') $true))
+  $title=[Windows.Controls.TextBox]::new();$title.Text=$DefaultTitle;$title.MinHeight=32;Set-PMMAIIODialogInputStyle $title;[void]$root.Children.Add($title)
+  [void]$root.Children.Add((New-PMMAIIODialogLabel (L 'Case type' 'Tipo de caso') $true))
+  $type=[Windows.Controls.ComboBox]::new();$type.MinHeight=32;$type.DisplayMemberPath='Label';$type.SelectedValuePath='Value'
+  $type.ItemsSource=@(
+    [pscustomobject]@{Value='NEW_MOD';Label=(L 'New mod' 'Nuevo mod')},
+    [pscustomobject]@{Value='FIX_MOD';Label=(L 'Update / repair mod' 'Actualizar / reparar mod')},
+    [pscustomobject]@{Value='COMPATIBILITY';Label=(L 'Compatibility' 'Compatibilidad')},
+    [pscustomobject]@{Value='UNDEFINED';Label=(L 'Research' 'Investigacion')}
+  )
+  $area=Get-Variable PMMCaseArea -Scope Script -ValueOnly -ErrorAction SilentlyContinue
+  $type.SelectedValue=if($DefaultType){$DefaultType}else{switch($area){'FIX'{'FIX_MOD'};'MERGE'{'COMPATIBILITY'};'HELP'{'UNDEFINED'};default{'NEW_MOD'}}}
+  [void]$root.Children.Add($type)
+  [void]$root.Children.Add((New-PMMAIIODialogLabel (L 'Description / goal' 'Descripcion / objetivo') $true))
+  $description=[Windows.Controls.TextBox]::new();$description.AcceptsReturn=$true;$description.TextWrapping='Wrap';$description.VerticalScrollBarVisibility='Auto';$description.Height=105;Set-PMMAIIODialogInputStyle $description;[void]$root.Children.Add($description)
+  $validation=[Windows.Controls.TextBlock]::new();$validation.TextWrapping='Wrap';[void]$root.Children.Add($validation)
   $buttons=[Windows.Controls.StackPanel]::new();$buttons.Orientation='Horizontal';$buttons.HorizontalAlignment='Right';$buttons.Margin=[Windows.Thickness]::new(0,14,0,0)
-  $cancel=[Windows.Controls.Button]::new();$cancel.Content='Cancel';$cancel.MinWidth=100;$cancel.Margin=[Windows.Thickness]::new(0,0,8,0)
-  $create=[Windows.Controls.Button]::new();$create.Content='Create case';$create.MinWidth=120;$create.FontWeight='SemiBold'
+  $cancel=[Windows.Controls.Button]::new();$cancel.Content=L 'Cancel' 'Cancelar';$cancel.MinWidth=100;$cancel.IsCancel=$true
+  $create=[Windows.Controls.Button]::new();$create.Content=L 'Create case' 'Crear caso';$create.MinWidth=120;$create.IsDefault=$true;$create.Margin=[Windows.Thickness]::new(8,0,0,0)
   [void]$buttons.Children.Add($cancel);[void]$buttons.Children.Add($create);[void]$root.Children.Add($buttons)
-
-  $script:PMMAIIONewCaseDialogResult=$null
-  $cancel.Add_Click({$dialog.DialogResult=$false;$dialog.Close()})
-  $create.Add_Click({$map=@{'New Mod'='NEW_MOD';'Fix Mod'='FIX_MOD';'Compatibility'='COMPATIBILITY';'Query / Consulta'='QUERY';'Undefined / Research'='UNDEFINED'};$script:PMMAIIONewCaseDialogResult=[pscustomobject]@{Title=[string]$title.Text;Type=[string]$map[[string]$type.SelectedItem];Description=[string]$description.Text};$dialog.DialogResult=$true;$dialog.Close()})
-  $dialog.Content=$root;$title.Focus()|Out-Null
-  $result=$null;if($dialog.ShowDialog() -eq $true){$result=$script:PMMAIIONewCaseDialogResult};$script:PMMAIIONewCaseDialogResult=$null;return $result
+  $dialog.Tag=@{Title=$title;Type=$type;Description=$description;Validation=$validation;Result=$null}
+  $create.Tag=$dialog;$create.Add_Click({
+    param($sender,$eventArgs)
+    $window=$sender.Tag;$state=$window.Tag
+    if([string]::IsNullOrWhiteSpace($state.Title.Text)){$state.Validation.Text=L 'Enter a title.' 'Escribe un titulo.';return}
+    $state.Result=[pscustomobject]@{Title=$state.Title.Text.Trim();Type=[string]$state.Type.SelectedValue;Description=[string]$state.Description.Text}
+    $window.DialogResult=$true
+  })
+  $dialog.Content=$scroll
+  if($dialog.ShowDialog() -eq $true){return $dialog.Tag.Result}
+  return $null
 }
 
 function Initialize-PMMAIIOPreview4Ui {

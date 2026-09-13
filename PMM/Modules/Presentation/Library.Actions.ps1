@@ -199,3 +199,20 @@ function Start-PMMAIHandoffFromUI { param([switch]$AllowOversize,[switch]$Force)
 
 function Prompt-PMMAIHandoffAfterAnalyze { # Cases are registered by the worker; no dialog or AI dispatch.
 }
+function Invoke-PMMNewLibraryCaseUI {
+  [void](Save-PMMAIIOCaseEditor)
+  $entries=@(Get-SelectedPMMLibraryEntries)
+  if(-not$entries.Count){throw (L 'Select a source mod first.' 'Selecciona primero un mod de la biblioteca.')}
+  # Freeze the selection before opening the modal; filtering cannot change its inputs.
+  $paths=@(foreach($entry in $entries){
+    if(-not[IO.File]::Exists($entry.Path)){throw ('Mod no longer available: '+$entry.Name)}
+    [string]$entry.Path
+  })
+  $type=if($paths.Count -eq 1){'FIX_MOD'}else{'COMPATIBILITY'}
+  $title=if($paths.Count -eq 1){[IO.Path]::GetFileNameWithoutExtension($paths[0])}else{L 'Compatibility of selected mods' 'Compatibilidad de los mods seleccionados'}
+  $draft=Show-PMMAIIONewCaseDialog -DefaultTitle $title -DefaultType $type -ReferenceNames @($entries.Name)
+  if(-not$draft){return}
+  $case=New-PMMAIIOCase -Title $draft.Title -Type $draft.Type -Description $draft.Description -Transport MCP -AIClient CHATGPT
+  foreach($path in $paths){$case=Add-PMMAIIOCaseModReference $case.CaseId $path 'FULL_PAK'}
+  Select-PMMCaseLocation $case
+}
