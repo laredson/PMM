@@ -95,7 +95,8 @@ function Stop-PMMRepairSession([string]$Id) {
   }
   return $s
 }
-function Start-PMMRepairAgentJob([string]$SessionId) {
+function Start-PMMRepairAgentJob([string]$SessionId,[string]$PromptId='') {
+  if(-not(Get-PMMAnalysisValue (Get-PMMAIPolicy) InternalEnabled $false)){throw 'Internal AI is disabled. Continue in Desktop, or explicitly enable internal requests in Advanced AI settings.'}
   $root=Get-PMMRepairSessionRoot $SessionId
   $launchLock=Enter-PMMAnalysisLock (Join-Path $root 'launch.lock')
   try{
@@ -105,6 +106,7 @@ function Start-PMMRepairAgentJob([string]$SessionId) {
     $s.Status='Starting';$s.LastMessage='Connecting to the configured AI runtime...';Save-PMMRepairSession $s
     $worker=Join-Path $Script:Root 'Modules/Analysis/Repair.Worker.ps1'
     $arguments=@('-NoProfile','-ExecutionPolicy','Bypass','-File',$worker,'-Root',$Script:Root,'-SessionId',$SessionId)
+    if($PromptId){$arguments+=@('-PromptId',$PromptId)}
     $line=(@($arguments|ForEach-Object{ConvertTo-NativeQuotedArgument $_}) -join ' ')
     $run=[guid]::NewGuid().ToString('N')
     $proc=Start-Process -FilePath (Join-Path $env:SystemRoot 'System32/WindowsPowerShell/v1.0/powershell.exe') -ArgumentList $line -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $root ($run+'.stdout.log')) -RedirectStandardError (Join-Path $root ($run+'.stderr.log'))
@@ -229,4 +231,108 @@ function Get-PMMCaseAgentView($Case) {
   $response='';$responsePath=Join-Path (Get-PMMRepairSessionRoot $session.Id) 'agent-response.txt'
   if([IO.File]::Exists($responsePath) -and (Get-Item -LiteralPath $responsePath).Length -le 1MB){$response=[IO.File]::ReadAllText($responsePath)}
   return [pscustomobject]@{SessionId=$session.Id;CaseId=$Case.CaseId;Status=$status;Message=$message;Response=$response;ThreadId=$session.ThreadId;Running=($alive -and $status -in @('Starting','Running','NeedsInput'));Current=$current;Route=(Get-PMMAnalysisValue $session AIRoute $null)}
+}
+
+
+function Add-PMMCaseChatEvent([string]$CaseId,[string]$Kind,$Data,[string]$Key='') {
+  $folder=Join-Path (Get-PMMAIIOCasePath $CaseId) 'Chat'
+  [void][IO.Directory]::CreateDirectory($folder)
+  if(-not$Key){$Key=[guid]::NewGuid().ToString('N')}
+  $id=Get-PMMAnalysisHash @($Kind,$Key)
+  $path=Join-Path $folder ($id+'.json')
+  $lock=Enter-PMMAnalysisLock ($path+'.lock')
+  try{
+    if(Test-Path -LiteralPath $path){return (Read-PMMJsonFile $path)}
+    $record=[pscustomobject]@{Schema='PMM_CASE_CHAT_V1';Id=$id;Kind=$Kind;Utc=[DateTime]::UtcNow.ToString('o');Data=$Data}
+    Write-PMMJsonAtomic $path $record -Depth 40
+    return $record
+  }finally{$lock.Dispose()}
+}
+function Get-PMMCaseChatText([string]$CaseId) {
+  $case=Get-PMMAIIOCase $CaseId
+  $lines=[Collections.Generic.List[string]]::new()
+  $lines.Add('PMM case: '+$case.Title+' | '+$CaseId)
+  $bindingPath=Join-Path (Get-PMMAIIOCasePath $CaseId) 'agent-conversation.json'
+  if(Test-Path -LiteralPath $bindingPath){$b=Read-PMMJsonFile $bindingPath;$lines.Add('Conversation: '+$b.ThreadId)}
+  $sessions=Join-PMMPath 'Workspace' 'RepairSessions'
+  if(Test-Path -LiteralPath $sessions){
+    foreach($dir in @(Get-ChildItem -LiteralPath $sessions -Directory)){
+      try{$s=Get-PMMRepairSession $dir.Name}catch{continue}
+      if($s.CaseId -cne $CaseId){continue}
+      foreach($file in @(Get-ChildItem -LiteralPath $dir.FullName -Filter 'turn-request*.json' -File|Sort-Object LastWriteTimeUtc)){
+        $r=Read-PMMJsonFile $file.FullName
+        $lines.Add([Environment]::NewLine+$r.Utc+' | '+$r.TaskKind+' | '+$r.AcknowledgedModel+' / '+$r.AcknowledgedEffort+' | '+$r.State+' | turn '+$r.TurnId)
+      }
+      foreach($file in @(Get-ChildItem -LiteralPath $dir.FullName -Filter 'usage-*.json' -File|Sort-Object LastWriteTimeUtc)){
+        $u=Read-PMMJsonFile $file.FullName;$v=$u.ReportedUsage.tokenUsage.total
+        $lines.Add('Usage snapshot '+$u.TaskKind+': total '+$v.totalTokens+'; cached input '+$v.cachedInputTokens+'; output '+$v.outputTokens+'. Provider counters; do not sum overlapping snapshots or treat them as a bill.')
+      }
+    }
+  }
+  $folder=Join-Path (Get-PMMAIIOCasePath $CaseId) 'Chat'
+  $events=@()
+  if(Test-Path -LiteralPath $folder){$events=@(Get-ChildItem -LiteralPath $folder -Filter '*.json' -File|ForEach-Object{Read-PMMJsonFile $_.FullName}|Sort-Object Utc)}
+  if(-not$events.Count){$lines.Add([Environment]::NewLine+$(if(Test-Path -LiteralPath $bindingPath){'Use Refresh conversation to recover the existing public transcript without starting a turn.'}else{'No messages yet. Continue in Desktop, or explicitly enable the advanced internal chat.'}))}
+  foreach($e in @($events|Select-Object -Last 300)){
+    $lines.Add([Environment]::NewLine+$e.Utc+' | '+$e.Kind)
+    $data=$e.Data
+    if($e.Kind -eq 'User'){$lines.Add([string]$data.Text)}
+    elseif($e.Kind -eq 'Assistant'){$lines.Add($data.Model+' / '+$data.Effort);$lines.Add([string]$data.Text)}
+    elseif($e.Kind -eq 'Request'){$lines.Add($data.AcknowledgedModel+' / '+$data.AcknowledgedEffort);$lines.Add([string]$data.Prompt)}
+    elseif($e.Kind -eq 'Conversation item' -and $data.Item.type -eq 'agentMessage'){$lines.Add([string]$data.Item.text)}
+    elseif($e.Kind -eq 'Conversation item' -and $data.Item.type -eq 'userMessage'){$lines.Add((@($data.Item.content|ForEach-Object{Get-PMMAnalysisValue $_ text ''}) -join [Environment]::NewLine))}
+    else{$lines.Add(($data|ConvertTo-Json -Depth 35))}
+  }
+  if($events.Count -gt 300){$lines.Add('Showing the latest 300 entries; the complete journal remains in the case Chat folder.')}
+  return ($lines -join [Environment]::NewLine)
+}
+function New-PMMChatPrompt([string]$SessionId,[string]$Text,[ValidateSet('Routine','Repair','Complex')][string]$TaskKind='Routine',[string]$PromptId='') {
+  $s=Get-PMMRepairSession $SessionId
+  Assert-PMMRepairAuthorization $SessionId $s.CaseId $s.EvidenceRevision Research|Out-Null
+  if([string]::IsNullOrWhiteSpace($Text) -or $Text.Length -gt 16000){throw 'Enter a prompt of 1 to 16000 characters.'}
+  if(-not$PromptId){$PromptId=[guid]::NewGuid().ToString('N')}
+  if($PromptId -cnotmatch '^[a-f0-9]{32}$'){throw 'Invalid prompt identifier.'}
+  $path=Join-Path (Get-PMMRepairSessionRoot $SessionId) ('chat-prompt-'+$PromptId+'.json')
+  $lock=Enter-PMMAnalysisLock ($path+'.lock')
+  try{
+    if(Test-Path -LiteralPath $path){
+      $old=Read-PMMJsonFile $path
+      if($old.Text -cne $Text -or $old.TaskKind -cne $TaskKind){throw 'Prompt retry changed its contents.'}
+      return $old
+    }
+    if(Test-PMMRepairWorkerAlive $s){throw 'Wait for the current response or interrupt it before sending another prompt.'}
+    $p=[pscustomobject]@{Id=$PromptId;SessionId=$SessionId;CaseId=$s.CaseId;EvidenceRevision=$s.EvidenceRevision;TaskKind=$TaskKind;Text=$Text}
+    Write-PMMJsonAtomic $path $p
+    Add-PMMCaseChatEvent $s.CaseId 'User' $p ('prompt-'+$PromptId)|Out-Null
+    return $p
+  }finally{$lock.Dispose()}
+}
+function Invoke-PMMChatPrompt([string]$SessionId,[string]$PromptId) {
+  if($PromptId -cnotmatch '^[a-f0-9]{32}$'){throw 'Invalid prompt identifier.'}
+  $p=Read-PMMJsonFile (Join-Path (Get-PMMRepairSessionRoot $SessionId) ('chat-prompt-'+$PromptId+'.json'))
+  $s=Get-PMMRepairSession $SessionId
+  if($p.SessionId -cne $SessionId -or $p.EvidenceRevision -cne $s.EvidenceRevision){throw 'The prompt belongs to a different session or evidence revision.'}
+  return (Invoke-PMMPersistentAgentStage $SessionId $p.TaskKind $PromptId $p.Text)
+}
+function Sync-PMMCaseChat([string]$CaseId) {
+  $path=Join-Path (Get-PMMAIIOCasePath $CaseId) 'agent-conversation.json'
+  if(Test-Path -LiteralPath $path){$binding=Read-PMMJsonFile $path}else{
+    $dispatch=Get-PMMDesktopDispatch $CaseId
+    if(-not$dispatch -or -not$dispatch.threadId){throw 'No conversation ID has been reported by Desktop yet. Continue in that chat and connect PMM first.'}
+    $binding=[pscustomobject]@{ThreadId=$dispatch.threadId}
+  }
+  $client=$null
+  try{
+    $client=Start-PMMAppServer
+    Invoke-PMMAppServerRequest $client initialize @{clientInfo=@{name='pmm';version='1.3.3'};capabilities=@{experimentalApi=$true}}|Out-Null
+    Send-PMMAppServer $client initialized @{} -Notification
+    $r=Invoke-PMMAppServerRequest $client 'thread/read' @{threadId=$binding.ThreadId;includeTurns=$true}
+    foreach($turn in $r.thread.turns){
+      foreach($item in $turn.items){
+        if($item.type -in @('reasoning','compaction')){continue}
+        Add-PMMCaseChatEvent $CaseId 'Conversation item' @{ThreadId=$binding.ThreadId;TurnId=$turn.id;Item=$item} ('item-'+$turn.id+'-'+$item.id)|Out-Null
+      }
+    }
+    return @{ResultText='Conversation refreshed without starting inference.';CaseId=$CaseId}
+  }finally{Stop-PMMAppServer $client}
 }

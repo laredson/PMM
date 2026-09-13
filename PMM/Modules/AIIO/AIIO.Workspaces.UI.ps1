@@ -119,11 +119,11 @@ function Initialize-PMMCaseClientSelector {
     $transport=Get-PMMAIIOCaseControl 'CmbTransport';$row=$transport.Parent
     $label=[Windows.Controls.TextBlock]::new();$label.Text=L 'AI client' 'Cliente IA';$label.VerticalAlignment='Center';$label.Margin=[Windows.Thickness]::new(8,0,3,0)
     $combo=[Windows.Controls.ComboBox]::new();$combo.Width=180;$combo.DisplayMemberPath='Label';$combo.SelectedValuePath='Value'
-    $combo.ItemsSource=@([pscustomobject]@{Label='ChatGPT Desktop';Value='CHATGPT'},[pscustomobject]@{Label=(L 'Other MCP client' 'Otro cliente MCP');Value='EXTERNAL'},[pscustomobject]@{Label=(L 'Codex console' 'Codex por consola');Value='CODEX'})
-    $combo.SelectedValue='EXTERNAL';$Script:PMMAIIOCaseUI['CmbClient']=$combo
+    $combo.ItemsSource=@([pscustomobject]@{Label='ChatGPT Desktop';Value='CHATGPT'},[pscustomobject]@{Label='Codex Desktop';Value='CODEX_DESKTOP'},[pscustomobject]@{Label=(L 'Advanced: other MCP client' 'Avanzado: otro cliente MCP');Value='EXTERNAL'},[pscustomobject]@{Label=(L 'Advanced: internal agent' 'Avanzado: agente interno');Value='CODEX'})
+    $combo.SelectedValue='CHATGPT';$Script:PMMAIIOCaseUI['CmbClient']=$combo
     $group=[Windows.Controls.StackPanel]::new();$group.Orientation='Horizontal';$group.Margin=[Windows.Thickness]::new(0,2,4,2)
     [void]$group.Children.Add($label);[void]$group.Children.Add($combo)
     $at=$row.Children.IndexOf($transport)+1;$row.Children.Insert($at,$group)
-    (Get-PMMAIIOCaseControl 'BtnCancel').Add_Click({$case=Get-PMMAIIOSelectedCase;if($case -and (Get-PMMCaseClient $case) -eq 'CHATGPT'){Cancel-PMMDesktopDispatch $case.CaseId}})
+    (Get-PMMAIIOCaseControl 'BtnCancel').Add_Click({$case=Get-PMMAIIOSelectedCase;if($case -and (Get-PMMCaseClient $case) -in @('CHATGPT','CODEX_DESKTOP')){Cancel-PMMDesktopDispatch $case.CaseId}})
     $combo.Add_SelectionChanged({if(-not $Script:PMMEditorLoading -and -not $Script:PMMCaseRefreshing){(Get-PMMAIIOCaseControl 'CmbTransport').SelectedValue='MCP'};Update-PMMAIIOTransportButton})
 }

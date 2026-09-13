@@ -36,3 +36,14 @@ The library's displayed rows now retain the actual source path and full SHA256. 
 - Existing model choices and reasoning ceilings are preserved. An unsupported effort requires selection; it is never silently increased.
 - The normal background account check now loads its runtime discovery and MCP service dependencies.
 - Validated on PowerShell 5.1 with English/Spanish WPF fixtures and a real metadata-only account/model check. No repair inference or Palworld launch was started.
+
+## Desktop-owned conversation hotfix
+
+- ChatGPT Desktop and Codex Desktop are distinct destinations. Desktop opens/prepares the case conversation; it does not start an internal inference worker. Receipt is confirmed only by MCP.
+- Existing Codex case conversations can be reopened and handed to Desktop without creating another conversation. New requests present the requested outcome: updated mod, reusable Fix Lab KL recipe, or another user-selected result.
+- Project-local MCP configuration points to this PMM installation. Existing different PMM entries are preserved and reported for review. Legacy ChatGPT installations without local-chat links are explicitly unsupported, instead of silently opening Codex.
+- Internal requests now require a separate opt-in. Account/model configuration, transport and prompt entry are advanced options. A completed stage never automatically starts a more expensive model.
+- Adds an AI chat tab with persistent prompts, public responses, tool events, model/effort acknowledgements and reported usage snapshots. Users can send explicit follow-up prompts in the same internal conversation and recover prior public messages with read-only thread/read. Hidden reasoning is not requested. Provider usage snapshots are not bills and must not be blindly added together.
+- A standalone repair case can no longer trigger the whole-library merge service without a deep-analysis report.
+- No free/unmetered background ChatGPT endpoint is claimed. Desktop and internal requests follow the connected product/account limits.
+- Validation uses isolated WPF fixtures, mocked inference, real MCP protocol checks and metadata-only reads. Automatic Desktop message submission and an AUAT repair are not claimed; sending the prepared request remains a Desktop action.

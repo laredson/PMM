@@ -31,27 +31,21 @@ Assert-Entry ($Script:DialogCalls -eq 1 -and $Script:ReceivedDraft.Type -eq 'FIX
 Assert-Entry ($case.Title -eq 'AUAT 1.0.4' -and $case.References.Mods.Count -eq 1 -and $case.References.Mods[0].Sha256 -eq (Get-Sha256 (Join-Path $mods 'AUAT-test/AUAT-test.pak'))) 'Case lost the exact selected mod/hash.'
 Assert-Entry ($case.Transport -eq 'MCP' -and (Get-PMMCaseClient $case) -eq 'CHATGPT') 'New mod case does not default to GPTD.'
 Assert-Entry (@((Get-PMMAIIOCaseControl 'DgRefs').ItemsSource).Count -eq 1 -and $Script:PMMCaseArea -eq 'FIX') 'New case did not navigate to its references.'
-$Script:Launches=0
-function Start-PMMRepairAgentJob([string]$SessionId){
-  $Script:Launches++;$s=Get-PMMRepairSession $SessionId
-  $s.Status='Paused';$s.LastMessage='Fixture: runtime unavailable';Save-PMMRepairSession $s;return $s
-}
+$Script:Launches=0;$Script:DesktopOpens=0;$Script:DesktopHelp=0
+function Start-PMMRepairAgentJob([string]$SessionId){$Script:Launches++;throw 'Desktop started an internal worker.'}
+function Get-PMMChatGPTDesktop($Destination){return [pscustomobject]@{SupportsLocalChats=$true;InstallLocation='fixture'}}
+function Open-PMMDesktopLink($Link,$Destination){$Script:DesktopOpens++;return $true}
+function Show-PMMDesktopDispatchHelp($Dispatch,$CanOpen){$Script:DesktopHelp++}
+$b=New-PMMDesktopBinding;Confirm-PMMDesktopBinding ([pscustomobject]@{nonce=$b.nonce})|Out-Null
 Show-PMMChatGPTCase
-$first=Get-PMMCaseRepairSession $case.CaseId
 Show-PMMChatGPTCase
-$second=Get-PMMCaseRepairSession $case.CaseId
-Assert-Entry ($first.Id -eq $second.Id -and $Script:Launches -eq 2) 'Retry created another repair session.'
+Assert-Entry ($Script:Launches -eq 0 -and $Script:DesktopOpens -eq 1 -and $Script:DesktopHelp -eq 1) 'Desktop duplicated its chat or launched hidden AI.'
+Assert-Entry ((Get-PMMDesktopDispatch $case.CaseId).prompt -match 'Fix Lab KL recipe') 'Desktop initial report omitted the user outcome choices.'
+Assert-Entry ($null -eq (Get-PMMCaseRepairSession $case.CaseId)) 'Desktop dispatch created an internal repair session.'
+Assert-Entry ($Script:PMMAIIOCaseUI.ContainsKey('ChatTranscript') -and -not(Get-PMMAIIOCaseControl 'ChatAdvanced').IsExpanded) 'AI chat or collapsed advanced settings are missing.'
+Assert-Entry (-not(Get-PMMAIPolicy).InternalEnabled) 'Internal inference is enabled by default.'
 Update-PMMMCPReplyUI
-Assert-Entry ((Get-PMMAIIOCaseControl 'TxtMCPReplyStatus').Text -like '*Fixture: runtime unavailable*') 'The case hid its agent failure behind MCP publication status.'
-Assert-Entry ((Get-PMMAIIOCaseControl 'PrgProgress').Value -eq 0 -and -not(Get-PMMAIIOCaseControl 'PrgProgress').IsIndeterminate) 'A failed request looked complete or kept spinning.'
-[IO.File]::WriteAllText((Join-Path (Get-PMMRepairSessionRoot $first.Id) 'agent-response.txt'),'AUAT response fixture')
-Update-PMMMCPReplyUI
-Assert-Entry ((Get-PMMAIIOCaseControl 'TxtMCPResponse').Text -eq 'AUAT response fixture') 'Persistent agent response is not visible in the case.'
-$s=Get-PMMRepairSession $first.Id;$s.Status='Running';$s.OwnerPid=$PID;$s.OwnerStart=(Get-Process -Id $PID).StartTime.ToUniversalTime().ToString('o');Save-PMMRepairSession $s
-Update-PMMMCPReplyUI
-Assert-Entry ((Get-PMMAIIOCaseControl 'PrgProgress').IsIndeterminate -and (Get-PMMAIIOCaseControl 'BtnCancel').IsEnabled) 'Running session has no visible progress/cancellation.'
-(Get-PMMAIIOCaseControl 'BtnCancel').RaiseEvent([Windows.RoutedEventArgs]::new([Windows.Controls.Button]::ClickEvent))
-Assert-Entry ((Get-PMMRepairSession $first.Id).Revoked) 'Case cancel did not revoke its repair session.'
+Assert-Entry ((Get-PMMAIIOCaseControl 'TxtMCPReplyStatus').Text -match 'prepared|preparado') 'Unacknowledged Desktop opening was reported as delivery.'
 $empty=New-PMMAIIOCase -Title 'Empty repair' -Type FIX_MOD -Transport MCP -AIClient CHATGPT
 Select-PMMCaseLocation $empty;$blocked=$false
 try{Show-PMMChatGPTCase}catch{$blocked=$_.Exception.Message -match 'Attach|Adjunta'}
@@ -87,4 +81,18 @@ Assert-Entry (-not$view.Dialog.Tag.Result -and $view.Dialog.Tag.Validation.Text)
 $view.Dialog.Tag.Title.Text='AUAT update'
 try{$view.Create.RaiseEvent([Windows.RoutedEventArgs]::new([Windows.Controls.Button]::ClickEvent))}catch{if($_.Exception.ToString() -notmatch 'DialogResult'){throw}}
 Assert-Entry ($view.Dialog.Tag.Result.Title -eq 'AUAT update' -and $view.Dialog.Tag.Result.Type -eq 'FIX_MOD') 'Create button lost its title/type.'
+
+$case=Get-PMMAIIOSelectedCase
+Select-PMMCaseLocation $case
+(Get-PMMAIIOCaseControl 'ChatTabs').SelectedIndex=1
+Update-PMMChatPanel $case
+Assert-Entry ((Get-PMMAIIOCaseControl 'ChatTranscript').Text -match [regex]::Escape($case.CaseId)) 'Chat tab displays another case history.'
+Assert-Entry (-not(Get-PMMAIIOCaseControl 'ChatSend').IsEnabled) 'Desktop case enabled internal prompt sending.'
+(Get-PMMAIIOCaseControl 'ChatAdvanced').IsExpanded=$true
+$Window.Content.Measure([Windows.Size]::new(1600,1050));$Window.Content.Arrange([Windows.Rect]::new(0,0,1600,1050));$Window.Content.UpdateLayout()
+$bitmap=[Windows.Media.Imaging.RenderTargetBitmap]::new(1600,1050,96,96,[Windows.Media.PixelFormats]::Pbgra32)
+$bitmap.Render($Window.Content)
+$encoder=[Windows.Media.Imaging.PngBitmapEncoder]::new();$encoder.Frames.Add([Windows.Media.Imaging.BitmapFrame]::Create($bitmap))
+$png=Join-Path $Script:Root 'chat-ui.png';$stream=[IO.File]::Create($png);try{$encoder.Save($stream)}finally{$stream.Dispose()}
+Write-Output ('Chat fixture: '+$png)
 Write-Output ('PASS case entry '+$Language+': '+$script:entryChecks+' assertions')

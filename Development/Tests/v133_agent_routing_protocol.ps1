@@ -32,16 +32,24 @@ function Invoke-PMMAppServerRequest($Client,[string]$Method,$Parameters,[int]$Ti
     default {throw ('Unexpected protocol method '+$Method)}
   }
 }
-Reject {Invoke-PMMPersistentAgent $s.Id} 'A harder stage ran without the configured cost authorization.'
-$turns=@($script:protocolCalls|Where-Object Method -eq 'turn/start')
-Assert ($turns.Count -eq 1 -and $turns[0].Parameters.model -eq 'gpt-5.6-luna' -and $turns[0].Parameters.effort -eq 'low' -and $turns[0].Parameters.serviceTierForTurn -eq 'default') 'Routine turn inherited account defaults.'
-Assert ((Get-PMMRepairSession $s.Id).Status -eq 'Paused') 'Blocked cost escalation lost its resumable state.'
+
+Reject {Invoke-PMMPersistentAgent $s.Id} 'Internal request ran without separate opt-in.'
+Assert ($script:protocolCalls.Count -eq 0) 'Disabled internal mode contacted the model server.'
+$policy.InternalEnabled=$true;Save-PMMAIPolicy $policy
+Invoke-PMMPersistentAgent $s.Id|Out-Null
+Assert ($script:protocolTurns -eq 1 -and (Get-PMMRepairSession $s.Id).Status -eq 'NeedsInput') 'Routine request escalated without a user prompt.'
 $policy.MaxStage='Repair';Save-PMMAIPolicy $policy
-Invoke-PMMPersistentAgent $s.Id|Out-Null
+$p=New-PMMChatPrompt $s.Id 'Create an updated version for publication; explain missing PMM capabilities.' Repair
+$again=New-PMMChatPrompt $s.Id $p.Text Repair $p.Id
+Assert ($again.Id -ceq $p.Id) 'Retry duplicated the user prompt.'
+Invoke-PMMChatPrompt $s.Id $p.Id|Out-Null
 $turns=@($script:protocolCalls|Where-Object Method -eq 'turn/start')
-Assert ($turns.Count -eq 2 -and $turns[1].Parameters.model -eq 'gpt-5.6-terra' -and $turns[1].Parameters.effort -eq 'medium') 'Authorized continuation repeated triage or used the wrong repair model.'
-Assert (@($script:protocolCalls|Where-Object Method -eq 'thread/start').Count -eq 1) 'Reasoning escalation duplicated the conversation.'
-Assert ($turns[0].Parameters.threadId -ceq $turns[1].Parameters.threadId) 'Reasoning escalation changed conversation identity.'
-Invoke-PMMPersistentAgent $s.Id|Out-Null
-Assert ($script:protocolTurns -eq 2) 'Retry repeated a completed turn.'
-Write-Output ('PASS agent routing protocol133: '+($script:checks-$before)+' persistent staged-control checks.')
+Assert ($turns.Count -eq 2 -and $turns[1].Parameters.model -eq 'gpt-5.6-terra') 'Explicit repair request used the wrong model.'
+Assert ($turns[1].Parameters.input[0].text -match [regex]::Escape($p.Text)) 'The user prompt was not delivered.'
+Assert (@($script:protocolCalls|Where-Object Method -eq 'thread/start').Count -eq 1) 'Model change duplicated the conversation.'
+Invoke-PMMChatPrompt $s.Id $p.Id|Out-Null
+Assert ($script:protocolTurns -eq 2) 'Retry repeated a completed user turn.'
+$history=Get-PMMCaseChatText $s.CaseId
+Assert ($history -match 'gpt-5.6-luna' -and $history -match 'gpt-5.6-terra' -and $history -match 'Create an updated version') 'The public chat omitted model changes or the user prompt.'
+Reject {New-PMMChatPrompt $s.Id 'Changed prompt' Repair $p.Id} 'Idempotency identifier accepted a different prompt.'
+Write-Output ('PASS agent routing protocol133: '+($script:checks-$before)+' Desktop/default, journal and explicit-turn checks.')

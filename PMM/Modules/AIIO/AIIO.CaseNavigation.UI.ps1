@@ -21,7 +21,7 @@ function Save-PMMAIIOCaseEditor {
     $c=Get-PMMAIIOSelectedCase
     if($c -and ($c.SelectedStep -le 0 -or $c.SelectedStep -eq $c.CurrentStep) -and $Script:PMMAIIOCaseUI.ContainsKey('CmbClient')){
         $choice=[string](Get-PMMAIIOCaseControl 'CmbClient').SelectedValue
-        if($choice -in @('CHATGPT','EXTERNAL','CODEX') -and (Get-PMMCaseClient $c) -ne $choice){
+        if($choice -in @('CHATGPT','CODEX_DESKTOP','EXTERNAL','CODEX') -and (Get-PMMCaseClient $c) -ne $choice){
             $reply=Get-PMMMCPReplyView $c
             if($c.ActiveOperation.Running -or ($reply -and $reply.status -eq 'PROCESSING')){throw 'Wait for the active client before changing destination.'}
             $c|Add-Member -NotePropertyName AIClient -NotePropertyValue $choice -Force

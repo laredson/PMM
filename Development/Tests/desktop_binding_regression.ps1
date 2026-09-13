@@ -55,12 +55,12 @@ function Show-PMMDesktopSetup{$Script:setup++}
 function Start-Process {param($FilePath,$ArgumentList,$WindowStyle);$Script:started++}
 Show-PMMChatGPTCase
 $d=Get-PMMDesktopDispatch $case.CaseId
-Assert ($Script:opened -eq 1 -and $Script:started -eq 1 -and $d.phase -eq 'PREPARED') 'First send opens one chat and one verification worker'
+Assert ($Script:opened -eq 1 -and $Script:started -eq 0 -and $d.phase -eq 'PREPARED') 'First send prepares one Desktop chat without starting a worker'
 Show-PMMChatGPTCase
 Assert ($Script:opened -eq 1 -and $Script:helpers -eq 1) 'Repeated send does not duplicate a chat'
 $case=Get-PMMMCPCase $case.CaseId
 Assert ((Get-PMMCaseClient $case) -eq 'CHATGPT' -and $case.Transport -eq 'MCP') 'Destination separate from MCP transport'
-Assert ((Invoke-PMMMCPClient $case.CaseId) -match 'Desktop' -and $Script:started -eq 1) 'Desktop never starts Codex CLI'
+Assert ((Invoke-PMMMCPClient $case.CaseId) -match 'Desktop' -and $Script:started -eq 0) 'Desktop never starts Codex CLI'
 Assert ((Get-PMMDesktopCaseStatus $case) -match 'prepared') 'Opening is not receipt or research'
 $lease=Invoke-PMMMCPTool 'pmm_request_claim' ([pscustomobject]@{caseId=$case.CaseId;requestId=$d.requestId})
 Reject {Show-PMMChatGPTCase} 'Busy unknown chat never starts another client'
@@ -72,7 +72,7 @@ Assert ((Get-PMMDesktopCaseStatus $case) -match 'investigating') 'Research statu
 $a.phase='AWAITING_APPROVAL';[void](Invoke-PMMMCPTool 'pmm_desktop_case_link' $a)
 Assert ((Get-PMMDesktopCaseStatus $case) -match 'approval') 'Plan approval status is distinct'
 Show-PMMChatGPTCase
-Assert ($Script:opened -eq 2 -and $Script:started -eq 1) 'Known active thread reopens without another worker'
+Assert ($Script:opened -eq 2 -and $Script:started -eq 0) 'Known active thread reopens without another worker'
 [void](Invoke-PMMMCPTool 'pmm_request_complete' ([pscustomobject]@{caseId=$case.CaseId;requestId=$d.requestId;token=$lease.token;message='Plan ready';response='Synthetic result';status='NEEDS_INPUT'}))
 Assert ((Get-PMMDesktopCaseStatus $case) -match 'NEEDS_INPUT') 'Terminal result overrides stale research status'
 # A real lock denies another operation before acquisition.
@@ -89,11 +89,11 @@ $Script:installed=$false
 Add-Type -AssemblyName PresentationFramework
 function Show-PMMThemedMessage($args){return [Windows.MessageBoxResult]::No}
 Show-PMMChatGPTCase
-Assert ($Script:started -eq 1) 'Declined missing-app install starts nothing'
+Assert ($Script:started -eq 0) 'Declined missing-app install starts nothing'
 function Show-PMMThemedMessage($args){return [Windows.MessageBoxResult]::Yes}
 $Script:installRequests=0
 function Request-PMMDependencyInstall($component,$caseId){if($component -ne 'chatgpt'){throw 'Wrong component'};$Script:installRequests++}
 function Open-PMMSettings($id){}
 Show-PMMChatGPTCase
-Assert ($Script:installRequests -eq 1 -and $Script:started -eq 1) 'Missing app uses installation consent service only'
+Assert ($Script:installRequests -eq 1 -and $Script:started -eq 0) 'Missing app uses installation consent service only'
 "DESKTOP_BINDING_OK: $Script:checks checks; no real installers or chat messages."

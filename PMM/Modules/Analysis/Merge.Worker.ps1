@@ -20,6 +20,8 @@ try{
   function Set-PMMBuildProgress([int]$Current,[int]$Total,[string]$Message,[switch]$Indeterminate){
     Write-PMMJsonAtomic (Join-Path $job 'progress.json') @{jobId=$JobId;status='Building';current=$Current;total=$Total;message=$Message}
   }
+  $revision=Get-PMMCaseEvidenceRevision $s.CaseId
+  if((Get-PMMAnalysisValue $revision.Evidence Kind '') -ne 'DeepAnalysis'){throw 'This service merges the analyzed active library, not an individual repair PAK. Attach an applicable deep-analysis report for a library merge; a standalone mod needs a scoped adaptation tool. No library scan or candidate was started.'}
   Invoke-PMMScan -NoPatchSelection|Out-Null
   $plan=Assert-PMMPlanMatchesLibrary @(Get-LibraryMods)
   $fingerprint=Get-PMMAnalysisHash @($s.EvidenceRevision,$plan)

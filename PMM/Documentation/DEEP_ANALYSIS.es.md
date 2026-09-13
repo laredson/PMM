@@ -53,3 +53,11 @@ El plan detectado y el catálogo real prevalecen sobre una preferencia de cuenta
 El chat manual prepara un texto para trasladarlo y devolver la respuesta al caso. PMM no controla el modelo elegido allí ni confirma automáticamente su entrega. Los chats también usan tokens y pueden tener límites; ChatGPT Work comparte uso con Codex. [Documentación oficial de uso](https://learn.chatgpt.com/docs/pricing).
 
 **Continuar investigación** retoma las etapas pendientes con la misma identidad. Los cambios en la política afectan a las siguientes peticiones, sin alterar un turno activo.
+
+## Desktop y la pestaña Chat IA
+
+Elige **ChatGPT Desktop** o **Codex Desktop** como destino del caso y pulsa enviar/abrir. PMM prepara una petición para que el chat presente un informe inicial y puedas elegir el resultado: una versión actualizada del mod, una receta KL de Fix Lab u otro objetivo. Envía el mensaje preparado en Desktop; abrir un enlace no confirma su recepción por MCP. Si tu versión instalada de ChatGPT no admite enlaces a chats MCP locales, usa Codex Desktop o actualiza ChatGPT. PMM distingue las dos aplicaciones.
+
+Las peticiones internas son opcionales: selecciona **Avanzado: agente interno**, abre **Chat IA > Avanzado**, habilítalas expresamente en los ajustes de cuenta, elige la etapa, revisa el modelo y esfuerzo indicados y escribe el prompt. La autorización para crear candidatos y descargar actualizaciones es independiente de ejecutar o desplegar en el juego. Cada envío inicia un único turno; subir de modelo queda como sugerencia. Cancelar conserva la conversación.
+
+**Actualizar conversación** recupera el historial público existente sin iniciar inferencia. La carpeta Chat del caso conserva todos los eventos guardados; la interfaz muestra los últimos 300 junto con los registros de modelo y uso. Se guardan las operaciones públicas de las herramientas, no el razonamiento privado. Los contadores del proveedor pueden solaparse o reiniciarse; no se suman como si fueran una factura. No se garantiza un canal automático gratuito o sin consumo.

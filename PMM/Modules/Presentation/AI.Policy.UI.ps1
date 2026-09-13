@@ -75,11 +75,12 @@ function Show-PMMAIPolicyDialog {
     [void]$row.Children.Add($label);[void]$row.Children.Add($model);[void]$row.Children.Add($effort);[void]$v.body.Children.Add($row)
     $controls[$stage+'Model']=$model;$controls[$stage+'Effort']=$effort
   }
+  $internal=[Windows.Controls.CheckBox]::new();$internal.IsChecked=[bool](Get-PMMAnalysisValue $policy InternalEnabled $false);$internal.Content=L 'Enable internal AI requests (uses the connected account allowance)' 'Habilitar peticiones IA internas (consumen el uso de la cuenta conectada)';$internal.Margin=[Windows.Thickness]::new(4);[void]$v.body.Children.Add($internal)
   $api=[Windows.Controls.CheckBox]::new();$api.IsChecked=$policy.AllowApiBilling;$api.Content=L 'Allow separately billed API requests' 'Permitir peticiones API facturadas por separado';$api.Margin=[Windows.Thickness]::new(4);[void]$v.body.Children.Add($api)
   $status=[Windows.Controls.TextBlock]::new();$status.TextWrapping='Wrap';$status.Margin=[Windows.Thickness]::new(4)
   [void]$v.body.Children.Add($status)
   $refresh=[Windows.Controls.Button]::new();$refresh.Content=L 'Check plan and models' 'Comprobar plan y modelos';$refresh.Margin=[Windows.Thickness]::new(3)
-  $state=@{Policy=$policy;Controls=$controls;Api=$api;Status=$status;Window=$v.window;Refresh=$refresh;Closed=$false;Initialized=$false}
+  $state=@{Policy=$policy;Controls=$controls;Api=$api;Internal=$internal;Status=$status;Window=$v.window;Refresh=$refresh;Closed=$false;Initialized=$false}
   $v.window.Tag=$state
   $v.window.Add_Closed({param($sender,$eventArgs)$sender.Tag.Closed=$true})
   $refresh.Tag=$state
@@ -107,6 +108,7 @@ function Show-PMMAIPolicyDialog {
   $save.Add_Click({param($sender,$eventArgs)
     $state=$sender.Tag;$policy=$state.Policy;$controls=$state.Controls
     try{
+      $policy|Add-Member -NotePropertyName InternalEnabled -NotePropertyValue ([bool]$state.Internal.IsChecked) -Force
       $policy.Profile=[string]$controls.Profile.SelectedValue;$policy.MaxStage=[string]$controls.MaxStage.SelectedValue;$policy.AllowApiBilling=[bool]$state.Api.IsChecked
       foreach($stage in @('Routine','Repair','Complex')){
         $entry=$controls[$stage+'Model'].SelectedItem

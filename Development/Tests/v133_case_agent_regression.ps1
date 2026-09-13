@@ -30,6 +30,8 @@ $work=Get-OrCreate-PMMCaseRepairSession $c3.CaseId $options
 # A real child process fails before any network request; its error must persist for the UI.
 $runtimeFile=Join-Path $fixture 'Modules/MCP/MCP.Client.ps1'
 [IO.File]::AppendAllText($runtimeFile,[Environment]::NewLine+"function Get-PMMCodexRuntime { throw 'Fixture runtime missing from PATH and desktop' }",[Text.UTF8Encoding]::new($true))
+Reject {Start-PMMRepairAgentJob $work.Id} 'An internal worker started without explicit opt-in.'
+$policy=New-PMMAIPolicy;$policy.InternalEnabled=$true;Save-PMMAIPolicy $policy
 Start-PMMRepairAgentJob $work.Id|Out-Null
 $watch=[Diagnostics.Stopwatch]::StartNew()
 do{

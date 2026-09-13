@@ -216,7 +216,7 @@ function Invoke-PMMDeepAnalysis($Options=$null,$ProposedReplacement=$null) {
     $finding|Add-Member -NotePropertyName ModsText -NotePropertyValue ($finding.Mods -join ', ')
   }
   $view=[ordered]@{Id=$id;Summary=$report.Summary;Findings=@($report.Findings|Select-Object Id,Rule,Mods,ModsText,Resource,Severity,Confidence,Classification,Message,Action);CaseId='';RepairSessionId=''}
-  if($Options.AutomaticSolution -and -not$ProposedReplacement){$case=New-PMMCaseFromDeepAnalysis $id;$session=New-PMMRepairSession $case.CaseId $Options;$view.CaseId=$case.CaseId;$view.RepairSessionId=$session.Id;Start-PMMRepairAgentJob $session.Id|Out-Null}
+  if($Options.AutomaticSolution -and -not$ProposedReplacement){$case=New-PMMCaseFromDeepAnalysis $id;$session=New-PMMRepairSession $case.CaseId $Options;$view.CaseId=$case.CaseId;$view.RepairSessionId=$session.Id;if((Get-PMMCaseClient $case) -eq 'CODEX' -and (Get-PMMAnalysisValue (Get-PMMAIPolicy) InternalEnabled $false)){Start-PMMRepairAgentJob $session.Id|Out-Null}else{$session.LastMessage='Continue this case in Desktop; internal AI is disabled.';Save-PMMRepairSession $session}}
   Write-PMMJsonAtomic (Join-Path $root 'view.json') $view -Depth 20
   $report|Add-Member -NotePropertyName RepairSessionId -NotePropertyValue $view.RepairSessionId
   $report.CaseId=$view.CaseId
@@ -234,7 +234,7 @@ function New-PMMCaseFromDeepAnalysis([string]$Id,[string[]]$FindingIds=@(),[stri
   try{
   if(-not$ExistingCaseId -and (Test-Path -LiteralPath $link)){$ExistingCaseId=(Read-PMMJsonFile $link).CaseId}
   if($ExistingCaseId){$case=Get-PMMAIIOCase $ExistingCaseId;if(-not$case){throw 'Linked case no longer exists.'}}
-  else{$case=New-PMMContextCase -Type Query -Mods @($report.Snapshot.Active) -Title 'Deep analysis / Analisis profundo' -Description 'Investigate the attached findings; preserve the intended functions. Check author updates before building repairs.'}
+  else{$case=New-PMMContextCase -Type Query -Mods @($report.Snapshot.Active) -Title 'Deep analysis / Analisis profundo' -Description 'Investigate the attached findings; preserve the intended functions. Check author updates before building repairs.';$case.Transport='MCP';$case|Add-Member -NotePropertyName AIClient -NotePropertyValue CHATGPT -Force;Save-PMMAIIOCase $case|Out-Null}
   $evidence=[ordered]@{Kind='DeepAnalysis';AnalysisId=$Id;Snapshot=$report.Snapshot;Findings=$findings;Coverage=$report.Coverage;ReportSha256=(Get-Sha256 (Join-Path (Get-PMMAnalysisPath $Id) 'report.json'))}
   Add-PMMCaseEvidenceRevision $case.CaseId $evidence|Out-Null
   Write-PMMJsonAtomic $link @{Schema='PMM_ANALYSIS_CASE_LINK_V1';CaseId=$case.CaseId;AnalysisId=$Id}

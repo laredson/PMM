@@ -1,4 +1,4 @@
-﻿param([Parameter(Mandatory=$true)][string]$Root,[Parameter(Mandatory=$true)][string]$SessionId)
+﻿param([Parameter(Mandatory=$true)][string]$Root,[Parameter(Mandatory=$true)][string]$SessionId,[string]$PromptId='')
 Set-StrictMode -Version 2;$ErrorActionPreference='Stop'
 $Script:Root=[IO.Path]::GetFullPath($Root)
 $workerLock=$null
@@ -10,7 +10,7 @@ try{
     $s=Get-PMMRepairSession $SessionId;$s.OwnerPid=$PID;$s.OwnerStart=(Get-Process -Id $PID).StartTime.ToUniversalTime().ToString('o');$s.Status='Starting';Save-PMMRepairSession $s
   }finally{$handshake.Dispose()}
   Set-PMMMCPEnabled $true
-  Invoke-PMMPersistentAgent $SessionId|Out-Null
+  if($PromptId){Invoke-PMMChatPrompt $SessionId $PromptId|Out-Null}else{Invoke-PMMPersistentAgent $SessionId|Out-Null}
 }catch{
   $failure=$_
   if($workerLock -and (Get-Command Get-PMMRepairSession -ErrorAction SilentlyContinue)){

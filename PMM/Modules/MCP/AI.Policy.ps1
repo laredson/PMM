@@ -1,6 +1,6 @@
 ﻿# Model routing is a local decision. Metadata requests do not start inference turns.
 function New-PMMAIPolicy {
-  return [pscustomobject]@{Schema='PMM_AI_POLICY_V1';Profile='Auto';MaxStage='Routine';AllowApiBilling=$false;RoutineModel='gpt-5.6-luna';RoutineEffort='low';RepairModel='gpt-5.6-terra';RepairEffort='medium';ComplexModel='gpt-5.6-sol';ComplexEffort='high';ServiceTier='default'}
+  return [pscustomobject]@{Schema='PMM_AI_POLICY_V1';InternalEnabled=$false;Profile='Auto';MaxStage='Routine';AllowApiBilling=$false;RoutineModel='gpt-5.6-luna';RoutineEffort='low';RepairModel='gpt-5.6-terra';RepairEffort='medium';ComplexModel='gpt-5.6-sol';ComplexEffort='high';ServiceTier='default'}
 }
 function Get-PMMAIPolicy {
   $path=Join-PMMPath 'State' 'ai-policy.json'

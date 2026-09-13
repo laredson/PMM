@@ -144,12 +144,15 @@ try{
       $case=New-PMMCaseFromDeepAnalysis $request.AnalysisId @($request.FindingIds) ([string](Get-PMMAnalysisValue $request ExistingCaseId ''))
       if(Get-PMMAnalysisValue $request StartRepair $false){
         $options=$request.Options;$options.AutomaticSolution=$true
-        $session=New-PMMRepairSession $case.CaseId $options;Start-PMMRepairAgentJob $session.Id|Out-Null
+        $session=New-PMMRepairSession $case.CaseId $options;if((Get-PMMCaseClient $case) -eq 'CODEX' -and (Get-PMMAnalysisValue (Get-PMMAIPolicy) InternalEnabled $false)){Start-PMMRepairAgentJob $session.Id|Out-Null}else{$session.LastMessage='Continue this case in Desktop; internal AI is disabled.';Save-PMMRepairSession $session}
         $extra['RepairSessionId']=$session.Id
         $viewPath=Join-Path (Get-PMMAnalysisPath $request.AnalysisId) 'view.json'
         $view=Read-PMMJsonFile $viewPath;$view.CaseId=$case.CaseId;$view.RepairSessionId=$session.Id;Write-PMMJsonAtomic $viewPath $view -Depth 20
       }
       $extra['CaseId']=$case.CaseId;$resultText='Persistent case created: '+$case.CaseId
+    }elseif((Get-PMMAnalysisValue $request Action '') -eq 'ReadConversation'){
+      $chat=Sync-PMMCaseChat ([string]$request.CaseId)
+      $resultText=$chat.ResultText
     }elseif((Get-PMMAnalysisValue $request Action '') -eq 'RefreshAI'){
       $client=$null
       try{

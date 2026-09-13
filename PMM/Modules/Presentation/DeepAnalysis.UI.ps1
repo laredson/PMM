@@ -85,7 +85,7 @@ function Initialize-PMMDeepAnalysisUI {
   $Script:DeepControls.History.Add_Click({try{Show-PMMRepairHistory}catch{Handle-UIError $_ 'Repair history'}})
   $Script:DeepControls.Source.Add_Click({Show-PMMUpdateSourceDialog})
   $Script:DeepControls.AIPolicy.Add_Click({try{Show-PMMAIPolicyDialog}catch{Handle-UIError $_ 'AI policy'}})
-  $Script:DeepControls.ResumeAI.Add_Click({try{if(-not$Script:DeepRepairSessionId){throw (L 'Create an investigation session first.' 'Crea primero una sesion de investigacion.')};Start-PMMRepairAgentJob $Script:DeepRepairSessionId|Out-Null}catch{Handle-UIError $_ 'Continue investigation'}})
+  $Script:DeepControls.ResumeAI.Add_Click({try{if(-not$Script:DeepRepairSessionId){throw (L 'Create an investigation session first.' 'Crea primero una sesion de investigacion.')};$s=Get-PMMRepairSession $Script:DeepRepairSessionId;Select-PMMCaseLocation (Get-PMMAIIOCase $s.CaseId);if((Get-PMMCaseClient (Get-PMMAIIOCase $s.CaseId)) -in @('CHATGPT','CODEX_DESKTOP')){Show-PMMChatGPTCase}else{(Get-PMMAIIOCaseControl 'ChatTabs').SelectedIndex=1;(Get-PMMAIIOCaseControl 'ChatAdvanced').IsExpanded=$true}}catch{Handle-UIError $_ 'Continue investigation'}})
   $timer=[Windows.Threading.DispatcherTimer]::new();$timer.Interval=[TimeSpan]::FromSeconds(2)
   $Script:PMMNextModuleCheck=[DateTime]::UtcNow.AddSeconds(30)
   $timer.Add_Tick({

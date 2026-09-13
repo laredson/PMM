@@ -24,7 +24,7 @@ function Confirm-PMMDesktopBinding($Arguments) {
     return @{status='CONNECTION_VERIFIED';root=$b.root;workspace=$b.workspace;extraFolder=$b.extraFolder;message='PMM connection verified. No account plan, brand or filesystem permission is certified. New UI cases default to Desktop.'}
 }
 function Get-PMMCaseClient($Case) {
-    if($Case -and $Case.PSObject.Properties['AIClient'] -and $Case.AIClient -in @('CHATGPT','EXTERNAL','CODEX')){return [string]$Case.AIClient}
+    if($Case -and $Case.PSObject.Properties['AIClient'] -and $Case.AIClient -in @('CHATGPT','CODEX_DESKTOP','EXTERNAL','CODEX')){return [string]$Case.AIClient}
     # Legacy cases preserve the global runner choice until explicitly changed.
     $p=Resolve-PMMMCPPath (Get-PMMMCPRoot) 'client.json'
     if(Test-Path -LiteralPath $p){$c=Read-PMMMCPJson $p;if($c.enabled){return 'CODEX'}}
@@ -50,6 +50,7 @@ function Set-PMMDesktopCaseLink($Arguments) {
     }
     $d.phase=$Arguments.phase;$d.updatedUtc=[DateTime]::UtcNow.ToString('o')
     Write-PMMAIIOJsonAtomic (Get-PMMDesktopFile ($Arguments.caseId+'\dispatch.json')) $d 8
+    if(Get-Command Add-PMMCaseChatEvent -ErrorAction SilentlyContinue){Add-PMMCaseChatEvent $Arguments.caseId 'Desktop receipt' @{Phase=$d.phase;RequestId=$d.requestId;ThreadId=$d.threadId} ($d.requestId+'-'+$d.phase)|Out-Null}
     return @{status=$d.phase;caseId=$Arguments.caseId;threadId=$d.threadId}
 }
 function Get-PMMDesktopCaseStatus($Case) {

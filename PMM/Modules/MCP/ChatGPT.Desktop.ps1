@@ -1,8 +1,9 @@
-. (Join-Path $PSScriptRoot 'Desktop.Binding.ps1')
+﻿. (Join-Path $PSScriptRoot 'Desktop.Binding.ps1')
 # Optional client: installation never implies authentication or a live MCP connection.
-function Get-PMMChatGPTDesktop {
+function Get-PMMChatGPTDesktop([string]$Destination='CHATGPT') {
     try{
         $packages=@(Get-AppxPackage -ErrorAction Stop | Where-Object {$_.Name -in @('OpenAI.ChatGPT-Desktop','OpenAI.Codex') -and $_.Publisher -eq 'CN=50BDFD77-8903-4850-9FFE-6E8522F64D5B'})
+        $packages=@($packages|Where-Object{if($Destination -eq 'CODEX_DESKTOP'){$_.Name -eq 'OpenAI.Codex'}else{$_.Name -eq 'OpenAI.ChatGPT-Desktop'}})
         $fallback=$null
         foreach($p in ($packages|Sort-Object Name)){
             $m=Get-AppxPackageManifest -Package $p.PackageFullName
@@ -14,8 +15,8 @@ function Get-PMMChatGPTDesktop {
         return $fallback
     }catch{return $null}
 }
-function Open-PMMChatGPTDesktop {
-    $p=Get-PMMChatGPTDesktop
+function Open-PMMChatGPTDesktop([string]$Destination='CHATGPT') {
+    $p=Get-PMMChatGPTDesktop $Destination
     if(-not $p){Start-Process 'ms-windows-store://pdp/?ProductId=9PLM9XGG6VKS';return}
     $manifest=Get-AppxPackageManifest -Package $p.PackageFullName
     $id=@($manifest.Package.Applications.Application)[0].Id
@@ -31,13 +32,14 @@ function Confirm-PMMDesktopConnection($Arguments){
     return @{status='CONNECTION_VERIFIED';caseId=$Arguments.caseId;scope='PMM MCP operations only; other client tools have separate permissions.'}
 }
 
-function Open-PMMDesktopLink([string]$Link) {
+function Open-PMMDesktopLink([string]$Link,[string]$Destination='CHATGPT') {
     $app=Get-PMMChatGPTDesktop
     if(-not $app -or -not $app.SupportsLocalChats){Open-PMMChatGPTDesktop;return $false}
     if($Link -notmatch '^codex://threads/'){throw 'Unsupported Desktop link.'}
-    try{Start-Process -FilePath $Link -ErrorAction Stop;return $true}catch{Open-PMMChatGPTDesktop;return $false}
+    try{Start-Process -FilePath $Link -ErrorAction Stop;return $true}catch{Open-PMMChatGPTDesktop $Destination;return $false}
 }
 function Show-PMMDesktopSetup {
+    Initialize-PMMDesktopProject
     $app=Get-PMMChatGPTDesktop
     $binding=Get-PMMDesktopBinding
     if(-not $binding -or -not $binding.verifiedUtc){$binding=New-PMMDesktopBinding}
@@ -77,7 +79,14 @@ function Show-PMMDesktopDispatchHelp($Dispatch,[bool]$CanOpen=$true) {
     foreach($action in @('copy','open','setup')){
         $b=[Windows.Controls.Button]::new();$b.Margin=[Windows.Thickness]::new(4);$b.Content=switch($action){'copy'{L 'Copy request' 'Copiar solicitud'}'open'{L 'Open new chat' 'Abrir chat nuevo'}'setup'{L 'Connection settings' 'Configurar conexion'}}
         if($action -eq 'open'){$b.IsEnabled=$CanOpen}
-        $op=$action;$b.Add_Click({switch($op){'copy'{[Windows.Clipboard]::SetText($Dispatch.prompt)}'open'{[void](Open-PMMDesktopLink (New-PMMDesktopLink $Dispatch.prompt))}'setup'{Show-PMMDesktopSetup}}}.GetNewClosure());[void]$v.actions.Children.Add($b)
+        $b.Tag=@{Action=$action;Dispatch=$Dispatch};$b.Add_Click({param($sender,$eventArgs)
+          $d=$sender.Tag.Dispatch
+          switch($sender.Tag.Action){
+            'copy'{[Windows.Clipboard]::SetText($d.prompt)}
+            'open'{$destination=if($d.PSObject.Properties['destination']){$d.destination}else{'CHATGPT'};[void](Open-PMMDesktopLink (New-PMMDesktopLink $d.prompt) $destination);$sender.IsEnabled=$false}
+            'setup'{Show-PMMDesktopSetup}
+          }
+        });[void]$v.actions.Children.Add($b)
     }
     $v.body.Children.Remove($v.actions);[void]$v.body.Children.Add($v.actions)
     [void]$v.window.ShowDialog()
@@ -87,40 +96,46 @@ function Show-PMMChatGPTCase {
     $case=Get-PMMAIIOSelectedCase
     if(-not $case){throw 'Select a case first.'}
     if($case.SelectedStep -gt 0 -and $case.SelectedStep -lt $case.CurrentStep){throw 'Select the latest case step first.'}
+    if($case.Type -in @('FIX_MOD','COMPATIBILITY') -and -not@($case.References.Mods).Count){throw (L 'Attach the mod with Add PAK before sending the case.' 'Adjunta el mod con Agregar PAK antes de enviar el caso.')}
     if($case.ActiveOperation.Running){throw 'A PMM worker is already processing this case.'}
-    $installed=Get-PMMChatGPTDesktop
+    $destination=Get-PMMCaseClient $case
+    if($destination -notin @('CHATGPT','CODEX_DESKTOP')){$destination='CHATGPT'}
+    $session=if(Get-Command Get-PMMCaseRepairSession -ErrorAction SilentlyContinue){Get-PMMCaseRepairSession $case.CaseId}else{$null}
+    if($session -and (Test-PMMRepairWorkerAlive $session)){throw 'Stop the internal request before handing control to Desktop.'}
+    $installed=Get-PMMChatGPTDesktop $destination
     if(-not $installed){
         if((Show-PMMThemedMessage @((L 'Install ChatGPT Desktop to continue?' 'Instalar ChatGPT Desktop para continuar?'),'ChatGPT','YesNo')) -eq [Windows.MessageBoxResult]::Yes){[void](Request-PMMDependencyInstall 'chatgpt' $case.CaseId);Open-PMMSettings 'INSTALLATIONS'}
         return
     }
-    if(-not $installed.SupportsLocalChats){Show-PMMDesktopSetup;return}
+    if(-not $installed.SupportsLocalChats){Open-PMMChatGPTDesktop $destination;Show-Info (L 'This installed ChatGPT version cannot open local MCP chats. Select Codex Desktop for PMM control, or update ChatGPT to a version supporting local MCP. No internal AI request was started.' 'Esta version instalada de ChatGPT no permite abrir chats MCP locales. Selecciona Codex Desktop para controlar PMM, o actualiza ChatGPT a una version con MCP local. No se inicio ninguna peticion IA interna.');return}
     $binding=Get-PMMDesktopBinding
     if(-not $binding -or -not $binding.verifiedUtc -or -not(Get-PMMMCPEnabled)){Show-PMMDesktopSetup;return}
+    Initialize-PMMDesktopProject
     $previous=Get-PMMDesktopDispatch $case.CaseId
     $reply=Get-PMMMCPReplyView $case
     if($reply -and $reply.status -eq 'PROCESSING'){
-        if($previous -and $previous.requestId -eq $reply.requestId -and $previous.threadId){[void](Open-PMMDesktopLink (New-PMMDesktopLink '' $previous.threadId));return}
+        if($previous -and $previous.requestId -eq $reply.requestId -and $previous.threadId){[void](Open-PMMDesktopLink (New-PMMDesktopLink '' $previous.threadId) $destination);return}
         throw 'An AI is processing this request. Continue in its chat; no second client was started.'
     }
-    $case.Transport='MCP';$case|Add-Member -NotePropertyName AIClient -NotePropertyValue CHATGPT -Force;Save-PMMAIIOCase $case|Out-Null
+    $case.Transport='MCP';$case|Add-Member -NotePropertyName AIClient -NotePropertyValue $destination -Force;Save-PMMAIIOCase $case|Out-Null
     $published=Publish-PMMAIIOCaseMCP $case.CaseId
     if($previous -and $previous.requestId -eq $published.RequestId -and $previous.phase -eq 'CANCELLED'){throw 'This request was cancelled. Edit the case and publish a follow-up.'}
     if($previous -and $previous.requestId -eq $published.RequestId){
-        if($previous.threadId){[void](Open-PMMDesktopLink (New-PMMDesktopLink '' $previous.threadId))}else{Show-PMMDesktopDispatchHelp $previous (-not [bool]$reply)}
+        if($previous.threadId){[void](Open-PMMDesktopLink (New-PMMDesktopLink '' $previous.threadId) $destination)}else{Show-PMMDesktopDispatchHelp $previous (-not [bool]$reply)}
         return
     }
-    $prompt='PMM case '+$case.CaseId+', request '+$published.RequestId+'. Workspace: '+$binding.root+'. Read pmm_case_get and claim this request using pmm_request_claim before working. Research first; do not edit assets, build, install, deploy or change PMM before presenting the plan and receiving the user approval in this chat. Use pmm_desktop_case_link with the lease token to report RECEIVED, RESEARCHING and AWAITING_APPROVAL; include your actual local threadId if available, never invent it. Renew the lease with pmm_request_progress while researching. Work in PMM Workspace'+$(if($binding.extraFolder){' or user-selected '+$binding.extraFolder}else{''})+'. Preserve normal saves. After approval, reclaim the request if the lease expired, then proceed within the approved scope. Return results using pmm_request_complete. Report built and game-tested separately.'
-    $d=[pscustomobject]@{caseId=$case.CaseId;requestId=$published.RequestId;root=$binding.root;prompt=$prompt;threadId='';phase='PREPARED';updatedUtc=[DateTime]::UtcNow.ToString('o');packageRoot=[string]$installed.InstallLocation}
+    $prompt='PMM case '+$case.CaseId+', request '+$published.RequestId+'. Workspace: '+$binding.root+'. Read pmm_case_get and claim this request using pmm_request_claim before working. You control the investigation in this Desktop conversation. First explain what the user seems to want and offer concrete outcomes: an updated mod ready for publication, a reusable functional Fix Lab KL recipe, or another user-chosen outcome. Ask only for missing decisions; respect the already authorized scope. After the user chooses, use PMM tools to inspect the exact case PAK, compare the current game reference, build and validate the chosen output. Do not substitute a merge of the entire active library for this case. If PMM lacks a tool, identify that specific missing capability; do not spend more reasoning or delegate to additional chats to compensate. Do not start an internal PMM AI runner. Mod changes go through PMM. Publication and game tests require their own authorization. Use pmm_desktop_case_link with the lease token to report RECEIVED, RESEARCHING and AWAITING_APPROVAL; include your actual local threadId if available, never invent it. Renew the lease with pmm_request_progress while researching. Work in PMM Workspace'+$(if($binding.extraFolder){' or user-selected '+$binding.extraFolder}else{''})+'. Preserve normal saves. After approval, reclaim the request if the lease expired, then proceed within the approved scope. Return results using pmm_request_complete. Report built and game-tested separately.'
+    $d=[pscustomobject]@{caseId=$case.CaseId;requestId=$published.RequestId;root=$binding.root;prompt=$prompt;threadId='';phase='PREPARED';updatedUtc=[DateTime]::UtcNow.ToString('o');packageRoot=[string]$installed.InstallLocation;destination=$destination}
+    if($session -and $session.ThreadId -and $destination -eq 'CODEX_DESKTOP'){$d.threadId=$session.ThreadId}
     $path=Get-PMMDesktopFile ($case.CaseId+'\dispatch.json')
     Write-PMMAIIOJsonAtomic $path $d 8
+    if(Get-Command Add-PMMCaseChatEvent -ErrorAction SilentlyContinue){Add-PMMCaseChatEvent $case.CaseId 'Desktop request prepared' @{Destination=$destination;Prompt=$prompt;RequestId=$published.RequestId} $published.RequestId|Out-Null}
     Refresh-PMMAIIOCaseList $case.CaseId
-    if($previous -and $previous.threadId){$d.threadId=$previous.threadId;Write-PMMAIIOJsonAtomic $path $d 8;[void](Open-PMMDesktopLink (New-PMMDesktopLink '' $d.threadId));Show-PMMDesktopDispatchHelp $d $false;return}
-    if(Open-PMMDesktopLink (New-PMMDesktopLink $prompt)){
-        $worker=Join-Path $Script:Root 'Modules\MCP\Desktop.SendWorker.ps1'
-        $args='-NoProfile -NonInteractive -ExecutionPolicy Bypass -File "'+$worker+'" -DispatchPath "'+$path+'"'
-        Start-Process -FilePath (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') -ArgumentList $args -WindowStyle Hidden | Out-Null
-        Set-PMMAIIOCaseUiStatus (L 'Chat prepared; waiting for verified delivery.' 'Chat preparado; esperando entrega verificada.')
+    if(($previous -and $previous.threadId) -or $d.threadId){if($previous -and $previous.threadId){$d.threadId=$previous.threadId};Write-PMMAIIOJsonAtomic $path $d 8;[void](Open-PMMDesktopLink (New-PMMDesktopLink '' $d.threadId) $destination);Show-PMMDesktopDispatchHelp $d $false;return}
+    if(Open-PMMDesktopLink (New-PMMDesktopLink $prompt) $destination){
+        Set-PMMAIIOCaseUiStatus (L 'Chat prepared. Send the request in Desktop; connection is confirmed when MCP receives it.' 'Chat preparado. Envia la solicitud en Desktop; la conexion se confirma al recibirla por MCP.')
     }else{Show-PMMDesktopDispatchHelp $d}
+
 }
 
 function Set-PMMDesktopDialogActions($View) {
@@ -129,4 +144,21 @@ function Set-PMMDesktopDialogActions($View) {
     $wrap=[Windows.Controls.WrapPanel]::new();$wrap.Margin=[Windows.Thickness]::new(0,14,0,0)
     # Buttons share the scrolling body, so narrow windows never clip setup actions.
     [void]$View.body.Children.Add($wrap);$View.actions=$wrap
+}
+
+
+function Initialize-PMMDesktopProject {
+  & (Join-Path $Script:Root 'Modules/MCP/Export-PMMMCPConfig.ps1') -Root $Script:Root -Enable|Out-Null
+  $generated=[IO.File]::ReadAllText((Join-Path (Get-PMMMCPRoot) 'codex-mcp.toml'))
+  $folder=Resolve-PMMMCPPath $Script:Root '.codex'
+  $path=Resolve-PMMMCPPath $folder 'config.toml'
+  $existing=if(Test-Path -LiteralPath $path){[IO.File]::ReadAllText($path)}else{''}
+  if($existing -match '(?m)^\s*\[mcp_servers\.pmm\]\s*$'){
+    if(-not$existing.Contains($generated.Trim())){throw 'This project already has a different PMM MCP entry. Review its .codex/config.toml and the generated Workspace/MCP/codex-mcp.toml; it was preserved.'}
+    return
+  }
+  [void][IO.Directory]::CreateDirectory($folder)
+  $expected=$existing
+  if((Test-Path -LiteralPath $path) -and [IO.File]::ReadAllText($path) -cne $expected){throw 'Project configuration changed during setup.'}
+  [IO.File]::WriteAllText($path,($existing+[Environment]::NewLine+'# PMM local tools; this does not authorize AI inference.'+[Environment]::NewLine+$generated),[Text.UTF8Encoding]::new($false))
 }

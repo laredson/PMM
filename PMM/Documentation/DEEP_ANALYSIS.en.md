@@ -41,3 +41,11 @@ Detected access and the current model catalog take precedence over a paid-profil
 Manual chat prepares text for user transfer and return to the case. PMM cannot control that chat's model or confirm delivery. Chats also use tokens and may have limits; ChatGPT Work shares usage with Codex. [Official usage documentation](https://learn.chatgpt.com/docs/pricing).
 
 **Continue investigation** resumes pending stages with the same identity. Policy changes apply to subsequent requests while active turns retain their settings.
+
+## Desktop and the AI chat tab
+
+Choose **ChatGPT Desktop** or **Codex Desktop** as the case destination, then send/open the case. PMM prepares a request for a preliminary report and outcome selection in that conversation. Send the prepared message in Desktop; a link opening is not proof of MCP receipt. If the installed ChatGPT version does not support local MCP chat links, use Codex Desktop or update ChatGPT. The applications are not silently substituted.
+
+For optional internal execution, select **Advanced: internal agent**, open **AI chat > Advanced**, explicitly enable internal requests in the account settings, choose the stage, review the displayed model/effort, and enter your prompt. Candidate build/download authorization is separate from game/deployment authorization. Each send is one explicit turn; harder reasoning is a suggestion, not automatic escalation. Cancel preserves the conversation.
+
+**Refresh conversation** reads the existing public transcript without an inference turn. The local case Chat folder retains all saved events; the UI displays the latest 300 entries plus route/usage records. Public tool activity is recorded; hidden reasoning and unreported provider usage cannot be reconstructed. Existing usage snapshots may overlap or reset and are not a monetary bill.

@@ -22,6 +22,8 @@ function ConvertTo-PMMMCPNativeArgument([string]$Value) {
     return ('"'+$escaped+'"')
 }
 function Invoke-PMMMCPClient([string]$CaseId) {
+    $case=Get-PMMMCPCase $CaseId
+    if((Get-PMMCaseClient $case) -in @('CHATGPT','CODEX_DESKTOP')){return 'Desktop owns this case. Continue in its conversation; no internal AI turn was started.'}
     if(-not(Get-PMMMCPClient)){return 'Available via MCP. Waiting for a connected AI to read the case.'}
     $options=New-PMMDeepAnalysisOptions;$options.AutomaticSolution=$true
     $session=Get-OrCreate-PMMCaseRepairSession $CaseId $options

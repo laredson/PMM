@@ -86,7 +86,7 @@ function Update-PMMAIIOTransportButton {
   $client='EXTERNAL'
   if($Script:PMMAIIOCaseUI.ContainsKey('CmbClient')){$client=[string](Get-PMMAIIOCaseControl 'CmbClient').SelectedValue}
   if([string]$transport.SelectedValue -eq 'MCP'){
-    $button.Content=switch($client){'CHATGPT'{L 'Send to ChatGPT' 'Enviar a ChatGPT'}'CODEX'{L 'Send to Codex console' 'Enviar a Codex consola'}default{L 'Publish to MCP' 'Publicar en MCP'}}
+    $button.Content=switch($client){'CHATGPT'{L 'Send to ChatGPT' 'Enviar a ChatGPT'}'CODEX_DESKTOP'{L 'Open in Codex Desktop' 'Abrir en Codex Desktop'}'CODEX'{L 'Internal AI chat...' 'Chat IA interno...'}default{L 'Publish to MCP' 'Publicar en MCP'}}
     $button.ToolTip=L 'Publish this case to the selected AI client.' 'Publicar este caso para el cliente IA seleccionado.'
   }else{$button.Content=L 'Create handoff' 'Crear paquete';$button.ToolTip=L 'Create a ZIP for manual sharing.' 'Crear un ZIP para compartir manualmente.'}
 }
