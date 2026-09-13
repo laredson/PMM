@@ -781,10 +781,10 @@ function Refresh-UI {
   $managedPatches=@(Get-PMMManagedPatches)
   $displayItems=[System.Collections.Generic.List[object]]::new()
   foreach($mod in $sourceMods){
-    $displayItems.Add([pscustomobject]@{Kind='Source';Name=[string]$mod.Name;Enabled=$true;State=(L 'active' 'activo');Priority=[int]$mod.Priority;SizeText=("{0:N2}" -f ($mod.Size/1MB));HashShort=$mod.Hash.Substring(0,12)})
+    $displayItems.Add([pscustomobject]@{Kind='Source';Name=[string]$mod.Name;Path=[string]$mod.Path;Hash=[string]$mod.Hash;Enabled=$true;State=(L 'active' 'activo');Priority=[int]$mod.Priority;SizeText=("{0:N2}" -f ($mod.Size/1MB));HashShort=$mod.Hash.Substring(0,12)})
   }
   foreach($mod in $disabledMods){
-    $displayItems.Add([pscustomobject]@{Kind='Source';Name=[string]$mod.Name;Enabled=$false;State=(L 'disabled' 'desactivado');Priority=[int]$mod.Priority;SizeText=("{0:N2}" -f ($mod.Size/1MB));HashShort=$mod.Hash.Substring(0,12)})
+    $displayItems.Add([pscustomobject]@{Kind='Source';Name=[string]$mod.Name;Path=[string]$mod.Path;Hash=[string]$mod.Hash;Enabled=$false;State=(L 'disabled' 'desactivado');Priority=[int]$mod.Priority;SizeText=("{0:N2}" -f ($mod.Size/1MB));HashShort=$mod.Hash.Substring(0,12)})
   }
   $Script:TxtLibraryCount.Text=((L '{0} active  |  {1} disabled' '{0} activos  |  {1} desactivados') -f $sourceMods.Count,$disabledMods.Count)
   Set-PMMLibraryDisplayItems @($displayItems|Sort-Object Priority,Name)

@@ -32,3 +32,13 @@ Applied to C:/Modding/palworld/1.3.3333/PMM. Backup: PMM-backup-case-entry-20260
 AUAT case AICASE-20260913-004810-a5411828 keeps its identity and advances from step 3 to step 4 by adding AutoUnlockAllTechnology_V1_P.pak (SHA256 b6af99dfd1d597b9a04458c884aacb5d09f8c3f30ca77f819d67d9a87e183f40). No duplicate case, investigation turn, new mod build or game launch was started by installation. The running old UI was left open to preserve any unsaved edits; restart is required to activate the menu changes.
 
 The clean PMM-1.3.3-case-entry-hotfix.zip passes SmokeTest, PS5.1 parsing of 117 scripts, all 589 file hashes and all 47 catalog entries. ZIP SHA256: 83b79f03d2f9bc638f005b04aa3b6a063e215535b3a8307be5637ca96b1d6148.
+
+## Follow-up: production row identity (hotfix 2)
+
+The previous context-menu regression constructed display rows containing Path, masking that Refresh-UI omitted Path for both active and disabled mods. The user's real error log locates the failure in Invoke-PMMNewLibraryCaseUI while reading the selected row. This invalidates the earlier test's coverage of the production scan-to-display boundary.
+
+The regression now creates filesystem library fixtures in the normal per-mod layout, disables one source through the library service, and runs the actual Refresh-UI. It reproduced the missing source identity before the fix. The production active/disabled display rows now preserve Path and the full Hash from their source record.
+
+After the fix, 26 checks pass in each language, including the real row identity, context selection, exact case references, disabled mod, multiple selection and manual case context. No AI request or Palworld process is used. Game mods and case history are not modified by the installation of this follow-up.
+
+Installed hotfix 2 at the same user path with backup PMM-backup-library-row-20260912-194547. All 589 public hashes match; all 112 existing mod/case workspace files are unchanged. Clean package passes PS5.1 parsing (117 scripts), 47 catalog entries and SmokeTest. ZIP SHA256: 3877564caa6f3676afc7d2d8158e15490868cc521db693cefa525b7f782acd78.

@@ -115,7 +115,7 @@
   "gameReferenceBackgroundWorker": "Modules/GameReference/GameReferenceWorker.ps1",
   "gameReferenceProgressUi": "Shared normal Settings + Fix Lab progress bars plus both Game Reference buttons as ColorFlow progress surfaces. AUTO invokes the canonical Settings Game Reference command before Fix Lab navigation; output choice may be highlighted concurrently while the worker runs.",
   "releaseCandidate": "1.3.3-deep-analysis-preview",
-  "buildId": "PMM-v1.3.3-case-entry-hotfix",
+  "buildId": "PMM-v1.3.3-case-entry-hotfix2",
   "buildIdentityFile": "Resources/Metadata/BUILD_ID.txt",
   "uiContract": "Public tabs are Mods & Merge, FIX LAB, AI & Help, World Save and Settings. Fresh size is 1460x900 and the normal minimum is 900x600; startup clamps to the Windows work area in device-independent pixels. Branding and action areas occupy equal header halves. Header actions are ordered Detect/status, folder/Play controls, then SemiAUTO/AUTO. SemiAUTO arms continuation after a manually started workflow action; the wider AUTO button runs the remaining safe workflow once and uses an idle-only sparkle treatment. AI & Help contains five focused subtabs: AI assistance, AI reception, Feedback & Knowledge, color-scheme editor and AI settings. AI assistance exposes separate diagnostic-case and standalone-mod-project entry points. Normal Settings also owns Vanilla Game Reference. General Settings follows the Sound events architecture by separating official PMM schemes from a bordered user-scheme collection. ColorFlow ends by highlighting Play as optional readiness without an action-required popup.",
   "bundledThemeCount": 11,
@@ -601,7 +601,7 @@
     "runtimeDiscovery": "Configured executable, PATH, installed desktop runtime; Explorer launch validated",
     "caseProgress": "Persistent response, explicit failures, cancel and original conversation link in case editor",
     "retry": "Reuse the same session for unchanged evidence without extending budgets or authorizations",
-    "validation": "18 WPF assertions per EN/ES; 10 additional session/worker/real metadata-connection checks; no inference or Palworld run for these checks",
+    "validation": "26 WPF assertions per EN/ES using production library scan/display rows; 10 additional session/worker/real metadata-connection checks; no inference or Palworld run for these checks",
     "restartRequired": true
   }
 }

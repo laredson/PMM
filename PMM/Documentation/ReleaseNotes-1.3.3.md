@@ -24,3 +24,7 @@ Usage: [English](DEEP_ANALYSIS.en.md) · [Español](DEEP_ANALYSIS.es.md).
 - Retrying unchanged evidence reuses the existing session and preserves its limits. Empty repair cases explain that a PAK must first be attached.
 - The window title now reads the packaged version. Restart PMM after installing this hotfix.
 - No game runtime acceptance or shared Windows desktop control is claimed by these fixes.
+
+### Case entry hotfix 2
+
+The library's displayed rows now retain the actual source path and full SHA256. This fixes the missing Path exception when creating a case from an imported mod, including disabled and multiple selections, and restores references in manually created cases. The regression now invokes the production library scan and Refresh-UI instead of injecting synthetic display rows.
