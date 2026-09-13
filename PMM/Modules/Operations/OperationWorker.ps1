@@ -49,6 +49,7 @@ Initialize-PMMPaths $Script:Root|Out-Null
 if($Operation -eq 'FixLabBuild'){
   . (Join-Path $Script:Root 'Modules\FixLab\FixLabService.ps1')
 }
+. (Join-Path $Script:Root 'Modules/MCP/MCP.Service.ps1')
 . (Join-Path $Script:Root 'Modules/Workbench.Services.ps1') -Profile Worker
 Start-PMMLogSession ('Worker-'+$Operation)
 Initialize-PMM

@@ -11,7 +11,7 @@ function Save-PMMAIPolicy($Policy) {
   if($Policy.Profile -notin @('Auto','Free','Paid','ManualChat') -or $Policy.MaxStage -notin @('Routine','Repair','Complex') -or $Policy.AllowApiBilling -isnot [bool]){throw 'Invalid AI policy.'}
   if($Policy.ServiceTier -cne 'default'){throw 'PMM automatic requests use standard speed.'}
   foreach($stage in @('Routine','Repair','Complex')){
-    if($Policy.($stage+'Model') -notmatch '^[a-zA-Z0-9._-]{1,100}$' -or $Policy.($stage+'Effort') -notin @('none','minimal','low','medium','high','xhigh','max')){throw 'Invalid model or effort preference.'}
+    if($Policy.($stage+'Model') -notmatch '^[a-zA-Z0-9._-]{1,100}$' -or $Policy.($stage+'Effort') -notin @('none','minimal','low','medium','high','xhigh','max','ultra')){throw 'Invalid model or effort preference.'}
   }
   Write-PMMJsonAtomic (Join-PMMPath 'State' 'ai-policy.json') $Policy -Schema PMM_AI_POLICY_V1
 }
@@ -47,8 +47,10 @@ function Resolve-PMMAIRoute($Policy,$Capabilities,[ValidateSet('Routine','Repair
   $effectiveProfile=if($Policy.Profile -eq 'Free' -or ($Capabilities.AuthType -eq 'chatgpt' -and $Capabilities.Plan -in @('free','go','unknown','Unknown'))){'Free'}else{'Paid'}
   if($effectiveProfile -eq 'Free' -and $TaskKind -ne 'Routine'){throw 'The free/conservative profile permits routine AI work only. Continue this complex step manually or refresh the detected account access.'}
   $modelName=[string]$Policy.($TaskKind+'Model');$effort=[string]$Policy.($TaskKind+'Effort')
-  $available=@($Capabilities.Models|Where-Object{$_.model -ceq $modelName -and -not(Get-PMMAnalysisValue $_ hidden $false)})
-  if($available.Count -ne 1){throw ('Configured model '+$modelName+' is not uniquely available. Choose an available model; PMM will not silently use a more expensive default.')}
+  $available=@($Capabilities.Models|Where-Object{$_.model -ieq $modelName -and -not(Get-PMMAnalysisValue $_ hidden $false)})
+  if($available.Count -eq 0){throw ('Model '+$modelName+' was not found in the detected account catalog. Open AI level / connection, check plan and models, and select an available model.')}
+  if($available.Count -gt 1){throw ('The detected catalog contains multiple entries for model '+$modelName+'. Refresh the model list before continuing.')}
+  $modelName=[string]$available[0].model
   if($effort -notin @($available[0].supportedReasoningEfforts|ForEach-Object{$_.reasoningEffort})){throw ('Model '+$modelName+' does not advertise effort '+$effort+'. Select a supported level.')}
   $buckets=@()
   if($Capabilities.Limits){

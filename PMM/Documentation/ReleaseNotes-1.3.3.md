@@ -28,3 +28,11 @@ Usage: [English](DEEP_ANALYSIS.en.md) · [Español](DEEP_ANALYSIS.es.md).
 ### Case entry hotfix 2
 
 The library's displayed rows now retain the actual source path and full SHA256. This fixes the missing Path exception when creating a case from an imported mod, including disabled and multiple selections, and restores references in manually created cases. The regression now invokes the production library scan and Refresh-UI instead of injecting synthetic display rows.
+
+## Detected model picker hotfix
+
+- AI level / connection now lists detected account models and each model's supported reasoning levels. The open dialog refreshes without reopening; connection errors appear there.
+- Model IDs resolve case-only spelling differences against the live catalog. Missing models and duplicate catalog entries have distinct explanations; there is no fallback to a different model.
+- Existing model choices and reasoning ceilings are preserved. An unsupported effort requires selection; it is never silently increased.
+- The normal background account check now loads its runtime discovery and MCP service dependencies.
+- Validated on PowerShell 5.1 with English/Spanish WPF fixtures and a real metadata-only account/model check. No repair inference or Palworld launch was started.

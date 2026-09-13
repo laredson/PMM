@@ -12,6 +12,13 @@ $policy.MaxStage='Repair'
 Assert ((Resolve-PMMAIRoute $policy $cap Repair).Model -eq 'gpt-5.6-terra') 'Repair did not use the configured appropriate model.'
 $policy.MaxStage='Complex'
 Assert ((Resolve-PMMAIRoute $policy $cap Complex).Model -eq 'gpt-5.6-sol') 'Complex work did not use the configured model.'
+$policy.RepairModel='gpt-5.6-Sol';$policy.RepairEffort='high'
+Assert ((Resolve-PMMAIRoute $policy $cap Repair).Model -ceq 'gpt-5.6-sol') 'Case-only spelling did not resolve to the detected canonical ID.'
+$cap.Models=@($catalog)+@($catalog[2])
+Reject {Resolve-PMMAIRoute $policy $cap Repair} 'Duplicate model catalog silently selected an entry.'
+$cap.Models=$catalog;$catalog[2].hidden=$true
+Reject {Resolve-PMMAIRoute $policy $cap Repair} 'Hidden model remained selectable.'
+$catalog[2].hidden=$false
 $cap.Plan='free';$policy.Profile='Paid'
 Reject {Resolve-PMMAIRoute $policy $cap Complex} 'A paid profile upgraded a free account.'
 Assert ((Resolve-PMMAIRoute $policy $cap Routine).EffectiveProfile -eq 'Free') 'Detected free access was ignored.'
