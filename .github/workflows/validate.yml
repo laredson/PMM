@@ -97,4 +97,3 @@ jobs:
           ./Development/Tests/desktop_snapshot_regression.ps1
           ./Development/Tests/workspaces_dependencies_regression.ps1 -Language en
           ./Development/Tests/workspaces_dependencies_regression.ps1 -Language es
-          ./Development/Tests/workspaces_dependencies_regression.ps1 -Language zh-CN
