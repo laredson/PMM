@@ -1,0 +1,78 @@
+name: PMM localization audit once
+
+on:
+  push:
+    branches: [1.3.4.1]
+    paths: [.github/workflows/localization-audit-once.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan UI literals and localization usage
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          roots=[Path('PMM/Modules'),Path('PMM/Resources/UI')]
+          needles=[
+            'Projects','Send to ChatGPT','Options','Candidates','Cases','Newest first','New case',
+            'Last step','Next step','Receive file','Create handoff','AI client','Detect modes',
+            'Select or create a case','Description / goal','References and evidence','Delete case',
+            'Optional tools and AI clients','Ask before each installation','Change permissions',
+            'Installation tutorial','Installations and status','Wwise','Unreal requires version',
+            'Research cases','Workflow','AI assistant','General','AI / MCP','Installations','Mods & Merge','Mod Creation'
+          ]
+          rows=[]
+          for root in roots:
+            for p in root.rglob('*'):
+              if p.suffix.lower() not in ('.ps1','.xaml','.json'): continue
+              try: text=p.read_text(encoding='utf-8-sig')
+              except Exception: continue
+              for i,line in enumerate(text.splitlines(),1):
+                if any(n.lower() in line.lower() for n in needles):
+                  rows.append(f'{p}:{i}: {line.strip()}')
+          # Also collect likely WPF literal assignments in PowerShell that are not already wrapped in L/Get-PMMText.
+          likely=[]
+          patterns=[
+            re.compile(r'\.(?:Text|Content|Header|ToolTip)\s*=\s*[\'\"]([^\'\"]{2,})[\'\"]'),
+            re.compile(r'@\(\s*[\'\"]([^\'\"]{2,})[\'\"]\s*,\s*[\'\"]([^\'\"]{2,})[\'\"]\s*\)')
+          ]
+          for p in Path('PMM/Modules').rglob('*.ps1'):
+            try: text=p.read_text(encoding='utf-8-sig')
+            except Exception: continue
+            for i,line in enumerate(text.splitlines(),1):
+              if ' L ' in line or '(L ' in line or 'Get-PMMText' in line: continue
+              for pat in patterns:
+                if pat.search(line):
+                  likely.append(f'{p}:{i}: {line.strip()}')
+                  break
+          out=Path('Development/Localization')
+          out.mkdir(parents=True,exist_ok=True)
+          report='''# PMM localization audit — v1.3.4.1\n\nThis report is generated from the UI source to locate strings that bypass the localization layer.\n\n## Screenshot-related matches\n\n'''
+          report+='\n'.join(rows) or '(none)'
+          report+='\n\n## Likely direct WPF literals in PowerShell\n\n'
+          report+='\n'.join(likely) or '(none)'
+          report+='\n'
+          (out/'UNLOCALIZED_AUDIT.txt').write_text(report,encoding='utf-8')
+          print(f'screenshot matches={len(rows)} likely direct literals={len(likely)}')
+          PY
+      - name: Commit audit and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/localization-audit-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add Development/Localization/UNLOCALIZED_AUDIT.txt .github/workflows/localization-audit-once.yml
+          git commit -m 'chore: add localization audit for v1.3.4.1'
+          git push origin HEAD:1.3.4.1
