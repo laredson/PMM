@@ -4,10 +4,20 @@ function Get-PMMDesktopPackages {
     foreach($p in @(Get-AppxPackage -ErrorAction Stop | Where-Object {
         $_.Name -in @('OpenAI.ChatGPT-Desktop','OpenAI.Codex') -and $_.Publisher -eq 'CN=50BDFD77-8903-4850-9FFE-6E8522F64D5B'
     })){
-        $manifest=Get-AppxPackageManifest -Package $p.PackageFullName
+        # AppX projections differ across Windows/PowerShell hosts. A partial projection
+        # is not a usable Desktop installation and must fail closed under StrictMode.
+        $installLocation=if($p.PSObject.Properties['InstallLocation']){[string]$p.InstallLocation}else{''}
+        $packageFullName=if($p.PSObject.Properties['PackageFullName']){[string]$p.PackageFullName}else{''}
+        $packageFamilyName=if($p.PSObject.Properties['PackageFamilyName']){[string]$p.PackageFamilyName}else{''}
+        if([string]::IsNullOrWhiteSpace($installLocation) -or [string]::IsNullOrWhiteSpace($packageFullName) -or [string]::IsNullOrWhiteSpace($packageFamilyName)){continue}
+        try{$manifest=Get-AppxPackageManifest -Package $packageFullName}catch{continue}
+        if(-not$manifest){continue}
         $protocols=@($manifest.SelectNodes('//*[local-name()="Protocol"]')|ForEach-Object{$_.Name})
-        $running=@($processes|Where-Object{try{$_.Path -and $_.Path.StartsWith($p.InstallLocation.TrimEnd('\')+'\',[StringComparison]::OrdinalIgnoreCase)}catch{$false}})
-        [pscustomobject]@{Name=$p.Name;Version=[string]$p.Version;InstallLocation=$p.InstallLocation;PackageFullName=$p.PackageFullName;PackageFamilyName=$p.PackageFamilyName;AppId=@($manifest.Package.Applications.Application)[0].Id;SupportsLocalChats=($protocols -contains 'codex');Running=($running.Count -gt 0)}
+        $running=@($processes|Where-Object{try{$_.Path -and $_.Path.StartsWith($installLocation.TrimEnd('\')+'\',[StringComparison]::OrdinalIgnoreCase)}catch{$false}})
+        $version=if($p.PSObject.Properties['Version']){[string]$p.Version}else{''}
+        $appId=''
+        try{$appId=[string]@($manifest.Package.Applications.Application)[0].Id}catch{}
+        [pscustomobject]@{Name=[string]$p.Name;Version=$version;InstallLocation=$installLocation;PackageFullName=$packageFullName;PackageFamilyName=$packageFamilyName;AppId=$appId;SupportsLocalChats=($protocols -contains 'codex');Running=($running.Count -gt 0)}
     }
 }
 function Select-PMMDesktopPackage([array]$Packages,[string]$Destination) {

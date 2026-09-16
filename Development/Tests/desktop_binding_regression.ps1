@@ -49,6 +49,8 @@ function Refresh-PMMAIIOCaseList($id){}
 function Set-PMMAIIOCaseUiStatus($message){}
 $Script:opened=0;$Script:helpers=0;$Script:setup=0;$Script:installed=$true;$Script:started=0
 function Get-PMMChatGPTDesktop{if($Script:installed){return [pscustomobject]@{InstallLocation='C:\synthetic desktop';SupportsLocalChats=$true}};return $null}
+# Synthetic Desktop exposes the same explicit routing modes expected by current PMM.
+function Get-PMMDesktopModes($App){return @('chat','work')}
 function Open-PMMDesktopLink($link){$Script:opened++;return $true}
 function Show-PMMDesktopDispatchHelp($Dispatch,$CanOpen){$Script:helpers++}
 function Show-PMMDesktopSetup{$Script:setup++}

@@ -31,9 +31,9 @@ Write-PMMAIIOJsonAtomic $challenge @{nonce='correct';expiresUtc=[DateTime]::UtcN
 $rejected=$false;try{Confirm-PMMDesktopConnection @{caseId='fixture';nonce='correct'}|Out-Null}catch{$rejected=$true};if(-not $rejected){throw 'Expired challenge accepted'}
 'DESKTOP_SNAPSHOT_OK: 478 cached jobs, initial dispatch '+$watch.ElapsedMilliseconds+'ms; invalid case, nonce and expiry rejected. No application installed.'
 
-function Get-AppxPackageManifest {param($Package) return [xml]'<Package><Applications><Application><Extensions><Protocol Name="codex" /></Extensions></Application></Applications></Package>'}
-function Get-AppxPackage {return [pscustomobject]@{Name='OpenAI.ChatGPT-Desktop';PackageFullName='fixture-chatgpt';Publisher='CN=50BDFD77-8903-4850-9FFE-6E8522F64D5B'}}
+function Get-AppxPackageManifest {param($Package) return [xml]'<Package><Applications><Application Id="fixture"><Extensions><Protocol Name="codex" /></Extensions></Application></Applications></Package>'}
+function Get-AppxPackage {return [pscustomobject]@{Name='OpenAI.ChatGPT-Desktop';Version='1.0.0.0';InstallLocation=$testRoot;PackageFullName='fixture-chatgpt';PackageFamilyName='fixture-chatgpt-family';Publisher='CN=50BDFD77-8903-4850-9FFE-6E8522F64D5B'}}
 if(-not(Get-PMMChatGPTDesktop)){throw 'Official ChatGPT identity not detected'}
-function Get-AppxPackage {return [pscustomobject]@{Name='OpenAI.ChatGPT-Desktop';PackageFullName='fixture-chatgpt';Publisher='CN=untrusted'}}
+function Get-AppxPackage {return [pscustomobject]@{Name='OpenAI.ChatGPT-Desktop';Version='1.0.0.0';InstallLocation=$testRoot;PackageFullName='fixture-chatgpt';PackageFamilyName='fixture-chatgpt-family';Publisher='CN=untrusted'}}
 if(Get-PMMChatGPTDesktop){throw 'Untrusted publisher accepted'}
 'CHATGPT_IDENTITY_OK'

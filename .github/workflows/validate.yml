@@ -1,3 +1,7 @@
+# Current-release CI: version-aware package integrity, localization, Windows PowerShell 5.1, WPF and runtime checks.
+# Desktop/workspace regression fixtures are deterministic and independent of the hosted runner's installed apps.
+# This workflow intentionally validates the current release contract rather than historical RC-only assumptions.
+# Final v1.3.4.1 CI verification after the robust AppX projection fix.
 name: PMM validation
 
 on:
@@ -26,20 +30,45 @@ jobs:
         with:
           go-version: '1.23.x'
 
-      - name: Validate repository and PMM package contract
+      - name: Validate current repository and PMM package contract
         shell: pwsh
         run: |
           ./Development/Scripts/validation/Validate-v1.3.ps1 -Quiet
+
+      - name: Windows PowerShell 5.1 localization regression
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-ExecutionPolicy -Scope Process Bypass -Force
+          if($PSVersionTable.PSVersion.Major -ne 5){throw "Expected Windows PowerShell 5.1, got $($PSVersionTable.PSVersion)"}
+          ./Development/Localization/Test-PowerShell51.ps1 -Language zh-CN
+
+      - name: Localization catalog audit
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python Development/Localization/audit_localization.py
+          ./Development/Localization/Test-Localization.ps1 -Language zh-CN
+
+      - name: Parse shipped PowerShell with Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $failed=$false
+          Get-ChildItem PMM/Modules -Recurse -Filter *.ps1 | ForEach-Object {
+            $tokens=$null;$errors=$null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName,[ref]$tokens,[ref]$errors)|Out-Null
+            if($errors.Count){
+              $failed=$true
+              $errors|ForEach-Object{Write-Error ($_.Extent.File+': '+$_.Message)}
+            }
+          }
+          if($failed){throw 'Windows PowerShell 5.1 parse validation failed'}
 
       - name: Materialize WPF window and AUTO template
         shell: powershell
         run: |
           ./Development/Tests/wpf_xaml_runtime_regression.ps1
-
-      - name: Run RC21 static smoke contract
-        shell: pwsh
-        run: |
-          ./Development/Tests/SmokeTest.ps1
 
       - name: Compile-test PMM Host source snapshot
         shell: pwsh
@@ -53,12 +82,12 @@ jobs:
         run: |
           go test ./...
 
-      - name: Native Runtime self-test (packaged Guided Flow binary)
+      - name: Native Runtime self-test
         shell: pwsh
         run: |
           ./PMM/Engine/PMMRuntime.exe self-test
 
-      - name: Host to Runtime native-route self-test (packaged Guided Flow binary)
+      - name: Host to Runtime native-route self-test
         shell: pwsh
         run: |
           ./PMM/PMM.exe runtime-self-test
