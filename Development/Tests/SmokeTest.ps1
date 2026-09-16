@@ -76,10 +76,10 @@ $manifestBytes=[IO.File]::ReadAllBytes((Join-Path $App 'Resources/Metadata/RELEA
 $manifestHasBom=($manifestBytes.Length -ge 3 -and $manifestBytes[0] -eq 0xEF -and $manifestBytes[1] -eq 0xBB -and $manifestBytes[2] -eq 0xBF)
 Assert-PMM (-not $manifestHasBom) 'Native release manifest is UTF-8 without BOM'
 $manifest=Get-Content (Join-Path $App 'Resources/Metadata/RELEASE_MANIFEST.json') -Raw|ConvertFrom-Json
-Assert-PMM ([string]$manifest.version -eq '1.3.3') 'Manifest version 1.3.3'
+Assert-PMM ([string]$manifest.version -eq '1.3.4') 'Manifest version 1.3.4'
 Assert-PMM ([int]$manifest.mergePlanSchema -eq 19) 'Merge plan schema 19'
 Assert-PMM ([int]$manifest.buildManifestSchema -eq 9) 'Build manifest schema 9'
-Assert-PMM ([string]$manifest.buildId -eq 'PMM-v1.3.3-desktop-chat-hotfix4') 'PMM 1.3.3 analysis build identity'
+Assert-PMM ([string]$manifest.buildId -eq 'PMM-v1.3.4-desktop-auat-rc2') 'PMM 1.3.3 analysis build identity'
 Assert-PMM ([string]$manifest.runtime.executable -eq 'Engine/PMMRuntime.exe') 'Runtime new path'
 Assert-PMM ([string]$manifest.aiioModule -eq 'Modules/AIIO/AIIO.ps1') 'AIIO new path'
 Assert-PMM ([string]$manifest.ckl.catalog -eq 'CKL/Catalog/case-index.json') 'Manifest CKL catalog path'

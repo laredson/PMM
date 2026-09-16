@@ -280,7 +280,7 @@ function Invoke-PMMMCPTool([string]$Name,$Arguments) {
                     }
                     $toolchain+=@{name=$pair[0];installed=$installed}
                 }
-                return @{game='Palworld';reference=(Get-PMMMCPReferenceStatus);capabilities=@{prepareReference='pmm_reference_prepare';referenceProgress='pmm_reference_status';search='pmm_reference_search';export='pmm_reference_export';inspect='pmm_asset_inspect';archiveSearch='pmm_archive_search';prepareAsset='pmm_asset_prepare';edit='pmm_asset_edit';build='pmm_candidate_build';candidates='pmm_candidates_list';unrealEditor='pmm_unreal_status'};bridgeVersion='0.5.0';transport='stdio';enabled=$true;toolchain=$toolchain;scope='PMM cases, MCP artifacts, hydrated Vanilla reference';unrealEditorAdapter=(Get-PMMUnrealStatus);deployment='PMM user interface only'}
+                return @{installationRoot=[IO.Path]::GetFullPath($Script:Root);game='Palworld';reference=(Get-PMMMCPReferenceStatus);capabilities=@{prepareReference='pmm_reference_prepare';referenceProgress='pmm_reference_status';search='pmm_reference_search';export='pmm_reference_export';inspect='pmm_asset_inspect';archiveSearch='pmm_archive_search';prepareAsset='pmm_asset_prepare';edit='pmm_asset_edit';build='pmm_candidate_build';candidates='pmm_candidates_list';unrealEditor='pmm_unreal_status'};bridgeVersion='0.5.0';transport='stdio';enabled=$true;toolchain=$toolchain;scope='PMM cases, MCP artifacts, hydrated Vanilla reference';unrealEditorAdapter=(Get-PMMUnrealStatus);deployment='PMM user interface only'}
             }
             'pmm_cases_list' {
                 $offset=0;if(@($Arguments.PSObject.Properties | ForEach-Object { $_.Name }) -contains 'offset'){$offset=$Arguments.offset}

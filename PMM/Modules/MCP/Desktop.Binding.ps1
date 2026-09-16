@@ -68,12 +68,13 @@ function Get-PMMDesktopCaseStatus($Case) {
     if(Test-Path -LiteralPath $result){$r=Read-PMMMCPJson $result;if($r.requestId -eq $d.requestId -and $r.status -eq 'SENT'){return (L 'Message sent; waiting for MCP receipt.' 'Mensaje enviado; esperando recepcion por MCP.')}}
     return (L 'Chat prepared. Send the message in ChatGPT; MCP receipt is pending.' 'Chat preparado. Envia el mensaje en ChatGPT; la recepcion por MCP sigue pendiente.')
 }
-function New-PMMDesktopLink([string]$Prompt,[string]$ThreadId='') {
+function New-PMMDesktopLink([string]$Prompt,[string]$ThreadId='',[string]$Mode='chat') {
     if($ThreadId){
         if($ThreadId -cnotmatch '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'){throw 'Invalid thread ID.'}
         return 'codex://threads/'+$ThreadId
     }
-    return 'codex://threads/new?path='+[Uri]::EscapeDataString([IO.Path]::GetFullPath($Script:Root))+'&prompt='+[Uri]::EscapeDataString($Prompt)
+    if($Mode -notmatch '^[a-z][a-z0-9_-]{0,40}$'){throw 'Invalid Desktop mode.'}
+    return 'codex://threads/new?mode='+[Uri]::EscapeDataString($Mode)+'&path='+[Uri]::EscapeDataString([IO.Path]::GetFullPath($Script:Root))+'&prompt='+[Uri]::EscapeDataString($Prompt)
 }
 
 function Cancel-PMMDesktopDispatch([string]$CaseId) {

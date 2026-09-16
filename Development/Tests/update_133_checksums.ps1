@@ -9,7 +9,8 @@ foreach($line in Get-Content -LiteralPath $inventory){
 foreach($file in Get-ChildItem -LiteralPath (Join-Path $app 'Modules') -Recurse -File|Where-Object{$_.Extension -in @('.ps1','.json')}){
   [void]$paths.Add($file.FullName.Substring($app.Length+1).Replace('\','/'))
 }
-foreach($leaf in @('DEEP_ANALYSIS.en.md','DEEP_ANALYSIS.es.md','ReleaseNotes-1.3.3.md')){[void]$paths.Add('Documentation/'+$leaf)}
+foreach($leaf in @('DEEP_ANALYSIS.en.md','DEEP_ANALYSIS.es.md','ReleaseNotes-1.3.3.md','ReleaseNotes-1.3.4.md')){[void]$paths.Add('Documentation/'+$leaf)}
+[void]$paths.Add('Resources/Mappings/Historical/Palworld-1.0.3.usmap')
 $ordered=[string[]]@($paths);[Array]::Sort($ordered,[StringComparer]::Ordinal)
 $lines=@(foreach($relative in $ordered){
   if($relative -match '(^|/)(Workspace|TestResults|ExternalFiles|\.\.)(/|$)' -or $relative -match '[:\\]' -or $relative -eq 'Resources/Metadata/SHA256SUMS.txt'){throw 'Unsafe inventory entry.'}

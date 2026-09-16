@@ -46,11 +46,15 @@ function Initialize-PMMCaseAgentUI {
     $session=Get-PMMCaseRepairSession $case.CaseId
     if($session){Stop-PMMRepairSession $session.Id|Out-Null;Update-PMMMCPReplyUI}
   }catch{Handle-UIError $_ 'Stop GPT'}})
+  Initialize-PMMDesktopOptionsUI
+  Initialize-PMMCaseFoldersUI
   Initialize-PMMChatPanel
 }
 
 
 function Update-PMMChatPanel($Case) {
+  Update-PMMDesktopOptionsUI $Case
+  Update-PMMCaseFoldersUI $Case
   if(-not$Script:PMMAIIOCaseUI.ContainsKey('ChatTranscript')){return}
   $box=Get-PMMAIIOCaseControl 'ChatTranscript'
   $stamp=$Case.CaseId+'|'+[DateTime]::UtcNow.ToString('yyyyMMddHHmmss')
@@ -134,3 +138,5 @@ function Initialize-PMMChatPanel {
   }catch{Handle-UIError $_ 'AI chat'}})
   [void]$advancedBody.Children.Add($send)
 }
+
+. (Join-Path $PSScriptRoot '../Presentation/Desktop.Options.UI.ps1')

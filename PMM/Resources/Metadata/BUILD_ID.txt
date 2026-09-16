@@ -1,1 +1,1 @@
-PMM-v1.3.3-desktop-chat-hotfix4
+PMM-v1.3.4-desktop-auat-rc2

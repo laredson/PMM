@@ -231,6 +231,70 @@
           }
         }
       }
+    },
+    {
+      "id": "fixlab-auat-v1-to-v1-1-pw104",
+      "caseId": "FIXLAB-AUAT-1_0_4",
+      "name": "AUAT V1 -> v1.1 / Palworld 1.0.4",
+      "description": "Rebuilds the 588 proven default technology unlocks on the current game Blueprint; preserves every other current property and function.",
+      "target": {
+        "game": "Palworld",
+        "knownBuild": "1.0.4",
+        "engineProfile": "UE5_1",
+        "knownMappingsSha256": "369a9413f3ea9faa7cd409f57cb70a02feb56ad865a306a9a141cf6cdc969153"
+      },
+      "match": {
+        "signatures": [
+          {
+            "kind": "pak-sha256",
+            "label": "AUAT V1 source PAK",
+            "sha256": "b6af99dfd1d597b9a04458c884aacb5d09f8c3f30ca77f819d67d9a87e183f40"
+          }
+        ],
+        "filenameHints": [
+          "AutoUnlockAllTechnology_V1_P"
+        ],
+        "exactRequiredForAutomaticBuild": true
+      },
+      "referencePolicy": {
+        "currentRequired": false,
+        "historicalGameReferenceRequired": false,
+        "reason": "Executor extracts the exact current game families and requires the pinned family hashes and mappings; a stale hydrated cache is never used."
+      },
+      "repairStrategies": [
+        "CURRENT_GAME_PROPERTY_REBUILD"
+      ],
+      "requiredCapabilities": [
+        "AssetTools.AuatUpgrade",
+        "repak"
+      ],
+      "variants": [
+        {
+          "id": "auat-v1-1",
+          "label": "AUAT v1.1 (Palworld 1.0.4)",
+          "description": "Automatically unlock all 588 technologies using the current Blueprint. Game validation is recorded separately.",
+          "runtimeStatus": "pending-user-validation",
+          "buildStatus": "validated-structural-output",
+          "knownOutputSha256": "",
+          "deployAllowed": true,
+          "outputClass": "experimental-repair"
+        }
+      ],
+      "implementation": {
+        "mode": "auat-property-upgrade",
+        "status": "ready",
+        "currentFamilyHashes": {
+          "Pal/Content/Pal/Blueprint/System/BP_PalGameSetting.uasset": "f1daa21fca414c2104e2cf37d90aaef173b1b9822be1cde7cb7a5cc61bbc8643",
+          "Pal/Content/Pal/Blueprint/System/BP_PalGameSetting.uexp": "597dab2ceb0c7d4d4277a253947509b25321810049be090dd5e9b4841e9c5e59",
+          "Pal/Content/Pal/DataTable/Technology/DT_TechnologyRecipeUnlock_Common.uasset": "456b7fca8f6fca7a91d79834ecc07e2232338a3b9ba9e88877aba57d4ebc4661",
+          "Pal/Content/Pal/DataTable/Technology/DT_TechnologyRecipeUnlock_Common.uexp": "1b8f717e21b5cb07e48c4ccf793a56423506ddd084ba45b5b6a47779df44208e"
+        },
+        "legacyMappingsSha256": "604550ba90faab1e394c2789f38eeff625493d3729c2d7f6a6058bfedb90a67b"
+      },
+      "limitations": [
+        "No assertion of in-game functional validation.",
+        "Other game builds, modified donors or changed technology sets require a new recipe."
+      ]
     }
   ]
 }

@@ -1,6 +1,6 @@
 ﻿$script:entryChecks=0
 function Assert-Entry($condition,[string]$message){if(-not$condition){throw $message};$script:entryChecks++}
-Assert-Entry ($Window.Title -like '*1.3.3') 'Window title retained the old XAML version.'
+Assert-Entry ($Window.Title -like '*1.3.4') 'Window title retained the old XAML version.'
 Assert-Entry ($Script:LstMods.ContextMenu.Items[0].Header -eq (L 'Create new case...' 'Crear nuevo caso...')) 'Library context menu is missing or not localized.'
 $mods=Join-PMMPath 'Mods';foreach($folder in @('AUAT-test','Other-test')){[void][IO.Directory]::CreateDirectory((Join-Path $mods $folder))};[IO.File]::WriteAllText((Join-Path $mods 'AUAT-test/AUAT-test.pak'),'AUAT fixture')
 [IO.File]::WriteAllText((Join-Path $mods 'Other-test/Other-test.pak'),'Other fixture')
@@ -29,11 +29,12 @@ $Script:LstMods.ContextMenu.Items[0].RaiseEvent([Windows.RoutedEventArgs]::new([
 $case=Get-PMMAIIOSelectedCase
 Assert-Entry ($Script:DialogCalls -eq 1 -and $Script:ReceivedDraft.Type -eq 'FIX_MOD' -and $Script:ReceivedDraft.Refs[0] -eq 'AUAT-test.pak') 'Context command did not open a repair draft for the clicked mod.'
 Assert-Entry ($case.Title -eq 'AUAT 1.0.4' -and $case.References.Mods.Count -eq 1 -and $case.References.Mods[0].Sha256 -eq (Get-Sha256 (Join-Path $mods 'AUAT-test/AUAT-test.pak'))) 'Case lost the exact selected mod/hash.'
-Assert-Entry ($case.Transport -eq 'MCP' -and (Get-PMMCaseClient $case) -eq 'CHATGPT') 'New mod case does not default to GPTD.'
+Assert-Entry ($case.Transport -eq 'MCP' -and (Get-PMMCaseClient $case) -eq 'CODEX_DESKTOP') 'New mod case does not default to GPTD.'
 Assert-Entry (@((Get-PMMAIIOCaseControl 'DgRefs').ItemsSource).Count -eq 1 -and $Script:PMMCaseArea -eq 'FIX') 'New case did not navigate to its references.'
 $Script:Launches=0;$Script:DesktopOpens=0;$Script:DesktopHelp=0
 function Start-PMMRepairAgentJob([string]$SessionId){$Script:Launches++;throw 'Desktop started an internal worker.'}
-function Get-PMMChatGPTDesktop($Destination){return [pscustomobject]@{SupportsLocalChats=$true;InstallLocation='fixture'}}
+function Get-PMMChatGPTDesktop($Destination){return [pscustomobject]@{SupportsLocalChats=$true;InstallLocation='fixture';Name='Fixture Desktop';Version='1'}}
+function Get-PMMDesktopModes($App){return @('chat','work','codex')}
 function Open-PMMDesktopLink($Link,$Destination){$Script:DesktopOpens++;return $true}
 function Show-PMMDesktopDispatchHelp($Dispatch,$CanOpen){$Script:DesktopHelp++}
 $b=New-PMMDesktopBinding;Confirm-PMMDesktopBinding ([pscustomobject]@{nonce=$b.nonce})|Out-Null
@@ -45,7 +46,15 @@ Assert-Entry ($null -eq (Get-PMMCaseRepairSession $case.CaseId)) 'Desktop dispat
 Assert-Entry ($Script:PMMAIIOCaseUI.ContainsKey('ChatTranscript') -and -not(Get-PMMAIIOCaseControl 'ChatAdvanced').IsExpanded) 'AI chat or collapsed advanced settings are missing.'
 Assert-Entry (-not(Get-PMMAIPolicy).InternalEnabled) 'Internal inference is enabled by default.'
 Update-PMMMCPReplyUI
-Assert-Entry ((Get-PMMAIIOCaseControl 'TxtMCPReplyStatus').Text -match 'prepared|preparado') 'Unacknowledged Desktop opening was reported as delivery.'
+Assert-Entry ((Get-PMMAIIOCaseControl 'TxtMCPReplyStatus').Text -match 'prepared|preparado') ('Unacknowledged Desktop opening was reported as delivery: '+(Get-PMMAIIOCaseControl 'TxtMCPReplyStatus').Text)
+Assert-Entry ((Get-PMMDesktopDispatch $case.CaseId).mode -eq 'chat') 'New desktop request did not use Chat.'
+Assert-Entry ((Get-PMMAIIOCaseControl 'CmbDesktopMode').Items.Count -eq 3) 'Detected modes did not populate the dropdown.'
+Assert-Entry ((Get-PMMAIIOCaseControl 'BtnFolder').Visibility -eq 'Collapsed' -and (Get-PMMAIIOCaseControl 'CaseFolders').Children.Count -ge 6) 'Folders panel did not replace the ambiguous folder button.'
+(Get-PMMAIIOCaseControl 'CmbDesktopSend').SelectedValue='SEND'
+$blocked=$false
+try{Show-PMMChatGPTCase}catch{$blocked=$_.Exception.Message -match 'Automatic|automatic|automatico'}
+Assert-Entry ($blocked -and $Script:DesktopOpens -eq 1) 'Unsupported automatic send launched a new chat.'
+(Get-PMMAIIOCaseControl 'CmbDesktopSend').SelectedValue='DRAFT';Save-PMMAIIOCaseEditor
 $empty=New-PMMAIIOCase -Title 'Empty repair' -Type FIX_MOD -Transport MCP -AIClient CHATGPT
 Select-PMMCaseLocation $empty;$blocked=$false
 try{Show-PMMChatGPTCase}catch{$blocked=$_.Exception.Message -match 'Attach|Adjunta'}
@@ -90,6 +99,11 @@ Assert-Entry ((Get-PMMAIIOCaseControl 'ChatTranscript').Text -match [regex]::Esc
 Assert-Entry (-not(Get-PMMAIIOCaseControl 'ChatSend').IsEnabled) 'Desktop case enabled internal prompt sending.'
 (Get-PMMAIIOCaseControl 'ChatAdvanced').IsExpanded=$true
 $Window.Content.Measure([Windows.Size]::new(1600,1050));$Window.Content.Arrange([Windows.Rect]::new(0,0,1600,1050));$Window.Content.UpdateLayout()
+# Exercise the connection dialog too: it must work without a selected case variable.
+$definition=(Get-Command Show-PMMDesktopSetup).Definition.Replace('[void]$v.window.ShowDialog()','return $v')
+Invoke-Expression ('function Show-PMMDesktopSetup {'+$definition+'}')
+$setup=Show-PMMDesktopSetup
+Assert-Entry ($setup.window -and $setup.body.Children.Count -gt 0) 'Desktop setup dialog failed before rendering.'
 $bitmap=[Windows.Media.Imaging.RenderTargetBitmap]::new(1600,1050,96,96,[Windows.Media.PixelFormats]::Pbgra32)
 $bitmap.Render($Window.Content)
 $encoder=[Windows.Media.Imaging.PngBitmapEncoder]::new();$encoder.Frames.Add([Windows.Media.Imaging.BitmapFrame]::Create($bitmap))

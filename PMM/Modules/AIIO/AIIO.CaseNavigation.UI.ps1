@@ -29,6 +29,7 @@ function Save-PMMAIIOCaseEditor {
             $changed=$true
         }
     }
+    if($c -and ($c.SelectedStep -le 0 -or $c.SelectedStep -eq $c.CurrentStep)){Save-PMMDesktopOptionsUI $c}
     if($changed -and $c){Update-PMMCaseContextRevision ([string]$c.CaseId)|Out-Null}
     return $changed
 }
@@ -59,7 +60,7 @@ function Invoke-PMMNewCaseUI {
     [void](Save-PMMAIIOCaseEditor)
     $d=Show-PMMAIIONewCaseDialog
     if(-not $d){return}
-    $transport='MCP';$client='CHATGPT'
+    $transport='MCP';$client='CODEX_DESKTOP'
     $c=New-PMMAIIOCase -Title $d.Title -Type $d.Type -Description $d.Description -Transport $transport -AIClient $client
     Add-PMMCaseAreaContext $c.CaseId
     Select-PMMCaseLocation $c

@@ -1,6 +1,8 @@
 ﻿param([string]$Root=([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))),[string]$CaseId='',[string]$RepairSessionId='')
 Set-StrictMode -Version 2.0
 $ErrorActionPreference='Stop'
+# Non-PowerShell parents can suppress script-function autoloading. Load the built-in hashing module explicitly.
+Import-Module (Join-Path $PSHOME 'Modules/Microsoft.PowerShell.Utility/Microsoft.PowerShell.Utility.psd1') -ErrorAction Stop
 $ProgressPreference='SilentlyContinue'
 $WarningPreference='SilentlyContinue'
 $InformationPreference='SilentlyContinue'

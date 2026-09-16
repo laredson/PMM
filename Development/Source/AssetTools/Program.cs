@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 static class Program {
  static int Main(string[] args) {
   try {
+   if(args.Length>0 && args[0]=="auat-upgrade")return AuatUpgrade.Run(args);
    if(args.Length==3 && args[0]=="schema") {
     var mapping=new Usmap(args[1]);
     foreach(DictionaryEntry entry in (IDictionary)mapping.Schemas) {

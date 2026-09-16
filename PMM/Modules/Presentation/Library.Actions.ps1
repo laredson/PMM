@@ -212,7 +212,7 @@ function Invoke-PMMNewLibraryCaseUI {
   $title=if($paths.Count -eq 1){[IO.Path]::GetFileNameWithoutExtension($paths[0])}else{L 'Compatibility of selected mods' 'Compatibilidad de los mods seleccionados'}
   $draft=Show-PMMAIIONewCaseDialog -DefaultTitle $title -DefaultType $type -ReferenceNames @($entries.Name)
   if(-not$draft){return}
-  $case=New-PMMAIIOCase -Title $draft.Title -Type $draft.Type -Description $draft.Description -Transport MCP -AIClient CHATGPT
+  $case=New-PMMAIIOCase -Title $draft.Title -Type $draft.Type -Description $draft.Description -Transport MCP -AIClient CODEX_DESKTOP
   foreach($path in $paths){$case=Add-PMMAIIOCaseModReference $case.CaseId $path 'FULL_PAK'}
   Select-PMMCaseLocation $case
 }
