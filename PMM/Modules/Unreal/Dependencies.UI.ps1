@@ -1,4 +1,4 @@
-. (Join-Path $PSScriptRoot 'Dependency.Permissions.UI.ps1')
+﻿. (Join-Path $PSScriptRoot 'Dependency.Permissions.UI.ps1')
 . (Join-Path $PSScriptRoot 'Dependencies.Snapshot.ps1')
 . (Join-Path $PSScriptRoot 'Setup.Tutorial.UI.ps1')
 . (Join-Path $PSScriptRoot 'Dependency.Locations.UI.ps1')
@@ -84,8 +84,9 @@ function New-PMMDependencyPanel {
                 try{$result=Show-PMMDependencyLocation ([string]$sender.Tag);if($result){$Script:PMMDependencySelectedJob='';Start-PMMDependencyScan}}catch{Handle-UIError $_ 'Locate'}finally{$Script:PMMDependencyModal=$false}
             })
         }
-        $label=[Windows.Controls.TextBlock]::new();$label.Text=$d.name+' ('+$d.version+')';$label.TextWrapping='Wrap';$label.VerticalAlignment='Center';[void]$row.Children.Add($label)
-        $Script:PMMDependencyLabels[$d.id]=@{label=$label;button=$button;name=$d.name;version=$d.version}
+        $displayName=Get-PMMLocalizedText ([string]$d.name);$displayVersion=Get-PMMLocalizedText ([string]$d.version)
+        $label=[Windows.Controls.TextBlock]::new();$label.Text=$displayName+' ('+$displayVersion+')';$label.TextWrapping='Wrap';$label.VerticalAlignment='Center';[void]$row.Children.Add($label)
+        $Script:PMMDependencyLabels[$d.id]=@{label=$label;button=$button;name=$displayName;version=$displayVersion}
         $button.Add_Click({param($sender,$eventArgs)
             try{if($sender.Content -eq (L 'Open' 'Abrir')){Open-PMMDependencyComponent ([string]$sender.Tag);return};$case=Get-PMMAIIOSelectedCase;$caseId='';if($case){$caseId=$case.CaseId};$job=Request-PMMDependencyInstall ([string]$sender.Tag) $caseId;$Script:PMMDependencySelectedJob=$job.id;$Script:PMMDependencyStatus.Text=$job.status}catch{Handle-UIError $_ 'Dependencies'}
         })
@@ -164,7 +165,7 @@ function Update-PMMDependencyPanel {
             if($active.Count){$jobs=$active}else{$jobs=@($jobs|Select-Object -First 1)}
         }
         foreach($job in $jobs){
-            $Script:PMMDependencyStatus.Text=$job.status+' - '+$job.message
+            $Script:PMMDependencyStatus.Text=(Get-PMMLocalizedText ([string]$job.status))+' - '+(Get-PMMLocalizedText ([string]$job.message))
             break
         }
     }catch{$Script:PMMDependencyStatus.Text=$_.Exception.Message}

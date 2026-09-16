@@ -7,7 +7,7 @@ $Script:PMMSaveCaseCore=${function:Save-PMMAIIOCaseEditor}
 function Show-PMMAIIOCaseEditor {
     $Script:PMMEditorLoading=$true;$Script:PMMEditorCaseId=''
     try{& $Script:PMMRenderCaseCore;$c=Get-PMMAIIOSelectedCase;if($Script:PMMAIIOCaseUI.ContainsKey('CmbClient')){$client=Get-PMMAIIOCaseControl 'CmbClient';$client.IsEnabled=($c -and ($c.SelectedStep -le 0 -or $c.SelectedStep -eq $c.CurrentStep));$client.SelectedValue=if($c){Get-PMMCaseClient $c}else{'EXTERNAL'};Update-PMMAIIOTransportButton};if($c){$Script:PMMEditorCaseId=$c.CaseId}else{(Get-PMMAIIOCaseControl 'TxtTitle').Text='';(Get-PMMAIIOCaseControl 'TxtDescription').Text=''}}
-    finally{$Script:PMMEditorLoading=$false}
+    finally{try{if($Script:PMMCaseEditor){Invoke-PMMLocalizeVisualTree $Script:PMMCaseEditor}}catch{};$Script:PMMEditorLoading=$false}
 }
 function Save-PMMAIIOCaseEditor {
     if($Script:PMMEditorLoading -or $Script:PMMCaseRefreshing -or -not $Script:PMMEditorCaseId -or $Script:PMMEditorCaseId -cne $Script:PMMAIIOCaseSelectedId){return $false}

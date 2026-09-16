@@ -1,5 +1,5 @@
 ﻿. (Join-Path $PSScriptRoot 'LongPaths.ps1')
-. (Join-Path $PSScriptRoot 'Localization.zh-CN.ps1')
+. (Join-Path $PSScriptRoot 'Localization.ps1')
 <#
 Common.ps1 - shared configuration, logging, dependencies and process safety.
 All other PowerShell modules may call these helpers. Keep this file free of UI
@@ -206,9 +206,10 @@ function Save-PMMConfig($Config){$Config|ConvertTo-Json -Depth 10|Set-Content -L
 
 function Get-PMMText([string]$English,[string]$Spanish){
   $cfg=Get-PMMConfig
-  if($cfg.Language -eq 'es'){return $Spanish}
-  if($cfg.Language -eq 'zh-CN'){return Get-PMMChineseText $English}
-  return $English
+  $language=Resolve-PMMLanguageCode ([string]$cfg.Language)
+  if($language -eq 'es'){return $Spanish}
+  if($language -eq 'en'){return $English}
+  return Get-PMMLocalizedText $English $language
 }
 
 function Set-PMMGamePath([string]$Path){

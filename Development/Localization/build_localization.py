@@ -69,6 +69,7 @@ def repair_and_complete_catalogs():
         "MERGER": "MERGER",
         "AUTO": "AUTO",
         "PMM": "PMM",
+        "PMM manual/AI solution (*.zip)|*.zip|All files (*.*)|*.*": "PMM 手动/AI 解决方案 (*.zip)|*.zip|所有文件 (*.*)|*.*",
         "+ New case": "+ 新建案例",
         "Projects": "项目",
         "Send to ChatGPT": "发送到 ChatGPT",
@@ -353,8 +354,8 @@ function Get-PMMLanguageOptions {return @(Get-PMMLanguageRegistry).languages|For
 function Get-PMMLanguageCatalog([string]$Code){
   $code=Resolve-PMMLanguageCode $Code
   if($Script:PMMLanguageCatalogCache.ContainsKey($code)){return $Script:PMMLanguageCatalogCache[$code]}
-  $table=@{};$path=Join-Path (Get-PMMLocalizationRoot) ($code+'.json')
-  if(Test-Path -LiteralPath $path -PathType Leaf){$doc=Get-Content -LiteralPath $path -Raw -Encoding UTF8|ConvertFrom-Json;if($doc.strings){foreach($p in $doc.strings.PSObject.Properties){$table[[string]$p.Name]=[string]$p.Value}}}
+  $table=[Collections.Hashtable]::new([StringComparer]::Ordinal);$path=Join-Path (Get-PMMLocalizationRoot) ($code+'.json')
+  if(Test-Path -LiteralPath $path -PathType Leaf){$doc=Get-Content -LiteralPath $path -Raw -Encoding UTF8|ConvertFrom-Json -AsHashtable;if($doc.ContainsKey('strings')){foreach($kv in $doc['strings'].GetEnumerator()){$table[[string]$kv.Key]=[string]$kv.Value}}}
   $Script:PMMLanguageCatalogCache[$code]=$table;return $table
 }
 function Get-PMMLocalizedText([string]$English,[string]$LanguageCode=''){
@@ -442,7 +443,7 @@ def patch_source():
     p = MODULES / "AIIO" / "AIIO.CaseNavigation.UI.ps1"
     text = read_ps(p)
     anchor = "    finally{$Script:PMMEditorLoading=$false}"
-    text = replace_once(text, anchor, "    try{if($Script:PMMCaseEditor){Invoke-PMMLocalizeVisualTree $Script:PMMCaseEditor}}catch{}\n" + anchor, "case render sweep")
+    text = replace_once(text, anchor, "    finally{try{if($Script:PMMCaseEditor){Invoke-PMMLocalizeVisualTree $Script:PMMCaseEditor}}catch{};$Script:PMMEditorLoading=$false}", "case render sweep")
     write_ps(p, text)
 
     p = MODULES / "AIIO" / "AIIO.Workspaces.UI.ps1"
@@ -488,12 +489,12 @@ def write_validator():
 $ErrorActionPreference='Stop'
 $root=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
 $loc=Join-Path $root 'PMM\Resources\Localization'
-$en=Get-Content (Join-Path $loc 'en.json') -Raw -Encoding UTF8|ConvertFrom-Json
-$target=Get-Content (Join-Path $loc ($Language+'.json')) -Raw -Encoding UTF8|ConvertFrom-Json
-$targetMap=@{};foreach($p in $target.strings.PSObject.Properties){$targetMap[[string]$p.Name]=[string]$p.Value}
+$en=Get-Content (Join-Path $loc 'en.json') -Raw -Encoding UTF8|ConvertFrom-Json -AsHashtable
+$target=Get-Content (Join-Path $loc ($Language+'.json')) -Raw -Encoding UTF8|ConvertFrom-Json -AsHashtable
+$targetMap=$target['strings']
 $missing=@();$empty=@();$placeholder=@();$residue=@()
-foreach($p in $en.strings.PSObject.Properties){
-  $key=[string]$p.Name
+foreach($keyValue in $en['strings'].GetEnumerator()){
+  $key=[string]$keyValue.Key
   if(-not$targetMap.ContainsKey($key)){$missing+=$key;continue}
   $value=[string]$targetMap[$key];if([string]::IsNullOrWhiteSpace($value)){$empty+=$key}
   $a=@([regex]::Matches($key,'\{[^{}]+\}')|ForEach-Object{$_.Value}|Sort-Object);$b=@([regex]::Matches($value,'\{[^{}]+\}')|ForEach-Object{$_.Value}|Sort-Object)

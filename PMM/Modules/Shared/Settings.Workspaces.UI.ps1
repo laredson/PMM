@@ -1,4 +1,4 @@
-# Move existing controls; handlers, values and names remain attached.
+﻿# Move existing controls; handlers, values and names remain attached.
 function Move-PMMSettingsElement($Element,$Target){
     if(-not $Element){return}
     $parent=$Element.Parent
@@ -40,16 +40,16 @@ function Initialize-PMMSettingsWorkspaces {
     $general=New-PMMSettingsSection 'GENERAL' (L 'General' 'General')
     [void]$general.Children.Add($generalContent)
     $ai=$Window.FindName('TabAISettings');$Script:AIHelpTabs.Items.Remove($ai)
-    $ai.Header='AI / MCP';$ai.Tag='AI';[void]$Script:PMMSettingsTabs.Items.Add($ai);$Script:PMMSettingsById['AI']=$ai;$Script:PMMAISettingsTab=$ai
+    $ai.Header=L 'AI / MCP' 'IA / MCP';$ai.Tag='AI';[void]$Script:PMMSettingsTabs.Items.Add($ai);$Script:PMMSettingsById['AI']=$ai;$Script:PMMAISettingsTab=$ai
     $install=New-PMMSettingsSection 'INSTALLATIONS' (L 'Installations' 'Instalaciones')
     $Script:PMMInstallationSettingsTab=$Script:PMMSettingsById['INSTALLATIONS']
     $dependency=New-PMMDependencyPanel;$Script:PMMInstallationSettingsTab.Content=$dependency
     Move-PMMSettingsElement ($Window.FindName('PnlBaseDependencySettings')) $Script:PMMDependencyHelpPanel
-    $merge=New-PMMSettingsSection 'MERGE' 'Mods & Merge'
+    $merge=New-PMMSettingsSection 'MERGE' (L 'Mods & Merge' 'Mods y Merge')
     Move-PMMSettingsElement ($Window.FindName('PnlLibrarySettings')) $merge
-    $creation=New-PMMSettingsSection 'CREATE' 'Mod Creation'
+    $creation=New-PMMSettingsSection 'CREATE' (L 'Mod Creation' 'Creacion de mods')
     Move-PMMSettingsCard 'BtnUnrealPrepare' $creation
-    $help=New-PMMSettingsSection 'HELP' 'Help'
+    $help=New-PMMSettingsSection 'HELP' (L 'Help' 'Ayuda')
     Move-PMMSettingsCard 'ChkAIIOAutoCreateErrorCases' $help
     Move-PMMSettingsCard 'BtnOpenKnowledge' $help
     $aiPanel=$ai.Content.Content

@@ -1,4 +1,4 @@
-. (Join-Path $PSScriptRoot 'AIIO.CaseNavigation.UI.ps1')
+﻿. (Join-Path $PSScriptRoot 'AIIO.CaseNavigation.UI.ps1')
 . (Join-Path $PSScriptRoot '../Shared/Settings.Workspaces.UI.ps1')
 
 # One reusable editor with per-area selection; no case files are moved.
@@ -58,7 +58,7 @@ function Initialize-PMMWorkspaces {
     $helpHost=[Windows.Controls.ContentControl]::new();$caseTab.Content=$helpHost
     $caseTab.Header=L 'Research cases' 'Casos de investigacion'
     $Script:PMMAreaHosts['HELP']=$helpHost
-    $help.Header='Help';$help.Tag='HELP'
+    $help.Header=L 'Help' 'Ayuda';$help.Tag='HELP'
     $merge=$Window.FindName('TabMerge');$merge.Name='TabMerge';$merge.Tag='MERGE';$Script:PMMMergeTab=$merge
     $fix=$Script:TabFixLab;$fix.Tag='FIX'
     foreach($pair in @(@($merge,'MERGE'),@($fix,'FIX'))){
@@ -68,7 +68,7 @@ function Initialize-PMMWorkspaces {
         [void]$tabs.Items.Add($flow);[void]$tabs.Items.Add((New-PMMAreaTab (L 'AI assistant' 'Asistente IA') $pair[1]))
         $tab.Content=$tabs
     }
-    $creation=[Windows.Controls.TabItem]::new();$creation.Header='Mod Creation';$creation.Name='TabModCreation';$creation.Tag='CREATE'
+    $creation=[Windows.Controls.TabItem]::new();$creation.Header=L 'Mod Creation' 'Creacion de mods';$creation.Name='TabModCreation';$creation.Tag='CREATE'
     $tabs=[Windows.Controls.TabControl]::new()
     [void]$tabs.Items.Add((New-PMMAreaTab (L 'Projects' 'Proyectos') 'CREATE'))
     $creation.Content=$tabs
@@ -81,6 +81,7 @@ function Initialize-PMMWorkspaces {
     })
     if(-not $main.SelectedItem){$main.SelectedItem=$merge}
     Switch-PMMCaseArea ([string]$main.SelectedItem.Tag)
+    try{Invoke-PMMLocalizeVisualTree $Window}catch{}
     $Script:PMMWorkspacesInitialized=$true
 }
 

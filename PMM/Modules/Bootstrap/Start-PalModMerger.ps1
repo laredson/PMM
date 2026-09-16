@@ -111,12 +111,15 @@ $autoDepsOk = Initialize-PMMDependenciesIfNeeded # fast no-op when already prepa
 # Load localized XAML.
 # ---------------------------------------------------------------------------
 $startupCfg = Get-PMMConfig
-$lang = if ($startupCfg.Language -eq 'es') { 'es' } elseif ($startupCfg.Language -eq 'zh-CN') { 'zh-CN' } else { 'en' }
-$xamlPath = Join-Path $Script:Root ("Resources\UI\MainWindow.{0}.xaml" -f $lang)
+$lang = Resolve-PMMLanguageCode ([string]$startupCfg.Language)
+$xamlPath = Get-PMMLanguageXamlPath $lang
 try {
-  [xml]$xaml = Get-Content -LiteralPath $xamlPath -Raw -Encoding UTF8
+  $xamlText=Get-Content -LiteralPath $xamlPath -Raw -Encoding UTF8
+  if($lang -ne 'en' -and [IO.Path]::GetFileName($xamlPath) -ieq 'MainWindow.en.xaml'){$xamlText=Convert-PMMXamlLocalization $xamlText $lang}
+  [xml]$xaml=$xamlText
   $reader = New-Object System.Xml.XmlNodeReader $xaml
   $Window = [Windows.Markup.XamlReader]::Load($reader)
+  Set-PMMLanguageDirection $Window $lang
   $versionPath=Join-Path $Script:Root 'Resources/Metadata/VERSION.txt'
   $Window.Title='PMM - Palworld Manager Merger v'+([IO.File]::ReadAllText($versionPath).Trim())
 } catch {
@@ -178,11 +181,7 @@ foreach ($name in $controlNames) {
 
 # Use data items rather than nested ComboBoxItem controls. This keeps the
 # collapsed language selector and its popup on the same typography/height path.
-$Script:LanguageOptions=@(
-  [pscustomobject]@{Label='English';Code='en'},
-  [pscustomobject]@{Label='Español';Code='es'},
-  [pscustomobject]@{Label='简体中文';Code='zh-CN'}
-)
+$Script:LanguageOptions=@(Get-PMMLanguageOptions)
 $Script:CmbLanguage.ItemsSource=$Script:LanguageOptions
 
 # Load the transparent high-resolution header mark fully into memory so the
@@ -1341,7 +1340,7 @@ $Script:BtnApplyLanguage.Add_Click({
   try {
     $cfg = Get-PMMConfig
     $selectedCode = [string]$Script:CmbLanguage.SelectedValue
-    $cfg.Language = if ($selectedCode -in @('es','zh-CN')) { $selectedCode } else { 'en' }
+    $cfg.Language = Resolve-PMMLanguageCode $selectedCode
     Save-PMMConfig $cfg
     $Script:TxtStatus.Text=L 'Language saved. Restart Palworld Manager Merger to apply it to the entire interface.' 'Idioma guardado. Reinicia Palworld Manager Merger para aplicarlo a toda la interfaz.'
   } catch { Handle-UIError $_ 'Language' }

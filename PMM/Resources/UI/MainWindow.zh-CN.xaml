@@ -455,7 +455,7 @@
 
               <Grid Grid.Row="2">
                 <Grid.RowDefinitions><RowDefinition Height="*" MinHeight="90"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-              <DataGrid x:Name="LstMods" Grid.Row="0" AutoGenerateColumns="False" IsReadOnly="False" SelectionMode="Extended" SelectionUnit="FullRow" EnableRowVirtualization="True" AlternationCount="2" AllowDrop="True" HorizontalGridLinesBrush="{DynamicResource GridLine}" ToolTip="Ctrl/Shift select multiple mods; Ctrl+A selects all. Merge order: drag a row, or type a new number in Order. Top applies earlier; bottom has higher priority.">
+              <DataGrid x:Name="LstMods" Grid.Row="0" AutoGenerateColumns="False" IsReadOnly="False" SelectionMode="Extended" SelectionUnit="FullRow" EnableRowVirtualization="True" AlternationCount="2" AllowDrop="True" HorizontalGridLinesBrush="{DynamicResource GridLine}" ToolTip="Ctrl/Shift 选择多个模式; Ctrl+ 一个选择全部。 合并顺序:拖动一行,或按顺序键入新编号。 顶部应用较早;底部优先级较高.">
                 <DataGrid.RowStyle>
                   <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
                     <Setter Property="Background" Value="{DynamicResource InputBackground}"/>
@@ -471,20 +471,20 @@
                   <DataGridTemplateColumn Header="启用" Width="52">
                     <DataGridTemplateColumn.CellTemplate>
                       <DataTemplate>
-                        <CheckBox IsChecked="{Binding Enabled, Mode=OneWay}" Tag="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="Enabled source mods participate in Analyze, Build and Deploy"/>
+                        <CheckBox IsChecked="{Binding Enabled, Mode=OneWay}" Tag="{Binding Name}" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="启用源模式参与分析、构建和部署"/>
                       </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                   </DataGridTemplateColumn>
                   <DataGridTemplateColumn Header="顺序" Width="66" IsReadOnly="False">
                     <DataGridTemplateColumn.CellTemplate>
                       <DataTemplate>
-                        <TextBox Text="{Binding Priority, Mode=OneWay}" Tag="{Binding Name}" Style="{StaticResource PriorityEditorTextBox}" ToolTip="Type a new merge position. Values below 1 become 1; values above the library size become the last position."/>
+                        <TextBox Text="{Binding Priority, Mode=OneWay}" Tag="{Binding Name}" Style="{StaticResource PriorityEditorTextBox}" ToolTip="键入新的合并位置 。 低于1的值变为1;高于库大小的值成为最后一个位置."/>
                       </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                   </DataGridTemplateColumn>
                   <DataGridTextColumn Header="模组" Binding="{Binding Name}" Width="*" IsReadOnly="True"/>
                   <DataGridTextColumn Header="MB" Binding="{Binding SizeText}" Width="72" IsReadOnly="True"/>
-                  <DataGridTextColumn Header="Hash" Binding="{Binding HashShort}" Width="105" IsReadOnly="True"/>
+                  <DataGridTextColumn Header="哈许" Binding="{Binding HashShort}" Width="105" IsReadOnly="True"/>
                 </DataGrid.Columns>
               </DataGrid>
 
@@ -496,11 +496,11 @@
                   <Button x:Name="BtnDisableMods" Content="禁用所选" IsEnabled="False"/>
                 </WrapPanel>
                 <WrapPanel HorizontalAlignment="Center">
-                  <Button x:Name="BtnPriorityUp" Content="提前 / 降低优先级" IsEnabled="False" ToolTip="Move this mod upward: its diff is applied earlier"/>
-                  <Button x:Name="BtnPriorityDown" Content="延后 / 提高优先级" IsEnabled="False" ToolTip="Move this mod downward: it wins truly overlapping values"/>
+                  <Button x:Name="BtnPriorityUp" Content="提前 / 降低优先级" IsEnabled="False" ToolTip="向上移动此模式: 它的 diff 应用较早"/>
+                  <Button x:Name="BtnPriorityDown" Content="延后 / 提高优先级" IsEnabled="False" ToolTip="向下移动此模式: 它赢得真正重叠的值"/>
                   <Button x:Name="BtnDeleteMod" Content="删除所选" IsEnabled="False"/>
-                  <ComboBox x:Name="CmbLibraryOrder" Width="188" Margin="3" ToolTip="Reorder the imported mod library. Changing order invalidates Analyze."/>
-                  <Button x:Name="BtnReorderLibrary" Content="重新排序" IsEnabled="True" ToolTip="Reorder the imported mod library. Changing order invalidates Analyze."/>
+                  <ComboBox x:Name="CmbLibraryOrder" Width="188" Margin="3" ToolTip="重新订购导入的 Mod 库 。 更改命令无效分析 。"/>
+                  <Button x:Name="BtnReorderLibrary" Content="重新排序" IsEnabled="True" ToolTip="重新订购导入的 Mod 库 。 更改命令无效分析 。"/>
                 </WrapPanel>
               </StackPanel>
 
@@ -519,11 +519,11 @@
                       <TextBlock x:Name="TxtPatchCount" Foreground="{DynamicResource MutedText}" FontSize="11.5"/>
                     </StackPanel>
                     <WrapPanel Grid.Column="1" HorizontalAlignment="Right">
-                      <Button x:Name="BtnValidatePatch" Content="验证合并" Padding="8,3" MinHeight="26" IsEnabled="False" ToolTip="Mark the selected saved merge as tested and functional in runtime."/>
-                      <Button x:Name="BtnDeletePatch" Content="删除合并" Padding="8,3" MinHeight="26" IsEnabled="False" ToolTip="Delete the exact deployed copy if present and every matching saved copy inside PMM."/>
+                      <Button x:Name="BtnValidatePatch" Content="验证合并" Padding="8,3" MinHeight="26" IsEnabled="False" ToolTip="将选中的已保存的合并标为测试和运行时的功能 。"/>
+                      <Button x:Name="BtnDeletePatch" Content="删除合并" Padding="8,3" MinHeight="26" IsEnabled="False" ToolTip="如果有, 删除准确的已部署副本, 并且内部保存的每个匹配副本PMM。 。 。 。"/>
                     </WrapPanel>
                   </Grid>
-                  <TextBlock Grid.Row="1" Margin="2,0,2,4" FontSize="10.5" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Text="Choose a saved overlay, or No compatibility patch to deploy source mods only. A deployed external PMM merge can still be inspected/undeployed/deleted even when it is not selectable for Deploy; only exact source hashes + mappings make a build reusable."/>
+                  <TextBlock Grid.Row="1" Margin="2,0,2,4" FontSize="10.5" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Text="选择已保存的叠加, 或者没有兼容补丁只部署源模式 。 外部部署PMM合并即使不能选择用于部署,仍然可以检查/部署/删除;只有精确的源散列和映射才能重新使用。"/>
                   <DataGrid x:Name="LstPatches" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" CanUserDeleteRows="False" SelectionMode="Single" SelectionUnit="FullRow" EnableRowVirtualization="True" FontSize="11" HorizontalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
                       <DataGridTemplateColumn Header="使用" Width="42">
@@ -621,7 +621,7 @@
                     <TextBlock Text="全部应用：" VerticalAlignment="Center" Margin="0,0,6,0"/>
                     <ComboBox x:Name="CmbBulkWinner" Width="190" Margin="0,0,6,0"/>
                     <TextBlock Text="自定义：" VerticalAlignment="Center" Margin="4,0,4,0"/>
-                    <TextBox x:Name="TxtBulkCustom" Width="110" Margin="0,0,6,0" ToolTip="Used only when Custom is selected"/>
+                    <TextBox x:Name="TxtBulkCustom" Width="110" Margin="0,0,6,0" ToolTip="仅在选择自定义时使用"/>
                     <Button x:Name="BtnApplyBulk" Content="应用到所有行"/>
                     <Button x:Name="BtnOpenReview" Content="打开审查文件"/>
                   </WrapPanel>
@@ -640,11 +640,11 @@
                   <TextBlock Text="禁用来源：" VerticalAlignment="Center" Margin="0,0,7,0"/>
                   <ComboBox x:Name="CmbUnsupportedDisable" Grid.Column="1" Margin="0,0,7,0"/>
                   <Button x:Name="BtnDisableUnsupported" Grid.Column="2" Content="禁用所选模组并分析" Style="{StaticResource PrimaryButton}" Padding="10,4"/>
-                  <TextBlock x:Name="TxtUnsupportedHint" Grid.Column="3" Text="When an asset is unsupported, PMM can suggest the source whose removal disturbs the fewest other compatible shared merges. This is a structural suggestion, not a gameplay judgement." TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{DynamicResource MutedText}" Margin="10,0,0,0"/>
+                  <TextBlock x:Name="TxtUnsupportedHint" Grid.Column="3" Text="当资产得不到支持时,PMM能够说明哪些来源的删除干扰了其他最少数兼容的共享合并。 这是一个结构建议,而不是游戏的判断。" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{DynamicResource MutedText}" Margin="10,0,0,0"/>
                 </Grid>
                 <WrapPanel Grid.Row="3" Margin="0,5,0,0">
-                  <Button x:Name="BtnOpenAIHandoff" Content="打开案例" IsEnabled="False" ToolTip="Open the selected asset case. Choose ZIP, MCP or a client inside the case."/>
-                  <Button x:Name="BtnImportManualSolution" Content="导入 AI/手动解决方案..." IsEnabled="False" ToolTip="Import PMM_MANUAL_SOLUTION_V1. PMM validates structure/provenance, but it remains experimental until tested in game."/>
+                  <Button x:Name="BtnOpenAIHandoff" Content="打开案例" IsEnabled="False" ToolTip="打开选中的资产大小写 。 选择ZIP, (中文(简体) ).MCP或者案件里的客户"/>
+                  <Button x:Name="BtnImportManualSolution" Content="导入 AI/手动解决方案..." IsEnabled="False" ToolTip="导入PMM MANUAL SOLUTION V1 (英语).PMM验证结构/验证,但它在游戏中测试之前仍为实验."/>
                 </WrapPanel>
               </Grid>
             </Expander>
@@ -661,7 +661,7 @@
                 <UniformGrid Grid.Row="2" Rows="1" Columns="3">
                   <Button x:Name="BtnBuild" Content="构建合并" FontWeight="Bold"/>
                   <Button x:Name="BtnDeploy" Content="部署"/>
-                  <Button x:Name="BtnUndeployPatch" Content="取消部署" IsEnabled="False" ToolTip="Remove only the selected merge from Palworld ~mods. The saved PMM build is kept."/>
+                  <Button x:Name="BtnUndeployPatch" Content="取消部署" IsEnabled="False" ToolTip="只删除选中的合并Palworld~ 模样. 获救者PMM建筑保存。"/>
                 </UniformGrid>
                 <StackPanel Grid.Row="3" Margin="3,5,3,0">
                   <TextBlock x:Name="TxtOperationProgress" Text="就绪。上次操作将保留在这里。" HorizontalAlignment="Center" Foreground="{DynamicResource MutedText}" TextTrimming="CharacterEllipsis"/>
@@ -711,7 +711,7 @@
                   </StackPanel>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
-                  <Button x:Name="BtnFixLabRefreshDashboard" Content="刷新修复实验室" MinWidth="180" ToolTip="Refresh the Fix Lab dashboard on demand. Tab switching uses the cached view so navigation stays immediate."/>
+                  <Button x:Name="BtnFixLabRefreshDashboard" Content="刷新修复实验室" MinWidth="180" ToolTip="刷新该Fix Lab仪表板需要。 Tab 切换使用缓存视图, 从而保持导航即时 。"/>
                   <Button x:Name="BtnFixLabBuildReference" Content="构建 / 刷新游戏参考" MinWidth="180"/>
                   <Button x:Name="BtnFixLabOpenReference" Content="打开参考" MinWidth="180" Margin="0,5,0,0"/>
                 </StackPanel>
@@ -724,7 +724,7 @@
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <TextBlock Text="!" FontSize="18" FontWeight="Bold" Foreground="#D97706" VerticalAlignment="Center" Margin="1,0,8,0"/>
                 <TextBlock x:Name="TxtFixLabNotice" Grid.Column="1" TextWrapping="Wrap" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource AccentHeadingAmber}"/>
-                <Button x:Name="BtnFixLabDismissNotice" Grid.Column="2" Content="X" ToolTip="关闭" Margin="10,0,0,0" Padding="9,2"/>
+                <Button x:Name="BtnFixLabDismissNotice" Grid.Column="2" Content="页:1" ToolTip="关闭" Margin="10,0,0,0" Padding="9,2"/>
               </Grid>
             </Border>
 
@@ -743,8 +743,8 @@
                 <StackPanel Margin="0,6,0,0">
                   <DockPanel LastChildFill="True">
                     <Button x:Name="BtnFixLabDiscover" DockPanel.Dock="Right" Content="分析可修复模组" Margin="8,0,0,5" Padding="10,4"/>
-                    <Button x:Name="BtnFixLabIgnoreSource" DockPanel.Dock="Right" Content="忽略此旧版模组" Margin="8,0,0,5" Padding="10,4" ToolTip="Skip Fix Lab for this exact source hash and allow Analyze/AUTO to continue under your responsibility."/>
-                    <Button x:Name="BtnFixLabDeleteSource" DockPanel.Dock="Right" Content="删除此模组" Margin="8,0,0,5" Padding="10,4" ToolTip="Delete the source mod from the PMM library and its exact matching PAK from ~mods using the same operation as Imported Mods > Delete."/>
+                    <Button x:Name="BtnFixLabIgnoreSource" DockPanel.Dock="Right" Content="忽略此旧版模组" Margin="8,0,0,5" Padding="10,4" ToolTip="跳过Fix Lab用于此精确源散列并允许分析/AUTO继续由你负责。"/>
+                    <Button x:Name="BtnFixLabDeleteSource" DockPanel.Dock="Right" Content="删除此模组" Margin="8,0,0,5" Padding="10,4" ToolTip="删除源模式PMM库及其精确匹配PAK从 ~mods 中,使用与导入的 Mods &gt; 删除相同的操作。"/>
                     <TextBlock Text="选择修复实验室要修复的旧版模组案例。" TextWrapping="Wrap" Foreground="{DynamicResource MutedText}" Margin="0,3,0,5"/>
                   </DockPanel>
                   <ListBox x:Name="LstFixLabCandidates" SelectionMode="Single" SelectedValuePath="RecipeId" MinHeight="70" MaxHeight="130">
@@ -829,14 +829,14 @@
                   <GridSplitter Grid.Column="1" Width="8" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext"/>
                   <Border Grid.Column="2" Background="{DynamicResource CardAltBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6" Padding="10"><Grid>
                     <StackPanel x:Name="PnlAIHelpSelectedCase"><TextBlock x:Name="TxtAIHelpSelectedCaseTitle" Text="未选择案例" FontWeight="SemiBold" FontSize="17" TextWrapping="Wrap"/><TextBlock x:Name="TxtAIHelpSelectedCaseMeta" Text="在左侧选择案例，或点击“新建案例”。" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,3,0,8"/><Border Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource InputBorder}" BorderThickness="1" CornerRadius="5" Padding="10" MinHeight="160"><TextBlock x:Name="TxtAIHelpSelectedCaseDescription" TextWrapping="Wrap"/></Border><TextBlock Text="打开案例后可选择 ZIP、MCP 或客户端，同时保留证据和历史记录。" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,8,0,0"/></StackPanel>
-                    <StackPanel x:Name="PnlAIHelpNewCase" Visibility="Collapsed"><TextBlock Text="打开新的协助案例" FontWeight="SemiBold" FontSize="17"/><TextBlock Text="选择 PMM 功能，然后描述发生了什么、预期结果以及复现方式。所选模组或构建仅是疑点，并非已确认原因。" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,7"/><ComboBox x:Name="CmbAIHelpDiagnosticType" DisplayMemberPath="Label" SelectedValuePath="Id"/><TextBox x:Name="TxtAIHelpDiagnosticTitle" Margin="0,6,0,0" ToolTip="Short title"/><TextBox x:Name="TxtAIHelpDiagnosticDescription" Height="150" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Margin="0,6,0,0" ToolTip="What happened, what you expected and how to reproduce it"/><CheckBox x:Name="ChkAIHelpIncludePalLog" Content="包含有限且已脱敏的 Palworld 日志摘要" Margin="0,7,0,2"/><WrapPanel><Button x:Name="BtnAIHelpCreateAndPrepareCase" Content="创建并打开案例" FontWeight="SemiBold"/><Button x:Name="BtnAIHelpCreateCase" Content="保存到本地"/><Button x:Name="BtnAIHelpCancelNewCase" Content="取消"/></WrapPanel><TextBlock x:Name="TxtAIHelpDiagnosticStatus" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,8,0,0"/></StackPanel>
+                    <StackPanel x:Name="PnlAIHelpNewCase" Visibility="Collapsed"><TextBlock Text="打开新的协助案例" FontWeight="SemiBold" FontSize="17"/><TextBlock Text="选择 PMM 功能，然后描述发生了什么、预期结果以及复现方式。所选模组或构建仅是疑点，并非已确认原因。" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,7"/><ComboBox x:Name="CmbAIHelpDiagnosticType" DisplayMemberPath="Label" SelectedValuePath="Id"/><TextBox x:Name="TxtAIHelpDiagnosticTitle" Margin="0,6,0,0" ToolTip="短标题"/><TextBox x:Name="TxtAIHelpDiagnosticDescription" Height="150" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Margin="0,6,0,0" ToolTip="发生了什么事,你期望什么,如何复制它"/><CheckBox x:Name="ChkAIHelpIncludePalLog" Content="包含有限且已脱敏的 Palworld 日志摘要" Margin="0,7,0,2"/><WrapPanel><Button x:Name="BtnAIHelpCreateAndPrepareCase" Content="创建并打开案例" FontWeight="SemiBold"/><Button x:Name="BtnAIHelpCreateCase" Content="保存到本地"/><Button x:Name="BtnAIHelpCancelNewCase" Content="取消"/></WrapPanel><TextBlock x:Name="TxtAIHelpDiagnosticStatus" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,8,0,0"/></StackPanel>
                   </Grid></Border>
                 </Grid>
               </Grid>
             </TabItem>
             <TabItem Header="AI 接收">
               <Grid Margin="10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                <TextBlock Text="Receive an AI response or a recognized self-describing artifact here. Standard response ZIPs route themselves to their existing exchange; a standalone theme can open as an uninstalled draft. Returned data stays inactive until you inspect and explicitly accept it." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="2,0,2,8"/>
+                <TextBlock Text="在这里接收人工智能回复 或确认的自我描述文物。 标准反应ZIPs 路径本身到其现有的交换; 一个独立的主题可以作为未安装的草稿打开 。 返回的数据在检查和明确接受之前不活动。" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="2,0,2,8"/>
                 <Grid Grid.Row="1"><Grid.ColumnDefinitions><ColumnDefinition Width="0.95*" MinWidth="300"/><ColumnDefinition Width="8"/><ColumnDefinition Width="1.2*" MinWidth="380"/></Grid.ColumnDefinitions>
                   <Border Background="{DynamicResource CardAltBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6" Padding="10"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="2*"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><StackPanel><TextBlock Text="已知 AI 交换" FontWeight="SemiBold" FontSize="15"/><TextBlock Text="历史记录会跨重启保留，并将每个请求、响应、候选和决策集中保存。" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap"/></StackPanel><ListBox x:Name="LstAIIOSessions" Grid.Row="1" DisplayMemberPath="Display" MinHeight="70" Margin="0,7"/><TextBlock Grid.Row="2" Text="已接收候选" FontWeight="SemiBold" Margin="0,3,0,3"/><ListBox x:Name="LstAIIOCandidates" Grid.Row="3" DisplayMemberPath="Display" MinHeight="55"/><TextBlock x:Name="TxtAIIOCandidateStatus" Grid.Row="4" Text="返回内容在明确接受前均视为不受信任且未激活。" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,5,0,4"/><WrapPanel Grid.Row="5"><Button x:Name="BtnAIIOOpenWorkspace" Content="打开 AI 工作区"/><Button x:Name="BtnAIIOOpenHandoff" Content="打开最新交接" IsEnabled="False"/><Button x:Name="BtnAIIOArchive" Content="归档交换"/><Button x:Name="BtnAIIOOpenCandidate" Content="检查候选"/><Button x:Name="BtnAIIOUseCandidate" Content="在合并中使用候选..." IsEnabled="False" FontWeight="SemiBold"/></WrapPanel></Grid></Border>
                   <GridSplitter Grid.Column="1" Width="8" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext"/>
@@ -852,16 +852,16 @@
                   <TextBlock Text="反馈类型" FontWeight="SemiBold" Margin="0,7,0,3"/>
                   <ComboBox x:Name="CmbAIHelpFeedbackType" DisplayMemberPath="Label" SelectedValuePath="Id"/>
                   <TextBlock Text="标题" FontWeight="SemiBold" Margin="0,7,0,3"/>
-                  <TextBox x:Name="TxtAIHelpFeedbackTitle" ToolTip="Short title (optional if comments are provided)"/>
+                  <TextBox x:Name="TxtAIHelpFeedbackTitle" ToolTip="短标题(如果提供评论意见,可选择)"/>
                   <TextBlock Text="评论" FontWeight="SemiBold" Margin="0,7,0,3"/>
-                  <TextBox x:Name="TxtAIHelpFeedbackComments" Height="120" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" ToolTip="Comments, expected behavior, reproduction notes or Knowledge/CKL context"/>
+                  <TextBox x:Name="TxtAIHelpFeedbackComments" Height="120" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" ToolTip="评论、预期行为、复制说明或知识/CKL上下文"/>
                   <TextBlock Text="可选的精确合并上下文" FontWeight="SemiBold" Margin="0,8,0,3"/>
                   <ComboBox x:Name="CmbAIHelpFeedbackBuild" DisplayMemberPath="Display"/>
                   <WrapPanel Margin="0,7,0,0"><Button x:Name="BtnAIHelpCreateFeedback" Content="创建共享文件..." FontWeight="SemiBold"/><Button x:Name="BtnAIHelpOpenFeedback" Content="打开反馈文件夹"/><Button x:Name="BtnAIHelpUploadFeedback" Content="上传（未连接）" IsEnabled="False"/></WrapPanel>
                   <TextBlock x:Name="TxtAIHelpFeedbackStatus" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,7,0,0"/>
                 </StackPanel></Border>
-                <Border Style="{StaticResource SummaryCard}" Margin="3,8,3,3"><StackPanel><TextBlock Text="精确合并验证" FontSize="15" FontWeight="SemiBold"/><TextBlock Text="Exports the latest local PASS, PARTIAL or FAIL event for the selected deterministic build. Ordinary validation does not create a main AI &amp; Help alert." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,3,0,7"/><Button x:Name="BtnAIHelpGenerateFeedback" Content="创建精确验证反馈" HorizontalAlignment="Left"/></StackPanel></Border>
-                <Border Style="{StaticResource SummaryCard}" Margin="3,8,3,3"><StackPanel><TextBlock Text="知识 / CKL 贡献" FontSize="15" FontWeight="SemiBold"/><TextBlock Text="After an imported solution has been tested in Palworld, package its handoff, candidate and exact runtime evidence for manual maintainer/community review." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,3,0,7"/><WrapPanel><Button x:Name="BtnExportKnowledgeContribution" Content="创建已测试贡献..."/><Button x:Name="BtnOpenKnowledgeContributions" Content="打开贡献文件夹"/></WrapPanel></StackPanel></Border>
+                <Border Style="{StaticResource SummaryCard}" Margin="3,8,3,3"><StackPanel><TextBlock Text="精确合并验证" FontSize="15" FontWeight="SemiBold"/><TextBlock Text="为选定的确定性构建导出最新的本地 PASS、PartIal 或 FAIL 事件。 普通验证不会创建主AI &amp; 帮助提醒." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,3,0,7"/><Button x:Name="BtnAIHelpGenerateFeedback" Content="创建精确验证反馈" HorizontalAlignment="Left"/></StackPanel></Border>
+                <Border Style="{StaticResource SummaryCard}" Margin="3,8,3,3"><StackPanel><TextBlock Text="知识 / CKL 贡献" FontSize="15" FontWeight="SemiBold"/><TextBlock Text="在输入溶液测试后Palworld,包装其交割、候选人和准确的运行时间证据,供手工维护者/社区审查。" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,3,0,7"/><WrapPanel><Button x:Name="BtnExportKnowledgeContribution" Content="创建已测试贡献..."/><Button x:Name="BtnOpenKnowledgeContributions" Content="打开贡献文件夹"/></WrapPanel></StackPanel></Border>
                 <Border Style="{StaticResource SummaryCard}" Margin="3,8,3,3"><StackPanel><TextBlock Text="本地知识" FontSize="15" FontWeight="SemiBold"/><TextBlock x:Name="TxtAIHelpKnowledgeSummary" TextWrapping="Wrap" Foreground="{DynamicResource MutedText}" Margin="0,3,0,0"/><WrapPanel Margin="0,7,0,0"><Button x:Name="BtnAIHelpOpenKnowledge" Content="打开知识库"/><Button x:Name="BtnOpenReviewCases" Content="打开 AI 审查案例"/></WrapPanel></StackPanel></Border>
                 <Border Style="{StaticResource SummaryCard}" Margin="3,8,3,3"><StackPanel><TextBlock Text="存储与可恢复性" FontSize="15" FontWeight="SemiBold"/><TextBlock x:Name="TxtAIHelpStorageSummary" TextWrapping="Wrap" Foreground="{DynamicResource MutedText}" Margin="0,3,0,0"/><TextBlock Text="中断的操作" FontWeight="SemiBold" Margin="0,8,0,3"/><ListBox x:Name="LstAIHelpInterrupted" DisplayMemberPath="Display" MinHeight="60" MaxHeight="150"/><WrapPanel Margin="0,7,0,0"><Button x:Name="BtnAIHelpRefreshKnowledge" Content="刷新"/><Button x:Name="BtnAIHelpCleanup" Content="检查可清理内容"/></WrapPanel></StackPanel></Border>
               </StackPanel></ScrollViewer>
@@ -869,14 +869,14 @@
             <TabItem Header="配色方案编辑器" x:Name="TabHelpTheme"><Grid Margin="10"><Grid.ColumnDefinitions><ColumnDefinition Width="285"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*" MinWidth="430"/></Grid.ColumnDefinitions>
               <Border Background="{DynamicResource CardAltBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6" Padding="10"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><TextBlock Text="创建或继续" FontSize="15" FontWeight="SemiBold"/><ComboBox x:Name="CmbThemeEditorSource" Grid.Row="1" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,7,0,0"/><Button x:Name="BtnThemeEditorNew" Grid.Row="2" Content="从所选方案新建" Margin="0,5,0,7"/><ListBox x:Name="LstThemeDrafts" Grid.Row="3" DisplayMemberPath="Display"/><WrapPanel Grid.Row="4" Margin="0,7,0,0"><Button x:Name="BtnThemeEditorLoad" Content="加载草稿"/><Button x:Name="BtnThemeEditorDelete" Content="删除草稿"/></WrapPanel></Grid></Border>
               <GridSplitter Grid.Column="1" Width="8" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext"/>
-              <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="4"><TextBlock Text="配色方案编辑器" FontSize="17" FontWeight="SemiBold"/><TextBlock Text="Every named brush keeps a required fallback color and may use a packaged PNG/JPEG image. Images are copied into the draft; external paths and URLs are forbidden." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,7"/><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="150"/></Grid.ColumnDefinitions><TextBox x:Name="TxtThemeEditorName" ToolTip="方案名称"/><TextBox x:Name="TxtThemeEditorId" Grid.Column="2" ToolTip="小写方案 ID"/><ComboBox x:Name="CmbThemeEditorBase" Grid.Column="4"/></Grid><Border x:Name="BrdThemeEditorPreview" Background="{DynamicResource CardBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6" Padding="9" Margin="0,8,0,8"><StackPanel><TextBlock Text="Live preview uses the current whole-window theme after Preview. Save or install only when validation passes." TextWrapping="Wrap"/><WrapPanel Margin="0,6,0,0"><Button Content="普通按钮" IsHitTestVisible="False"/><Button Content="禁用按钮" IsEnabled="False"/><TextBox Width="180" Text="输入 / 选定颜色" IsReadOnly="True"/></WrapPanel></StackPanel></Border><StackPanel x:Name="PnlThemeEditorRows"/><TextBlock Text="主题协助案例" FontWeight="SemiBold" Margin="0,10,0,3"/><TextBox x:Name="TxtThemeEditorPrompt" Height="80" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" ToolTip="描述提供给外部 AI 的视觉方向"/><WrapPanel Margin="0,7,0,0"><Button x:Name="BtnThemeEditorSave" Content="保存草稿"/><Button x:Name="BtnThemeEditorPreview" Content="预览"/><Button x:Name="BtnThemeEditorRevert" Content="还原预览"/><Button x:Name="BtnThemeEditorInstall" Content="本地安装" FontWeight="SemiBold"/><Button x:Name="BtnThemeEditorExport" Content="导出 JSON/ZIP"/><Button x:Name="BtnThemeEditorCreateAI" Content="打开案例"/><Button x:Name="BtnThemeEditorImportAI" Content="导入 AI 主题..."/></WrapPanel><TextBlock x:Name="TxtThemeEditorStatus" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,8,0,0"/></StackPanel></ScrollViewer>
+              <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="4"><TextBlock Text="配色方案编辑器" FontSize="17" FontWeight="SemiBold"/><TextBlock Text="每个命名的刷子都保持了所需的倒置颜色,并可能使用一个包裹的PNG/JPEG图像. 图像被复制到草稿中;禁止外部路径和URL." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,7"/><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="150"/></Grid.ColumnDefinitions><TextBox x:Name="TxtThemeEditorName" ToolTip="方案名称"/><TextBox x:Name="TxtThemeEditorId" Grid.Column="2" ToolTip="小写方案 ID"/><ComboBox x:Name="CmbThemeEditorBase" Grid.Column="4"/></Grid><Border x:Name="BrdThemeEditorPreview" Background="{DynamicResource CardBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6" Padding="9" Margin="0,8,0,8"><StackPanel><TextBlock Text="直播预览使用当前预览后的全窗主题. 只在验证通过时保存或安装." TextWrapping="Wrap"/><WrapPanel Margin="0,6,0,0"><Button Content="普通按钮" IsHitTestVisible="False"/><Button Content="禁用按钮" IsEnabled="False"/><TextBox Width="180" Text="输入 / 选定颜色" IsReadOnly="True"/></WrapPanel></StackPanel></Border><StackPanel x:Name="PnlThemeEditorRows"/><TextBlock Text="主题协助案例" FontWeight="SemiBold" Margin="0,10,0,3"/><TextBox x:Name="TxtThemeEditorPrompt" Height="80" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" ToolTip="描述提供给外部 AI 的视觉方向"/><WrapPanel Margin="0,7,0,0"><Button x:Name="BtnThemeEditorSave" Content="保存草稿"/><Button x:Name="BtnThemeEditorPreview" Content="预览"/><Button x:Name="BtnThemeEditorRevert" Content="还原预览"/><Button x:Name="BtnThemeEditorInstall" Content="本地安装" FontWeight="SemiBold"/><Button x:Name="BtnThemeEditorExport" Content="导出 JSON/ZIP"/><Button x:Name="BtnThemeEditorCreateAI" Content="打开案例"/><Button x:Name="BtnThemeEditorImportAI" Content="导入 AI 主题..."/></WrapPanel><TextBlock x:Name="TxtThemeEditorStatus" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,8,0,0"/></StackPanel></ScrollViewer>
             </Grid></TabItem>
             <TabItem Header="设置" x:Name="TabAISettings">
               <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="12" MaxWidth="1100">
-                <TextBlock Text="Choose how the local AI &amp; Help module records real failures. No provider or upload connection is configured here." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="2,0,2,8"/>
-<Border Style="{StaticResource SummaryCard}"><StackPanel><TextBlock Text="本地 MCP 桥接（预览）" FontSize="15" FontWeight="SemiBold"/><TextBlock Text="Connect an AI client to this PMM installation. Enabling shares AIIO case summaries, staged files and current Vanilla reference through bounded tools. Returned files remain inactive. Review them before building or deploying. Connect local Codex below to process published requests automatically." TextWrapping="Wrap" Margin="0,7,0,0"/><WrapPanel Margin="0,8,0,0"><Button x:Name="BtnMCPEnable" Content="启用并准备连接" Margin="0,0,8,0"/><Button x:Name="BtnMCPDisable" Content="禁用 MCP" Margin="0,0,8,0"/><Button x:Name="BtnMCPOpen" Content="连接与暂存文件"/></WrapPanel><WrapPanel Margin="0,8,0,0"><Button x:Name="BtnMCPConnectCodex" Content="使用本地 Codex" Margin="0,0,8,0"/><Button x:Name="BtnMCPExternal" Content="仅外部客户端"/></WrapPanel><TextBlock Text="Local Codex uses your existing sign-in and account usage. Responses appear in the case for review." TextWrapping="Wrap" Margin="0,7,0,0"/><TextBlock x:Name="TxtMCPClientStatus" TextWrapping="Wrap" Margin="0,7,0,0"/><TextBlock x:Name="TxtMCPStatus" TextWrapping="Wrap" Margin="0,7,0,0"/></StackPanel></Border>
-                <Border Style="{StaticResource SummaryCard}"><StackPanel><TextBlock Text="可选 Unreal 集成" FontSize="15" FontWeight="SemiBold"/><TextBlock Text="PMM works without Unreal. Enable this only to create and cook content with Unreal 5.1.1 and the Palworld Modding Kit. Python is included with Unreal." TextWrapping="Wrap" Margin="0,7,0,0"/><WrapPanel><Button x:Name="BtnUnrealPrepare" Content="准备 Unreal 集成"/><Button x:Name="BtnUnrealDisable" Content="保持 Unreal 关闭"/><Button x:Name="BtnUnrealInstall" Content="安装 / 打开 Epic Launcher"/><Button x:Name="BtnUnrealRunInstaller" Content="运行已验证的 Epic 安装程序..."/></WrapPanel><WrapPanel><Button x:Name="BtnUnrealEnginePath" Content="定位 Unreal..."/><Button x:Name="BtnUnrealWwiseSdk" Content="定位 Wwise SDK..."/><Button x:Name="BtnUnrealWwiseIntegration" Content="定位 Wwise 集成..."/><Button x:Name="BtnUnrealGuide" Content="安装指南"/><Button x:Name="BtnUnrealCandidates" Content="案例候选"/></WrapPanel><TextBlock x:Name="TxtUnrealStatus" TextWrapping="Wrap" Margin="0,7,0,0"/></StackPanel></Border>
-<Border Style="{StaticResource SummaryCard}"><StackPanel><TextBlock Text="诊断行为" FontSize="15" FontWeight="SemiBold"/><CheckBox x:Name="ChkAIIOAutoCreateErrorCases" Content="PMM 实际操作失败时创建或复用诊断案例" Margin="0,7,0,0"/><TextBlock Text="Identical repeated failures reuse one open case. Normal validation and Waiting for AI sessions never create a main-tab alert." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,3,0,0"/><TextBlock x:Name="TxtAIIOSettingsStatus" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,7,0,0"/></StackPanel></Border>
+                <TextBlock Text="选择本地 AI &amp; 帮助模块如何记录真实的失败 。 这里没有配置提供者或上传连接 。" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="2,0,2,8"/>
+<Border Style="{StaticResource SummaryCard}"><StackPanel><TextBlock Text="本地 MCP 桥接（预览）" FontSize="15" FontWeight="SemiBold"/><TextBlock Text="连接一个 AI 客户端到此PMM安装。 启用股份AIIO案例摘要、阶段文件和当前通过限定工具提供的香草参考。 返回的文件仍然不活动 。 在建造或部署之前先审查。 连接本地Codex处理已公布的请求auto慢慢来" TextWrapping="Wrap" Margin="0,7,0,0"/><WrapPanel Margin="0,8,0,0"><Button x:Name="BtnMCPEnable" Content="启用并准备连接" Margin="0,0,8,0"/><Button x:Name="BtnMCPDisable" Content="禁用 MCP" Margin="0,0,8,0"/><Button x:Name="BtnMCPOpen" Content="连接与暂存文件"/></WrapPanel><WrapPanel Margin="0,8,0,0"><Button x:Name="BtnMCPConnectCodex" Content="使用本地 Codex" Margin="0,0,8,0"/><Button x:Name="BtnMCPExternal" Content="仅外部客户端"/></WrapPanel><TextBlock Text="当地Codex使用您已有的登录和账户使用。 答复是供审查的。" TextWrapping="Wrap" Margin="0,7,0,0"/><TextBlock x:Name="TxtMCPClientStatus" TextWrapping="Wrap" Margin="0,7,0,0"/><TextBlock x:Name="TxtMCPStatus" TextWrapping="Wrap" Margin="0,7,0,0"/></StackPanel></Border>
+                <Border Style="{StaticResource SummaryCard}"><StackPanel><TextBlock Text="可选 Unreal 集成" FontSize="15" FontWeight="SemiBold"/><TextBlock Text="PMM没有工作Unreal。启用此选项仅用于创建和烹调内容Unreal第5.1.1条和Palworld Modding Kit中包含 Python 。Unreal。 。 。 。" TextWrapping="Wrap" Margin="0,7,0,0"/><WrapPanel><Button x:Name="BtnUnrealPrepare" Content="准备 Unreal 集成"/><Button x:Name="BtnUnrealDisable" Content="保持 Unreal 关闭"/><Button x:Name="BtnUnrealInstall" Content="安装 / 打开 Epic Launcher"/><Button x:Name="BtnUnrealRunInstaller" Content="运行已验证的 Epic 安装程序..."/></WrapPanel><WrapPanel><Button x:Name="BtnUnrealEnginePath" Content="定位 Unreal..."/><Button x:Name="BtnUnrealWwiseSdk" Content="定位 Wwise SDK..."/><Button x:Name="BtnUnrealWwiseIntegration" Content="定位 Wwise 集成..."/><Button x:Name="BtnUnrealGuide" Content="安装指南"/><Button x:Name="BtnUnrealCandidates" Content="案例候选"/></WrapPanel><TextBlock x:Name="TxtUnrealStatus" TextWrapping="Wrap" Margin="0,7,0,0"/></StackPanel></Border>
+<Border Style="{StaticResource SummaryCard}"><StackPanel><TextBlock Text="诊断行为" FontSize="15" FontWeight="SemiBold"/><CheckBox x:Name="ChkAIIOAutoCreateErrorCases" Content="PMM 实际操作失败时创建或复用诊断案例" Margin="0,7,0,0"/><TextBlock Text="同样的屡屡失败 重用一个悬案。 正常的验证和等待AI会话从不创建主塔布提示." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,3,0,0"/><TextBlock x:Name="TxtAIIOSettingsStatus" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,7,0,0"/></StackPanel></Border>
                 <Border Style="{StaticResource SummaryCard}" Margin="3,8,3,3"><StackPanel><TextBlock Text="知识运行状态" FontSize="15" FontWeight="SemiBold"/><TextBlock x:Name="TxtKnowledgeSummary" TextWrapping="Wrap" Margin="0,4,0,6" Foreground="{DynamicResource MutedText}"/><Button x:Name="BtnOpenKnowledge" Content="打开知识库" HorizontalAlignment="Left"/></StackPanel></Border>
               </StackPanel></ScrollViewer>
             </TabItem>
@@ -930,35 +930,35 @@
                 <WrapPanel>
                   <ComboBox x:Name="CmbLanguage" Width="180" DisplayMemberPath="Label" SelectedValuePath="Code"/>
                   <Button x:Name="BtnApplyLanguage" Content="应用语言"/>
-                  <Button x:Name="BtnResetLayout" Content="重置工作区布局" ToolTip="Reset window size and the draggable panel dividers"/>
+                  <Button x:Name="BtnResetLayout" Content="重置工作区布局" ToolTip="重置窗口大小和可拖动面板分隔符"/>
                   <TextBlock Text="操作提示：" VerticalAlignment="Center" Margin="14,0,5,0"/>
-                  <ComboBox x:Name="CmbActionHintDuration" Width="220" DisplayMemberPath="Label" SelectedValuePath="Value" ToolTip="0 disables the bubble; 1-120 seconds; Infinite stays until closed with ×."/>
+                  <ComboBox x:Name="CmbActionHintDuration" Width="220" DisplayMemberPath="Label" SelectedValuePath="Value" ToolTip="0 禁用气泡; 1- 120秒; 无限停留至 x 关闭为止 。"/>
                 </WrapPanel>
               </StackPanel>
               <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="20,0,0,0">
-                <Button x:Name="BtnRestoreDefaults" Content="恢复默认设置" MinWidth="130" ToolTip="Restore interface, ColorFlow hint and audio defaults. Language, paths, library and user data are not changed."/>
-                <Button x:Name="BtnApplySettings" Content="应用更改" MinWidth="130" FontWeight="SemiBold" ToolTip="Apply theme, ColorFlow hint duration and completion sound without restarting PMM."/>
+                <Button x:Name="BtnRestoreDefaults" Content="恢复默认设置" MinWidth="130" ToolTip="恢复接口, ColorFlow 提示和音频默认. 语言,路径,库和用户数据不更改."/>
+                <Button x:Name="BtnApplySettings" Content="应用更改" MinWidth="130" FontWeight="SemiBold" ToolTip="应用主题、 ColorFlow 提示持续时间和完成声音而不重新启动PMM。 。 。 。"/>
               </StackPanel>
             </Grid>
             <Border Background="{DynamicResource CardAltBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="7" Padding="10" Margin="0,4,0,8">
               <StackPanel>
                 <TextBlock Text="配色方案" FontSize="15.5" FontWeight="SemiBold"/>
-                <TextBlock Text="Choose a scheme and press Apply changes. PMM Crystal is the fresh-install default. User JSON schemes can override the full palette and optionally the ColorFlow colors." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,7"/>
+                <TextBlock Text="选择一个方案并按下应用程序更改 。PMMCrystal是新安装默认值. 用户JSON方案可以覆盖全调色板,也可以选择色彩花色。" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,7"/>
                 <TextBlock Text="官方 PMM 方案" FontWeight="SemiBold" Margin="0,2,0,1"/>
                 <WrapPanel x:Name="PnlThemeOptions" Margin="0,1,0,5"/>
                 <Border Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource InputBorder}" BorderThickness="1" CornerRadius="5" Padding="8" Margin="0,1,0,6"><StackPanel><DockPanel LastChildFill="True"><TextBlock DockPanel.Dock="Left" Text="已添加的用户方案" FontWeight="SemiBold"/><TextBlock x:Name="TxtThemeInfo" Margin="12,0,0,0" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap"/></DockPanel><TextBlock x:Name="TxtUserThemeEmpty" Text="未安装用户方案。" Foreground="{DynamicResource MutedText}" Margin="0,5,0,0"/><ScrollViewer MaxHeight="120" VerticalScrollBarVisibility="Auto"><WrapPanel x:Name="PnlUserThemeOptions" Margin="0,5,0,0"/></ScrollViewer></StackPanel></Border>
-                <WrapPanel><Button x:Name="BtnImportTheme" Content="添加方案..." ToolTip="Install reusable user schemes from JSON or ZIP."/><Button x:Name="BtnOpenThemesFolder" Content="打开方案文件夹"/></WrapPanel>
+                <WrapPanel><Button x:Name="BtnImportTheme" Content="添加方案..." ToolTip="从JSON或者说ZIP。 。 。 。"/><Button x:Name="BtnOpenThemesFolder" Content="打开方案文件夹"/></WrapPanel>
               </StackPanel>
             </Border>
 
             <Border Background="{DynamicResource CardAltBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="7" Padding="10" Margin="0,0,0,8">
               <StackPanel>
                 <TextBlock Text="声音事件" FontSize="15.5" FontWeight="SemiBold"/>
-                <TextBlock Text="Configure each notification separately. Built-in sounds stay on the top row; sounds you add appear in the custom list below." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,7"/>
+                <TextBlock Text="分别配置每个通知。 内建声音留在顶行; 声音您添加到下面的自定义列表中 。" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,7"/>
                 <WrapPanel Margin="0,0,0,7" VerticalAlignment="Center">
                   <TextBlock Text="配置：" VerticalAlignment="Center" Margin="0,0,7,0"/>
                   <ComboBox x:Name="CmbSoundEventProfile" Width="285"/>
-                  <CheckBox x:Name="ChkSoundEachAutoStep" Content="每个 AUTO 步骤播放声音" VerticalAlignment="Center" Margin="14,0,0,0" ToolTip="Play the Semiauto sound after every completed step while AUTO/SemiAUTO is running. Enabled by default; choose None or clear this option to mute it."/>
+                  <CheckBox x:Name="ChkSoundEachAutoStep" Content="每个 AUTO 步骤播放声音" VerticalAlignment="Center" Margin="14,0,0,0" ToolTip="播放该Semiauto在每个完成步骤之后发出声音AUTO编号 :SemiAUTO正在运行。 默认启用; 选择“ 无” 或“ 清除” 选项以关闭 。"/>
                   <CheckBox x:Name="ChkSoundAttention" Content="需要注意时播放声音" VerticalAlignment="Center" Margin="14,0,0,0"/>
                 </WrapPanel>
                 <TextBlock x:Name="TxtSoundEventDescription" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,0,0,7"/>
@@ -988,7 +988,7 @@
             <Border Background="{DynamicResource CardAltBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6" Padding="11" Margin="0,8,0,0">
               <StackPanel>
                 <TextBlock Text="原版游戏参考" FontSize="16" FontWeight="SemiBold"/>
-                <TextBlock Text="Optional reusable research reference built locally from your own Pal-Windows.pak. It does not modify Palworld and normal AI handoffs include only the bounded files they require." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,3,0,4"/>
+                <TextBlock Text="本地从自己的 Pal- Windows 创建的可选可重复使用的研究参考.pak它不修改Palworld而正常AI的交接只包括它们需要的受限文件." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,3,0,4"/>
                 <TextBlock x:Name="TxtGameReferenceSummary" TextWrapping="Wrap" Margin="0,2,0,6" Foreground="{DynamicResource MutedText}"/>
                 <WrapPanel><Button x:Name="BtnBuildGameReference" Content="构建 / 刷新游戏参考"/><Button x:Name="BtnOpenGameReference" Content="打开游戏参考文件夹"/></WrapPanel>
                 <WrapPanel Margin="0,5,0,0"><Button x:Name="BtnImportMappings" Content="导入映射 (.usmap)"/><Button x:Name="BtnBundledMappings" Content="使用内置映射"/></WrapPanel>
@@ -1001,7 +1001,7 @@
             <Border Background="{DynamicResource CardAltBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6" Padding="11">
               <StackPanel>
                 <TextBlock Text="Palworld 安装" FontSize="16" FontWeight="SemiBold"/>
-                <TextBlock Text="Automatic detection is recommended. Manual Steam and Palworld selectors are available here for unusual installations." Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,7"/>
+                <TextBlock Text="Auto建议进行人工检测。 手动蒸汽和Palworld这里有用于不同寻常设施的选择器。" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,7"/>
                 <TextBox x:Name="TxtGamePath" IsReadOnly="True" Margin="0,0,0,6"/>
                 <WrapPanel>
                   <Button x:Name="BtnDetectGameSettings" Content="自动检测"/>
@@ -1021,7 +1021,7 @@
             </StackPanel></Border>
             <Border x:Name="PnlBaseDependencySettings" Style="{StaticResource SummaryCard}"><StackPanel><Separator Margin="0,12"/>
             <TextBlock Text="依赖项" FontSize="16" FontWeight="SemiBold"/>
-            <TextBlock Text="Start checks dependencies automatically and prepares/downloads only what is missing. This button forces a manual repair." TextWrapping="Wrap" Margin="0,4,0,6" Foreground="{DynamicResource MutedText}"/>
+            <TextBlock Text="自动开始检查依赖性, 只准备/ 下载缺失的内容 。 这个按钮迫使人工修复." TextWrapping="Wrap" Margin="0,4,0,6" Foreground="{DynamicResource MutedText}"/>
             <Button x:Name="BtnSetupDeps" Content="准备 / 修复依赖项" HorizontalAlignment="Left"/>
 
             </StackPanel></Border>
