@@ -1,4 +1,4 @@
-PMM v1.3.0 — QUICK START
+PMM v1.3.1 MOD CREATION PREVIEW — QUICK START
 
 Normal use:
   Double-click PMM.exe
@@ -57,6 +57,16 @@ operation recovery, exact-build validation and the color-scheme editor. Prepare
 for AI creates a bounded ZIP that you send manually; PMM has no provider login
 and uploads nothing. Imported responses are untrusted data. They stay staged,
 cannot run code and never Apply Fix, Build or Deploy automatically.
+
+Standalone mod creation is a separate CREATE_MOD workflow. Start a new mod
+project, describe the intended change and optionally name an exact asset/family.
+PMM can prepare a request ZIP, extract only specifically requested current
+Game Reference families, import an untrusted cooked-tree candidate and build a
+separate local PAK after strict path/hash/reference/probe validation. The result
+is LOCAL_BUILD_UNPROVEN: PMM never installs, deploys or publishes it automatically.
+Created PAKs contain inert "created using PMM" metadata. When publishing one,
+include this exact sentence in its description:
+  This mod was created with PMM assistance.
 
 Settings lists 11 release JSON themes plus Night/Light as official schemes.
 Schemes added by the user stay in a separate bordered Workspace\Themes list,

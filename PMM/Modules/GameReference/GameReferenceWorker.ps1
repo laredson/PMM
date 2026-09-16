@@ -1,20 +1,27 @@
 ﻿param(
   [Parameter(Mandatory=$true)][string]$Root,
   [Parameter(Mandatory=$true)][string]$ProgressPath,
-  [Parameter(Mandatory=$true)][string]$ResultPath
+  [Parameter(Mandatory=$true)][string]$ResultPath,
+  [switch]$MCP
 )
 
 Set-StrictMode -Version 2.0
 $ErrorActionPreference='Stop'
 $Script:Root=[IO.Path]::GetFullPath($Root)
 . (Join-Path $Script:Root 'Modules\Shared\Paths.ps1')
-Initialize-PMMPaths $Script:Root|Out-Null
+if($MCP){
+  . (Join-Path $Script:Root 'Modules\MCP\MCP.Service.ps1')
+  $Script:PMMPaths=[ordered]@{App=$Script:Root}
+  foreach($pair in @(@('State','Workspace\State'),@('GameReference','Workspace\GameReference'),@('Cache','Workspace\Cache'),@('Logs','Workspace\Logs'),@('Mappings','Resources\Mappings'),@('Engine','Engine'),@('Metadata','Resources\Metadata'),@('CKLStable','CKL\Stable'))){
+    $Script:PMMPaths[$pair[0]]=Resolve-PMMMCPPath $Script:Root $pair[1]
+  }
+}else{Initialize-PMMPaths $Script:Root|Out-Null}
 
 . (Join-Path $Script:Root 'Modules\Shared\Common.ps1')
 . (Join-Path $Script:Root 'Modules\Merge\PakService.ps1')
 . (Join-Path $Script:Root 'Modules\GameReference\GameReferenceService.ps1')
 Start-PMMLogSession 'Worker-GameReference'
-Initialize-PMM
+if(-not $MCP){Initialize-PMM}
 
 function Write-PMMWorkerJson([string]$Path,$Object){
   $dir=Split-Path -Parent $Path

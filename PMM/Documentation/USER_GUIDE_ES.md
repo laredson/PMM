@@ -1,4 +1,4 @@
-# Palworld Manager Merger v1.3.0 — Guía de usuario
+# Palworld Manager Merger v1.3.1 — Guía de usuario
 
 **Flujo guiado:** PMM ilumina solo la siguiente etapa útil: **Importar -> Fix Lab cuando sea necesario -> Analizar -> Build -> Deploy -> Jugar**. El color depende del estado real. Durante Importar/Analizar/Build/Deploy el propio boton iluminado sirve tambien como progreso, mientras la barra persistente bajo Build/Deploy conserva el ultimo porcentaje/resultado hasta que empiece otra operacion.
 
@@ -22,7 +22,7 @@ PMM es a la vez un manager de mods PAK de Palworld y un merger de compatibilidad
 
 ## Cabecera y rutas de Palworld
 
-La cabecera usa el icono PMM transparente ampliado, el nombre en tres líneas **PALWORLD / MANAGER / MERGER** y su subtítulo. En una ventana ancha, marca y acciones ocupan mitades iguales; con poco ancho, las acciones pasan debajo. La tarjeta de estado es también la acción Detectar: se activa cuando hace falta actuar y queda desactivada tras validar la instalación. Debajo están **Abrir carpeta del juego**, **Abrir carpeta de mods** e **Iniciar Palworld**; la última fila contiene **Auto ON**, **Ejecutar Palworld tras Deploy** y **AUTO** de una sola ejecución. La ruta completa, Detectar/cambiar instalación, **Elegir carpeta de Steam** / **Elegir carpeta de Palworld** y el diagnóstico siguen en **Opciones**. **Abrir carpeta de mods** abre o crea `Pal\Content\Paks\~mods`.
+La cabecera usa el icono PMM transparente ampliado, el nombre en tres líneas **PALWORLD / MANAGER / MERGER** y su subtítulo. En una ventana ancha, marca y acciones ocupan mitades iguales; con poco ancho, las acciones pasan debajo. La tarjeta de estado es también la acción Detectar: se activa cuando hace falta actuar y queda desactivada tras validar la instalación. Debajo están **Abrir carpeta del juego**, **Abrir carpeta de mods** e **Iniciar Palworld**; la última fila contiene **SemiAUTO**, **Ejecutar Palworld tras Deploy** y **AUTO** de una sola ejecución. La ruta completa, Detectar/cambiar instalación, **Elegir carpeta de Steam** / **Elegir carpeta de Palworld** y el diagnóstico siguen en **Opciones**. **Abrir carpeta de mods** abre o crea `Pal\Content\Paks\~mods`.
 
 ## Modo sólo manager
 
@@ -47,13 +47,15 @@ PMM puede conservar varios patches, por ejemplo con decisiones distintas para un
 - **Borrar seleccionados** es inmediato: elimina la copia importada de PMM y el mismo hash de Palworld `~mods` si esta desplegado alli. Un archivo con el mismo nombre pero SHA-256 diferente bloquea el borrado. Cualquier merge de compatibilidad PMM desplegado y su sidecar se conservan hasta que los cambies explicitamente en **Compatibility patches**; la vigencia de Analyze se invalida para que PMM explique el nuevo estado de fuentes.
 - Deploy no borra a ciegas PAK ajenos que PMM nunca haya gestionado.
 
-## Saves
+## Guardado del mundo
 
-La pestaña **Saves** permite crear backups de mundos y restaurarlos. PMM crea un backup de seguridad antes de sustituir el mundo durante Restore. Mantén también copias independientes de los mundos importantes.
+La pestaña **Guardado del mundo** permite crear backups de mundos y restaurarlos. PMM crea un backup de seguridad antes de sustituir el mundo durante Restore. Mantén también copias independientes de los mundos importantes.
 
 ## IA y ayuda y AIIO local
 
-**IA y ayuda** separa Ayuda y diagnostico, Reparacion IA/AIIO, Feedback, Knowledge, el editor de esquemas y Opciones IA. Ayuda sirve para describir y conservar un problema; Reparacion IA prepara una tarea para razonamiento externo y mantiene sus respuestas/candidatos. **Preparar para IA** crea un ZIP local para que tu decidas donde enviarlo. PMM no tiene login de proveedor ni sube nada automaticamente. Un ZIP devuelto es dato no confiable: se rechazan scripts, ejecutables, rutas inseguras y archivos anidados, y cada candidato queda en staging hasta revisarlo.
+**IA y ayuda** separa asistencia, tareas persistentes de reparacion/creacion con AIIO, Feedback y Knowledge, recepcion de trabajo devuelto, editor de esquemas y opciones IA. **Preparar para IA** crea un ZIP local para que tu decidas donde enviarlo. PMM no tiene login de proveedor ni sube nada automaticamente. Un ZIP devuelto es dato no confiable: se rechazan scripts, ejecutables, rutas inseguras y archivos anidados, y cada candidato queda en staging hasta revisarlo.
+
+Para crear un mod independiente, usa **Nuevo proyecto de mod**, describe el comportamiento y, si lo conoces, indica un asset/familia exacto. Una sesion `CREATE_MOD` puede pedir familias limitadas de la Game Reference actual. Tras importar la respuesta, **Construir PAK independiente...** solo aparece si el candidato declara un arbol cooked seguro y hashes exactos. El resultado permanece en el workspace AIIO como `LOCAL_BUILD_UNPROVEN`: PMM no lo instala, despliega ni publica automaticamente. El PAK contiene metadatos inertes `created using PMM`. Si publicas el mod, su descripcion debe incluir: **This mod was created with PMM assistance.**
 
 Feedback crea JSON inspeccionable para un comentario general, una incidencia de PMM, un merge/validacion exacto o Knowledge/CKL. Compartir sigue siendo manual y el control de subida muestra una conexion futura desactivada. Validar normalmente o esperar una respuesta IA no enciende el contador principal; el contador se reserva para Unsupported, errores reales, operaciones interrumpidas o una respuesta que requiere revision. Los fallos identicos reutilizan un caso y cada diagnostico reutiliza su sesion activa.
 
@@ -71,11 +73,13 @@ Empieza por `Documentation/TROUBLESHOOTING.md` y `Logs/PalModMerger.log`. Para s
 
 ## Game Reference Vanilla y AIIO
 
-En **IA y ayuda > Opciones IA**, **Crear / actualizar Game Reference** mantiene una caché local con identidad de versión. PMM lee material seleccionado de tu `Pal-Windows.pak` dentro de `Workspace/GameReference` y nunca modifica el juego. El análisis normal no necesita una referencia completa, mientras que las recetas de Fix Lab pueden pedir y conservar familias actuales adicionales bajo demanda.
+En **Opciones**, **Crear / actualizar Game Reference** mantiene una caché local con identidad de versión. El mismo control tambien puede consultarse desde las opciones de IA y ayuda. PMM lee material seleccionado de tu `Pal-Windows.pak` dentro de `Workspace/GameReference` y nunca modifica el juego. El análisis normal no necesita una referencia completa, mientras que las recetas de Fix Lab y la creacion explícita de mods pueden pedir y conservar familias actuales adicionales bajo demanda.
 
 AIIO no necesita esa caché para crear un handoff. Cuando creas uno explícitamente, AIIO
 vuelve a extraer el archivo/familia Vanilla exacto en conflicto y sus equivalentes exactos
 de cada PAK implicado, y los coloca por origen dentro de un único bundle.
+Si cierras la ventana del Explorador, selecciona el intercambio en **Recepcion IA** y pulsa
+**Abrir ultimo handoff** para volver a mostrar su ZIP de peticion mas reciente.
 
 Después de importar una solución IA/manual y comprobarla realmente dentro de Palworld,
 IA y ayuda -> Feedback -> **Crear contribución probada...** genera un único ZIP de evidencia para
@@ -99,7 +103,7 @@ Los controles justo debajo de **Mod library** pertenecen a los mods importados. 
 
 ### Modo automatico y Cancelar
 
-**ColorFlow y AUTO usan la misma máquina de estados.** El orden es `Detectar (solo si hace falta) -> Importar -> [Fix Lab si corresponde: Game Reference -> elegir output -> Repair -> Apply Fix] -> Analyze -> Build Merge -> Deploy -> listo para jugar`. **Auto ON** es la continuación persistente: si está marcado, una acción del flujo iniciada manualmente continúa por los pasos seguros restantes. El botón **AUTO** de la cabecera es distinto: ejecuta una vez el flujo restante sin activar Auto ON. AUTO puede importar directamente la fuente conocida `~mods` de Palworld; una importación arbitraria de archivos/carpeta sigue esperando que el usuario elija. Tras un despliegue actualizado, ColorFlow solo ilumina **Iniciar Palworld** como estado opcional disponible: no abre un aviso de accion requerida ni obliga a iniciar el juego. **Ejecutar Palworld tras Deploy** controla únicamente el inicio automático y sigue desactivado por defecto.
+**ColorFlow y AUTO usan la misma máquina de estados.** El orden es `Detectar (solo si hace falta) -> Importar -> [Fix Lab si corresponde: Game Reference -> elegir output -> Repair -> Apply Fix] -> Analyze -> Build Merge -> Deploy -> listo para jugar`. **SemiAUTO** es la continuación persistente: si está marcado, una acción del flujo iniciada manualmente continúa por los pasos seguros restantes. El botón **AUTO** de la cabecera es distinto: ejecuta una vez el flujo restante sin activar SemiAUTO. AUTO puede importar directamente la fuente conocida `~mods` de Palworld; una importación arbitraria de archivos/carpeta sigue esperando que el usuario elija. Tras un despliegue actualizado, ColorFlow solo ilumina **Iniciar Palworld** como estado opcional disponible: no abre un aviso de accion requerida ni obliga a iniciar el juego. **Ejecutar Palworld tras Deploy** controla únicamente el inicio automático y sigue desactivado por defecto.
 
 Si PMM reconoce la identidad exacta de un mod antiguo/roto soportado por Fix Lab, Fix Lab pasa a ser el siguiente estado de ColorFlow/AUTO **antes del Analyze normal**. Si la receta necesita Current Game Reference y no está actual, AUTO la construye directamente en background. Una sola salida puede seleccionarse automáticamente; con varias salidas se detiene en **elegir output**. Después de Repair y **Apply Fix**, Fix Lab queda resuelto y el siguiente estado común es **Analyze**. Ignorar este mod antiguo omite Fix Lab para ese hash exacto bajo responsabilidad del usuario.
 
@@ -122,9 +126,9 @@ Cuando un caso compatible de Fix Lab necesita Current Game Reference, PMM inicia
 
 ### AUTO mientras Fix Lab crea Game Reference
 
-Si una reparacion detectada necesita Game Reference, AUTO invoca primero **el mismo comando canonico Crear / actualizar Game Reference que usa IA y ayuda > Opciones IA**, antes de cualquier cambio de pestana a Fix Lab. Asi no existe una segunda ruta de arranque exclusiva de AUTO. Cuando AUTO encuentra por primera vez ese caso, abre **Fix Lab una sola vez** para mostrar el caso y la eleccion de output. Despues de esa presentacion inicial, las pestanas vuelven a estar bajo control del usuario: si vas a otra pestana mientras Game Reference se crea, el watchdog no te devuelve a Fix Lab. El mismo estado/barra de progreso se muestra en Opciones IA y Fix Lab. Si la reparacion tiene varias salidas, puedes elegir una en cualquier momento mientras se crea la referencia; AUTO reanuda en cuanto esten listas tanto la referencia como tu eleccion. Una Game Reference iniciada manualmente tambien reanuda una cadena AUTO que ya estaba activa al terminar; con Auto ON, iniciar Game Reference manualmente arma la continuacion igual que cualquier otro paso del flujo.
+Si una reparacion detectada necesita Game Reference, AUTO invoca primero **el mismo comando canonico Crear / actualizar Game Reference que usa IA y ayuda > Opciones IA**, antes de cualquier cambio de pestana a Fix Lab. Asi no existe una segunda ruta de arranque exclusiva de AUTO. Cuando AUTO encuentra por primera vez ese caso, abre **Fix Lab una sola vez** para mostrar el caso y la eleccion de output. Despues de esa presentacion inicial, las pestanas vuelven a estar bajo control del usuario: si vas a otra pestana mientras Game Reference se crea, el watchdog no te devuelve a Fix Lab. El mismo estado/barra de progreso se muestra en Opciones IA y Fix Lab. Si la reparacion tiene varias salidas, puedes elegir una en cualquier momento mientras se crea la referencia; AUTO reanuda en cuanto esten listas tanto la referencia como tu eleccion. Una Game Reference iniciada manualmente tambien reanuda una cadena AUTO que ya estaba activa al terminar; con SemiAUTO, iniciar Game Reference manualmente arma la continuacion igual que cualquier otro paso del flujo.
 
-Los pasos completados correctamente ya no muestran ventanas informativas de OK. **Opciones** permite configurar por separado el esquema de color y cada evento de sonido, con sonidos integrados o custom y volumen 0-100% (50% por defecto). Los dos perfiles de microondas siguen siendo distintos: **Final de microondas** y **3 pitidos**. Los pasos manuales usan el perfil Manual; AUTO/Auto ON usa los perfiles Auto/Semiauto configurados.
+Los pasos completados correctamente ya no muestran ventanas informativas de OK. **Opciones** permite configurar por separado el esquema de color y cada evento de sonido, con sonidos integrados o custom y volumen 0-100% (50% por defecto). Los dos perfiles de microondas siguen siendo distintos: **Final de microondas** y **3 pitidos**. Los pasos manuales usan el perfil Manual; AUTO/SemiAUTO usa los perfiles Auto/Semiauto configurados.
 
 
 ### Apariencia
@@ -138,7 +142,7 @@ La apariencia, duración del aviso, sonido y volumen se preparan en Ajustes y se
 
 Las instalaciones nuevas usan **PMM Crystal** por defecto y conservan la eleccion valida de una instalacion existente. Configuracion separa **Esquema de color** y **Sonido de finalizacion** en listas independientes. **Agregar esquemas (JSON/ZIP)...** admite uno o varios JSON `PMM_COLOR_SCHEME_V1`, o un ZIP acotado, y guarda solo esquemas validados en `Workspace\Themes`; **Agregar sonido...** copia un WAV/MP3/WMA a `Workspace\Sounds`. Pulsa **Aplicar cambios** para aplicar tema, duración del aviso ColorFlow, sonido y volumen sin reiniciar PMM. **Restaurar valores**, situado junto a Aplicar en la esquina superior derecha, prepara PMM Crystal, aviso de 5 segundos, volumen 50% y los perfiles de sonido RC19 sin cambiar idioma, rutas, biblioteca ni datos del usuario; pulsa Aplicar para guardarlos.
 
-La pestana Partidas tiene ahora dos paneles colapsables a la derecha: **Save seleccionado** y **Backups PMM creados**. Al seleccionar un backup se muestran fecha, tamano ZIP, tamano expandido, numero de archivos y una comparacion simple con el save actual. Restaurar utiliza el backup PMM seleccionado y crea antes un backup de seguridad.
+La pestana Guardado del mundo tiene dos paneles colapsables a la derecha: **Save seleccionado** y **Backups PMM creados**. Al seleccionar un backup se muestran fecha, tamano ZIP, tamano expandido, numero de archivos y una comparacion simple con el save actual. Restaurar utiliza el backup PMM seleccionado y crea antes un backup de seguridad.
 
 
 ### Eventos de sonido

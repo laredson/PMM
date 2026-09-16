@@ -93,7 +93,7 @@ function Move-PMMLegacyWorkspaceIfPresent {
 
 function Get-PMMRuntimePath { Join-PMMPath 'Engine' 'PMMRuntime.exe' }
 function Get-PMMRepakExecutablePath { Join-PMMPath 'Engine' 'repak.exe' }
-function Get-PMMMappingsPath { Join-PMMPath 'Mappings' 'Mappings.usmap' }
+. (Join-Path $PSScriptRoot 'Mappings.ps1')
 function Get-PMMMetadataPath([string]$Name) { Join-PMMPath 'Metadata' $Name }
 function Get-PMMCKLStablePath([string]$Name) { Join-PMMPath 'CKLStable' $Name }
 function Get-PMMCKLExperimentalPath([string]$Name) { Join-PMMPath 'CKLExperimental' $Name }

@@ -114,7 +114,7 @@ RC23 singleton / effective-patch acceptance
 27) Restore BigInventory, disable only AutoUnlockAllTechnology_V1_P.pak and repeat.
     Expected: the same safe reuse/deployment behavior.
 
-28) With AUTO or Auto ON active, complete an intermediate step.
+28) With AUTO or SemiAUTO active, complete an intermediate step.
     Expected: the selected Semiauto sound plays; None or a cleared Sound each AUTO step checkbox mutes it.
 
 29) Change a real conflict provider/hash, output-relevant priority, decision, mappings or Vanilla identity.

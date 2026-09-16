@@ -1,0 +1,9 @@
+{
+  "schema": "PMM_LOCALIZATION_MISSING_V2",
+  "catalogCount": 1291,
+  "discoveredCount": 1278,
+  "relevantCount": 1232,
+  "missingCount": 0,
+  "missing": {},
+  "note": "Generated from LAST_AUDIT.json. No catalog gaps remain."
+}

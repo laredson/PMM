@@ -5,6 +5,12 @@
 **Baseline:** RC30, build `PMM-v1.3.0-RC30-LEAN-AI-VALIDATION-FLOW`  
 **Authority:** runnable `PMM/` tree plus the packaged RC30 binaries
 
+> Branch note: `1.3.1-mod-creation` preserves this RC30 foundation and extends
+> it with `AIIO.ModCreationService.ps1`, `PMM_CAPABILITIES_V2`, the
+> `PMM_MOD_CREATION_CANDIDATE_V1` contract and explicit undeployed standalone
+> PAK construction. Read `Development/Docs/PMM_1_3_1_MOD_CREATION.md` before
+> changing the creation path.
+
 ## What RC27 implemented and RC30 preserves
 
 AIIO is no longer merely a proposed module. RC27 exposes it through the top-level **AI & Help** tab and keeps the WPF layer thin over these services:
@@ -14,6 +20,7 @@ AIIO is no longer merely a proposed module. RC27 exposes it through the top-leve
 | `Modules/AIIO/AIIO.ps1` | Exact Unsupported cases and bounded source handoffs |
 | `AIIO.SessionService.ps1` | Persistent sessions, capabilities, history and incremental bundles |
 | `AIIO.DiagnosticService.ps1` | Local diagnostic cases and sanitized evidence |
+| `AIIO.ModCreationService.ps1` | Exact Game Reference evidence, hostile standalone-candidate validation and explicit undeployed PAK construction |
 | `AIIO.ResponseService.ps1` | Strict response validation, requested data and staged candidates |
 | `AIIO.ArtifactService.ps1` | Artifact inventory and conservative cleanup classification |
 | `AIIO.ValidationService.ps1` | Deterministic build IDs, immutable local evidence and feedback files |

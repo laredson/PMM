@@ -39,9 +39,9 @@ PMM puede guardar varios patches construidos con los mismos hashes de sources + 
 - **Delete from library** elimina la copia gestionada y registra la retirada para el siguiente Deploy.
 - Deploy no borra a ciegas PAK ajenos que PMM nunca haya gestionado.
 
-## Saves
+## Guardado del mundo
 
-La pestaña **Saves** permite crear backups de mundos y restaurarlos. PMM crea un backup de seguridad antes de sustituir el mundo durante Restore. Mantén también copias independientes de los mundos importantes.
+La pestaña **Guardado del mundo** permite crear backups de mundos y restaurarlos. PMM crea un backup de seguridad antes de sustituir el mundo durante Restore. Mantén también copias independientes de los mundos importantes.
 
 ## Qué significa Unsupported
 

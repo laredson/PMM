@@ -1,0 +1,14 @@
+PMM localization audit - v1.3.4.1
+
+Discovered UI strings: 1278
+Relevant translatable strings: 1232
+English catalog strings: 1291
+Chinese catalog strings: 1291
+
+Result: PASS
+Missing English: 0
+Missing Chinese: 0
+Placeholder errors: 0
+Translation residue: 0
+Clearly untranslated prose: 0
+Wiring errors: 0

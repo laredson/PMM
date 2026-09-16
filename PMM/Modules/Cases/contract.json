@@ -1,0 +1,7 @@
+﻿{
+  "module": "Cases", "contractVersion": 4, "envelope": "PMM_AIIO_CASE_V3_PREVIEW1",
+  "dependencies": ["Shared/Persistence", "AIIO/CaseWorkspace", "Merge/ReviewEvidence"],
+  "reload": "Restart", "operationsPinVersion": "Worker process loads a fixed module snapshot; restart PMM after an update.",
+  "transports": ["MANUAL_ZIP", "MCP", "CHATGPT", "CODEX", "EXTERNAL"],
+  "migration": "Additive, idempotent; retains AICASE and legacy review/session IDs."
+}

@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Text.Json;
 using UAssetAPI;
 using UAssetAPI.ExportTypes;
@@ -11,6 +12,7 @@ namespace PMM.AssetReader;
 
 internal static class Program
 {
+    private static readonly List<string> ReadErrors = new();
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
     public static int Main(string[] args)
@@ -40,7 +42,7 @@ internal static class Program
 
     private static int Usage(int exitCode)
     {
-        Console.WriteLine("PMM.AssetReader v0.2 - read-only UAssetAPI bridge");
+        Console.WriteLine("PMM.AssetReader v0.3 - read-only UAssetAPI bridge");
         Console.WriteLine("  export-json --asset <file.uasset> --output <file.json> --mappings <Mappings.usmap> --engine <UE5_1>");
         Console.WriteLine("  export-datatable --asset <file.uasset> --output <file.json> --mappings <Mappings.usmap> --engine <UE5_1>");
         Console.WriteLine("  probe --asset <file.uasset> --mappings <Mappings.usmap> --engine <UE5_1>");
@@ -76,7 +78,10 @@ internal static class Program
             status = "OK",
             engine = version.ToString(),
             asset = Path.GetFullPath(assetPath),
-            output = Path.GetFullPath(outputPath)
+            output = Path.GetFullPath(outputPath),
+            semanticReadability = Readability(asset),
+            opaqueExports = asset.Exports.OfType<RawExport>().Count(),
+            readErrors = ReadErrors.ToArray()
         }));
         return 0;
     }
@@ -90,7 +95,10 @@ internal static class Program
         var version = ParseEngine(parsed.Require("--engine"));
         var asset = Load(assetPath, mappings, version);
         var tableExport = asset.Exports.OfType<DataTableExport>().SingleOrDefault()
-            ?? throw new InvalidDataException("Asset does not contain exactly one DataTableExport.");
+            ?? throw new InvalidDataException("DataTable was not decoded. " +
+                (asset.Exports.Any(x => x is RawExport)
+                    ? "The reader retained opaque exports; mappings may be incomplete for this game build or the schema is unsupported. "
+                    : "Asset does not contain exactly one DataTableExport. ") + string.Join(" | ", ReadErrors));
         if (tableExport.Table is null)
             throw new InvalidDataException("DataTableExport has no table payload.");
 
@@ -196,6 +204,9 @@ internal static class Program
             status = "OK",
             engine = version.ToString(),
             exports,
+            semanticReadability = Readability(asset),
+            opaqueExports = asset.Exports.OfType<RawExport>().Count(),
+            readErrors = ReadErrors.ToArray(),
             jsonBytes = System.Text.Encoding.UTF8.GetByteCount(json)
         }, JsonOptions));
         return 0;
@@ -207,9 +218,27 @@ internal static class Program
             throw new FileNotFoundException("Cooked .uasset not found.", assetPath);
         if (!File.Exists(mappingsPath))
             throw new FileNotFoundException("Mappings.usmap not found.", mappingsPath);
-        var mappings = new Usmap(mappingsPath);
-        return new UAsset(assetPath, version, mappings);
+        ReadErrors.Clear();
+        // UAssetAPI catches some property/schema failures and returns RawExport.
+        // Preserve that lossless representation, but never call it semantic success.
+        void Capture(object? sender, FirstChanceExceptionEventArgs e)
+        {
+            var owner = e.Exception.TargetSite?.DeclaringType?.Namespace ?? "";
+            if (owner.StartsWith("UAssetAPI", StringComparison.Ordinal) &&
+                ReadErrors.Count < 16 && !ReadErrors.Contains(e.Exception.Message))
+                ReadErrors.Add(e.Exception.Message);
+        }
+        AppDomain.CurrentDomain.FirstChanceException += Capture;
+        try
+        {
+            var mappings = new Usmap(mappingsPath);
+            return new UAsset(assetPath, version, mappings);
+        }
+        finally { AppDomain.CurrentDomain.FirstChanceException -= Capture; }
     }
+
+    private static string Readability(UAsset asset)
+        => asset.Exports.Any(x => x is RawExport) ? "Partial" : "Decoded";
 
     private static EngineVersion ParseEngine(string value)
         => value.ToUpperInvariant() switch

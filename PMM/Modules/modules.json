@@ -1,0 +1,901 @@
+﻿{
+  "Schema": "PMM_MODULE_MANIFEST_V1",
+  "ContractVersion": 1,
+  "Description": "Legacy entries document already-loaded compatibility prerequisites. Stage Extension is loaded once by Workbench.Services after those prerequisites. Restart policies preserve top-level state and event ownership.",
+  "Modules": [
+    {
+      "Id": "paths",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Shared/Paths.ps1",
+      "Dependencies": [],
+      "Capabilities": [
+        "workspace.paths"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "persistence",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Shared/Persistence.ps1",
+      "Dependencies": [
+        "paths"
+      ],
+      "Capabilities": [
+        "json.atomic",
+        "json.migrations"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "common",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Shared/Common.ps1",
+      "Dependencies": [
+        "persistence"
+      ],
+      "Capabilities": [
+        "config",
+        "logging"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "operation-journal",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Operations/OperationJournal.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "operations.journal"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "game-locator",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Shared/GameLocator.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "game.location"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "pak",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Merge/PakService.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "pak.read",
+        "pak.build"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "deployment-recovery",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Operations/DeploymentRecovery.ps1",
+      "Dependencies": [
+        "persistence",
+        "game-locator"
+      ],
+      "Capabilities": [
+        "deployment.recovery"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "library",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Library/LibraryService.ps1",
+      "Dependencies": [
+        "pak",
+        "deployment-recovery"
+      ],
+      "Capabilities": [
+        "library",
+        "deployment"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "saves",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Saves/SaveService.ps1",
+      "Dependencies": [
+        "library"
+      ],
+      "Capabilities": [
+        "saves"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "semantic-lab",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/CKL/SemanticLab.ps1",
+      "Dependencies": [
+        "pak"
+      ],
+      "Capabilities": [
+        "assets.semantic"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "game-reference",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/GameReference/GameReferenceService.ps1",
+      "Dependencies": [
+        "semantic-lab"
+      ],
+      "Capabilities": [
+        "game.reference"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "knowledge-recipes",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/CKL/KnowledgeRecipeService.ps1",
+      "Dependencies": [
+        "game-reference"
+      ],
+      "Capabilities": [
+        "knowledge.recipes"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "merge",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Merge/MergeEngine.ps1",
+      "Dependencies": [
+        "knowledge-recipes",
+        "library"
+      ],
+      "Capabilities": [
+        "merge.analyze",
+        "merge.build"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "aiio",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/AIIO/AIIO.ps1",
+      "Dependencies": [
+        "merge"
+      ],
+      "Capabilities": [
+        "aiio.legacy"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "aiio-sessions",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/AIIO/AIIO.SessionService.ps1",
+      "Dependencies": [
+        "aiio"
+      ],
+      "Capabilities": [
+        "aiio.sessions"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "aiio-cases",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/AIIO/AIIO.CaseWorkspaceService.ps1",
+      "Dependencies": [
+        "aiio-sessions"
+      ],
+      "Capabilities": [
+        "cases.legacy"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "aiio-preview",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/AIIO/AIIO.CaseWorkspace.Preview5.ps1",
+      "Dependencies": [
+        "aiio-cases"
+      ],
+      "Capabilities": [
+        "cases.preview"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "aiio-action-safety",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/AIIO/AIIO.CaseWorkspace.ActionSafety.ps1",
+      "Dependencies": [
+        "aiio-preview"
+      ],
+      "Capabilities": [
+        "cases.action-safety"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "mcp",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/MCP/MCP.Service.ps1",
+      "Dependencies": [
+        "aiio-action-safety"
+      ],
+      "Capabilities": [
+        "transport.mcp"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "unreal",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Unreal/Unreal.Service.ps1",
+      "Dependencies": [
+        "mcp"
+      ],
+      "Capabilities": [
+        "tools.unreal"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "dependencies",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Unreal/Dependencies.Service.ps1",
+      "Dependencies": [
+        "unreal"
+      ],
+      "Capabilities": [
+        "tools.dependencies"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "cases",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Cases/CaseService.ps1",
+      "Dependencies": [
+        "aiio-action-safety",
+        "persistence"
+      ],
+      "Capabilities": [
+        "cases.persistent",
+        "cases.revisions"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Extension",
+      "Reload": "Functions"
+    },
+    {
+      "Id": "knowledge",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Knowledge/Knowledge.Service.ps1",
+      "Dependencies": [
+        "cases"
+      ],
+      "Capabilities": [
+        "knowledge.local",
+        "knowledge.exchange"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Extension",
+      "Reload": "Functions"
+    },
+    {
+      "Id": "observations",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Observations/Observation.Service.ps1",
+      "Dependencies": [
+        "knowledge",
+        "library"
+      ],
+      "Capabilities": [
+        "game.observations"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Extension",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "module-runtime",
+      "Version": "1.0.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Operations/ModuleRuntime.ps1",
+      "Dependencies": [
+        "persistence"
+      ],
+      "Capabilities": [
+        "runtime.modules"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "presentation.assistance.actions",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Presentation/Assistance.Actions.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "ui.legacy"
+      ],
+      "Profiles": [
+        "UI"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "presentation.assistance.ui",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Presentation/Assistance.UI.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "ui.legacy"
+      ],
+      "Profiles": [
+        "UI"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "presentation.fixlab.ui",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Presentation/FixLab.UI.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "ui.legacy"
+      ],
+      "Profiles": [
+        "UI"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "presentation.layout.ui",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Presentation/Layout.UI.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "ui.legacy"
+      ],
+      "Profiles": [
+        "UI"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "presentation.legacy.ui",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Presentation/Legacy.UI.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "ui.legacy"
+      ],
+      "Profiles": [
+        "UI"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "presentation.library.actions",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Presentation/Library.Actions.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "ui.legacy"
+      ],
+      "Profiles": [
+        "UI"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "presentation.library.ui",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Presentation/Library.UI.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "ui.legacy"
+      ],
+      "Profiles": [
+        "UI"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "presentation.operations.ui",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Presentation/Operations.UI.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "ui.legacy"
+      ],
+      "Profiles": [
+        "UI"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "presentation.shell.actions",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Presentation/Shell.Actions.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "ui.legacy"
+      ],
+      "Profiles": [
+        "UI"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "presentation.theme.ui",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Presentation/Theme.UI.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "ui.legacy"
+      ],
+      "Profiles": [
+        "UI"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "presentation.guidedflow",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Workflow/GuidedFlow.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "ui.legacy"
+      ],
+      "Profiles": [
+        "UI"
+      ],
+      "Stage": "Legacy",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "analysis.model",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Analysis/Analysis.Model.ps1",
+      "Dependencies": [
+        "common"
+      ],
+      "Capabilities": [
+        "analysis.model"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Extension",
+      "Reload": "Functions"
+    },
+    {
+      "Id": "analysis.updates",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Analysis/Updates.Service.ps1",
+      "Dependencies": [
+        "analysis.model"
+      ],
+      "Capabilities": [
+        "analysis.updates"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Extension",
+      "Reload": "Functions"
+    },
+    {
+      "Id": "analysis.repair",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Analysis/Repair.Service.ps1",
+      "Dependencies": [
+        "analysis.model"
+      ],
+      "Capabilities": [
+        "analysis.repair"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Extension",
+      "Reload": "Functions"
+    },
+    {
+      "Id": "analysis.service",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Analysis/Analysis.Service.ps1",
+      "Dependencies": [
+        "analysis.model",
+        "analysis.updates",
+        "analysis.repair"
+      ],
+      "Capabilities": [
+        "analysis.service"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Extension",
+      "Reload": "Functions"
+    },
+    {
+      "Id": "agent.runtime",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/MCP/MCP.Client.ps1",
+      "Dependencies": ["mcp"],
+      "Capabilities": ["agent.runtime"],
+      "Profiles": ["UI", "Worker", "MCP"],
+      "Stage": "Extension",
+      "Reload": "Functions"
+    },
+    {
+      "Id": "agent.app-server",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/MCP/AppServer.Client.ps1",
+      "Dependencies": [
+        "analysis.repair",
+        "agent.policy",
+        "agent.runtime"
+      ],
+      "Capabilities": [
+        "agent.app-server"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Extension",
+      "Reload": "Functions"
+    },
+    {
+      "Id": "analysis.ui",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Presentation/DeepAnalysis.UI.ps1",
+      "Dependencies": [
+        "analysis.service"
+      ],
+      "Capabilities": [
+        "analysis.ui"
+      ],
+      "Profiles": [
+        "UI"
+      ],
+      "Stage": "Extension",
+      "Reload": "Restart"
+    },
+    {
+      "Id": "analysis.mcp",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Analysis/MCP.Analysis.ps1",
+      "Dependencies": [
+        "analysis.service"
+      ],
+      "Capabilities": [
+        "analysis.mcp"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Extension",
+      "Reload": "Functions"
+    },
+    {
+      "Id": "analysis.guards",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Analysis/Analysis.Guards.ps1",
+      "Dependencies": [
+        "analysis.repair"
+      ],
+      "Capabilities": [
+        "analysis.guards"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Extension",
+      "Reload": "Functions"
+    },
+    {
+      "Id": "analysis.update-stage",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Analysis/Updates.Stage.ps1",
+      "Dependencies": [
+        "analysis.guards",
+        "analysis.service"
+      ],
+      "Capabilities": [
+        "analysis.update-stage"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Extension",
+      "Reload": "Functions"
+    },
+    {
+      "Id": "agent.policy",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/MCP/AI.Policy.ps1",
+      "Dependencies": [
+        "analysis.repair"
+      ],
+      "Capabilities": [
+        "agent.model-routing"
+      ],
+      "Profiles": [
+        "UI",
+        "MCP",
+        "Worker"
+      ],
+      "Stage": "Extension",
+      "Reload": "Functions"
+    },
+    {
+      "Id": "agent.policy.ui",
+      "Version": "1.3.3",
+      "ContractVersion": 1,
+      "Path": "Modules/Presentation/AI.Policy.UI.ps1",
+      "Dependencies": [
+        "agent.policy",
+        "analysis.ui"
+      ],
+      "Capabilities": [
+        "agent.policy.ui"
+      ],
+      "Profiles": [
+        "UI"
+      ],
+      "Stage": "Extension",
+      "Reload": "Restart"
+    }
+  ]
+}

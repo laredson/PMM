@@ -38,6 +38,47 @@
           }
         ]
       },
+      "currentLayoutTransfer": {
+        "schema": "PMM_DATATABLE_CURRENT_LAYOUT_TRANSFER_V1",
+        "id": "palmonsterparameter-1.0.4-preserve-uncapturable",
+        "mappingsSha256": "369a9413f3ea9faa7cd409f57cb70a02feb56ad865a306a9a141cf6cdc969153",
+        "vanilla": {
+          "uasset": {
+            "sha256": "2e13b291b12016d47da9f728eef4ca7ea58e8533647cbadf5cddf1b5b907a5b6",
+            "size": 43774
+          },
+          "uexp": {
+            "sha256": "fed4e62046eb0082b169014ee5ff72324276c92cf13f09b98df3c43d247be3ed",
+            "size": 186162
+          }
+        },
+        "preserveCurrentOnlyProperties": [
+          "IsUncapturable"
+        ],
+        "policy": "Recover the historical baseline from the exact RushRoar family and verify both historical hashes. Apply only verified historical mod deltas to the exact current game. Materialize changed zero-masked 32-bit scalars losslessly before the existing scalar adapter. Preserve every other current-game field and all opaque bytes.",
+        "validation": "Static byte/property preservation; game runtime not tested on 1.0.4.",
+        "historicalBaseline": {
+          "uasset": {
+            "sha256": "d576b086d1edf7c75795093e19aa5845b703f84b8b4fda14e8c22f822a9a2969",
+            "size": 43774
+          },
+          "uexp": {
+            "sha256": "311c37ee5b321fee8c3cf3b7f2229d3b3d87705bdd66b87c8e283a958343877c",
+            "size": 186027
+          }
+        },
+        "baselineRecovery": {
+          "providerPakSha256": "b663b49a2a0825b01c45bfd223b2114e7dfc30bf108d8250aa89f6d82ee4a266",
+          "row": "Boar",
+          "property": "WorkSuitability_MonsterFarm",
+          "expectedValue": 1,
+          "historicalValue": 0
+        },
+        "headerOffsets": {
+          "bulkDataStart": 236,
+          "exportSerialSize": 43686
+        }
+      },
       "providers": [
         {
           "name": "FasterMounts4xAllWorkSuitabilitiesLevel10_P.pak",

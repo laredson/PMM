@@ -10,8 +10,9 @@ Palworld Manager Merger v1.3.0 preserves the proven conservative composition ada
      become per-byte decisions.
   2. StaticItemDataAssetAdapter for DA_StaticItemDataAsset. It transfers stale
      semantic intent into a current cooked base via fixed-size byte patches.
-  3. DataTableScalarTransfer for DataTables. The largest provider is the cooked
-     anchor and independent fixed-size scalar properties are transplanted into it.
+  3. DataTableScalarTransfer for DataTables. The selected cooked anchor must
+     retain every current row/property. Exact schema-evolution rules recover
+     historical intent and preserve the current game before scalar transfer.
   4. ContainedDeltaSuperset for variable-size cooked families where one real
      provider strictly contains every other provider's executable delta and
      compatible package metadata; that cooked provider is preserved unchanged.
@@ -23,10 +24,13 @@ No adapter calls UAsset.Write(). UAssetAPI is a read-only semantic/offset reader
 A shared Unreal asset is never silently degraded to a whole-asset winner when an adapter fails. Infrastructure failures stop Analyze; unsupported structures are reported as unsupported. Only true same-property conflicts are intended to require a user choice.
 #>
 
+. (Join-Path $PSScriptRoot 'LayoutDiagnostics.ps1')
+. (Join-Path $PSScriptRoot 'DataTableLayout.ps1')
+
 function Get-PMMCorePath { return (Join-PMMPath 'Engine' 'PMMCore\pmmcore.dll') }
 function Get-PMMExpectedCoreVersion { return '0.9.0' }
 function Get-PMMEngineId { return 'PMMCore-v0.9.0' }
-function Get-PMMPlanSchemaVersion { return 18 }
+function Get-PMMPlanSchemaVersion { return 19 }
 function Get-PMMAssetReaderPath { return (Join-PMMPath 'Engine' 'AssetReader\PMM.AssetReader.dll') }
 function Get-PMMMergePlanPath { return (Join-PMMPath 'State' 'merge-plan.json') }
 function Get-PMMLastScanPath { return (Join-PMMPath 'State' 'last-scan.json') }
@@ -273,7 +277,7 @@ function Read-PMMMergePlan {
 }
 
 function Write-PMMMergePlan($Plan) {
-  $Plan | ConvertTo-Json -Depth 80 | Set-Content -LiteralPath (Get-PMMMergePlanPath) -Encoding UTF8
+  Write-PMMJsonAtomic -Path (Get-PMMMergePlanPath) -Value $Plan -Depth 80
 }
 
 function Get-PMMAssetGroups([array]$Mods) {
@@ -499,7 +503,17 @@ function Invoke-PMMCore([array]$Arguments,[string]$Context) {
   if(-not $dotnet){throw 'Portable .NET host is unavailable.'}
   $output = & $dotnet $dll @Arguments 2>&1
   $exit = $LASTEXITCODE
-  Write-PMMProcessOutputLog -Prefix ("PMMCore {0}" -f $Context) -Output @($output)
+  if(@($output).Count -gt 400){
+    # Large native JSON reports must not acquire the cross-process log mutex
+    # for every property. Retain every output line in a durable diagnostic file.
+    $text=(@($output|ForEach-Object{[string]$_}) -join "`n")
+    $digest=Get-PMMTableBytesHash ([Text.Encoding]::UTF8.GetBytes(($Context+"|"+$exit+"|"+$text)))
+    $diagnostic=Join-Path (Get-PMMPath 'Logs') ('EngineReports/'+$digest+'.json')
+    if(-not(Test-Path -LiteralPath $diagnostic -PathType Leaf)){
+      Write-PMMJsonAtomic -Path $diagnostic -Value ([ordered]@{Schema='PMM_CORE_OUTPUT_V1';Context=$Context;ExitCode=$exit;Output=@($output|ForEach-Object{[string]$_})}) -Depth 5
+    }
+    Write-PMMLog ("PMMCore {0}: exit={1}; {2} output lines retained in {3}" -f $Context,$exit,@($output).Count,$diagnostic)
+  }else{Write-PMMProcessOutputLog -Prefix ("PMMCore {0}" -f $Context) -Output @($output)}
   return [pscustomobject]@{ExitCode=$exit;Output=@($output)}
 }
 
@@ -540,7 +554,7 @@ function Get-PMMSemanticJsonCached([string]$HeaderPath) {
   $mappings = Get-PMMMappingsPath
   $mappingHash = Get-Sha256 $mappings
   $familyKey = Get-PMMAssetFamilyCacheFingerprint $HeaderPath
-  $cache = Join-Path (Get-PMMPath 'Cache') ('SemanticJson\v2_UE5_1_' + $mappingHash.Substring(0,12) + '_' + $familyKey + '.json')
+  $cache = Join-Path (Get-PMMPath 'Cache') ('SemanticJson\v3_UE5_1_' + (Get-Sha256 $reader).Substring(0,12) + '_' + $mappingHash.Substring(0,12) + '_' + $familyKey + '.json')
   if (Test-Path -LiteralPath $cache -PathType Leaf) { return $cache }
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $cache) | Out-Null
   $dotnet = Get-PMMDotnetHostPath
@@ -561,7 +575,7 @@ function Get-PMMDataTableMapCached([string]$HeaderPath) {
   $mappings = Get-PMMMappingsPath
   $mappingHash = Get-Sha256 $mappings
   $familyKey = Get-PMMAssetFamilyCacheFingerprint $HeaderPath
-  $cache = Join-Path (Get-PMMPath 'Cache') ('DataTableMaps\v2_UE5_1_' + $mappingHash.Substring(0,12) + '_' + $familyKey + '.json')
+  $cache = Join-Path (Get-PMMPath 'Cache') ('DataTableMaps\v3_UE5_1_' + (Get-Sha256 $reader).Substring(0,12) + '_' + $mappingHash.Substring(0,12) + '_' + $familyKey + '.json')
   if (Test-Path -LiteralPath $cache -PathType Leaf) { return $cache }
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $cache) | Out-Null
   $dotnet = Get-PMMDotnetHostPath
@@ -641,6 +655,15 @@ function Invoke-PMMDataTableMerge($Group,$Vanilla,[array]$ProviderRecords,[strin
   $baseMapRecord=@($maps.ToArray()|Where-Object{$_.Record.Mod.Name -eq $baseRecord.Mod.Name}|Select-Object -First 1)[0]
   if(-not$baseMapRecord){throw 'DataTable adapter could not locate the selected base provider semantic map.'}
   $baseMap=[string]$baseMapRecord.Map
+  $layoutRule=Get-PMMDataTableLayoutTransfer $Group $Vanilla $ProviderRecords
+  if($layoutRule){
+    $migration=New-PMMDataTableMigratedInputs $Vanilla ($maps.ToArray()) $layoutRule (Join-Path $Transaction ('DataTableLayout/'+$assetId))
+    $vanillaMap=$migration.VanillaMap;$baseMap=$migration.BaseMap
+    $baseRecord=[pscustomobject]@{Mod=[pscustomobject]@{Name='Vanilla (current)'};Export=$migration.BaseExport}
+    $maps.Clear();foreach($m in $migration.Maps){$maps.Add($m)}
+    $maps.Add([pscustomobject]@{Record=$baseRecord;Map=$baseMap})
+  }else{Assert-PMMDataTableAnchorPreservesCurrent $vanillaMap $baseMap}
+
   $stem=Get-PakLogicalStem ([string]$Group.Asset)
   $baseUasset=Get-PMMFamilyPartPath $baseRecord.Export '.uasset'
   $baseUexp=Get-PMMFamilyPartPath $baseRecord.Export '.uexp'
@@ -669,6 +692,10 @@ function Invoke-PMMDataTableMerge($Group,$Vanilla,[array]$ProviderRecords,[strin
       New-Item -ItemType Directory -Force -Path (Split-Path -Parent $outUbulk)|Out-Null
       Copy-Item -LiteralPath $baseUbulk -Destination $outUbulk -Force
     }
+  }
+  if($layoutRule -and $reportObject){
+    $reportObject|Add-Member -NotePropertyName currentLayoutTransfer -NotePropertyValue ([ordered]@{RuleId=[string]$layoutRule.id;PreservedProperties=@($layoutRule.preserveCurrentOnlyProperties);Anchor='Current Vanilla';RuntimeProven=$false}) -Force
+    Write-PMMJsonAtomic -Path $report -Value $reportObject -Depth 30
   }
   return [pscustomobject]@{Run=$run;ReportPath=$report;Report=$reportObject;BaseRecord=$baseRecord}
 }
@@ -808,6 +835,10 @@ function New-PMMDataTableConflictAnalysis($Group,[array]$ProviderRecords,$Vanill
     AssetKey=[string]$Group.Key;Asset=[string]$Group.Asset;Providers=@($ProviderRecords|ForEach-Object{$_.Mod.Name});Mode=$mode;
     ConflictCount=$rows.Count;ChangedPathCount=([int](@($DataTableResult.Report.patches).Count+$automatic.Count));Reason=$reason;ReviewFolder=$ReviewFolder;
     AutomaticResolutions=$automatic.ToArray();CompatibilityRuleCount=$automatic.Count
+  }
+  if($DataTableResult.Report.PSObject.Properties['currentLayoutTransfer']){
+    $asset|Add-Member -NotePropertyName CurrentLayoutTransfer -NotePropertyValue $DataTableResult.Report.currentLayoutTransfer -Force
+    $asset.Reason+=' Current-game-only fields are preserved in the current cooked base. Runtime on this game build is not yet validated.'
   }
   if($automatic.Count -gt 0 -and $ReviewFolder -and (Test-Path -LiteralPath $ReviewFolder -PathType Container)){
     try{
@@ -1610,7 +1641,14 @@ function Invoke-PMMSharedAssetAnalysis($Group,[array]$ProviderMods,[string]$Tran
     return (New-PMMRelocatableConflictAnalysis $Group $providerRecords $reloc $PreviousMap $review)
   }
   $why=if($reloc.Report){[string]$reloc.Report.reason}else{'No safe relocatable composition was found.'}
-  return (Resolve-PMMUnsupportedOrManual $Group $vanilla $providerRecords ('No safe automatic adapter accepted this shared asset. Contained-superset proof: '+$containedWhy+'. Relocatable proof: '+$why) $review)
+  $layout=$null
+  try{
+    $layout=Get-PMMCookedLayoutDiagnostic $vanilla $providerRecords
+    if($layout.Reason){$why=[string]$layout.Reason+' '+$why}
+  }catch{Write-PMMLog ('Optional cooked layout diagnostic: '+$_.Exception.Message)}
+  $result=Resolve-PMMUnsupportedOrManual $Group $vanilla $providerRecords ('No safe automatic adapter accepted this shared asset. Contained-superset proof: '+$containedWhy+'. Relocatable proof: '+$why) $review
+  if($layout){$result.Asset|Add-Member -NotePropertyName LayoutEvidence -NotePropertyValue $layout -Force}
+  return $result
 }
 
 function Invoke-PMMSharedPlainFileAnalysis($Group,[array]$ProviderMods,[string]$Transaction,$PreviousMap) {
@@ -1758,7 +1796,7 @@ function Get-PMMOrderedManagedPatchCandidates {
     @{Expression={$_.Modified};Descending=$true})
 }
 
-function Set-PMMPlanEquivalentPatch($Plan,$Patch,[array]$Mods) {
+function Set-PMMPlanEquivalentPatch($Plan,$Patch,[array]$Mods,[switch]$NoPatchSelection) {
   if(-not$Plan -or -not$Patch){return $Plan}
   $patchedMods=@($Patch.PatchedMods|ForEach-Object{[string]$_}|Where-Object{$_}|Sort-Object -Unique)
   $values=[ordered]@{
@@ -1775,7 +1813,7 @@ function Set-PMMPlanEquivalentPatch($Plan,$Patch,[array]$Mods) {
     if($Plan.PSObject.Properties.Name -contains $kv.Key){$Plan.($kv.Key)=$kv.Value}else{$Plan|Add-Member -NotePropertyName $kv.Key -NotePropertyValue $kv.Value}
   }
   $Plan.DeploymentSuppressions=@(Get-PMMPatchDeploymentSuppressions $Mods $Patch $Plan)
-  try{Set-PMMSelectedPatchName ([string]$Patch.Name)}catch{}
+  if(-not$NoPatchSelection){try{Set-PMMSelectedPatchName ([string]$Patch.Name)}catch{}}
   return $Plan
 }
 
@@ -1811,7 +1849,7 @@ function ConvertTo-PMMReusePlanAsset($Asset) {
   }
 }
 
-function Get-PMMFastPatchReuseCandidate([array]$Mods,[array]$AnalysisMods,[array]$SharedGroups) {
+function Get-PMMFastPatchReuseCandidate([array]$Mods,[array]$AnalysisMods,[array]$SharedGroups,[switch]$NoPatchSelection) {
   <#
   Conservative pre-adapter reuse for automatic patches. A manifest proves every
   patched shared group; any remaining current group must either be covered by a
@@ -1903,7 +1941,7 @@ function Get-PMMFastPatchReuseCandidate([array]$Mods,[array]$AnalysisMods,[array
       AlreadyPatched=$false;ActivePatch='';PatchedMods=@();PackageChoicePendingReanalysis=$false;DeploymentSuppressions=@();Assets=$proofAssets.ToArray();Rows=@()
     }
     if(Test-PMMPatchPlanCompatible $patch $plan $Mods){
-      $plan=Set-PMMPlanEquivalentPatch $plan $patch $Mods
+      $plan=Set-PMMPlanEquivalentPatch $plan $patch $Mods -NoPatchSelection:$NoPatchSelection
       return [pscustomobject]@{Patch=$patch;Plan=$plan}
     }
   }
@@ -1911,7 +1949,7 @@ function Get-PMMFastPatchReuseCandidate([array]$Mods,[array]$AnalysisMods,[array
 }
 
 function Invoke-PMMScan {
-  param([switch]$Force)
+  param([switch]$Force,[switch]$NoPatchSelection)
   Assert-Repak
   Assert-PMMEngineReady
   $mods = @(Get-LibraryMods)
@@ -2019,6 +2057,8 @@ function Invoke-PMMScan {
       $report | ConvertTo-Json -Depth 40 | Set-Content -LiteralPath (Get-PMMLastScanPath) -Encoding UTF8
       Write-PMMLog "Analyze short-circuit: PMM patch is current. $($currentPatch.Name)"
       Invoke-PMMProgress 2 2 (Get-PMMText 'Analyze complete - compatibility patch is current.' 'Analisis terminado - el parche de compatibilidad esta al dia.')
+      if(Get-Command Sync-PMMCasesFromAnalysis -ErrorAction SilentlyContinue){Sync-PMMCasesFromAnalysis -Plan $plan -Completed|Out-Null}
+
       return [pscustomobject]@{Summary=$summary;Shared=$assetCount;Binary=0;Semantic=0;Relocatable=0;Decisions=0;Unsupported=0;Identical=0;AlreadyPatched=$true;ActivePatch=$currentPatch.Name}
     }
   }
@@ -2034,6 +2074,7 @@ function Invoke-PMMScan {
       $summary = Get-PMMText 'Analyze cache hit: source mods, priority, mappings and game identity are unchanged. Reused the current safe compatibility plan.' 'Cache de Analizar: los mods fuente, la prioridad, los mappings y la identidad del juego no han cambiado. Se reutilizó el plan de compatibilidad seguro actual.'
       Write-PMMLog 'Analyze exact-plan cache hit; expensive adapters skipped.'
       Invoke-PMMProgress 1 1 $summary
+      if(Get-Command Sync-PMMCasesFromAnalysis -ErrorAction SilentlyContinue){Sync-PMMCasesFromAnalysis -Plan $reusedPlan -Completed|Out-Null;Write-PMMMergePlan $reusedPlan}
       return [pscustomobject]@{
         Summary=$summary
         Shared=$cachedAssets.Count
@@ -2057,7 +2098,7 @@ function Invoke-PMMScan {
 
   if(-not$Force -and $packageAssets.Count -eq 0 -and $packageRows.Count -eq 0){
     Invoke-PMMProgress 1 2 (Get-PMMText 'Checking whether the saved compatibility patch still covers the effective conflict set...' 'Comprobando si el parche guardado aun cubre el conjunto efectivo de conflictos...')
-    $fastReuse=Get-PMMFastPatchReuseCandidate $mods $analysisMods $shared
+    $fastReuse=Get-PMMFastPatchReuseCandidate $mods $analysisMods $shared -NoPatchSelection:$NoPatchSelection
     if($fastReuse){
       $plan=$fastReuse.Plan
       $patch=$fastReuse.Patch
@@ -2073,6 +2114,8 @@ function Invoke-PMMScan {
       $summary=(Get-PMMText 'Reused {0}: the effective conflict participants and output recipe are unchanged ({1}). No new Build is needed.' 'Reutilizado {0}: los participantes efectivos de conflicto y la receta de salida no han cambiado ({1}). No hace falta otro Build.') -f [string]$patch.Name,$state
       Write-PMMLog ('Analyze effective-conflict-set patch reuse; expensive adapters skipped. '+[string]$patch.Name)
       Invoke-PMMProgress 2 2 (Get-PMMText 'Analyze complete - existing compatibility patch reused.' 'Analisis terminado - se reutilizo el parche de compatibilidad existente.')
+      if(Get-Command Sync-PMMCasesFromAnalysis -ErrorAction SilentlyContinue){Sync-PMMCasesFromAnalysis -Plan $plan -Completed|Out-Null}
+
       return [pscustomobject]@{Summary=$summary;Shared=$shared.Count;Binary=$binary;Semantic=$semantic;Relocatable=$relocatable;Experimental=0;Decisions=0;Unsupported=0;Identical=$identical;AlreadyPatched=$true;ActivePatch=[string]$patch.Name;PackageChoicePendingReanalysis=$false;EffectiveConflictSetReuse=$true}
     }
   }
@@ -2156,7 +2199,7 @@ function Invoke-PMMScan {
     $equivalentPatch=$null
     if(-not$Force){
       $equivalentPatch=Get-PMMPlanCompatibleManagedPatch $plan $mods
-      if($equivalentPatch){$plan=Set-PMMPlanEquivalentPatch $plan $equivalentPatch $mods}
+      if($equivalentPatch){$plan=Set-PMMPlanEquivalentPatch $plan $equivalentPatch $mods -NoPatchSelection:$NoPatchSelection}
     }
     Write-PMMMergePlan $plan
 
@@ -2180,6 +2223,11 @@ function Invoke-PMMScan {
     }else{
       Write-PMMLog "Analyze complete. $summary"
       Invoke-PMMProgress $totalSteps $totalSteps (Get-PMMText 'Analyze complete.' 'Analisis terminado.')
+    }
+    # Only completed and persisted Analyze results publish investigation cases.
+    if(Get-Command Sync-PMMCasesFromAnalysis -ErrorAction SilentlyContinue){
+      Sync-PMMCasesFromAnalysis -Plan $plan -Completed|Out-Null
+      Write-PMMMergePlan $plan
     }
     return [pscustomobject]@{Summary=$summary;Shared=$sharedTotal;Binary=$binary;Semantic=$semantic;Relocatable=$relocatable;Experimental=$experimental;Decisions=$decisions;Unsupported=$unsupported;Identical=$identical;AlreadyPatched=($null -ne $equivalentPatch);ActivePatch=$(if($equivalentPatch){[string]$equivalentPatch.Name}else{''});PackageChoicePendingReanalysis=$false;EffectiveConflictSetReuse=($null -ne $equivalentPatch)}
   } finally {
@@ -2349,7 +2397,7 @@ function Build-PMMAutoAsset($AssetPlan,[array]$Mods,[string]$Transaction,[string
     foreach($row in @($ResolutionRows)){if($row){$dataTableRows.Add($row)}}
     $dt=Invoke-PMMDataTableMerge $group $vanilla $records $Transaction $OutDir ($dataTableRows.ToArray())
     if($dt.Run.ExitCode -ne 0){
-      $detail=if($dt.Report){$dt.Report|ConvertTo-Json -Depth 30 -Compress}else{($dt.Run.Output -join "`n")}
+      $detail=if($dt.Report){(@($dt.Report.unsupported|Select-Object -First 3|ForEach-Object{$_.Path+": "+$_.Reason}) -join " | ")+" Report: "+$dt.ReportPath}else{(@($dt.Run.Output|Select-Object -First 3) -join "`n")}
       throw "DataTable merge no longer validates for $($AssetPlan.Asset). Run Analyze again.`n$detail"
     }
     return
@@ -2408,8 +2456,15 @@ function ConvertTo-PMMPatchManifestAssetProof($Asset) {
 }
 
 function Build-PMMMerge {
-  param([ValidateSet('ConflictGroups')][string]$Mode='ConflictGroups')
+  param([ValidateSet('ConflictGroups')][string]$Mode='ConflictGroups',[string]$CandidateDirectory='')
   Assert-PMMEngineReady;Assert-Repak
+  if($CandidateDirectory){
+    $candidateRoot=[IO.Path]::GetFullPath($CandidateDirectory)
+    $workspace=[IO.Path]::GetFullPath((Get-PMMPath 'Workspace')).TrimEnd('\')+'\'
+    if(-not$candidateRoot.StartsWith($workspace,[StringComparison]::OrdinalIgnoreCase)){throw 'A candidate must remain inside the PMM workspace.'}
+    if(Test-Path -LiteralPath $candidateRoot){throw 'Candidate output already exists; preserve it and use its recorded result.'}
+    [void][IO.Directory]::CreateDirectory($candidateRoot)
+  }
   $mods=@(Get-LibraryMods);if($mods.Count -eq 0){throw(Get-PMMText 'The library contains no mods.' 'La biblioteca no contiene mods.')}
   $plan=Assert-PMMPlanMatchesLibrary $mods
   $transaction=Join-Path (Get-PMMPath 'Cache') ('Build_'+[guid]::NewGuid().ToString('N'));$outDir=Join-Path $transaction 'PatchRoot';New-Item -ItemType Directory -Force -Path $outDir|Out-Null
@@ -2433,7 +2488,7 @@ function Build-PMMMerge {
       return (Get-PMMText 'No compatibility overlay is needed; shared files are identical.' 'No hace falta overlay de compatibilidad; los archivos compartidos son identicos.')
     }
     Assert-OutputAssetFamiliesComplete $outDir
-    $stamp=Get-Date -Format 'yyyyMMdd_HHmmss';$name="zzzzzzzzzz_PMM_Merge_${stamp}_P.pak";$build=Join-Path (Join-PMMPath 'Builds' 'Current') $name
+    $stamp=Get-Date -Format 'yyyyMMdd_HHmmss';$name="zzzzzzzzzz_PMM_Merge_${stamp}_P.pak";$build=Join-Path $(if($CandidateDirectory){$candidateRoot}else{Join-PMMPath 'Builds' 'Current'}) $name
     $buildStep++
     Invoke-PMMBuildProgress $buildStep $buildTotal (Get-PMMText 'Packing output PAK...' 'Empaquetando el PAK de salida...')
     Pack-Pak $outDir $build;if(-not(Test-Pak $build)){throw 'Generated PAK failed index verification.'};Assert-PakAssetFamiliesComplete $build
@@ -2474,6 +2529,7 @@ function Build-PMMMerge {
     }
     $manifestPath=$build+'.manifest.json'
     $manifest|ConvertTo-Json -Depth 40|Set-Content -LiteralPath $manifestPath -Encoding UTF8
+    if(-not$CandidateDirectory){
     $previousRoot=Join-PMMPath 'Builds' 'Previous'
     New-Item -ItemType Directory -Force -Path $previousRoot|Out-Null
     foreach($old in @(Get-ChildItem (Join-PMMPath 'Builds' 'Current') -Filter 'zzzzzzzzzz_PMM_Merge_*_P.pak' -File -ErrorAction SilentlyContinue)){
@@ -2484,7 +2540,9 @@ function Build-PMMMerge {
       if(Test-Path -LiteralPath $oldSidecar -PathType Leaf){Move-Item $oldSidecar ($previousPak+'.manifest.json') -Force}
     }
     $cfg=Get-PMMConfig;$cfg.LastBuild=$name;if(-not($cfg.PSObject.Properties.Name -contains 'SelectedPatchName')){$cfg|Add-Member -NotePropertyName SelectedPatchName -NotePropertyValue ''};$cfg.SelectedPatchName=$name;Save-PMMConfig $cfg
+    }
     Invoke-PMMBuildProgress $buildTotal $buildTotal (Get-PMMText 'Build complete - ready to Deploy.' 'Build terminado - listo para Deploy.')
+    if($CandidateDirectory){return ('Compatibility candidate built: '+$build+'. Runtime unproven; selection and deployment unchanged.')}
     return((Get-PMMText "Compatibility overlay built locally:`n{0}`n`nShared assets reconciled: {1}`nPAK: {2:N1} KB`nSHA-256:`n{3}`n`nNo game files were changed. Press DEPLOY to synchronize active source mods and this patch to Palworld." "Overlay de compatibilidad creado localmente:`n{0}`n`nAssets compartidos reconciliados: {1}`nPAK: {2:N1} KB`nSHA-256:`n{3}`n`nNo se modifico ningun archivo del juego. Pulsa DEPLOY para sincronizar los mods fuente activos y este parche con Palworld.") -f $name,@($plan.Assets|Where-Object{$_.Mode -ne 'Identical'}).Count,((Get-Item $build).Length/1KB),(Get-Sha256 $build))
   }finally{
     Remove-Item -LiteralPath $transaction -Recurse -Force -ErrorAction SilentlyContinue

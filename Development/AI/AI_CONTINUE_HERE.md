@@ -1,14 +1,33 @@
-# PMM 1.3.0 RC30 — continue here
+# PMM 1.3.1 Mod Creation preview — continue here
 
-The runnable `PMM/` directory is the authority for RC30. It is built directly on the user's executed RC29 and preserves the complete RC22–RC29 regression chain. Never replace it with either RC20 runtime or rebuild its packaged Host/Runtime binaries from the older native-source snapshot without first proving source parity.
+The runnable `PMM/` directory is the authority for this branch. It starts from
+GitHub `main` commit `9886c4fcb58654c81894f429a60bba5a704af6de` (published
+v1.3.0 Stable plus its four post-release corrections) and adds the isolated
+AIIO standalone-mod creation path. Never replace its packaged Host/Runtime
+binaries from the older native-source snapshot without first proving source
+parity.
 
 Read in this order:
 
 1. `Development/AI/CURRENT_STATE.md`
-2. `Development/AI/AIIO_1_3_0_HANDOFF.md`
-3. `PMM/Documentation/AIIO_HANDOFF_RC30.md`
-4. `Development/Docs/RC30_RELEASE_NOTES.md`
-5. The separate RC30 continuation package, beginning with `READ_FIRST_RC30.md`.
+2. `Development/Docs/PMM_1_3_1_MOD_CREATION.md`
+3. `PMM/Documentation/MOD_CREATION_AIIO.md`
+4. `Development/AI/AIIO_1_3_0_HANDOFF.md` for the inherited AIIO base
+5. `PMM/Documentation/AIIO_HANDOFF_RC30.md` for historical RC30 detail.
+
+## 1.3.1 branch delta
+
+- `CREATE_MOD` has a visible **New mod project...** entry point and persistent
+  manual request/response exchange;
+- capability set `PMM_CAPABILITIES_V2` adds focused Game Reference query plus
+  exact/bounded current-Vanilla family extraction;
+- `PMM_MOD_CREATION_CANDIDATE_V1` is staged as hostile data and binds the exact
+  session, Game Reference, source-family and output hashes;
+- the explicit `AIIOModBuild` worker revalidates, probes and packs a standalone
+  PAK without deploying, publishing or promoting it;
+- every created PAK contains inert `PMM/Metadata/created-with-pmm.json`, and the
+  UI requires the public sentence `This mod was created with PMM assistance.`;
+- every result remains runtime `UNPROVEN` until an exact Palworld test.
 
 ## AIIO implemented in RC27 and simplified for this release in RC30
 
@@ -38,4 +57,6 @@ Preserve schema-18 plan proofs, schema-9 build manifests, exact effective-patch 
 
 ## Next gate
 
-Run `PMM/Documentation/TEST_THIS_BUILD_RC30.txt` on Windows before public promotion. Static validation is not a substitute for WPF, Windows PowerShell 5.1, audio, repak/PMMCore, Palworld deployment and in-game validation.
+Run `PMM/Documentation/TEST_THIS_BUILD_1_3_1_MOD_CREATION.txt` on Windows before
+promoting this branch. Static validation is not a substitute for WPF, Windows
+PowerShell 5.1, repak/AssetReader or an in-game Palworld test.

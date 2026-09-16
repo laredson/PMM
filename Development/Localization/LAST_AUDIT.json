@@ -1,0 +1,14 @@
+{
+  "schema": "PMM_LOCALIZATION_AUDIT_V1",
+  "discoveredUiStrings": 1278,
+  "relevantUiStrings": 1232,
+  "englishCatalogStrings": 1291,
+  "chineseCatalogStrings": 1291,
+  "missingEnglish": [],
+  "missingChinese": [],
+  "placeholderErrors": [],
+  "translationResidue": [],
+  "criticalTranslationErrors": {},
+  "clearlyUntranslatedProse": [],
+  "wiringErrors": []
+}

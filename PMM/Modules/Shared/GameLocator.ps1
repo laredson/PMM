@@ -237,5 +237,20 @@ function Start-Palworld {
   if(-not $cfg.GamePath){throw (Get-PMMText 'Configure the Palworld location first.' 'Configura primero la ubicacion de Palworld.')}
   $exe=Join-Path $cfg.GamePath 'Palworld.exe'
   if(-not(Test-Path -LiteralPath $exe -PathType Leaf)){throw (Get-PMMText 'Palworld.exe was not found.' 'No se encontro Palworld.exe.')}
+  # Let Steam apply its own configured launch options. Starting the game EXE
+  # directly can trigger Steam's empty-arguments confirmation on relaunch.
+  $steamApps=Split-Path -Parent (Split-Path -Parent ([IO.Path]::GetFullPath($cfg.GamePath).TrimEnd('\','/')))
+  $manifest=Join-Path $steamApps 'appmanifest_1623730.acf'
+  if(Test-Path -LiteralPath $manifest -PathType Leaf){
+    $text=[IO.File]::ReadAllText($manifest)
+    $install=[regex]::Match($text,'"installdir"\s+"([^"]+)"')
+    if($text -match '"appid"\s+"1623730"' -and $install.Success){
+      $installed=[IO.Path]::GetFullPath((Join-Path (Join-Path $steamApps 'common') $install.Groups[1].Value))
+      if($installed.TrimEnd('\','/') -ieq [IO.Path]::GetFullPath($cfg.GamePath).TrimEnd('\','/')){
+        Start-Process -FilePath 'steam://rungameid/1623730'
+        return
+      }
+    }
+  }
   Start-Process -FilePath $exe -WorkingDirectory $cfg.GamePath
 }

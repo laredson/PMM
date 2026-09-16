@@ -1468,6 +1468,9 @@ function script:Get-PMMFixLabCandidateBuildState {
   $recipe=Get-PMMFixLabRecipe ([string]$Candidate.RecipeId)
   if(-not$recipe){return [pscustomobject]@{Ready=$false;Mode='';Reason='Recipe metadata is unavailable.'}}
   if([string]::IsNullOrWhiteSpace($VariantId)){return [pscustomobject]@{Ready=$false;Mode='';Reason=(Get-PMMText 'Choose an output variant.' 'Elige una variante de salida.')}}
+  if($recipe.id -eq 'fixlab-auat-v1-to-v1-1-pw104' -and $VariantId -eq 'auat-v1-1'){
+    return [pscustomobject]@{Ready=$true;Mode='auat-property-upgrade';Reason=(Get-PMMText 'Build from exact AUAT V1 and current game files. Input hashes and all 588 technologies will be verified.' 'Construir desde AUAT V1 exacto y los archivos actuales del juego. Se verificaran los hashes y las 588 tecnologias.')}
+  }
   $requiresCurrent=$false
   if(($recipe.PSObject.Properties.Name -contains 'referencePolicy') -and $recipe.referencePolicy -and ($recipe.referencePolicy.PSObject.Properties.Name -contains 'currentRequired')){$requiresCurrent=[bool]$recipe.referencePolicy.currentRequired}
   if($requiresCurrent){$gr=Get-PMMGameReferenceState;if([string]$gr.Status -ne 'Current'){return [pscustomobject]@{Ready=$false;Mode='';Reason=(Get-PMMText 'Build or refresh the Current Game Reference first.' 'Crea o actualiza primero la Game Reference actual.')}}}
@@ -1492,8 +1495,12 @@ function script:Invoke-PMMFixLabBuild([string]$JobId) {
   $job.Build.Status='Building';$job.Build.RecipeId=[string]$recipe.id;$job.Build.VariantId=[string]$job.SelectedVariantId
   Save-PMMFixLabJob $job|Out-Null
   try{
-    if([string]$state.Mode -ne 'native-recipe-engine'){throw ('Unsupported Fix Lab build mode: '+[string]$state.Mode)}
-    $result=Invoke-PMMFixLabNativeRecipeEngineBuild (Get-PMMFixLabJob $JobId) $recipe ([string]$job.SelectedVariantId)
+    if($state.Mode -eq 'auat-property-upgrade'){
+      . (Join-Path $Script:Root 'Modules/FixLab/AuatUpgrade.ps1')
+      $result=Invoke-PMMAuatFixLabBuild (Get-PMMFixLabJob $JobId) $recipe ([string]$job.SelectedVariantId)
+    }elseif($state.Mode -eq 'native-recipe-engine'){
+      $result=Invoke-PMMFixLabNativeRecipeEngineBuild (Get-PMMFixLabJob $JobId) $recipe ([string]$job.SelectedVariantId)
+    }else{throw ('Unsupported Fix Lab build mode: '+[string]$state.Mode)}
     if(-not$result -or [string]::IsNullOrWhiteSpace([string]$result.OutputPath)){throw 'Fix Lab recipe returned no output PAK.'}
     $out=[string]$result.OutputPath
     if(-not(Test-Path -LiteralPath $out -PathType Leaf)){throw ('Fix Lab output was not created: '+$out)}
@@ -1502,7 +1509,7 @@ function script:Invoke-PMMFixLabBuild([string]$JobId) {
     Assert-PakAssetFamiliesComplete $out
     $validation=if($result.PSObject.Properties.Name -contains 'Validation'){[string]$result.Validation}else{'Static PASS; runtime test required'}
     $job=Get-PMMFixLabJob $JobId
-    $job.Build=[pscustomobject]@{Status='Built';OutputPath=$out;OutputSha256=(Get-Sha256 $out);RecipeId=[string]$recipe.id;VariantId=[string]$job.SelectedVariantId;Validation=$validation;BuiltUtc=[DateTime]::UtcNow.ToString('o');ReportPath=[string]$result.ReportPath;EngineMode='native-recipe-engine'}
+    $job.Build=[pscustomobject]@{Status='Built';OutputPath=$out;OutputSha256=(Get-Sha256 $out);RecipeId=[string]$recipe.id;VariantId=[string]$job.SelectedVariantId;Validation=$validation;BuiltUtc=[DateTime]::UtcNow.ToString('o');ReportPath=[string]$result.ReportPath;EngineMode=[string]$state.Mode}
     Save-PMMFixLabJob $job|Out-Null
     Publish-PMMFixLabProgress 96 100 (Get-PMMText 'Registering the built output in Fix Lab...' 'Registrando la salida construida en Fix Lab...')
     $builtRecord=Register-PMMFixLabBuiltOutput (Get-PMMFixLabJob $JobId) $out $validation
