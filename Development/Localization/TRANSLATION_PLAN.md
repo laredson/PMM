@@ -16,7 +16,6 @@ This file is the close translation-work ledger for PMM 1.5. Update it whenever a
 - When a language is finished, populate every canonical English key, preserve placeholders and invariant technical terms, validate it, then change its registry entry to `enabled: true` / `status: complete`.
 - `rtl` languages must be registered with right-to-left direction.
 - Language names in selectors always remain in their own native form.
-- Runtime language changes are applied live to the current PMM session; changing language must not require restarting the application.
 - Translation work is normally done in pairs so terminology and visual review remain manageable.
 - The branch development identity is `1.5.0.0`. `PMM/Resources/Metadata/VERSION.txt` is the runtime UI version source; changing Git branches alone does not rewrite this file or rebuild an executable.
 
@@ -122,17 +121,6 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 11. Update this ledger and `Development/AI/WORKBENCH_STATE.md` in the same intervention.
 
 ## Work log
-
-### 2026-09-16 — live language switching foundation
-
-- Confirmed from the branch contents that Hindi (`hi`) and Modern Standard Arabic (`ar`) are **not yet complete**. Their catalogs remain substantially smaller than the canonical English catalog and are correctly still marked `in-progress` / `enabled: false`; they were not falsely exposed as finished languages.
-- Prioritized the user's suggested UX improvement for this intervention: **Apply language now changes the running PMM interface without a restart**.
-- Extended the visual-tree localizer with a weak, reversible canonical-English baseline. Exact static text, headers, tooltips, DataGrid headers and ordinary data-bound labels can now move safely between any enabled languages and back to English instead of translating translated text.
-- Added a reverse-catalog safety path for windows that started from an already-localized XAML. Ambiguous translated values are deliberately not guessed.
-- The live handler is attached explicitly to the existing Apply language button during the final normal window sweep; there is no global `Loaded` hook. The existing Settings handler still owns persistence.
-- A live change updates LTR/RTL direction, runs the normal `Refresh-UI` path for dynamic/formatted text, then performs a second safe sweep for controls materialized by the refresh.
-- Extended the Windows PowerShell 5.1 regression with reversible `English -> target -> English -> target` probes and FlowDirection validation.
-- No language was newly enabled in this intervention. The next translation intervention still finishes and validates Hindi + Arabic before activating them; after that the queue resumes with Brazilian Portuguese + Korean.
 
 ### 2026-09-16 — v1.5 runtime identity correction
 
