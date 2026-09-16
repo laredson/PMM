@@ -1,0 +1,210 @@
+name: PMM localization catalog once
+
+on:
+  push:
+    branches: [1.3.4.1]
+    paths: [.github/workflows/localization-catalog-once.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install offline translation engine
+        shell: bash
+        run: |
+          python3 -m pip install --quiet argostranslate
+      - name: Build standardized catalogs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          import html, json, re
+          import argostranslate.package, argostranslate.translate
+
+          root=Path('PMM')
+          legacy=root/'Resources/UI/strings.zh-CN.json'
+          zh=json.loads(legacy.read_text(encoding='utf-8-sig')) if legacy.exists() else {}
+          inventory=Path('Development/Localization/MISSING_ZH_CN.json')
+          if not inventory.exists(): raise SystemExit('Missing localization inventory')
+          missing=json.loads(inventory.read_text(encoding='utf-8'))['missing']
+
+          curated={
+            '+ New case': '+ 新建案例',
+            'Projects': '项目',
+            'Send to ChatGPT': '发送到 ChatGPT',
+            'Options': '选项',
+            'Candidates': '候选',
+            'Cases': '案例',
+            'Newest first': '最新优先',
+            'Case': '案例',
+            'Last step': '上一步骤',
+            'Next step': '下一步骤',
+            'Delete case': '删除案例',
+            'No case selected': '未选择案例',
+            'Receive file...': '接收文件...',
+            'Create handoff': '创建交接包',
+            'Open folder': '打开文件夹',
+            'Save': '保存',
+            'Transport': '传输方式',
+            'Last Step': '上一步',
+            'Current': '当前',
+            'Select a case': '选择案例',
+            'Select or create a case': '选择或创建案例',
+            'Title': '标题',
+            'Type': '类型',
+            'Description / goal': '描述 / 目标',
+            'AI response': 'AI 响应',
+            'References and evidence': '参考与证据',
+            'Kind': '类型',
+            'Source': '来源',
+            'Mode': '模式',
+            'Selection': '选择',
+            'Add PAK...': '添加 PAK...',
+            'Add mod family...': '添加模组族...',
+            'Add Vanilla family...': '添加原版资源族...',
+            'Remove': '移除',
+            'Requested / pending work': '请求 / 待处理工作',
+            'No pending work': '没有待处理工作',
+            'History': '历史记录',
+            'Newest first. Steps are collapsed by default; jump directly to any point.': '最新优先。步骤默认折叠，可直接跳转到任意节点。',
+            'Research cases': '研究案例',
+            'Workflow': '工作流',
+            'AI assistant': 'AI 助手',
+            'AI client': 'AI 客户端',
+            'Advanced: other MCP client': '高级：其他 MCP 客户端',
+            'Advanced: internal agent': '高级：内部代理',
+            'Mod Creation': '模组创建',
+            'Help': '帮助',
+            'General': '常规',
+            'AI / MCP': 'AI / MCP',
+            'Installations': '安装',
+            'Mods & Merge': '模组与合并',
+            'Optional tools and AI clients': '可选工具与 AI 客户端',
+            'Ask before each installation': '每次安装前询问',
+            'Change permissions': '更改权限',
+            'Installation tutorial': '安装教程',
+            'Installations and status': '安装与状态',
+            'Open': '打开',
+            'Locate...': '定位...',
+            'Detected': '已检测',
+            'Not detected': '未检测',
+            'Install / complete': '安装 / 完成',
+            'Detect installed tools': '检测已安装工具',
+            'Install missing components': '安装缺失组件',
+            'Cancel pending installations': '取消待处理安装',
+            'Install modding tools': '安装模组制作工具',
+            'Install everything needed without asking again': '安装所需全部组件，不再询问',
+            'Accept': '接受',
+            'Cancel': '取消',
+            'PMM proposes installing: ': 'PMM 建议安装：',
+            'Only the PMM dependency catalog is covered. Official account, license and Windows prompts remain. You can revoke this permission in Settings.': '此权限仅适用于 PMM 依赖项目录。官方账户、许可证和 Windows 提示仍会保留。你可以随时在设置中撤销此权限。',
+            'Unreal requires version 5.1.1 for the supported Palworld kit. PMM opens Epic Launcher; in Unreal Engine > Library, add/select 5.1.1 manually, then Install. The launcher may suggest a newer version. Quixel Bridge is optional and is not required by PMM.': '受支持的 Palworld 工具包需要 Unreal 5.1.1。PMM 会打开 Epic Launcher；请在 Unreal Engine > Library 中手动添加或选择 5.1.1，然后安装。启动器可能会推荐更新版本。Quixel Bridge 为可选组件，PMM 不需要它。',
+            'Wwise 2021.1.11: PMM detects the installed SDK and offline downloads separately. Downloading an offline package does not install the SDK. Use Install / complete to open the official installer, or Locate to select an existing folder or executable. The Unreal integration is a separate package.': 'Wwise 2021.1.11：PMM 会分别检测已安装的 SDK 和离线下载包。下载离线包并不等于安装 SDK。使用“安装 / 完成”打开官方安装程序，或使用“定位”选择现有文件夹或可执行文件。Unreal 集成是独立的软件包。',
+            'Open Wwise offline folder': '打开 Wwise 离线文件夹',
+            'Wwise Unreal integration: in Audiokinetic Launcher, open Unreal Engine > Download > Offline integration files, choose 2021.1.11 and save in the integration folder below. PMM detects Unreal.5.0.tar.xz automatically; Locate also accepts a download saved elsewhere.': 'Wwise Unreal 集成：在 Audiokinetic Launcher 中打开 Unreal Engine > Download > Offline integration files，选择 2021.1.11，并保存到下方的集成文件夹。PMM 会自动检测 Unreal.5.0.tar.xz；“定位”也可选择保存在其他位置的下载文件。',
+            'Open integration download folder': '打开集成下载文件夹',
+            'ChatGPT Desktop (optional AI client)': 'ChatGPT Desktop（可选 AI 客户端）',
+            'Unreal Engine / Epic Launcher': 'Unreal Engine / Epic Launcher',
+            'Visual Studio 2022 + MSVC': 'Visual Studio 2022 + MSVC',
+            'Windows SDK': 'Windows SDK',
+            '.NET Runtime x64': '.NET x64 运行时',
+            'Wwise SDK': 'Wwise SDK',
+            'Offline package ready; SDK not installed': '离线包已就绪；SDK 尚未安装',
+            'Offline package rejected; inspect location': '离线包无效；请检查位置',
+            'This settings workspace is managed by its own tab.': '此设置工作区由其自己的标签页管理。',
+            'AI clients': 'AI 客户端',
+            'Optional. PMM can also work with manual ZIP exchange.': '可选。PMM 也可以通过手动 ZIP 交换工作。',
+            'Folders': '文件夹',
+            'Question': '问题',
+            'Prepare question': '准备问题',
+            'Send question': '发送问题',
+            'Detect modes': '检测模式',
+            'unavailable': '不可用',
+            'Project folder: ': '项目文件夹：',
+            'Solutions': '解决方案',
+            'Evidence': '证据',
+            'AI chat history': 'AI 聊天历史',
+            'Built mods': '已构建模组',
+            'Step {0}': '步骤 {0}',
+            'historical Step {0}': '历史步骤 {0}'
+          }
+          zh.update(curated)
+
+          # Install English -> Chinese Argos model for the remaining audited strings.
+          argostranslate.package.update_package_index()
+          packages=argostranslate.package.get_available_packages()
+          package=next((p for p in packages if p.from_code=='en' and p.to_code in ('zh','zh_cn','zh-CN')),None)
+          if package is None: raise SystemExit('No Argos English-to-Chinese package available')
+          argostranslate.package.install_from_path(package.download())
+
+          protected_terms=['PMM','Palworld','ChatGPT','Codex','MCP','PAK','ZIP','JSON','SHA-256','Steam','Unreal','Wwise','Epic Launcher','Visual Studio','Windows SDK','CKL','AIIO','AUTO','SemiAUTO','Fix Lab','Game Reference']
+          token_re=re.compile(r'\{[^{}]+\}|%\w+|`[nr]|\$\([^)]+\)|\$[A-Za-z_][A-Za-z0-9_]*')
+          def shield(text):
+              vals=[]
+              def rep(m): vals.append(m.group(0)); return f'__PMMTOKEN{len(vals)-1}__'
+              text=token_re.sub(rep,text)
+              for term in sorted(protected_terms,key=len,reverse=True):
+                  if term in text:
+                      marker=f'__PMMTERM{len(vals)}__';vals.append(term);text=text.replace(term,marker)
+              return text,vals
+          def restore(text,vals):
+              for i,v in enumerate(vals):
+                  text=text.replace(f'__PMMTOKEN{i}__',v).replace(f'__PMMTERM{i}__',v)
+              return text
+          def translate(text):
+              masked,vals=shield(text)
+              try: out=argostranslate.translate.translate(masked,'en',package.to_code)
+              except Exception: out=text
+              out=restore(out,vals).strip()
+              # Never accept empty or unchanged Latin prose as a generated Chinese translation.
+              if not out: out=text
+              return out
+
+          for i,key in enumerate(missing,1):
+              if key in zh: continue
+              zh[key]=translate(key)
+              if i%100==0: print('translated',i,'/',len(missing))
+
+          loc=root/'Resources/Localization';loc.mkdir(parents=True,exist_ok=True)
+          languages={
+            'schema':'PMM_LANGUAGES_V1','default':'en',
+            'languages':[
+              {'code':'en','nativeName':'English','englishName':'English','fallback':None,'direction':'ltr','xaml':'MainWindow.en.xaml'},
+              {'code':'es','nativeName':'Español','englishName':'Spanish','fallback':'en','direction':'ltr','xaml':'MainWindow.es.xaml'},
+              {'code':'zh-CN','nativeName':'简体中文','englishName':'Chinese (Simplified)','fallback':'en','direction':'ltr','xaml':'MainWindow.zh-CN.xaml'}
+            ]
+          }
+          (loc/'languages.json').write_text(json.dumps(languages,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          zhdoc={'schema':'PMM_LANGUAGE_V1','language':'zh-CN','nativeName':'简体中文','fallback':'en','strings':dict(sorted(zh.items(),key=lambda kv:kv[0].lower()))}
+          (loc/'zh-CN.json').write_text(json.dumps(zhdoc,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          # Canonical English catalog: every discovered UI key plus all existing Chinese keys.
+          source=set(zh)
+          source.update(missing)
+          endoc={'schema':'PMM_LANGUAGE_V1','language':'en','nativeName':'English','fallback':None,'strings':{k:k for k in sorted(source,key=str.lower)}}
+          (loc/'en.json').write_text(json.dumps(endoc,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          # Keep old path synchronized for backward compatibility during this release.
+          legacy.write_text(json.dumps(dict(sorted(zh.items(),key=lambda kv:kv[0].lower())),ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          readme='''# PMM localization\n\nPMM uses one canonical English source string catalog and one JSON catalog per language. Runtime code never needs a new `if language == ...` branch.\n\n## Add a language\n\n1. Copy `en.json` to `<language-code>.json` (BCP-47 code such as `de`, `ja`, `pt-BR`, `ar`).\n2. Set `language`, `nativeName`, `fallback`, and translate every value under `strings` while keeping the English keys unchanged.\n3. Add one entry to `languages.json`. `direction` may be `ltr` or `rtl`.\n4. Run `Development/Localization/Test-Localization.ps1`. Missing keys, broken placeholders and untranslated catalog values fail validation.\n\nThe English key is the stable source identifier for v1.3.4.1. `Get-PMMLocalizedText` is the generic lookup API; the existing `L English Spanish` helper remains compatible and routes every non-English/non-Spanish language through its catalog. Static XAML may have a dedicated file, but a new language can fall back to the English XAML and be localized from its catalog. Dynamically created WPF controls should use `L`/`Get-PMMLocalizedText`, or call `Invoke-PMMLocalizeVisualTree` after construction.\n\nDo not translate product names, file formats, paths, IDs, hashes, or placeholders such as `{0}` unless the surrounding sentence requires it.\n'''
+          (loc/'README.md').write_text(readme,encoding='utf-8')
+          print('Chinese catalog strings:',len(zh))
+          PY
+      - name: Commit catalogs and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/localization-catalog-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add PMM/Resources/Localization PMM/Resources/UI/strings.zh-CN.json .github/workflows/localization-catalog-once.yml
+          git commit -m 'feat: standardize and complete Chinese localization catalog'
+          git push origin HEAD:1.3.4.1
