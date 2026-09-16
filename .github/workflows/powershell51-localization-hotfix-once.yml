@@ -78,8 +78,8 @@ jobs:
             sha256=$hash
             catalogStrings=$audit.chineseCatalogStrings
             discoveredUiStrings=$audit.discoveredUiStrings
-            rootCause='ConvertFrom-Json -AsHashtable is unavailable in Windows PowerShell 5.1'
-            checks=@('Windows PowerShell 5.1 catalog load passed','Windows PowerShell 5.1 localized WPF load passed','PowerShell 7-only AsHashtable rejected from shipped tree','localization audit passed','shipped PowerShell parsed under Windows PowerShell 5.1')
+            rootCause='PowerShell 7-only JSON handling was used by a Windows PowerShell 5.1 runtime; PowerShell 5.1 also rejects case-only duplicate JSON property names.'
+            checks=@('Windows PowerShell 5.1 catalog load passed','Windows PowerShell 5.1 localized WPF load passed','PowerShell 7-only AsHashtable rejected from shipped tree','case-sensitive localization keys preserved','localization audit passed','shipped PowerShell parsed under Windows PowerShell 5.1')
           }
           $validation|ConvertTo-Json -Depth 5|Set-Content PMM-1.3.4.1.validation.json -Encoding utf8
 
@@ -97,9 +97,10 @@ jobs:
 
           In-place refresh of the existing v1.3.4.1 release.
 
-          - Fixes the exact startup exception captured by PMM's emergency handoff: `ConvertFrom-Json -AsHashtable` is not available in Windows PowerShell 5.1.
-          - The localization catalog loader now uses the PowerShell 5.1-compatible `PSObject.Properties` API.
-          - Adds a permanent Windows PowerShell 5.1 localization regression test that loads the Chinese catalog and a real localized WPF window.
+          - Fixes the exact startup exception captured by PMM's emergency handoff: `ConvertFrom-Json -AsHashtable` is unavailable in Windows PowerShell 5.1.
+          - Also handles localization keys that differ only by letter case, which Windows PowerShell 5.1's normal `ConvertFrom-Json` cannot deserialize safely.
+          - The catalog loader now uses a case-preserving JSON path compatible with Windows PowerShell 5.1, while PowerShell 7 uses `System.Text.Json`.
+          - Adds a permanent Windows PowerShell 5.1 regression test that loads the Chinese catalog and a real localized WPF window.
           - Keeps the complete BCP-47 catalog architecture and Simplified Chinese translation.
           - No new version or release was created.
           '@|Set-Content release-notes.md -Encoding utf8
