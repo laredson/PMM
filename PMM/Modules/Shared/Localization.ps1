@@ -67,22 +67,3 @@ function Set-PMMLanguageDirection($Element,[string]$LanguageCode=''){
   if(-not$Element){return};$code=if($LanguageCode){Resolve-PMMLanguageCode $LanguageCode}else{Get-PMMCurrentLanguage};$def=Get-PMMLanguageDefinition $code
   try{$Element.FlowDirection=if($def -and [string]$def.direction -eq 'rtl'){[Windows.FlowDirection]::RightToLeft}else{[Windows.FlowDirection]::LeftToRight}}catch{}
 }
-$Script:PMMLiveLocalizationHandler=$null
-function Register-PMMLiveLocalization($Root,[string]$LanguageCode=''){
-  if(-not$Root){return}
-  $code=if($LanguageCode){Resolve-PMMLanguageCode $LanguageCode}else{Get-PMMCurrentLanguage}
-  if($code -eq 'en'){return}
-  Invoke-PMMLocalizeVisualTree $Root $code
-  Set-PMMLanguageDirection $Root $code
-  try{
-    $handler=[Windows.RoutedEventHandler]{
-      param($sender,$eventArgs)
-      try{
-        $target=$eventArgs.OriginalSource
-        if($target -is [Windows.DependencyObject]){Invoke-PMMLocalizeVisualTree $target $code}
-      }catch{}
-    }.GetNewClosure()
-    $Root.AddHandler([Windows.FrameworkElement]::LoadedEvent,$handler,$true)
-    $Script:PMMLiveLocalizationHandler=$handler
-  }catch{}
-}

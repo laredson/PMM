@@ -221,7 +221,6 @@ def main() -> int:
         "Convert-PMMXamlLocalization",
         "Invoke-PMMLocalizeVisualTree",
         "Set-PMMLanguageDirection",
-        "Register-PMMLiveLocalization",
     ):
         if required not in runtime:
             wiring_errors.append(f"Localization.ps1 missing {required}")
@@ -230,8 +229,10 @@ def main() -> int:
     if "Convert-PMMXamlLocalization $x" not in case_workspace:
         wiring_errors.append("embedded case XAML localization missing")
     start = (MODULES / "Bootstrap" / "Start-PalModMerger.ps1").read_text(encoding="utf-8-sig")
-    if "Register-PMMLiveLocalization $Window $lang" not in start:
-        wiring_errors.append("live localization registration missing")
+    if "Invoke-PMMLocalizeVisualTree $Window $lang;Set-PMMLanguageDirection $Window $lang" not in start:
+        wiring_errors.append("safe startup localization sweep missing")
+    if "Register-PMMLiveLocalization" in start:
+        wiring_errors.append("unsafe live localization hook present")
 
     report = {
         "schema": "PMM_LOCALIZATION_AUDIT_V1",

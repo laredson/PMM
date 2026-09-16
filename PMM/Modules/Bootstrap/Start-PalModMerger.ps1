@@ -1441,7 +1441,7 @@ Initialize-PMMLibraryCaseMenu
 Initialize-PMMDeepAnalysisUI
 . (Join-Path $Script:Root 'Modules/MCP/AppServer.UI.ps1')
 Initialize-PMMCaseAgentUI
-Register-PMMLiveLocalization $Window $lang
+try{Invoke-PMMLocalizeVisualTree $Window $lang;Set-PMMLanguageDirection $Window $lang}catch{Write-PMMLog ('Startup localization sweep failed: '+$_.Exception.Message)}
 $uiExitState='Normal'
 try {
   [void]$Window.ShowDialog()
