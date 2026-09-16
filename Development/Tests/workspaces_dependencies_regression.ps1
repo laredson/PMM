@@ -24,6 +24,9 @@ Initialize-PMMPaths $Script:Root|Out-Null
 function Write-PMMLog([string]$Message){}
 function L([string]$English,[string]$Spanish){if($Language -eq 'es'){return $Spanish};return $English}
 function Handle-UIError($Failure,[string]$Title){throw $Failure}
+# Hosted-runner AppX inventory is outside this regression's scope and varies by image.
+# Stub the cmdlet before Desktop.Runtime.ps1 is loaded so discovery is deterministic.
+function Get-AppxPackage { return @() }
 Add-Type -AssemblyName PresentationFramework,PresentationCore,WindowsBase,System.Windows.Forms
 $c=New-PMMAIIOCase -Title 'New mod fixture' -Type NEW_MOD
 $f=New-PMMAIIOCase -Title 'Fix fixture' -Type FIX_MOD
