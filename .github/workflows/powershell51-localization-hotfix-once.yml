@@ -1,0 +1,107 @@
+name: PMM v1.3.4.1 PowerShell 5.1 localization hotfix
+
+on:
+  push:
+    branches: [1.3.4.1]
+    paths: [.github/workflows/powershell51-localization-hotfix-once.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  hotfix:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Windows PowerShell 5.1 localization regression
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-ExecutionPolicy -Scope Process Bypass -Force
+          if($PSVersionTable.PSVersion.Major -ne 5){throw "Expected Windows PowerShell 5.1, got $($PSVersionTable.PSVersion)"}
+          & .\Development\Localization\Test-PowerShell51.ps1 -Language zh-CN
+
+      - name: Localization catalog audit
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          python Development/Localization/audit_localization.py
+          & ./Development/Localization/Test-Localization.ps1 -Language zh-CN
+
+      - name: Parse shipped PowerShell with Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $failed=$false
+          Get-ChildItem PMM/Modules -Recurse -Filter *.ps1 | ForEach-Object {
+            $tokens=$null;$errors=$null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName,[ref]$tokens,[ref]$errors)|Out-Null
+            if($errors.Count){
+              $failed=$true
+              $errors|ForEach-Object{Write-Error ($_.Extent.File+': '+$_.Message)}
+            }
+          }
+          if($failed){throw 'Windows PowerShell 5.1 parse validation failed'}
+
+      - name: Remove one-shot workflow and commit final state
+        id: commit
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          Remove-Item .github/workflows/powershell51-localization-hotfix-once.yml -Force
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if((git status --porcelain).Length -gt 0){git commit -m 'release: finalize Windows PowerShell 5.1 localization hotfix'}
+          git push origin HEAD:1.3.4.1
+          $sha=(git rev-parse HEAD).Trim()
+          [IO.File]::AppendAllText($env:GITHUB_OUTPUT,"sha=$sha`n",[Text.Encoding]::UTF8)
+
+      - name: Package corrected v1.3.4.1
+        id: package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          Compress-Archive -Path PMM/* -DestinationPath PMM-1.3.4.1.zip -CompressionLevel Optimal
+          $hash=(Get-FileHash PMM-1.3.4.1.zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  PMM-1.3.4.1.zip"|Set-Content PMM-1.3.4.1.zip.sha256 -Encoding ascii
+          $audit=Get-Content Development/Localization/LAST_AUDIT.json -Raw|ConvertFrom-Json
+          $validation=[ordered]@{
+            version='1.3.4.1'
+            release='Chinese translation + Windows PowerShell 5.1 startup hotfix'
+            language='zh-CN'
+            languageName='简体中文'
+            commit='${{ steps.commit.outputs.sha }}'
+            sha256=$hash
+            catalogStrings=$audit.chineseCatalogStrings
+            discoveredUiStrings=$audit.discoveredUiStrings
+            rootCause='ConvertFrom-Json -AsHashtable is unavailable in Windows PowerShell 5.1'
+            checks=@('Windows PowerShell 5.1 catalog load passed','Windows PowerShell 5.1 localized WPF load passed','PowerShell 7-only AsHashtable rejected from shipped tree','localization audit passed','shipped PowerShell parsed under Windows PowerShell 5.1')
+          }
+          $validation|ConvertTo-Json -Depth 5|Set-Content PMM-1.3.4.1.validation.json -Encoding utf8
+
+      - name: Replace assets in existing v1.3.4.1 release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference='Stop'
+          $sha='${{ steps.commit.outputs.sha }}'
+          git tag -f v1.3.4.1 $sha
+          git push origin refs/tags/v1.3.4.1 --force
+          @'
+          ## v1.3.4.1 Chinese translation — Windows PowerShell 5.1 startup hotfix
+
+          In-place refresh of the existing v1.3.4.1 release.
+
+          - Fixes the exact startup exception captured by PMM's emergency handoff: `ConvertFrom-Json -AsHashtable` is not available in Windows PowerShell 5.1.
+          - The localization catalog loader now uses the PowerShell 5.1-compatible `PSObject.Properties` API.
+          - Adds a permanent Windows PowerShell 5.1 localization regression test that loads the Chinese catalog and a real localized WPF window.
+          - Keeps the complete BCP-47 catalog architecture and Simplified Chinese translation.
+          - No new version or release was created.
+          '@|Set-Content release-notes.md -Encoding utf8
+          gh release upload v1.3.4.1 PMM-1.3.4.1.zip PMM-1.3.4.1.zip.sha256 PMM-1.3.4.1.validation.json --clobber
+          gh release edit v1.3.4.1 --title 'v1.3.4.1 Chinese translation' --notes-file release-notes.md --target $sha --latest
