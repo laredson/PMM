@@ -1,4 +1,4 @@
-# Rerun with current Desktop-options extension and current Codex Desktop default.
+# Rerun with current Desktop-options extension and current Codex Desktop labels/defaults.
 name: Isolate workspace CI fixture once
 
 on:
@@ -32,6 +32,10 @@ jobs:
           $new="if(`$desktopCase.AIClient -ne 'CODEX_DESKTOP' -or `$desktopCase.Transport -ne 'MCP'){throw 'New case does not default to Codex Desktop MCP'}"
           if(-not $text.Contains($old)){throw 'Desktop default assertion marker not found'}
           $text=$text.Replace($old,$new)
+          $oldLabel="if((Get-PMMAIIOCaseControl 'BtnHandoff').Content -ne (L 'Send to ChatGPT' 'Enviar a ChatGPT')){throw 'Wrong Desktop send label'}"
+          $newLabel="if((Get-PMMAIIOCaseControl 'BtnHandoff').Content -ne (L 'Open in Codex Desktop' 'Abrir en Codex Desktop')){throw 'Wrong Codex Desktop handoff label'}"
+          if(-not $text.Contains($oldLabel)){throw 'Desktop handoff label assertion marker not found'}
+          $text=$text.Replace($oldLabel,$newLabel)
           [IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))
 
       - name: Run workspace regressions
