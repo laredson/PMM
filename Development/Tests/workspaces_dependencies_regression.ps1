@@ -37,6 +37,11 @@ foreach($preview in @('AIIO.CaseWorkspace.UI.Preview2.ps1','AIIO.CaseWorkspace.U
 . (Join-Path $Script:Root 'Modules\Shared\Dialogs.ps1')
 . (Join-Path $Script:Root 'Modules\Unreal\Dependencies.UI.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.Workspaces.UI.ps1')
+# Load the current Desktop-options extension that production loads through the UI module registry.
+. (Join-Path $Script:Root 'Modules\Presentation\Desktop.Options.UI.ps1')
+# This regression validates PMM workspace/dependency behavior, not the runner's installed AppX inventory.
+# Keep Desktop package discovery deterministic so hosted-runner software cannot change the result.
+function Get-PMMDesktopPackages { return @() }
 try{
     Initialize-PMMWorkspaces
     if($Script:MainTabs.Items.Count -ne 6){throw 'Expected six main sections'}
@@ -106,8 +111,8 @@ try{
     $Script:FixtureDialog=[pscustomobject]@{Title='Desktop case';Type='NEW_MOD';Description='Plan first'}
     Invoke-PMMNewCaseUI
     $desktopCase=Get-PMMAIIOSelectedCase
-    if($desktopCase.AIClient -ne 'CHATGPT' -or $desktopCase.Transport -ne 'MCP'){throw 'Paired new case does not default to Desktop'}
-    if((Get-PMMAIIOCaseControl 'BtnHandoff').Content -ne (L 'Send to ChatGPT' 'Enviar a ChatGPT')){throw 'Wrong Desktop send label'}
+    if($desktopCase.AIClient -ne 'CODEX_DESKTOP' -or $desktopCase.Transport -ne 'MCP'){throw 'New case does not default to Codex Desktop MCP'}
+    if((Get-PMMAIIOCaseControl 'BtnHandoff').Content -ne (L 'Open in Codex Desktop' 'Abrir en Codex Desktop')){throw 'Wrong Codex Desktop handoff label'}
     (Get-PMMAIIOCaseControl 'CmbClient').SelectedValue='EXTERNAL'
     [void](Save-PMMAIIOCaseEditor);Refresh-PMMAIIOCaseList $desktopCase.CaseId
     if((Get-PMMAIIOSelectedCase).AIClient -ne 'EXTERNAL'){throw 'Client selector did not persist'}
