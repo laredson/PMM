@@ -72,13 +72,11 @@ if($languagesDoc){
     if($expectedNative.ContainsKey($code)){Assert-PMM ($native -ceq $expectedNative[$code]) ("Native language name $code = $native")}
     $catalog=Join-Path $App ('Resources\Localization\'+$code+'.json')
     Assert-PMM (Test-Path -LiteralPath $catalog -PathType Leaf) ('Catalog exists: '+$code)
-    if($lang.TryGetProperty('xaml',[ref]([System.Text.Json.JsonElement]$xamlElement)) -and $xamlElement.ValueKind -eq [System.Text.Json.JsonValueKind]::String){
-      $xamlName=$xamlElement.GetString()
-      if($xamlName){
-        $xamlPath=Join-Path $App ('Resources\UI\'+$xamlName)
-        Assert-PMM (Test-Path -LiteralPath $xamlPath -PathType Leaf) ('Localized XAML exists: '+$xamlName)
-        if(Test-Path -LiteralPath $xamlPath -PathType Leaf){try{[xml]$null=Get-Content -LiteralPath $xamlPath -Raw -Encoding UTF8;Pass ('Valid XAML: '+$xamlName)}catch{Fail ('Invalid XAML '+$xamlName+' | '+$_.Exception.Message)}}
-      }
+    $xamlName=$lang.GetProperty('xaml').GetString()
+    if($xamlName){
+      $xamlPath=Join-Path $App ('Resources\UI\'+$xamlName)
+      Assert-PMM (Test-Path -LiteralPath $xamlPath -PathType Leaf) ('Localized XAML exists: '+$xamlName)
+      if(Test-Path -LiteralPath $xamlPath -PathType Leaf){try{[xml]$null=Get-Content -LiteralPath $xamlPath -Raw -Encoding UTF8;Pass ('Valid XAML: '+$xamlName)}catch{Fail ('Invalid XAML '+$xamlName+' | '+$_.Exception.Message)}}
     }
   }
   foreach($code in $expectedNative.Keys){Assert-PMM $seen.ContainsKey($code) ('Language registry contains '+$code)}
