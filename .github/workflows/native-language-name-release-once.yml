@@ -1,3 +1,4 @@
+# Retry after making the PowerShell 5.1 regression test ASCII-safe.
 name: PMM v1.3.4.1 native language names
 
 on:
