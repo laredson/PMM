@@ -1,4 +1,4 @@
-# Rerun with newline-agnostic fixture insertion.
+# Rerun with the current Desktop-options extension loaded like production.
 name: Isolate workspace CI fixture once
 
 on:
@@ -17,7 +17,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Isolate workspace regression from runner AppX inventory
+      - name: Refresh workspace regression fixture
         shell: pwsh
         run: |
           $ErrorActionPreference='Stop'
@@ -26,7 +26,7 @@ jobs:
           $pattern="(?m)^\. \(Join-Path \`$Script:Root 'Modules\\AIIO\\AIIO\.Workspaces\.UI\.ps1'\)\r?$"
           $match=[regex]::Match($text,$pattern)
           if(-not $match.Success){throw 'Workspace regression insertion marker not found'}
-          $insertion=$match.Value+"`n# This regression validates PMM workspace/dependency behavior, not the runner's installed AppX inventory.`n# Keep Desktop package discovery deterministic so hosted-runner software cannot change the result.`nfunction Get-PMMDesktopPackages { return @() }"
+          $insertion=$match.Value+"`n# Load the current Desktop-options extension that production loads through the UI module registry.`n. (Join-Path `$Script:Root 'Modules\Presentation\Desktop.Options.UI.ps1')`n# This regression validates PMM workspace/dependency behavior, not the runner's installed AppX inventory.`n# Keep Desktop package discovery deterministic so hosted-runner software cannot change the result.`nfunction Get-PMMDesktopPackages { return @() }"
           $text=[regex]::Replace($text,$pattern,[Text.RegularExpressions.MatchEvaluator]{param($m)$insertion},1)
           [IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))
 
@@ -37,7 +37,7 @@ jobs:
           ./Development/Tests/workspaces_dependencies_regression.ps1 -Language en
           ./Development/Tests/workspaces_dependencies_regression.ps1 -Language es
 
-      - name: Commit isolated fixture
+      - name: Commit refreshed fixture
         shell: pwsh
         run: |
           $ErrorActionPreference='Stop'
@@ -45,5 +45,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
-          git commit -m 'test: isolate workspace regression from runner AppX inventory'
+          git commit -m 'test: align workspace regression with current UI extensions'
           git push origin HEAD:release/1.3.4.1-ci-refresh
