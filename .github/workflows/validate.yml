@@ -1,3 +1,4 @@
+# Current-release CI: version-aware package integrity, localization, Windows PowerShell 5.1, WPF and runtime checks.
 name: PMM validation
 
 on:
