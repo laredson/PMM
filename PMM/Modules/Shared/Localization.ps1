@@ -28,7 +28,12 @@ function Get-PMMLanguageCatalog([string]$Code){
   $code=Resolve-PMMLanguageCode $Code
   if($Script:PMMLanguageCatalogCache.ContainsKey($code)){return $Script:PMMLanguageCatalogCache[$code]}
   $table=[Collections.Hashtable]::new([StringComparer]::Ordinal);$path=Join-Path (Get-PMMLocalizationRoot) ($code+'.json')
-  if(Test-Path -LiteralPath $path -PathType Leaf){$doc=Get-Content -LiteralPath $path -Raw -Encoding UTF8|ConvertFrom-Json -AsHashtable;if($doc.ContainsKey('strings')){foreach($kv in $doc['strings'].GetEnumerator()){$table[[string]$kv.Key]=[string]$kv.Value}}}
+  if(Test-Path -LiteralPath $path -PathType Leaf){
+    $doc=Get-Content -LiteralPath $path -Raw -Encoding UTF8|ConvertFrom-Json
+    if($doc -and ($doc.PSObject.Properties.Name -contains 'strings') -and $doc.strings){
+      foreach($property in $doc.strings.PSObject.Properties){$table[[string]$property.Name]=[string]$property.Value}
+    }
+  }
   $Script:PMMLanguageCatalogCache[$code]=$table;return $table
 }
 function Get-PMMLocalizedText([string]$English,[string]$LanguageCode=''){
