@@ -1,0 +1,9 @@
+{
+  "schema": "PMM_LANGUAGE_V1",
+  "language": "ko",
+  "nativeName": "한국어",
+  "fallback": "en",
+  "templateStatus": "pending",
+  "templateSource": "en.json",
+  "strings": {}
+}
