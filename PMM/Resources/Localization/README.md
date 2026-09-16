@@ -10,6 +10,21 @@ The shipped PMM UI currently runs on **Windows PowerShell 5.1** on supported Win
 
 Language selectors always show each language in its own native form, independent of the active UI language. `languages.json.nativeName` is UI metadata and must never be translated by a language catalog. For example, the active selector currently displays `English`, `Español`, and `简体中文`. `Get-PMMLanguageOptions` marks these labels with `PMMLocalizeLabel = $false`; the generic visual-tree localizer respects that opt-out.
 
+## Live language switching
+
+Changing the language from Settings is applied to the running PMM window immediately; restarting PMM is not required. The selected locale is still persisted in `config.json`, so the next startup uses the same language.
+
+The live path is deliberately explicit and does **not** use a global WPF `Loaded` hook. During the final normal localization sweep, `Register-PMMLiveLanguageSwitch` attaches one handler to the existing **Apply language** button. The normal Settings handler saves the new language first; the localization handler then:
+
+1. retranslates the existing visual tree from its canonical English baseline,
+2. applies the target LTR/RTL `FlowDirection`,
+3. calls the normal `Refresh-UI` path so formatted/dynamic text is regenerated in the new language, and
+4. performs a second safe sweep for controls/items materialized by that refresh.
+
+`Invoke-PMMLocalizeVisualTree` keeps a weak per-object baseline for exact static strings and data-bound labels. This makes transitions reversible (`English -> Español -> 简体中文 -> English`) instead of trying to translate one translated string into another. If a dynamic formatted string cannot be mapped safely back to an English catalog key, the localizer leaves it alone and lets `Refresh-UI` regenerate it rather than guessing.
+
+This works because the editable WPF/PowerShell UI and localization catalogs live outside the native host executable. `PMM.exe` supervises/launches the runtime, while the interface text and layout are supplied by the shipped XAML/PowerShell resources.
+
 ## Registry versus activation
 
 `languages.json` is the complete language inventory for the translation branch, not just the list of finished translations. Every planned locale must have an entry there and a matching catalog file.
@@ -30,10 +45,10 @@ Only entries with `enabled: true` are returned by `Get-PMMLanguageOptions` or ac
 - `en.json`: canonical English keys/source text.
 - `<BCP-47>.json`: one catalog per target language.
 - `MainWindow.en.xaml`: canonical static WPF layout. A locale may provide `MainWindow.<code>.xaml`; otherwise PMM translates the English XAML from the catalog at runtime.
-- `Modules/Shared/Localization.ps1`: generic lookup, fallback, activation filtering, XAML translation and visual-tree translation. It must remain Windows PowerShell 5.1 compatible.
+- `Modules/Shared/Localization.ps1`: generic lookup, fallback, activation filtering, XAML translation, reversible visual-tree translation and live language switching. It must remain Windows PowerShell 5.1 compatible.
 - `Development/Localization/audit_localization.py`: discovers visible strings in XAML and PowerShell and fails when catalogs/wiring drift.
 - `Development/Localization/Test-Localization.ps1`: validates key completeness, placeholders, residue and critical strings.
-- `Development/Localization/Test-PowerShell51.ps1`: loads a real language catalog and localized WPF window under Windows PowerShell 5.1.
+- `Development/Localization/Test-PowerShell51.ps1`: loads a real language catalog and localized WPF window under Windows PowerShell 5.1, including a reversible live-switch probe.
 - `Development/Localization/TRANSLATION_PLAN.md`: ordered v1.5 backlog and intervention ledger.
 
 ## v1.5 staged language templates

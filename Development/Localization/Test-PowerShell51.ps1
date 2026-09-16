@@ -62,7 +62,7 @@ $languageCombo=New-Object Windows.Controls.ComboBox
 $languageCombo.DisplayMemberPath='Label'
 $languageCombo.SelectedValuePath='Code'
 $languageCombo.ItemsSource=$languageOptions
-Invoke-PMMLocalizeVisualTree $languageCombo $Language
+Invoke-PMMLocalizeVisualTree $languageCombo $Language 'en'
 foreach($option in @($languageCombo.ItemsSource)){
   $code=[string]$option.Code
   if([string]$option.Label -cne [string]$expectedNativeNames[$code]){
@@ -74,9 +74,28 @@ $normalItem=[pscustomobject]@{Label='Settings';Value='settings'}
 $normalCombo=New-Object Windows.Controls.ComboBox
 $normalCombo.DisplayMemberPath='Label'
 $normalCombo.ItemsSource=@($normalItem)
-Invoke-PMMLocalizeVisualTree $normalCombo $Language
+Invoke-PMMLocalizeVisualTree $normalCombo $Language 'en'
 if([string]$normalItem.Label -ceq 'Settings'){
   throw 'Normal data-bound labels stopped localizing while protecting native language names.'
+}
+Invoke-PMMLocalizeVisualTree $normalCombo 'en' $Language
+if([string]$normalItem.Label -cne 'Settings'){
+  throw "Live localization did not restore the canonical English label. Value='$($normalItem.Label)'"
+}
+Invoke-PMMLocalizeVisualTree $normalCombo $Language 'en'
+if([string]$normalItem.Label -cne $translated){
+  throw "Live localization did not reapply '$Language' after returning to English. Value='$($normalItem.Label)'"
+}
+
+$probe=New-Object Windows.Controls.TextBlock
+$probe.Text='Settings'
+Invoke-PMMLocalizeVisualTree $probe $Language 'en'
+if([string]$probe.Text -cne $translated){
+  throw "Live TextBlock translation failed. Value='$($probe.Text)'"
+}
+Invoke-PMMLocalizeVisualTree $probe 'en' $Language
+if([string]$probe.Text -cne 'Settings'){
+  throw "Live TextBlock English restore failed. Value='$($probe.Text)'"
 }
 
 $xamlPath=Get-PMMLanguageXamlPath $Language
@@ -84,8 +103,11 @@ $xamlPath=Get-PMMLanguageXamlPath $Language
 $reader=New-Object System.Xml.XmlNodeReader $xml
 $window=[Windows.Markup.XamlReader]::Load($reader)
 if(-not $window){throw 'Localized WPF window did not load.'}
-Invoke-PMMLocalizeVisualTree $window $Language
+Invoke-PMMLocalizeVisualTree $window $Language $Language
 Set-PMMLanguageDirection $window $Language
+$definition=Get-PMMLanguageDefinition $Language
+$expectedDirection=if($definition -and [string]$definition.direction -eq 'rtl'){[Windows.FlowDirection]::RightToLeft}else{[Windows.FlowDirection]::LeftToRight}
+if($window.FlowDirection -ne $expectedDirection){throw "FlowDirection was not applied for '$Language'."}
 $window.Close()
 
-Write-Host "Windows PowerShell 5.1 localization OK: language=$Language strings=$($catalog.Count) nativeNames=OK"
+Write-Host "Windows PowerShell 5.1 localization OK: language=$Language strings=$($catalog.Count) nativeNames=OK liveSwitch=OK"

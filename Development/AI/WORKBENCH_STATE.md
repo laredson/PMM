@@ -16,6 +16,18 @@ The backlog is prioritized by estimated **Palworld audience**, not world populat
 
 Hindi (`hi`) and Modern Standard Arabic (`ar`) are translation pair 1 even though their normal Palworld-market priority is later. Both have real translated content committed on this branch and remain `in-progress` / `enabled: false`. Arabic is the first full RTL validation target. Do not mark either complete until every canonical English key is translated, placeholder checks pass, PowerShell 5.1/WPF validation passes, and Arabic receives a visual RTL review. After this pair, resume with `pt-BR` + `ko`.
 
+### Live language switching
+
+The user asked to prioritize live language switching in this intervention instead of spending the prompt on the next translation pair. Inspection confirmed that Hindi and Arabic were started previously but are **not complete**; they therefore remain disabled rather than being exposed prematurely.
+
+The localization runtime now supports reversible in-session switching for every enabled locale. `Invoke-PMMLocalizeVisualTree` keeps a weak per-object canonical-English baseline for static text, content, headers, tooltips, DataGrid headers and normal data-bound `Label` values. It can therefore move between localized values and restore English without attempting to translate one translated string into another. A reverse-catalog path recovers canonical English from windows that were originally loaded from localized XAML, and refuses ambiguous reverse mappings instead of guessing.
+
+`Register-PMMLiveLanguageSwitch` attaches one additional handler to the existing Settings **Apply language** button during the final normal window localization sweep. The pre-existing Settings handler remains responsible for saving the selected locale. The live handler then retranslates the current visual tree, updates LTR/RTL `FlowDirection`, runs `Refresh-UI` so formatted/dynamic state text is regenerated in the new locale, and performs a second sweep for newly materialized controls. There is no global WPF `Loaded` hook.
+
+`Development/Localization/Test-PowerShell51.ps1` now includes reversible live-switch probes (`English -> target -> English -> target`) plus direction validation. The code remains designed for Windows PowerShell 5.1. This intervention did not run that Windows-only regression inside the current execution environment, so the user's local PMM test is still required before calling the live-switch behavior runtime-proven.
+
+No new language was enabled here. The next translation intervention remains: finish and validate Hindi + Modern Standard Arabic, enable both for user testing, then continue with Brazilian Portuguese + Korean.
+
 ### v1.5 runtime identity correction
 
 A user screenshot on the correct `v1.5.0.0-PMM-translated` checkout still showed `PMM - Palworld Manager Merger v1.3.4.1`. The checkout itself was not the problem. `Modules/Bootstrap/Start-PalModMerger.ps1` reads `Resources/Metadata/VERSION.txt` when it creates the WPF title, and that metadata file was still inherited unchanged from the 1.3.4.1 release.
