@@ -2,11 +2,15 @@
 
 ## v1.5.0.0 translation branch — 2026-09-16
 
-Branch `v1.5.0.0-PMM-translated` starts from validated `main` commit `70d106e871099e4936dc5f81eef3e4ea15529d93`. This branch is now the working line for the next PMM localization release; the discarded historical 1.4 line is not reused.
+Branch `v1.5.0.0-PMM-translated` starts from validated `main` commit `70d106e871099e4936dc5f81eef3e4ea15529d93`. This branch is the working line for the next PMM localization release; the discarded historical 1.4 line is not reused.
 
-This intervention prepares the translation backlog only. Existing English (`en`), Spanish (`es`) and Simplified Chinese (`zh-CN`) catalogs remain unchanged and active. Seventeen additional independent catalog templates were staged for Hindi, Modern Standard Arabic, French, Bengali, Brazilian Portuguese, Indonesian, Urdu, Russian, German, Japanese, Nigerian Pidgin, Egyptian Arabic, Marathi, Vietnamese, Telugu, Hausa and Turkish. Pending templates fall back to English and are intentionally not registered in `languages.json` until each translation is complete and validated, so untranslated languages do not appear as false choices in the UI.
+Existing English (`en`), Spanish (`es`) and Simplified Chinese (`zh-CN`) catalogs remain complete and active. The localization backlog is now prioritized by estimated **Palworld audience**, not by world population alone. Public Palworld data provides direct approximate Steam-market shares only for the two dominant countries (United States and China, roughly 27% each); later priorities therefore combine Palworld review/player-language signals, general gaming-market scale, and worldwide speakers only as a tie-break. The detailed evidence model, market order and per-language ledger live in `Development/Localization/TRANSLATION_PLAN.md`.
 
-The authoritative per-language order, state and future intervention log is `Development/Localization/TRANSLATION_PLAN.md`. Update that ledger whenever a language is started/completed/validated/activated. No release or tag is created by this scaffolding step, and no native executable is changed.
+The market-oriented scaffold now includes pending templates for Brazilian Portuguese, Korean, Russian, French, German, Traditional Chinese, Japanese, Turkish, Polish, Italian, Thai, Indonesian, Vietnamese, Dutch, Ukrainian and Czech in addition to the previous worldwide-speaker templates. Pending languages remain deliberately absent from `languages.json` until they are actually complete and validated, so the UI never advertises an untranslated locale.
+
+Hindi (`hi`) and Modern Standard Arabic (`ar`) are the first v1.5 quality pair even though their normal Palworld-market priority is later. They were chosen deliberately to exercise Devanagari/non-Latin rendering and, for Arabic, the first full right-to-left (`rtl`) path. Both catalogs now contain a substantial translated first pass and are explicitly marked `translationStatus: in-progress`; neither is registered/active yet. Do not treat either as complete until every canonical English key is translated, placeholder validation passes, the PowerShell 5.1/WPF checks pass, and Arabic receives a visual RTL review. After this pair is completed, resume the market queue with `pt-BR` + `ko`.
+
+Update `Development/Localization/TRANSLATION_PLAN.md` and this state record whenever a translation pair is started/completed/validated/activated or the market-priority model changes. No release, tag, main merge or native executable change is part of this v1.5 work yet.
 
 ---
 
