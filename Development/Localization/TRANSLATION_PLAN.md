@@ -17,6 +17,7 @@ This file is the close translation-work ledger for PMM 1.5. Update it whenever a
 - `rtl` languages must be registered with right-to-left direction.
 - Language names in selectors always remain in their own native form.
 - Translation work is normally done in pairs so terminology and visual review remain manageable.
+- The branch development identity is `1.5.0.0`. `PMM/Resources/Metadata/VERSION.txt` is the runtime UI version source; changing Git branches alone does not rewrite this file or rebuild an executable.
 
 ## Priority model: Palworld audience first, global language reach as tie-break
 
@@ -120,6 +121,15 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 11. Update this ledger and `Development/AI/WORKBENCH_STATE.md` in the same intervention.
 
 ## Work log
+
+### 2026-09-16 — v1.5 runtime identity correction
+
+- User screenshot proved that the branch was checked out correctly while the PMM title still reported `v1.3.4.1`.
+- Root cause: `Modules/Bootstrap/Start-PalModMerger.ps1` builds the window title from `Resources/Metadata/VERSION.txt`, and that file had never been advanced from the 1.3.4.1 release baseline.
+- Updated `Resources/Metadata/VERSION.txt` to `1.5.0.0` and `Resources/Metadata/BUILD_ID.txt` to `PMM-v1.5.0.0-localization-dev` on this branch only.
+- No release/tag/main merge was created. The existing 1.3.4.1 release manifest/hash inventory remains release provenance and will be regenerated when 1.5 is actually packaged.
+- The language selector still intentionally exposes only `English`, `Español`, `简体中文`; all unfinished locales remain registered but disabled until their translations pass validation.
+- GitHub Desktop branch switching changes the checked-out source files. It does not by itself rebuild/replace a binary; the current editable UI nevertheless reads `VERSION.txt` at startup, so after fetching/pulling this commit and restarting PMM from this checkout the title should report `v1.5.0.0`.
 
 ### 2026-09-16 — registry/progress synchronization correction
 
