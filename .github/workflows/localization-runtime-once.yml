@@ -29,17 +29,34 @@ jobs:
           from pathlib import Path
           p=Path('Development/Localization/build_localization.py')
           t=p.read_text(encoding='utf-8')
+
           key='PMM manual/AI solution (*.zip)|*.zip|All files (*.*)|*.*'
           if key not in t:
               anchor='        "PMM": "PMM",\n'
               replacement=anchor+'        "PMM manual/AI solution (*.zip)|*.zip|All files (*.*)|*.*": "PMM 手动/AI 解决方案 (*.zip)|*.zip|所有文件 (*.*)|*.*",\n'
               if anchor not in t: raise SystemExit('Curated map anchor not found')
               t=t.replace(anchor,replacement,1)
+
           old="$doc=Get-Content -LiteralPath $path -Raw -Encoding UTF8|ConvertFrom-Json;if($doc.strings){foreach($p in $doc.strings.PSObject.Properties){$table[[string]$p.Name]=[string]$p.Value}}"
           new="$doc=Get-Content -LiteralPath $path -Raw -Encoding UTF8|ConvertFrom-Json -AsHashtable;if($doc.ContainsKey('strings')){foreach($kv in $doc['strings'].GetEnumerator()){$table[[string]$kv.Key]=[string]$kv.Value}}"
           if new not in t:
               if old not in t: raise SystemExit('Runtime catalog parser anchor not found')
               t=t.replace(old,new,1)
+
+          # Catalog keys are intentionally case-sensitive (for example Analyze Fixable Mods vs Analyze fixable mods).
+          old_table="$table=@{};$path=Join-Path (Get-PMMLocalizationRoot) ($code+'.json')"
+          new_table="$table=[Collections.Hashtable]::new([StringComparer]::Ordinal);$path=Join-Path (Get-PMMLocalizationRoot) ($code+'.json')"
+          if new_table not in t:
+              if old_table not in t: raise SystemExit('Case-sensitive catalog table anchor not found')
+              t=t.replace(old_table,new_table,1)
+
+          # The localization pass belongs inside the existing finally block; putting a new try between try/finally is invalid PowerShell.
+          old_case='    text = replace_once(text, anchor, "    try{if($Script:PMMCaseEditor){Invoke-PMMLocalizeVisualTree $Script:PMMCaseEditor}}catch{}\\n" + anchor, "case render sweep")'
+          new_case='    text = replace_once(text, anchor, "    finally{try{if($Script:PMMCaseEditor){Invoke-PMMLocalizeVisualTree $Script:PMMCaseEditor}}catch{};$Script:PMMEditorLoading=$false}", "case render sweep")'
+          if new_case not in t:
+              if old_case not in t: raise SystemExit('Case navigation build patch anchor not found')
+              t=t.replace(old_case,new_case,1)
+
           t=t.replace("$en=Get-Content (Join-Path $loc 'en.json') -Raw -Encoding UTF8|ConvertFrom-Json\n$target=Get-Content (Join-Path $loc ($Language+'.json')) -Raw -Encoding UTF8|ConvertFrom-Json\n$targetMap=@{};foreach($p in $target.strings.PSObject.Properties){$targetMap[[string]$p.Name]=[string]$p.Value}","$en=Get-Content (Join-Path $loc 'en.json') -Raw -Encoding UTF8|ConvertFrom-Json -AsHashtable\n$target=Get-Content (Join-Path $loc ($Language+'.json')) -Raw -Encoding UTF8|ConvertFrom-Json -AsHashtable\n$targetMap=$target['strings']")
           t=t.replace("foreach($p in $en.strings.PSObject.Properties){\n  $key=[string]$p.Name","foreach($keyValue in $en['strings'].GetEnumerator()){\n  $key=[string]$keyValue.Key")
           p.write_text(t,encoding='utf-8')
