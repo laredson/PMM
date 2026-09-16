@@ -1,0 +1,32 @@
+name: Diagnose localization runtime once
+
+on:
+  push:
+    branches: [1.3.4.1]
+    paths: [.github/workflows/localization-diagnose-once.yml]
+
+jobs:
+  diagnose:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Diagnose generic lookup
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $Script:Root=(Resolve-Path 'PMM').Path
+          . (Join-Path $Script:Root 'Modules/Shared/Localization.ps1')
+          Write-Host ('ROOT='+$Script:Root)
+          $registry=Get-PMMLanguageRegistry
+          Write-Host ('DEFAULT='+$registry.default)
+          Write-Host ('CODES='+(@($registry.languages|ForEach-Object{$_.code}) -join ','))
+          $resolved=Resolve-PMMLanguageCode 'zh-CN'
+          Write-Host ('RESOLVED='+$resolved)
+          $def=Get-PMMLanguageDefinition 'zh-CN'
+          Write-Host ('DEF='+($def|ConvertTo-Json -Compress))
+          $catalog=Get-PMMLanguageCatalog 'zh-CN'
+          Write-Host ('COUNT='+$catalog.Count)
+          Write-Host ('CONTAINS_PROJECTS='+$catalog.ContainsKey('Projects'))
+          Write-Host ('PROJECTS='+[string]$catalog['Projects'])
+          Write-Host ('LOOKUP='+(Get-PMMLocalizedText 'Projects' 'zh-CN'))
+          if((Get-PMMLocalizedText 'Projects' 'zh-CN') -cne '项目'){throw 'lookup failed'}
