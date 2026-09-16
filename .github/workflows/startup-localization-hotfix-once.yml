@@ -36,6 +36,15 @@ jobs:
           $locText=$locText.Substring(0,$at).TrimEnd()+[Environment]::NewLine
           [IO.File]::WriteAllText((Resolve-Path $loc),$locText,[Text.UTF8Encoding]::new($true))
 
+          $audit='Development/Localization/audit_localization.py'
+          $auditText=Get-Content -LiteralPath $audit -Raw -Encoding UTF8
+          $auditText=$auditText.Replace('        "Register-PMMLiveLocalization",'+[Environment]::NewLine,'')
+          $oldAudit='    if "Register-PMMLiveLocalization $Window $lang" not in start:'+[Environment]::NewLine+'        wiring_errors.append("live localization registration missing")'
+          $newAudit='    if "Invoke-PMMLocalizeVisualTree $Window $lang;Set-PMMLanguageDirection $Window $lang" not in start:'+[Environment]::NewLine+'        wiring_errors.append("safe startup localization sweep missing")'+[Environment]::NewLine+'    if "Register-PMMLiveLocalization" in start:'+[Environment]::NewLine+'        wiring_errors.append("unsafe live localization hook present")'
+          if(-not $auditText.Contains($oldAudit)){throw 'Localization audit live-hook assertion not found'}
+          $auditText=$auditText.Replace($oldAudit,$newAudit)
+          [IO.File]::WriteAllText((Resolve-Path $audit),$auditText,[Text.UTF8Encoding]::new($false))
+
       - name: Audit localization
         shell: pwsh
         run: |
