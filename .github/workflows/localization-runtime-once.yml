@@ -22,6 +22,22 @@ jobs:
         shell: bash
         run: python3 -m pip install --quiet argostranslate
 
+      - name: Add exact file-filter translation to build tool
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('Development/Localization/build_localization.py')
+          t=p.read_text(encoding='utf-8')
+          key='PMM manual/AI solution (*.zip)|*.zip|All files (*.*)|*.*'
+          if key not in t:
+              anchor='        "PMM": "PMM",\n'
+              replacement=anchor+'        "PMM manual/AI solution (*.zip)|*.zip|All files (*.*)|*.*": "PMM 手动/AI 解决方案 (*.zip)|*.zip|所有文件 (*.*)|*.*",\n'
+              if anchor not in t: raise SystemExit('Curated map anchor not found')
+              t=t.replace(anchor,replacement,1)
+              p.write_text(t,encoding='utf-8')
+          PY
+
       - name: Build localization runtime and catalogs
         shell: bash
         run: python3 Development/Localization/build_localization.py
