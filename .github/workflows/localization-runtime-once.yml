@@ -2,8 +2,10 @@ name: PMM localization runtime once
 
 on:
   push:
-    branches: [1.3.4.1]
-    paths: [.github/workflows/localization-runtime-once.yml]
+    branches:
+      - 1.3.4.1
+    paths:
+      - .github/workflows/localization-runtime-once.yml
 
 permissions:
   contents: write
@@ -20,342 +22,9 @@ jobs:
         shell: bash
         run: python3 -m pip install --quiet argostranslate
 
-      - name: Repair catalog and wire generic localization
+      - name: Build localization runtime and catalogs
         shell: bash
-        run: |
-          set -euo pipefail
-          python3 <<'PY'
-          from pathlib import Path
-          import html, json, re
-          import argostranslate.package, argostranslate.translate
-
-          root=Path('PMM')
-          loc=root/'Resources/Localization'
-          zh_path=loc/'zh-CN.json'
-          en_path=loc/'en.json'
-          zhdoc=json.loads(zh_path.read_text(encoding='utf-8-sig'))
-          endoc=json.loads(en_path.read_text(encoding='utf-8-sig'))
-          zh=zhdoc['strings']; en=endoc['strings']
-          inventory=json.loads(Path('Development/Localization/MISSING_ZH_CN.json').read_text(encoding='utf-8'))['missing']
-
-          # Exact UI terminology and technical text that should never be machine-mutated.
-          curated={
-            'PALWORLD':'PALWORLD','MANAGER':'MANAGER','MERGER':'MERGER','AUTO':'AUTO','PMM':'PMM',
-            '+ New case':'+ 新建案例','Projects':'项目','Send to ChatGPT':'发送到 ChatGPT','Options':'选项','Candidates':'候选',
-            'Cases':'案例','Newest first':'最新优先','Case':'案例','Last step':'上一步骤','Next step':'下一步骤',
-            'Delete case':'删除案例','No case selected':'未选择案例','Receive file...':'接收文件...','Create handoff':'创建交接包',
-            'Open folder':'打开文件夹','Save':'保存','Transport':'传输方式','Last Step':'上一步','Current':'当前',
-            'Select a case':'选择案例','Select or create a case':'选择或创建案例','Title':'标题','Type':'类型',
-            'Description / goal':'描述 / 目标','AI response':'AI 响应','References and evidence':'参考与证据','Kind':'类型',
-            'Source':'来源','Mode':'模式','Selection':'选择','Add PAK...':'添加 PAK...','Add mod family...':'添加模组族...',
-            'Add Vanilla family...':'添加原版资源族...','Remove':'移除','Requested / pending work':'请求 / 待处理工作',
-            'No pending work':'没有待处理工作','History':'历史记录',
-            'Newest first. Steps are collapsed by default; jump directly to any point.':'最新优先。步骤默认折叠，可直接跳转到任意节点。',
-            'Research cases':'研究案例','Workflow':'工作流','AI assistant':'AI 助手','AI client':'AI 客户端',
-            'Advanced: other MCP client':'高级：其他 MCP 客户端','Advanced: internal agent':'高级：内部代理',
-            'Mod Creation':'模组创建','Help':'帮助','General':'常规','AI / MCP':'AI / MCP','Installations':'安装',
-            'Mods & Merge':'模组与合并','Optional tools and AI clients':'可选工具与 AI 客户端',
-            'Ask before each installation':'每次安装前询问','Change permissions':'更改权限','Installation tutorial':'安装教程',
-            'Installations and status':'安装与状态','Open':'打开','Locate...':'定位...','Detected':'已检测','Not detected':'未检测',
-            'Install / complete':'安装 / 完成','Detect installed tools':'检测已安装工具','Install missing components':'安装缺失组件',
-            'Cancel pending installations':'取消待处理安装','Install modding tools':'安装模组制作工具',
-            'Install everything needed without asking again':'安装所需全部组件，不再询问','Accept':'接受','Cancel':'取消',
-            'PMM proposes installing: ':'PMM 建议安装：',
-            'Only the PMM dependency catalog is covered. Official account, license and Windows prompts remain. You can revoke this permission in Settings.':'此权限仅适用于 PMM 依赖项目录。官方账户、许可证和 Windows 提示仍会保留。你可以随时在设置中撤销此权限。',
-            'Unreal requires version 5.1.1 for the supported Palworld kit. PMM opens Epic Launcher; in Unreal Engine > Library, add/select 5.1.1 manually, then Install. The launcher may suggest a newer version. Quixel Bridge is optional and is not required by PMM.':'受支持的 Palworld 工具包需要 Unreal 5.1.1。PMM 会打开 Epic Launcher；请在 Unreal Engine > Library 中手动添加或选择 5.1.1，然后安装。启动器可能会推荐更新版本。Quixel Bridge 为可选组件，PMM 不需要它。',
-            'Wwise 2021.1.11: PMM detects the installed SDK and offline downloads separately. Downloading an offline package does not install the SDK. Use Install / complete to open the official installer, or Locate to select an existing folder or executable. The Unreal integration is a separate package.':'Wwise 2021.1.11：PMM 会分别检测已安装的 SDK 和离线下载包。下载离线包并不等于安装 SDK。使用“安装 / 完成”打开官方安装程序，或使用“定位”选择现有文件夹或可执行文件。Unreal 集成是独立的软件包。',
-            'Open Wwise offline folder':'打开 Wwise 离线文件夹',
-            'Wwise Unreal integration: in Audiokinetic Launcher, open Unreal Engine > Download > Offline integration files, choose 2021.1.11 and save in the integration folder below. PMM detects Unreal.5.0.tar.xz automatically; Locate also accepts a download saved elsewhere.':'Wwise Unreal 集成：在 Audiokinetic Launcher 中打开 Unreal Engine > Download > Offline integration files，选择 2021.1.11，并保存到下方的集成文件夹。PMM 会自动检测 Unreal.5.0.tar.xz；“定位”也可选择保存在其他位置的下载文件。',
-            'Open integration download folder':'打开集成下载文件夹','ChatGPT Desktop (optional AI client)':'ChatGPT Desktop（可选 AI 客户端）',
-            'Unreal Engine / Epic Launcher':'Unreal Engine / Epic Launcher','Visual Studio 2022 + MSVC':'Visual Studio 2022 + MSVC',
-            'Windows SDK':'Windows SDK','.NET Runtime x64':'.NET x64 运行时','Wwise SDK':'Wwise SDK',
-            'Wwise offline integration':'Wwise 离线集成','Palworld Modding Kit':'Palworld 模组制作工具包','Current':'当前',
-            'Offline package ready; SDK not installed':'离线包已就绪；SDK 尚未安装','Offline package rejected; inspect location':'离线包无效；请检查位置',
-            'This settings workspace is managed by its own tab.':'此设置工作区由其自己的标签页管理。',
-            'AI clients':'AI 客户端','Optional. PMM can also work with manual ZIP exchange.':'可选。PMM 也可以通过手动 ZIP 交换工作。',
-            'Folders':'文件夹','Question':'问题','Prepare question':'准备问题','Send question':'发送问题','Detect modes':'检测模式',
-            'unavailable':'不可用','Project folder: ':'项目文件夹：','Solutions':'解决方案','Evidence':'证据','AI chat history':'AI 聊天历史',
-            'Built mods':'已构建模组','[current]':'[当前]','Step {0}':'步骤 {0}','historical Step {0}':'历史步骤 {0}',
-            'Detecting installed components':'正在检测已安装组件','Installation requested':'已请求安装',
-            'Cancelled; no further installers will start.':'已取消；不会再启动其他安装程序。',
-            'Requested components detected; project verification is separate.':'已检测到请求的组件；项目验证将单独进行。',
-            'Installation worker stopped. Check any official installer still open before retrying.':'安装进程已停止。重试前请检查是否仍有官方安装程序处于打开状态。',
-            'VS 2022 DETECTED; MSVC 14.38 MISSING':'已检测 VS 2022；缺少 MSVC 14.38'
-          }
-          zh.update(curated)
-          for k,v in curated.items(): en.setdefault(k,k)
-
-          # Repair machine translations whose temporary protection markers were altered.
-          # Translate text segments around protected technical terms instead of inserting markers.
-          argostranslate.package.update_package_index()
-          packages=argostranslate.package.get_available_packages()
-          package=next((p for p in packages if p.from_code=='en' and p.to_code in ('zh','zh_cn','zh-CN')),None)
-          if package is None: raise SystemExit('No Argos English-to-Chinese package available')
-          argostranslate.package.install_from_path(package.download())
-          installed=argostranslate.translate.get_installed_languages()
-          src=next(x for x in installed if x.code=='en')
-          dst=next(x for x in installed if x.code==package.to_code)
-          translator=src.get_translation(dst)
-          terms=['Palworld Manager Merger','Game Reference','Palworld Modding Kit','ChatGPT Desktop','Codex Desktop','Visual Studio','Epic Launcher','Windows SDK','Fix Lab','SemiAUTO','ChatGPT','Palworld','Unreal','Wwise','Audiokinetic','Codex','PMM','MCP','AIIO','CKL','PAK','ZIP','JSON','SHA-256','.usmap','.pak','.zip','.7z','.rar','AUTO']
-          term_alt='|'.join(re.escape(x) for x in sorted(terms,key=len,reverse=True))
-          protected_re=re.compile(r'(\{[^{}]+\}|'+term_alt+r')',re.I)
-          placeholder_re=re.compile(r'\{[^{}]+\}')
-          def safe_translate(text):
-              pieces=protected_re.split(text)
-              out=[]
-              for part in pieces:
-                  if not part: continue
-                  if protected_re.fullmatch(part): out.append(part)
-                  elif part.strip(): out.append(translator.translate(part))
-                  else: out.append(part)
-              return ''.join(out).strip()
-          bad=[]
-          for key in inventory:
-              if key in curated: continue
-              value=zh.get(key,'')
-              ph_src=placeholder_re.findall(key);ph_dst=placeholder_re.findall(value)
-              if 'PMMTERM' in value or 'PMMTOKEN' in value or ' TERM' in value or ph_src!=ph_dst:
-                  zh[key]=safe_translate(key)
-                  value=zh[key]
-              if 'PMMTERM' in value or 'PMMTOKEN' in value or placeholder_re.findall(value)!=ph_src:
-                  bad.append(key)
-          if bad: raise SystemExit('Unrepaired translation markers/placeholders: '+repr(bad[:20]))
-
-          zhdoc['strings']=dict(sorted(zh.items(),key=lambda kv:kv[0].lower()))
-          endoc['strings']=dict(sorted(en.items(),key=lambda kv:kv[0].lower()))
-          zh_path.write_text(json.dumps(zhdoc,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          en_path.write_text(json.dumps(endoc,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          (root/'Resources/UI/strings.zh-CN.json').write_text(json.dumps(zhdoc['strings'],ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-
-          # Spanish catalog: keep the established Spanish translations from L/Get-PMMText,
-          # plus the shared workspace strings that previously bypassed localization.
-          es={k:k for k in en}
-          pair=re.compile(r"\b(?:L|Get-PMMText)\s+'((?:''|[^'])*)'\s+'((?:''|[^'])*)'")
-          for p in (root/'Modules').rglob('*.ps1'):
-              text=p.read_text(encoding='utf-8-sig',errors='ignore')
-              for m in pair.finditer(text): es[m.group(1).replace("''", "'")]=m.group(2).replace("''", "'")
-          es.update({
-            '+ New case':'+ Nuevo caso','Cases':'Casos','Newest first':'Más recientes primero','Case':'Caso','Last step':'Último paso','Next step':'Siguiente paso',
-            'Delete case':'Eliminar caso','No case selected':'Ningún caso seleccionado','Receive file...':'Recibir archivo...','Create handoff':'Crear entrega','Open folder':'Abrir carpeta','Save':'Guardar','Transport':'Transporte',
-            'Last Step':'Paso anterior','Current':'Actual','Select a case':'Selecciona un caso','Select or create a case':'Selecciona o crea un caso','Title':'Título','Type':'Tipo','Description / goal':'Descripción / objetivo',
-            'AI response':'Respuesta de IA','References and evidence':'Referencias y evidencia','Kind':'Tipo','Source':'Origen','Mode':'Modo','Selection':'Selección','Add PAK...':'Añadir PAK...','Add mod family...':'Añadir familia del mod...',
-            'Add Vanilla family...':'Añadir familia Vanilla...','Remove':'Quitar','Requested / pending work':'Trabajo solicitado / pendiente','No pending work':'No hay trabajo pendiente','History':'Historial',
-            'Newest first. Steps are collapsed by default; jump directly to any point.':'Más recientes primero. Los pasos están contraídos por defecto; puedes saltar directamente a cualquier punto.',
-            'Help':'Ayuda','AI / MCP':'IA / MCP','Mods & Merge':'Mods y Merge','Mod Creation':'Creación de mods','Installations':'Instalaciones'
-          })
-          esdoc={'schema':'PMM_LANGUAGE_V1','language':'es','nativeName':'Español','fallback':'en','strings':dict(sorted(es.items(),key=lambda kv:kv[0].lower()))}
-          (loc/'es.json').write_text(json.dumps(esdoc,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-
-          # Generic runtime. New languages are data files, not new code paths.
-          runtime=r'''$Script:PMMLanguageRegistryCache=$null
-$Script:PMMLanguageCatalogCache=@{}
-function Get-PMMLocalizationRoot { Join-Path $Script:Root 'Resources\Localization' }
-function Get-PMMLanguageRegistry {
-  if($Script:PMMLanguageRegistryCache){return $Script:PMMLanguageRegistryCache}
-  $path=Join-Path (Get-PMMLocalizationRoot) 'languages.json'
-  if(-not(Test-Path -LiteralPath $path -PathType Leaf)){throw 'Localization registry is missing.'}
-  $Script:PMMLanguageRegistryCache=Get-Content -LiteralPath $path -Raw -Encoding UTF8|ConvertFrom-Json
-  return $Script:PMMLanguageRegistryCache
-}
-function Get-PMMLanguageDefinition([string]$Code){
-  $registry=Get-PMMLanguageRegistry
-  return @($registry.languages|Where-Object{[string]$_.code -ieq $Code}|Select-Object -First 1)[0]
-}
-function Resolve-PMMLanguageCode([string]$Code){
-  $registry=Get-PMMLanguageRegistry
-  if(-[string]::IsNullOrWhiteSpace($Code)){
-    $exact=Get-PMMLanguageDefinition $Code;if($exact){return [string]$exact.code}
-    $base=($Code -split '-')[0];$match=@($registry.languages|Where-Object{([string]$_.code -split '-')[0] -ieq $base}|Select-Object -First 1)[0];if($match){return [string]$match.code}
-  }
-  return [string]$registry.default
-}
-function Get-PMMCurrentLanguage {
-  try{return Resolve-PMMLanguageCode ([string](Get-PMMConfig).Language)}catch{return Resolve-PMMLanguageCode ''}
-}
-function Get-PMMLanguageOptions {
-  return @(Get-PMMLanguageRegistry).languages|ForEach-Object{[pscustomobject]@{Label=[string]$_.nativeName;Code=[string]$_.code}}
-}
-function Get-PMMLanguageCatalog([string]$Code){
-  $code=Resolve-PMMLanguageCode $Code
-  if($Script:PMMLanguageCatalogCache.ContainsKey($code)){return $Script:PMMLanguageCatalogCache[$code]}
-  $table=@{}
-  $path=Join-Path (Get-PMMLocalizationRoot) ($code+'.json')
-  if(Test-Path -LiteralPath $path -PathType Leaf){
-    $doc=Get-Content -LiteralPath $path -Raw -Encoding UTF8|ConvertFrom-Json
-    if($doc.strings){foreach($p in $doc.strings.PSObject.Properties){$table[[string]$p.Name]=[string]$p.Value}}
-  }
-  $Script:PMMLanguageCatalogCache[$code]=$table
-  return $table
-}
-function Get-PMMLocalizedText([string]$English,[string]$LanguageCode=''){
-  if([string]::IsNullOrWhiteSpace($English)){return $English}
-  $code=if($LanguageCode){Resolve-PMMLanguageCode $LanguageCode}else{Get-PMMCurrentLanguage}
-  if($code -eq 'en'){return $English}
-  $visited=@{}
-  while($code -and -not$visited.ContainsKey($code)){
-    $visited[$code]=$true;$catalog=Get-PMMLanguageCatalog $code
-    if($catalog.ContainsKey($English) -and -not[string]::IsNullOrWhiteSpace([string]$catalog[$English])){return [string]$catalog[$English]}
-    $def=Get-PMMLanguageDefinition $code;$code=if($def){[string]$def.fallback}else{'en'}
-    if($code -eq 'en'){break}
-  }
-  return $English
-}
-function Get-PMMLanguageXamlPath([string]$LanguageCode=''){
-  $code=if($LanguageCode){Resolve-PMMLanguageCode $LanguageCode}else{Get-PMMCurrentLanguage}
-  $def=Get-PMMLanguageDefinition $code
-  if($def -and $def.xaml){$p=Join-Path $Script:Root ('Resources\UI\'+[string]$def.xaml);if(Test-Path -LiteralPath $p -PathType Leaf){return $p}}
-  return (Join-Path $Script:Root 'Resources\UI\MainWindow.en.xaml')
-}
-function Convert-PMMXamlLocalization([string]$Xaml,[string]$LanguageCode=''){
-  if([string]::IsNullOrWhiteSpace($Xaml)){return $Xaml}
-  $code=if($LanguageCode){Resolve-PMMLanguageCode $LanguageCode}else{Get-PMMCurrentLanguage}
-  if($code -eq 'en'){return $Xaml}
-  $pattern='(?<prefix>\b(?:Text|Content|Header|ToolTip)=\")(?<value>[^\"]*)(?<suffix>\")'
-  $eval=[Text.RegularExpressions.MatchEvaluator]{param($m)
-    $raw=[Net.WebUtility]::HtmlDecode([string]$m.Groups['value'].Value)
-    $translated=Get-PMMLocalizedText $raw $code
-    $escaped=[Security.SecurityElement]::Escape([string]$translated)
-    return [string]$m.Groups['prefix'].Value+$escaped+[string]$m.Groups['suffix'].Value
-  }
-  return [Text.RegularExpressions.Regex]::Replace($Xaml,$pattern,$eval)
-}
-function Invoke-PMMLocalizeVisualTree($Root,[string]$LanguageCode=''){
-  if(-not$Root){return}
-  $code=if($LanguageCode){Resolve-PMMLanguageCode $LanguageCode}else{Get-PMMCurrentLanguage}
-  if($code -eq 'en'){return}
-  try{
-    if($Root -is [Windows.Controls.TextBlock] -and -not[string]::IsNullOrWhiteSpace([string]$Root.Text)){$Root.Text=Get-PMMLocalizedText ([string]$Root.Text) $code}
-    if($Root -is [Windows.Documents.Run] -and -not[string]::IsNullOrWhiteSpace([string]$Root.Text)){$Root.Text=Get-PMMLocalizedText ([string]$Root.Text) $code}
-    if($Root -is [Windows.Controls.ContentControl] -and $Root.Content -is [string]){$Root.Content=Get-PMMLocalizedText ([string]$Root.Content) $code}
-    if($Root -is [Windows.Controls.HeaderedContentControl] -and $Root.Header -is [string]){$Root.Header=Get-PMMLocalizedText ([string]$Root.Header) $code}
-    if($Root -is [Windows.Controls.HeaderedItemsControl] -and $Root.Header -is [string]){$Root.Header=Get-PMMLocalizedText ([string]$Root.Header) $code}
-    if($Root -is [Windows.FrameworkElement] -and $Root.ToolTip -is [string]){$Root.ToolTip=Get-PMMLocalizedText ([string]$Root.ToolTip) $code}
-    if($Root -is [Windows.Controls.DataGrid]){foreach($column in @($Root.Columns)){if($column.Header -is [string]){$column.Header=Get-PMMLocalizedText ([string]$column.Header) $code}}}
-  }catch{}
-  try{foreach($child in [Windows.LogicalTreeHelper]::GetChildren($Root)){if($child -is [Windows.DependencyObject]){Invoke-PMMLocalizeVisualTree $child $code}}}catch{}
-}
-function Set-PMMLanguageDirection($Element,[string]$LanguageCode=''){
-  if(-not$Element){return};$code=if($LanguageCode){Resolve-PMMLanguageCode $LanguageCode}else{Get-PMMCurrentLanguage};$def=Get-PMMLanguageDefinition $code
-  try{$Element.FlowDirection=if($def -and [string]$def.direction -eq 'rtl'){[Windows.FlowDirection]::RightToLeft}else{[Windows.FlowDirection]::LeftToRight}}catch{}
-}
-'''
-          (root/'Modules/Shared/Localization.ps1').write_text(runtime,encoding='utf-8-sig')
-          shim="""﻿if(-not(Get-Command Get-PMMLocalizedText -ErrorAction SilentlyContinue)){. (Join-Path $PSScriptRoot 'Localization.ps1')}\nfunction Get-PMMChineseText([string]$English){return Get-PMMLocalizedText $English 'zh-CN'}\n"""
-          (root/'Modules/Shared/Localization.zh-CN.ps1').write_text(shim,encoding='utf-8')
-
-          def readps(path): return path.read_text(encoding='utf-8-sig')
-          def writeps(path,text): path.write_text(text,encoding='utf-8-sig')
-          def must_replace(text,old,new,label):
-              if new in text:return text
-              if old not in text:raise SystemExit('Patch anchor missing: '+label)
-              return text.replace(old,new,1)
-
-          # Common: generic catalog lookup while keeping the existing Spanish source pair compatible.
-          p=root/'Modules/Shared/Common.ps1';t=readps(p)
-          t=must_replace(t,". (Join-Path $PSScriptRoot 'Localization.zh-CN.ps1')",". (Join-Path $PSScriptRoot 'Localization.ps1')",'Common localization include')
-          old="""function Get-PMMText([string]$English,[string]$Spanish){
-  $cfg=Get-PMMConfig
-  if($cfg.Language -eq 'es'){return $Spanish}
-  if($cfg.Language -eq 'zh-CN'){return Get-PMMChineseText $English}
-  return $English
-}"""
-          new="""function Get-PMMText([string]$English,[string]$Spanish){
-  $cfg=Get-PMMConfig
-  $language=Resolve-PMMLanguageCode ([string]$cfg.Language)
-  if($language -eq 'es'){return $Spanish}
-  if($language -eq 'en'){return $English}
-  return Get-PMMLocalizedText $English $language
-}"""
-          t=must_replace(t,old,new,'Get-PMMText');writeps(p,t)
-
-          # Startup: registry-driven language selection and XAML fallback for any future language.
-          p=root/'Modules/Bootstrap/Start-PalModMerger.ps1';t=readps(p)
-          t=must_replace(t,"$lang = if ($startupCfg.Language -eq 'es') { 'es' } elseif ($startupCfg.Language -eq 'zh-CN') { 'zh-CN' } else { 'en' }","$lang = Resolve-PMMLanguageCode ([string]$startupCfg.Language)",'startup language')
-          t=must_replace(t,'$xamlPath = Join-Path $Script:Root ("Resources\\UI\\MainWindow.{0}.xaml" -f $lang)','$xamlPath = Get-PMMLanguageXamlPath $lang','xaml path')
-          t=must_replace(t,"  [xml]$xaml = Get-Content -LiteralPath $xamlPath -Raw -Encoding UTF8","  $xamlText=Get-Content -LiteralPath $xamlPath -Raw -Encoding UTF8\n  if($lang -ne 'en' -and [IO.Path]::GetFileName($xamlPath) -ieq 'MainWindow.en.xaml'){$xamlText=Convert-PMMXamlLocalization $xamlText $lang}\n  [xml]$xaml=$xamlText",'xaml localization')
-          t=must_replace(t,"  $Window = [Windows.Markup.XamlReader]::Load($reader)","  $Window = [Windows.Markup.XamlReader]::Load($reader)\n  Set-PMMLanguageDirection $Window $lang",'window direction')
-          options=re.compile(r"\$Script:LanguageOptions=@\(\n\s*\[pscustomobject\]@\{Label='English';Code='en'\},\n\s*\[pscustomobject\]@\{Label='Español';Code='es'\},\n\s*\[pscustomobject\]@\{Label='简体中文';Code='zh-CN'\}\n\)")
-          t,n=options.subn('$Script:LanguageOptions=@(Get-PMMLanguageOptions)',t,count=1)
-          if n!=1 and '$Script:LanguageOptions=@(Get-PMMLanguageOptions)' not in t:raise SystemExit('Language options patch failed')
-          t=must_replace(t,"$cfg.Language = if ($selectedCode -in @('es','zh-CN')) { $selectedCode } else { 'en' }","$cfg.Language = Resolve-PMMLanguageCode $selectedCode",'apply language')
-          writeps(p,t)
-
-          # Embedded XAML case workspace: translate before XamlReader sees it.
-          p=root/'Modules/AIIO/AIIO.CaseWorkspace.UI.ps1';t=readps(p)
-          t=must_replace(t,'  [xml]$xml=$x;$reader=New-Object System.Xml.XmlNodeReader $xml;$tab=[Windows.Markup.XamlReader]::Load($reader)','  $x=Convert-PMMXamlLocalization $x\n  [xml]$xml=$x;$reader=New-Object System.Xml.XmlNodeReader $xml;$tab=[Windows.Markup.XamlReader]::Load($reader)\n  Invoke-PMMLocalizeVisualTree $tab','embedded case XAML')
-          # Composite labels that cannot be matched by a simple exact-string sweep.
-          t=t.replace("$btn.Content=$(if($n -eq [int]$Case.CurrentStep){'[current]'}else{'[Step '+$n+']'})","$btn.Content=$(if($n -eq [int]$Case.CurrentStep){Get-PMMLocalizedText '[current]'}else{'['+((Get-PMMLocalizedText 'Step {0}') -f $n)+']'})")
-          t=t.replace("' — historical Step '+[int]$c.SelectedStep","' — '+((Get-PMMLocalizedText 'historical Step {0}') -f [int]$c.SelectedStep)")
-          writeps(p,t)
-
-          # Re-sweep the shared editor after each render so dynamic literal status controls are localized too.
-          p=root/'Modules/AIIO/AIIO.CaseNavigation.UI.ps1';t=readps(p)
-          anchor='    finally{$Script:PMMEditorLoading=$false}'
-          insert="    try{if($Script:PMMCaseEditor){Invoke-PMMLocalizeVisualTree $Script:PMMCaseEditor}}catch{}\n"+anchor
-          t=must_replace(t,anchor,insert,'case render sweep');writeps(p,t)
-
-          # New dynamically-created top-level workspaces.
-          p=root/'Modules/AIIO/AIIO.Workspaces.UI.ps1';t=readps(p)
-          t=must_replace(t,"    $help.Header='Help';$help.Tag='HELP'","    $help.Header=L 'Help' 'Ayuda';$help.Tag='HELP'",'help header')
-          t=must_replace(t,"    $creation=[Windows.Controls.TabItem]::new();$creation.Header='Mod Creation';$creation.Name='TabModCreation';$creation.Tag='CREATE'","    $creation=[Windows.Controls.TabItem]::new();$creation.Header=L 'Mod Creation' 'Creacion de mods';$creation.Name='TabModCreation';$creation.Tag='CREATE'",'creation header')
-          t=must_replace(t,'    $Script:PMMWorkspacesInitialized=$true','    try{Invoke-PMMLocalizeVisualTree $Window}catch{}\n    $Script:PMMWorkspacesInitialized=$true','workspace localization sweep')
-          writeps(p,t)
-
-          # Dynamically-created Settings tabs.
-          p=root/'Modules/Shared/Settings.Workspaces.UI.ps1';t=readps(p)
-          t=must_replace(t,"    $ai.Header='AI / MCP';$ai.Tag='AI'","    $ai.Header=L 'AI / MCP' 'IA / MCP';$ai.Tag='AI'",'AI settings header')
-          t=must_replace(t,"    $merge=New-PMMSettingsSection 'MERGE' 'Mods & Merge'","    $merge=New-PMMSettingsSection 'MERGE' (L 'Mods & Merge' 'Mods y Merge')",'merge settings header')
-          t=must_replace(t,"    $creation=New-PMMSettingsSection 'CREATE' 'Mod Creation'","    $creation=New-PMMSettingsSection 'CREATE' (L 'Mod Creation' 'Creacion de mods')",'creation settings header')
-          t=must_replace(t,"    $help=New-PMMSettingsSection 'HELP' 'Help'","    $help=New-PMMSettingsSection 'HELP' (L 'Help' 'Ayuda')",'help settings header')
-          writeps(p,t)
-
-          # Dependency names and asynchronous status messages come from service objects, not XAML.
-          p=root/'Modules/Unreal/Dependencies.UI.ps1';t=readps(p)
-          old="$label=[Windows.Controls.TextBlock]::new();$label.Text=$d.name+' ('+$d.version+')';$label.TextWrapping='Wrap';$label.VerticalAlignment='Center';[void]$row.Children.Add($label)"
-          new="$displayName=Get-PMMLocalizedText ([string]$d.name);$displayVersion=Get-PMMLocalizedText ([string]$d.version)\n        $label=[Windows.Controls.TextBlock]::new();$label.Text=$displayName+' ('+$displayVersion+')';$label.TextWrapping='Wrap';$label.VerticalAlignment='Center';[void]$row.Children.Add($label)"
-          t=must_replace(t,old,new,'dependency label')
-          t=must_replace(t,"$Script:PMMDependencyLabels[$d.id]=@{label=$label;button=$button;name=$d.name;version=$d.version}","$Script:PMMDependencyLabels[$d.id]=@{label=$label;button=$button;name=$displayName;version=$displayVersion}",'dependency label cache')
-          t=must_replace(t,"$Script:PMMDependencyStatus.Text=$job.status+' - '+$job.message","$Script:PMMDependencyStatus.Text=(Get-PMMLocalizedText ([string]$job.status))+' - '+(Get-PMMLocalizedText ([string]$job.message))",'dependency job message')
-          writeps(p,t)
-
-          # Regenerate the full Simplified-Chinese XAML from the canonical English UI.
-          en_xaml=(root/'Resources/UI/MainWindow.en.xaml').read_text(encoding='utf-8-sig')
-          attr=re.compile(r'(?P<prefix>\b(?:Text|Content|Header|ToolTip)=")(?P<value>[^"]*)(?P<suffix>")')
-          def xrepl(m):
-              source=html.unescape(m.group('value'))
-              value=zh.get(source,source)
-              return m.group('prefix')+html.escape(value,quote=True)+m.group('suffix')
-          zh_xaml=attr.sub(xrepl,en_xaml)
-          (root/'Resources/UI/MainWindow.zh-CN.xaml').write_text(zh_xaml,encoding='utf-8-sig')
-
-          # Persistent validator for future languages and releases.
-          test=r'''param([string]$Language='zh-CN')
-$ErrorActionPreference='Stop'
-$root=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
-$loc=Join-Path $root 'PMM\Resources\Localization'
-$en=Get-Content (Join-Path $loc 'en.json') -Raw -Encoding UTF8|ConvertFrom-Json
-$target=Get-Content (Join-Path $loc ($Language+'.json')) -Raw -Encoding UTF8|ConvertFrom-Json
-$targetMap=@{};foreach($p in $target.strings.PSObject.Properties){$targetMap[[string]$p.Name]=[string]$p.Value}
-$missing=@();$empty=@();$placeholder=@();$residue=@()
-foreach($p in $en.strings.PSObject.Properties){
-  $key=[string]$p.Name
-  if(-not$targetMap.ContainsKey($key)){$missing+=$key;continue}
-  $value=[string]$targetMap[$key];if([string]::IsNullOrWhiteSpace($value)){$empty+=$key}
-  $a=@([regex]::Matches($key,'\{[^{}]+\}')|ForEach-Object{$_.Value}|Sort-Object);$b=@([regex]::Matches($value,'\{[^{}]+\}')|ForEach-Object{$_.Value}|Sort-Object)
-  if(($a -join '|') -cne ($b -join '|')){$placeholder+=$key}
-  if($value -match 'PMMTERM|PMMTOKEN|__PMM'){$residue+=$key}
-}
-if($missing.Count -or $empty.Count -or $placeholder.Count -or $residue.Count){throw ('Localization validation failed. missing='+$missing.Count+' empty='+$empty.Count+' placeholders='+$placeholder.Count+' residue='+$residue.Count)}
-$critical=@{'+ New case'='+ 新建案例';'Projects'='项目';'Cases'='案例';'Mod Creation'='模组创建';'Help'='帮助';'Research cases'='研究案例';'Optional tools and AI clients'='可选工具与 AI 客户端';'Installations and status'='安装与状态';'Change permissions'='更改权限'}
-if($Language -eq 'zh-CN'){foreach($k in $critical.Keys){if($targetMap[$k] -cne $critical[$k]){throw ('Critical translation mismatch: '+$k)}}}
-[xml](Get-Content (Join-Path $root 'PMM\Resources\UI\MainWindow.zh-CN.xaml') -Raw -Encoding UTF8)|Out-Null
-Write-Host ('Localization '+$Language+' OK: '+$targetMap.Count+' strings')
-'''
-          (Path('Development/Localization/Test-Localization.ps1')).write_text(test,encoding='utf-8-sig')
-
-          # The canonical English catalog must include every key newly added above.
-          en_path.write_text(json.dumps(endoc,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          PY
+        run: python3 Development/Localization/build_localization.py
 
       - name: Validate PowerShell, XAML and Chinese catalog
         shell: pwsh
@@ -363,22 +32,31 @@ Write-Host ('Localization '+$Language+' OK: '+$targetMap.Count+' strings')
           $ErrorActionPreference='Stop'
           & ./Development/Localization/Test-Localization.ps1 -Language zh-CN
           $files=@(
-            'PMM/Modules/Shared/Localization.ps1','PMM/Modules/Shared/Common.ps1','PMM/Modules/Bootstrap/Start-PalModMerger.ps1',
-            'PMM/Modules/AIIO/AIIO.CaseWorkspace.UI.ps1','PMM/Modules/AIIO/AIIO.CaseNavigation.UI.ps1','PMM/Modules/AIIO/AIIO.Workspaces.UI.ps1',
-            'PMM/Modules/Shared/Settings.Workspaces.UI.ps1','PMM/Modules/Unreal/Dependencies.UI.ps1'
+            'PMM/Modules/Shared/Localization.ps1',
+            'PMM/Modules/Shared/Common.ps1',
+            'PMM/Modules/Bootstrap/Start-PalModMerger.ps1',
+            'PMM/Modules/AIIO/AIIO.CaseWorkspace.UI.ps1',
+            'PMM/Modules/AIIO/AIIO.CaseNavigation.UI.ps1',
+            'PMM/Modules/AIIO/AIIO.Workspaces.UI.ps1',
+            'PMM/Modules/Shared/Settings.Workspaces.UI.ps1',
+            'PMM/Modules/Unreal/Dependencies.UI.ps1'
           )
-          foreach($f in $files){$tokens=$null;$errors=$null;[System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $f),[ref]$tokens,[ref]$errors)|Out-Null;if($errors.Count){$errors|ForEach-Object{Write-Error ($f+': '+$_.Message)};throw "PowerShell parse failure"}}
+          foreach($f in $files){
+            $tokens=$null;$errors=$null
+            [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $f),[ref]$tokens,[ref]$errors)|Out-Null
+            if($errors.Count){$errors|ForEach-Object{Write-Error ($f+': '+$_.Message)};throw 'PowerShell parse failure'}
+          }
           [xml](Get-Content PMM/Resources/UI/MainWindow.en.xaml -Raw -Encoding UTF8)|Out-Null
           [xml](Get-Content PMM/Resources/UI/MainWindow.es.xaml -Raw -Encoding UTF8)|Out-Null
           [xml](Get-Content PMM/Resources/UI/MainWindow.zh-CN.xaml -Raw -Encoding UTF8)|Out-Null
 
-      - name: Commit runtime and remove one-shot workflow
+      - name: Commit localization runtime
         shell: bash
         run: |
           set -euo pipefail
           rm -f .github/workflows/localization-runtime-once.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add PMM/Resources/Localization PMM/Resources/UI/MainWindow.zh-CN.xaml PMM/Resources/UI/strings.zh-CN.json PMM/Modules/Shared/Localization.ps1 PMM/Modules/Shared/Localization.zh-CN.ps1 PMM/Modules/Shared/Common.ps1 PMM/Modules/Bootstrap/Start-PalModMerger.ps1 PMM/Modules/AIIO/AIIO.CaseWorkspace.UI.ps1 PMM/Modules/AIIO/AIIO.CaseNavigation.UI.ps1 PMM/Modules/AIIO/AIIO.Workspaces.UI.ps1 PMM/Modules/Shared/Settings.Workspaces.UI.ps1 PMM/Modules/Unreal/Dependencies.UI.ps1 Development/Localization/Test-Localization.ps1 .github/workflows/localization-runtime-once.yml
+          git add PMM Development/Localization .github/workflows/localization-runtime-once.yml
           git commit -m 'feat: complete generic localization runtime for v1.3.4.1'
           git push origin HEAD:1.3.4.1
