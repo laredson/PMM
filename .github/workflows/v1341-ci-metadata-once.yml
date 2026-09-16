@@ -1,0 +1,69 @@
+name: PMM v1.3.4.1 CI metadata refresh
+
+on:
+  push:
+    branches: [release/1.3.4.1-ci-refresh]
+    paths: [.github/workflows/v1341-ci-metadata-once.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Refresh release metadata
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $manifestPath='PMM/Resources/Metadata/RELEASE_MANIFEST.json'
+          $text=[IO.File]::ReadAllText($manifestPath,[Text.Encoding]::UTF8)
+          $text=$text.Replace('"version": "1.3.4"','"version": "1.3.4.1"')
+          $text=$text.Replace('"releaseCandidate": "1.3.4-rc2"','"releaseCandidate": "1.3.4.1-chinese-translation"')
+          [IO.File]::WriteAllText($manifestPath,$text,[Text.UTF8Encoding]::new($false))
+          if(([IO.File]::ReadAllText('PMM/Resources/Metadata/VERSION.txt')).Trim() -ne '1.3.4.1'){throw 'VERSION.txt is not 1.3.4.1'}
+
+      - name: Regenerate package SHA256 inventory
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $app=(Resolve-Path PMM).Path
+          $sumPath=Join-Path $app 'Resources/Metadata/SHA256SUMS.txt'
+          $rows=Get-ChildItem -LiteralPath $app -Recurse -File |
+            Where-Object {$_.FullName -ne $sumPath} |
+            ForEach-Object {
+              $relative=$_.FullName.Substring($app.Length).TrimStart('\','/').Replace('\','/')
+              $hash=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+              "$hash  $relative"
+            } | Sort-Object {($_ -split '  ',2)[1]}
+          [IO.File]::WriteAllLines($sumPath,[string[]]$rows,[Text.UTF8Encoding]::new($false))
+
+      - name: Validate refreshed package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          ./Development/Scripts/validation/Validate-v1.3.ps1
+          python Development/Localization/audit_localization.py
+          ./Development/Localization/Test-Localization.ps1 -Language zh-CN
+
+      - name: Windows PowerShell 5.1 localization regression
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          Set-ExecutionPolicy -Scope Process Bypass -Force
+          ./Development/Localization/Test-PowerShell51.ps1 -Language zh-CN
+
+      - name: Commit final CI refresh
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          Remove-Item .github/workflows/v1341-ci-metadata-once.yml -Force
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'ci: finalize v1.3.4.1 current validation metadata'
+          git push origin HEAD:release/1.3.4.1-ci-refresh
