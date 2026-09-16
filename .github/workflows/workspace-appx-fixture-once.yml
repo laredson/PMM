@@ -1,0 +1,48 @@
+name: Isolate workspace AppX fixture once
+
+on:
+  push:
+    branches: [release/1.3.4.1-ci-refresh]
+    paths: [.github/workflows/workspace-appx-fixture-once.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Stub AppX inventory before Desktop runtime loads
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $path='Development/Tests/workspaces_dependencies_regression.ps1'
+          $text=[IO.File]::ReadAllText($path,[Text.Encoding]::UTF8)
+          $needle="function Handle-UIError(`$Failure,[string]`$Title){throw `$Failure}"
+          $replacement=$needle+"`n# Hosted-runner AppX inventory is outside this regression's scope and varies by image.`n# Stub the cmdlet before Desktop.Runtime.ps1 is loaded so discovery is deterministic.`nfunction Get-AppxPackage { return @() }"
+          if(-not $text.Contains($needle)){throw 'Workspace AppX insertion marker not found'}
+          if($text.Contains('function Get-AppxPackage { return @() }')){throw 'Workspace AppX fixture already present'}
+          $text=$text.Replace($needle,$replacement)
+          [IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))
+
+      - name: Run workspace regressions
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          ./Development/Tests/workspaces_dependencies_regression.ps1 -Language en
+          ./Development/Tests/workspaces_dependencies_regression.ps1 -Language es
+
+      - name: Commit deterministic AppX fixture
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          Remove-Item .github/workflows/workspace-appx-fixture-once.yml -Force
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'test: isolate workspace regression from AppX inventory'
+          git push origin HEAD:release/1.3.4.1-ci-refresh
