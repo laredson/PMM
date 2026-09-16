@@ -7,7 +7,10 @@ function Get-PMMDesktopPackages {
         $manifest=Get-AppxPackageManifest -Package $p.PackageFullName
         $protocols=@($manifest.SelectNodes('//*[local-name()="Protocol"]')|ForEach-Object{$_.Name})
         $running=@($processes|Where-Object{try{$_.Path -and $_.Path.StartsWith($p.InstallLocation.TrimEnd('\')+'\',[StringComparison]::OrdinalIgnoreCase)}catch{$false}})
-        [pscustomobject]@{Name=$p.Name;Version=[string]$p.Version;InstallLocation=$p.InstallLocation;PackageFullName=$p.PackageFullName;PackageFamilyName=$p.PackageFamilyName;AppId=@($manifest.Package.Applications.Application)[0].Id;SupportsLocalChats=($protocols -contains 'codex');Running=($running.Count -gt 0)}
+        # AppX projections differ across Windows/PowerShell hosts. Version is metadata only,
+        # so an incomplete projection must not break Desktop discovery under StrictMode.
+        $version=if($p.PSObject.Properties['Version']){[string]$p.Version}else{''}
+        [pscustomobject]@{Name=$p.Name;Version=$version;InstallLocation=$p.InstallLocation;PackageFullName=$p.PackageFullName;PackageFamilyName=$p.PackageFamilyName;AppId=@($manifest.Package.Applications.Application)[0].Id;SupportsLocalChats=($protocols -contains 'codex');Running=($running.Count -gt 0)}
     }
 }
 function Select-PMMDesktopPackage([array]$Packages,[string]$Destination) {
