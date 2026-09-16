@@ -2,29 +2,33 @@
   "schema": "PMM_LANGUAGES_V1",
   "default": "en",
   "languages": [
-    {
-      "code": "en",
-      "nativeName": "English",
-      "englishName": "English",
-      "fallback": null,
-      "direction": "ltr",
-      "xaml": "MainWindow.en.xaml"
-    },
-    {
-      "code": "es",
-      "nativeName": "Español",
-      "englishName": "Spanish",
-      "fallback": "en",
-      "direction": "ltr",
-      "xaml": "MainWindow.es.xaml"
-    },
-    {
-      "code": "zh-CN",
-      "nativeName": "简体中文",
-      "englishName": "Chinese (Simplified)",
-      "fallback": "en",
-      "direction": "ltr",
-      "xaml": "MainWindow.zh-CN.xaml"
-    }
+    {"code":"en","nativeName":"English","englishName":"English","fallback":null,"direction":"ltr","xaml":"MainWindow.en.xaml","enabled":true,"status":"complete"},
+    {"code":"es","nativeName":"Español","englishName":"Spanish","fallback":"en","direction":"ltr","xaml":"MainWindow.es.xaml","enabled":true,"status":"complete"},
+    {"code":"zh-CN","nativeName":"简体中文","englishName":"Chinese (Simplified)","fallback":"en","direction":"ltr","xaml":"MainWindow.zh-CN.xaml","enabled":true,"status":"complete"},
+    {"code":"pt-BR","nativeName":"Português (Brasil)","englishName":"Portuguese (Brazil)","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"ko","nativeName":"한국어","englishName":"Korean","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"ru","nativeName":"Русский","englishName":"Russian","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"fr","nativeName":"Français","englishName":"French","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"de","nativeName":"Deutsch","englishName":"German","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"zh-TW","nativeName":"繁體中文","englishName":"Chinese (Traditional)","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"ja","nativeName":"日本語","englishName":"Japanese","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"tr","nativeName":"Türkçe","englishName":"Turkish","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"pl","nativeName":"Polski","englishName":"Polish","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"it","nativeName":"Italiano","englishName":"Italian","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"th","nativeName":"ไทย","englishName":"Thai","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"id","nativeName":"Bahasa Indonesia","englishName":"Indonesian","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"vi","nativeName":"Tiếng Việt","englishName":"Vietnamese","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"nl","nativeName":"Nederlands","englishName":"Dutch","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"uk","nativeName":"Українська","englishName":"Ukrainian","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"cs","nativeName":"Čeština","englishName":"Czech","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"hi","nativeName":"हिन्दी","englishName":"Hindi","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"in-progress"},
+    {"code":"ar","nativeName":"العربية","englishName":"Modern Standard Arabic","fallback":"en","direction":"rtl","xaml":null,"enabled":false,"status":"in-progress"},
+    {"code":"bn","nativeName":"বাংলা","englishName":"Bengali","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"reserve"},
+    {"code":"ur","nativeName":"اردو","englishName":"Urdu","fallback":"en","direction":"rtl","xaml":null,"enabled":false,"status":"reserve"},
+    {"code":"pcm","nativeName":"Naijá","englishName":"Nigerian Pidgin","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"reserve"},
+    {"code":"arz","nativeName":"العربية المصرية","englishName":"Egyptian Arabic","fallback":"en","direction":"rtl","xaml":null,"enabled":false,"status":"reserve"},
+    {"code":"mr","nativeName":"मराठी","englishName":"Marathi","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"reserve"},
+    {"code":"te","nativeName":"తెలుగు","englishName":"Telugu","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"reserve"},
+    {"code":"ha","nativeName":"Hausa","englishName":"Hausa","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"reserve"}
   ]
 }

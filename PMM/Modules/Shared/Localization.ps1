@@ -8,23 +8,28 @@ function Get-PMMLanguageRegistry {
   $Script:PMMLanguageRegistryCache=Get-Content -LiteralPath $path -Raw -Encoding UTF8|ConvertFrom-Json
   return $Script:PMMLanguageRegistryCache
 }
+function Test-PMMLanguageEnabled($Language){
+  if(-not$Language){return $false}
+  if($Language.PSObject.Properties.Name -notcontains 'enabled'){return $true}
+  return [bool]$Language.enabled
+}
 function Get-PMMLanguageDefinition([string]$Code){
   $registry=Get-PMMLanguageRegistry
-  return @($registry.languages|Where-Object{[string]$_.code -ieq $Code}|Select-Object -First 1)[0]
+  return @($registry.languages|Where-Object{([string]$_.code -ieq $Code) -and (Test-PMMLanguageEnabled $_)}|Select-Object -First 1)[0]
 }
 function Resolve-PMMLanguageCode([string]$Code){
   $registry=Get-PMMLanguageRegistry
   if(-not [string]::IsNullOrWhiteSpace($Code)){
     $exact=Get-PMMLanguageDefinition $Code;if($exact){return [string]$exact.code}
     $base=($Code -split '-')[0]
-    $match=@($registry.languages|Where-Object{([string]$_.code -split '-')[0] -ieq $base}|Select-Object -First 1)[0]
+    $match=@($registry.languages|Where-Object{(Test-PMMLanguageEnabled $_) -and (([string]$_.code -split '-')[0] -ieq $base)}|Select-Object -First 1)[0]
     if($match){return [string]$match.code}
   }
   return [string]$registry.default
 }
 function Get-PMMCurrentLanguage {try{return Resolve-PMMLanguageCode ([string](Get-PMMConfig).Language)}catch{return Resolve-PMMLanguageCode ''}}
 function Get-PMMLanguageOptions {
-  return @(Get-PMMLanguageRegistry).languages|ForEach-Object{
+  return @((Get-PMMLanguageRegistry).languages|Where-Object{Test-PMMLanguageEnabled $_})|ForEach-Object{
     [pscustomobject]@{
       Label=[string]$_.nativeName
       Code=[string]$_.code

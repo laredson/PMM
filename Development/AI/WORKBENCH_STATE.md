@@ -4,13 +4,19 @@
 
 Branch `v1.5.0.0-PMM-translated` starts from validated `main` commit `70d106e871099e4936dc5f81eef3e4ea15529d93`. This branch is the working line for the next PMM localization release; the discarded historical 1.4 line is not reused.
 
-Existing English (`en`), Spanish (`es`) and Simplified Chinese (`zh-CN`) catalogs remain complete and active. The localization backlog is now prioritized by estimated **Palworld audience**, not by world population alone. Public Palworld data provides direct approximate Steam-market shares only for the two dominant countries (United States and China, roughly 27% each); later priorities therefore combine Palworld review/player-language signals, general gaming-market scale, and worldwide speakers only as a tie-break. The detailed evidence model, market order and per-language ledger live in `Development/Localization/TRANSLATION_PLAN.md`.
+### Current translation state
 
-The market-oriented scaffold now includes pending templates for Brazilian Portuguese, Korean, Russian, French, German, Traditional Chinese, Japanese, Turkish, Polish, Italian, Thai, Indonesian, Vietnamese, Dutch, Ukrainian and Czech in addition to the previous worldwide-speaker templates. Pending languages remain deliberately absent from `languages.json` until they are actually complete and validated, so the UI never advertises an untranslated locale.
+The user correctly identified a repository-state inconsistency: the branch already contained many locale JSON files, but `PMM/Resources/Localization/languages.json` still listed only the three completed languages. That made the branch look like it had only English, Spanish and Simplified Chinese from the application's point of view.
 
-Hindi (`hi`) and Modern Standard Arabic (`ar`) are the first v1.5 quality pair even though their normal Palworld-market priority is later. They were chosen deliberately to exercise Devanagari/non-Latin rendering and, for Arabic, the first full right-to-left (`rtl`) path. Both catalogs now contain a substantial translated first pass and are explicitly marked `translationStatus: in-progress`; neither is registered/active yet. Do not treat either as complete until every canonical English key is translated, placeholder validation passes, the PowerShell 5.1/WPF checks pass, and Arabic receives a visual RTL review. After this pair is completed, resume the market queue with `pt-BR` + `ko`.
+This has been corrected. `languages.json` is now the complete locale inventory for v1.5. Every planned locale is recorded there with `enabled` and `status`. Only completed locales are enabled, so the runtime selector still exposes exactly the three already-finished native labels: `English`, `Español`, `简体中文`. Pending/in-progress/reserve languages are visible and traceable in Git but remain unavailable to users until validation is complete.
 
-Update `Development/Localization/TRANSLATION_PLAN.md` and this state record whenever a translation pair is started/completed/validated/activated or the market-priority model changes. No release, tag, main merge or native executable change is part of this v1.5 work yet.
+The localization runtime now filters disabled language definitions during normal resolution and selector construction. This preserves the existing UI behavior while allowing the branch itself to represent all translation work accurately.
+
+The backlog is prioritized by estimated **Palworld audience**, not world population alone. The detailed evidence model, ordered locale queue and intervention log live in `Development/Localization/TRANSLATION_PLAN.md`.
+
+Hindi (`hi`) and Modern Standard Arabic (`ar`) are translation pair 1 even though their normal Palworld-market priority is later. Both have real translated content committed on this branch and remain `in-progress` / `enabled: false`. Arabic is the first full RTL validation target. Do not mark either complete until every canonical English key is translated, placeholder checks pass, PowerShell 5.1/WPF validation passes, and Arabic receives a visual RTL review. After this pair, resume with `pt-BR` + `ko`.
+
+Every future translation intervention must update both `Development/Localization/TRANSLATION_PLAN.md` and this state record in the same branch commit. No v1.5 release, tag, main merge or native executable change has been made yet.
 
 ---
 
