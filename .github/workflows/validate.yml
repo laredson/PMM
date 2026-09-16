@@ -1,5 +1,5 @@
 # Current-release CI: version-aware package integrity, localization, Windows PowerShell 5.1, WPF and runtime checks.
-# Desktop regression fixtures model the current explicit Chat/Work mode discovery contract.
+# Desktop/workspace regression fixtures are deterministic and independent of the hosted runner's installed apps.
 name: PMM validation
 
 on:
