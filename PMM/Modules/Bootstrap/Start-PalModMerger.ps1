@@ -71,6 +71,7 @@ Set-PMMHostStartupState 'startup:UI-script-loading'
 . (Join-Path $Script:Root 'Modules\Presentation\Theme.UI.ps1')
 . (Join-Path $Script:Root 'Modules\Workflow\GuidedFlow.ps1')
 . (Join-Path $Script:Root 'Modules\Workbench.Services.ps1') -Profile UI
+function L([string]$English,[string]$Spanish){ return Get-PMMText $English $Spanish }
 Start-PMMLogSession 'UI'
 Initialize-PMM
 Add-Type -AssemblyName PresentationFramework,PresentationCore,WindowsBase
@@ -110,7 +111,7 @@ $autoDepsOk = Initialize-PMMDependenciesIfNeeded # fast no-op when already prepa
 # Load localized XAML.
 # ---------------------------------------------------------------------------
 $startupCfg = Get-PMMConfig
-$lang = if ($startupCfg.Language -eq 'es') { 'es' } else { 'en' }
+$lang = if ($startupCfg.Language -eq 'es') { 'es' } elseif ($startupCfg.Language -eq 'zh-CN') { 'zh-CN' } else { 'en' }
 $xamlPath = Join-Path $Script:Root ("Resources\UI\MainWindow.{0}.xaml" -f $lang)
 try {
   [xml]$xaml = Get-Content -LiteralPath $xamlPath -Raw -Encoding UTF8
@@ -179,7 +180,8 @@ foreach ($name in $controlNames) {
 # collapsed language selector and its popup on the same typography/height path.
 $Script:LanguageOptions=@(
   [pscustomobject]@{Label='English';Code='en'},
-  [pscustomobject]@{Label='Español';Code='es'}
+  [pscustomobject]@{Label='Español';Code='es'},
+  [pscustomobject]@{Label='简体中文';Code='zh-CN'}
 )
 $Script:CmbLanguage.ItemsSource=$Script:LanguageOptions
 
@@ -1339,7 +1341,7 @@ $Script:BtnApplyLanguage.Add_Click({
   try {
     $cfg = Get-PMMConfig
     $selectedCode = [string]$Script:CmbLanguage.SelectedValue
-    $cfg.Language = if ($selectedCode -eq 'es') { 'es' } else { 'en' }
+    $cfg.Language = if ($selectedCode -in @('es','zh-CN')) { $selectedCode } else { 'en' }
     Save-PMMConfig $cfg
     $Script:TxtStatus.Text=L 'Language saved. Restart Palworld Manager Merger to apply it to the entire interface.' 'Idioma guardado. Reinicia Palworld Manager Merger para aplicarlo a toda la interfaz.'
   } catch { Handle-UIError $_ 'Language' }
