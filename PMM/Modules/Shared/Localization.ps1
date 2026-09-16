@@ -23,7 +23,15 @@ function Resolve-PMMLanguageCode([string]$Code){
   return [string]$registry.default
 }
 function Get-PMMCurrentLanguage {try{return Resolve-PMMLanguageCode ([string](Get-PMMConfig).Language)}catch{return Resolve-PMMLanguageCode ''}}
-function Get-PMMLanguageOptions {return @(Get-PMMLanguageRegistry).languages|ForEach-Object{[pscustomobject]@{Label=[string]$_.nativeName;Code=[string]$_.code}}}
+function Get-PMMLanguageOptions {
+  return @(Get-PMMLanguageRegistry).languages|ForEach-Object{
+    [pscustomobject]@{
+      Label=[string]$_.nativeName
+      Code=[string]$_.code
+      PMMLocalizeLabel=$false
+    }
+  }
+}
 function Get-PMMLanguageCatalog([string]$Code){
   $code=Resolve-PMMLanguageCode $Code
   if($Script:PMMLanguageCatalogCache.ContainsKey($code)){return $Script:PMMLanguageCatalogCache[$code]}
@@ -76,7 +84,17 @@ function Invoke-PMMLocalizeVisualTree($Root,[string]$LanguageCode=''){
     if($Root -is [Windows.Controls.HeaderedContentControl] -and $Root.Header -is [string]){$Root.Header=Get-PMMLocalizedText ([string]$Root.Header) $code}
     if($Root -is [Windows.Controls.HeaderedItemsControl] -and $Root.Header -is [string]){$Root.Header=Get-PMMLocalizedText ([string]$Root.Header) $code}
     if($Root -is [Windows.FrameworkElement] -and $Root.ToolTip -is [string]){$Root.ToolTip=Get-PMMLocalizedText ([string]$Root.ToolTip) $code}
-    if($Root -is [Windows.Controls.ItemsControl] -and $Root.ItemsSource){foreach($item in @($Root.ItemsSource)){try{if($item -and ($item.PSObject.Properties.Name -contains 'Label') -and $item.Label -is [string]){$item.Label=Get-PMMLocalizedText ([string]$item.Label) $code}}catch{}}}
+    if($Root -is [Windows.Controls.ItemsControl] -and $Root.ItemsSource){
+      foreach($item in @($Root.ItemsSource)){
+        try{
+          if($item -and ($item.PSObject.Properties.Name -contains 'Label') -and $item.Label -is [string]){
+            $localizeLabel=$true
+            if($item.PSObject.Properties.Name -contains 'PMMLocalizeLabel'){$localizeLabel=[bool]$item.PMMLocalizeLabel}
+            if($localizeLabel){$item.Label=Get-PMMLocalizedText ([string]$item.Label) $code}
+          }
+        }catch{}
+      }
+    }
     if($Root -is [Windows.Controls.DataGrid]){foreach($column in @($Root.Columns)){if($column.Header -is [string]){$column.Header=Get-PMMLocalizedText ([string]$column.Header) $code}}}
   }catch{}
   try{foreach($child in [Windows.LogicalTreeHelper]::GetChildren($Root)){if($child -is [Windows.DependencyObject]){Invoke-PMMLocalizeVisualTree $child $code}}}catch{}
