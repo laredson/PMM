@@ -29,9 +29,22 @@ function Get-PMMLanguageCatalog([string]$Code){
   if($Script:PMMLanguageCatalogCache.ContainsKey($code)){return $Script:PMMLanguageCatalogCache[$code]}
   $table=[Collections.Hashtable]::new([StringComparer]::Ordinal);$path=Join-Path (Get-PMMLocalizationRoot) ($code+'.json')
   if(Test-Path -LiteralPath $path -PathType Leaf){
-    $doc=Get-Content -LiteralPath $path -Raw -Encoding UTF8|ConvertFrom-Json
-    if($doc -and ($doc.PSObject.Properties.Name -contains 'strings') -and $doc.strings){
-      foreach($property in $doc.strings.PSObject.Properties){$table[[string]$property.Name]=[string]$property.Value}
+    $json=Get-Content -LiteralPath $path -Raw -Encoding UTF8
+    if($PSVersionTable.PSVersion.Major -le 5){
+      Add-Type -AssemblyName System.Web.Extensions -ErrorAction Stop
+      $serializer=New-Object System.Web.Script.Serialization.JavaScriptSerializer
+      $serializer.MaxJsonLength=[int]::MaxValue
+      $doc=$serializer.DeserializeObject($json)
+      if($doc -and $doc.ContainsKey('strings') -and $doc['strings']){
+        $strings=$doc['strings']
+        foreach($key in $strings.Keys){$table[[string]$key]=[string]$strings[$key]}
+      }
+    }else{
+      $jsonDoc=[System.Text.Json.JsonDocument]::Parse($json)
+      try{
+        $stringsElement=$jsonDoc.RootElement.GetProperty('strings')
+        foreach($property in $stringsElement.EnumerateObject()){$table[[string]$property.Name]=[string]$property.Value.GetString()}
+      }finally{$jsonDoc.Dispose()}
     }
   }
   $Script:PMMLanguageCatalogCache[$code]=$table;return $table
