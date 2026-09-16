@@ -30,7 +30,47 @@ if([string]::IsNullOrWhiteSpace($translated) -or $translated -ceq 'Settings'){
   throw "Catalog lookup did not return a translated value for Settings. Value='$translated'"
 }
 
+$expectedNativeNames=@{
+  'en'='English'
+  'es'='Español'
+  'zh-CN'='简体中文'
+}
+$languageOptions=@(Get-PMMLanguageOptions)
+foreach($option in $languageOptions){
+  $code=[string]$option.Code
+  if($expectedNativeNames.ContainsKey($code)){
+    if([string]$option.Label -cne [string]$expectedNativeNames[$code]){
+      throw "Language option '$code' lost its native name. Expected '$($expectedNativeNames[$code])', got '$($option.Label)'."
+    }
+    if(-not($option.PSObject.Properties.Name -contains 'PMMLocalizeLabel') -or [bool]$option.PMMLocalizeLabel){
+      throw "Language option '$code' must opt out of label localization."
+    }
+  }
+}
+
 Add-Type -AssemblyName PresentationFramework,PresentationCore,WindowsBase
+
+$languageCombo=New-Object Windows.Controls.ComboBox
+$languageCombo.DisplayMemberPath='Label'
+$languageCombo.SelectedValuePath='Code'
+$languageCombo.ItemsSource=$languageOptions
+Invoke-PMMLocalizeVisualTree $languageCombo $Language
+foreach($option in @($languageCombo.ItemsSource)){
+  $code=[string]$option.Code
+  if($expectedNativeNames.ContainsKey($code) -and [string]$option.Label -cne [string]$expectedNativeNames[$code]){
+    throw "Visual-tree localization translated native language name '$code' to '$($option.Label)'."
+  }
+}
+
+$normalItem=[pscustomobject]@{Label='Settings';Value='settings'}
+$normalCombo=New-Object Windows.Controls.ComboBox
+$normalCombo.DisplayMemberPath='Label'
+$normalCombo.ItemsSource=@($normalItem)
+Invoke-PMMLocalizeVisualTree $normalCombo $Language
+if([string]$normalItem.Label -ceq 'Settings'){
+  throw 'Normal data-bound labels stopped localizing while protecting native language names.'
+}
+
 $xamlPath=Get-PMMLanguageXamlPath $Language
 [xml]$xml=Get-Content -LiteralPath $xamlPath -Raw -Encoding UTF8
 $reader=New-Object System.Xml.XmlNodeReader $xml
@@ -40,4 +80,4 @@ Invoke-PMMLocalizeVisualTree $window $Language
 Set-PMMLanguageDirection $window $Language
 $window.Close()
 
-Write-Host "Windows PowerShell 5.1 localization OK: language=$Language strings=$($catalog.Count) settings='$translated'"
+Write-Host "Windows PowerShell 5.1 localization OK: language=$Language strings=$($catalog.Count) settings='$translated' nativeNames=OK"
