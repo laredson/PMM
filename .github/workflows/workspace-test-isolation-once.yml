@@ -1,3 +1,4 @@
+# Rerun with newline-agnostic fixture insertion.
 name: Isolate workspace CI fixture once
 
 on:
@@ -22,10 +23,11 @@ jobs:
           $ErrorActionPreference='Stop'
           $path='Development/Tests/workspaces_dependencies_regression.ps1'
           $text=[IO.File]::ReadAllText($path,[Text.Encoding]::UTF8)
-          $needle=". (Join-Path `$Script:Root 'Modules\AIIO\AIIO.Workspaces.UI.ps1')`r`ntry{"
-          $replacement=". (Join-Path `$Script:Root 'Modules\AIIO\AIIO.Workspaces.UI.ps1')`r`n# This regression validates PMM workspace/dependency behavior, not the runner's installed AppX inventory.`r`n# Keep Desktop package discovery deterministic so hosted-runner software cannot change the result.`r`nfunction Get-PMMDesktopPackages { return @() }`r`ntry{"
-          if(-not $text.Contains($needle)){throw 'Workspace regression insertion marker not found'}
-          $text=$text.Replace($needle,$replacement)
+          $pattern="(?m)^\. \(Join-Path \`$Script:Root 'Modules\\AIIO\\AIIO\.Workspaces\.UI\.ps1'\)\r?$"
+          $match=[regex]::Match($text,$pattern)
+          if(-not $match.Success){throw 'Workspace regression insertion marker not found'}
+          $insertion=$match.Value+"`n# This regression validates PMM workspace/dependency behavior, not the runner's installed AppX inventory.`n# Keep Desktop package discovery deterministic so hosted-runner software cannot change the result.`nfunction Get-PMMDesktopPackages { return @() }"
+          $text=[regex]::Replace($text,$pattern,[Text.RegularExpressions.MatchEvaluator]{param($m)$insertion},1)
           [IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))
 
       - name: Run workspace regressions
