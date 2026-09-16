@@ -1,4 +1,16 @@
-﻿# PMM 1.3.3 shared implementation state
+# PMM shared implementation state
+
+## v1.5.0.0 translation branch — 2026-09-16
+
+Branch `v1.5.0.0-PMM-translated` starts from validated `main` commit `70d106e871099e4936dc5f81eef3e4ea15529d93`. This branch is now the working line for the next PMM localization release; the discarded historical 1.4 line is not reused.
+
+This intervention prepares the translation backlog only. Existing English (`en`), Spanish (`es`) and Simplified Chinese (`zh-CN`) catalogs remain unchanged and active. Seventeen additional independent catalog templates were staged for Hindi, Modern Standard Arabic, French, Bengali, Brazilian Portuguese, Indonesian, Urdu, Russian, German, Japanese, Nigerian Pidgin, Egyptian Arabic, Marathi, Vietnamese, Telugu, Hausa and Turkish. Pending templates fall back to English and are intentionally not registered in `languages.json` until each translation is complete and validated, so untranslated languages do not appear as false choices in the UI.
+
+The authoritative per-language order, state and future intervention log is `Development/Localization/TRANSLATION_PLAN.md`. Update that ledger whenever a language is started/completed/validated/activated. No release or tag is created by this scaffolding step, and no native executable is changed.
+
+---
+
+# Historical PMM 1.3.3 shared implementation state
 
 Branch 1.3.3 starts exactly at 1.3.2 commit 3e57247f823317c85ceb71a4272b0a813f1f34fc. Current implementation: deep-analysis preview with account-aware AI routing. No public release/push requested.
 

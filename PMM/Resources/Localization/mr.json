@@ -1,0 +1,9 @@
+{
+  "schema": "PMM_LANGUAGE_V1",
+  "language": "mr",
+  "nativeName": "मराठी",
+  "fallback": "en",
+  "templateStatus": "pending",
+  "templateSource": "en.json",
+  "strings": {}
+}
