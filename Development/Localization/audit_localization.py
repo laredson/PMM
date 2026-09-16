@@ -66,6 +66,7 @@ def discover_ui_strings() -> dict[str, list[dict]]:
     return found
 
 
+# Invariant product names, acronyms and technical labels are intentionally not translated.
 TECHNICAL_EXACT = {
     "AUTO",
     "AIIO",
@@ -77,6 +78,7 @@ TECHNICAL_EXACT = {
     "ZIP",
     "JSON",
     "MB",
+    "OK",
     "ChatGPT",
     "Codex",
     "Palworld",
@@ -85,7 +87,9 @@ TECHNICAL_EXACT = {
     "Wwise",
     "Windows",
     "Visual Studio",
+    "Visual Studio 2022 + MSVC",
     "Epic Launcher",
+    "Unreal Engine / Epic Launcher",
     "Game Reference",
     "Fix Lab",
 }
