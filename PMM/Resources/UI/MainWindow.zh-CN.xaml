@@ -1001,7 +1001,7 @@
             <Border Background="{DynamicResource CardAltBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6" Padding="11">
               <StackPanel>
                 <TextBlock Text="Palworld 安装" FontSize="16" FontWeight="SemiBold"/>
-                <TextBlock Text="Auto建议进行人工检测。 手动蒸汽和Palworld这里有用于不同寻常设施的选择器。" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,7"/>
+                <TextBlock Text="建议使用自动检测。对于特殊安装位置，可在此手动选择 Steam 或 Palworld 文件夹。" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,7"/>
                 <TextBox x:Name="TxtGamePath" IsReadOnly="True" Margin="0,0,0,6"/>
                 <WrapPanel>
                   <Button x:Name="BtnDetectGameSettings" Content="自动检测"/>

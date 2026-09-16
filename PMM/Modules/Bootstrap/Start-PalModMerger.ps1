@@ -1441,6 +1441,7 @@ Initialize-PMMLibraryCaseMenu
 Initialize-PMMDeepAnalysisUI
 . (Join-Path $Script:Root 'Modules/MCP/AppServer.UI.ps1')
 Initialize-PMMCaseAgentUI
+Register-PMMLiveLocalization $Window $lang
 $uiExitState='Normal'
 try {
   [void]$Window.ShowDialog()

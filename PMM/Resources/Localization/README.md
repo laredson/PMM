@@ -1,14 +1,23 @@
 # PMM localization
 
-PMM uses one canonical English source string catalog and one JSON catalog per language. Runtime code never needs a new `if language == ...` branch.
+PMM uses a catalog-driven localization layer. English is the canonical source; every visible UI string is inventoried and every language is a data file. Application code must not add language-specific branches.
 
-## Add a language
+## Files
 
-1. Copy `en.json` to `<language-code>.json` (BCP-47 code such as `de`, `ja`, `pt-BR`, `ar`).
-2. Set `language`, `nativeName`, `fallback`, and translate every value under `strings` while keeping the English keys unchanged.
-3. Add one entry to `languages.json`. `direction` may be `ltr` or `rtl`.
-4. Run `Development/Localization/Test-Localization.ps1`. Missing keys, broken placeholders and untranslated catalog values fail validation.
+- `languages.json`: registry (`code`, native/English names, fallback, `ltr`/`rtl`, optional XAML file).
+- `en.json`: canonical English keys/source text.
+- `<BCP-47>.json`: one catalog per language, using the same English keys.
+- `MainWindow.en.xaml`: canonical static WPF layout. A locale may provide `MainWindow.<code>.xaml`; otherwise PMM translates the English XAML from the catalog at runtime.
+- `Modules/Shared/Localization.ps1`: generic lookup, fallback, XAML translation, visual-tree translation and live translation for dynamically created controls.
+- `Development/Localization/audit_localization.py`: discovers visible strings in XAML and PowerShell and fails when catalogs/wiring drift.
+- `Development/Localization/Test-Localization.ps1`: validates key completeness, placeholders, residue and critical strings.
 
-The English key is the stable source identifier for v1.3.4.1. `Get-PMMLocalizedText` is the generic lookup API; the existing `L English Spanish` helper remains compatible and routes every non-English/non-Spanish language through its catalog. Static XAML may have a dedicated file, but a new language can fall back to the English XAML and be localized from its catalog. Dynamically created WPF controls should use `L`/`Get-PMMLocalizedText`, or call `Invoke-PMMLocalizeVisualTree` after construction.
+## Add any language
 
-Do not translate product names, file formats, paths, IDs, hashes, or placeholders such as `{0}` unless the surrounding sentence requires it.
+1. Run `Development/Localization/New-Language.ps1 -Code de -NativeName Deutsch -EnglishName German` (use any BCP-47 code such as `ja`, `pt-BR`, `ar`, `zh-TW`).
+2. Translate every empty value in `PMM/Resources/Localization/<code>.json`; never change the English keys.
+3. Add/register the language in `languages.json` (the scaffold prints the exact entry). Set `direction` to `rtl` for Arabic/Hebrew-style layouts.
+4. Run `Development/Localization/Test-Localization.ps1 -Language <code>` and `python Development/Localization/audit_localization.py`.
+5. If a new UI label is added in PowerShell, use `L 'English' 'Spanish'` or `Get-PMMLocalizedText 'English'`. Embedded/static XAML may remain canonical English: the runtime/catalog layer translates it. Controls created dynamically are covered by `Register-PMMLiveLocalization`, but new strings still must be present in the catalog and audit.
+
+Product names, file formats, paths, IDs, hashes and placeholders such as `{0}` are kept invariant unless grammar requires surrounding translation. The audit treats a small documented set of those values as intentionally language-neutral.

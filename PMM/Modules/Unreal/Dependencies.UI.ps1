@@ -17,7 +17,7 @@ function Show-PMMInstallConsent($Job){
     $card.SetResourceReference([Windows.Controls.Border]::BackgroundProperty,'CardBackground');$card.SetResourceReference([Windows.Controls.Border]::BorderBrushProperty,'CardBorder')
     $content=[Windows.Controls.StackPanel]::new();$card.Child=$content;[void]$v.body.Children.Add($card)
     $label=[Windows.Controls.TextBlock]::new();$label.TextWrapping='Wrap'
-    $names=@(Get-PMMDependencyDefinitions|Where-Object{($Job.component -eq 'all' -and $_.id -ne 'chatgpt') -or $_.id -eq $Job.component}|ForEach-Object{$_.name+' '+$_.version})
+    $names=@(Get-PMMDependencyDefinitions|Where-Object{($Job.component -eq 'all' -and $_.id -ne 'chatgpt') -or $_.id -eq $Job.component}|ForEach-Object{(Get-PMMLocalizedText ([string]$_.name))+' '+(Get-PMMLocalizedText ([string]$_.version))})
     $label.Text=(L 'PMM proposes installing: ' 'PMM propone instalar: ')+($names -join ', ')
     [void]$content.Children.Add($label)
     $all=[Windows.Controls.RadioButton]::new();$all.Content=L 'Install everything needed without asking again' 'Instalar todo lo necesario sin volver a preguntar';$all.GroupName='Permission';$all.IsChecked=$true;$all.Margin=[Windows.Thickness]::new(0,18,0,8)
@@ -88,7 +88,7 @@ function New-PMMDependencyPanel {
         $label=[Windows.Controls.TextBlock]::new();$label.Text=$displayName+' ('+$displayVersion+')';$label.TextWrapping='Wrap';$label.VerticalAlignment='Center';[void]$row.Children.Add($label)
         $Script:PMMDependencyLabels[$d.id]=@{label=$label;button=$button;name=$displayName;version=$displayVersion}
         $button.Add_Click({param($sender,$eventArgs)
-            try{if($sender.Content -eq (L 'Open' 'Abrir')){Open-PMMDependencyComponent ([string]$sender.Tag);return};$case=Get-PMMAIIOSelectedCase;$caseId='';if($case){$caseId=$case.CaseId};$job=Request-PMMDependencyInstall ([string]$sender.Tag) $caseId;$Script:PMMDependencySelectedJob=$job.id;$Script:PMMDependencyStatus.Text=$job.status}catch{Handle-UIError $_ 'Dependencies'}
+            try{if($sender.Content -eq (L 'Open' 'Abrir')){Open-PMMDependencyComponent ([string]$sender.Tag);return};$case=Get-PMMAIIOSelectedCase;$caseId='';if($case){$caseId=$case.CaseId};$job=Request-PMMDependencyInstall ([string]$sender.Tag) $caseId;$Script:PMMDependencySelectedJob=$job.id;$Script:PMMDependencyStatus.Text=Get-PMMLocalizedText ([string]$job.status)}catch{Handle-UIError $_ 'Dependencies'}
         })
         [void]$row.Children.Add($actions);[void]$list.Children.Add($row)
     }

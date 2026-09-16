@@ -14,7 +14,7 @@ function Get-PMMLanguageDefinition([string]$Code){
 }
 function Resolve-PMMLanguageCode([string]$Code){
   $registry=Get-PMMLanguageRegistry
-  if(-[string]::IsNullOrWhiteSpace($Code)){
+  if(-not [string]::IsNullOrWhiteSpace($Code)){
     $exact=Get-PMMLanguageDefinition $Code;if($exact){return [string]$exact.code}
     $base=($Code -split '-')[0]
     $match=@($registry.languages|Where-Object{([string]$_.code -split '-')[0] -ieq $base}|Select-Object -First 1)[0]
@@ -58,6 +58,7 @@ function Invoke-PMMLocalizeVisualTree($Root,[string]$LanguageCode=''){
     if($Root -is [Windows.Controls.HeaderedContentControl] -and $Root.Header -is [string]){$Root.Header=Get-PMMLocalizedText ([string]$Root.Header) $code}
     if($Root -is [Windows.Controls.HeaderedItemsControl] -and $Root.Header -is [string]){$Root.Header=Get-PMMLocalizedText ([string]$Root.Header) $code}
     if($Root -is [Windows.FrameworkElement] -and $Root.ToolTip -is [string]){$Root.ToolTip=Get-PMMLocalizedText ([string]$Root.ToolTip) $code}
+    if($Root -is [Windows.Controls.ItemsControl] -and $Root.ItemsSource){foreach($item in @($Root.ItemsSource)){try{if($item -and ($item.PSObject.Properties.Name -contains 'Label') -and $item.Label -is [string]){$item.Label=Get-PMMLocalizedText ([string]$item.Label) $code}}catch{}}}
     if($Root -is [Windows.Controls.DataGrid]){foreach($column in @($Root.Columns)){if($column.Header -is [string]){$column.Header=Get-PMMLocalizedText ([string]$column.Header) $code}}}
   }catch{}
   try{foreach($child in [Windows.LogicalTreeHelper]::GetChildren($Root)){if($child -is [Windows.DependencyObject]){Invoke-PMMLocalizeVisualTree $child $code}}}catch{}
@@ -65,4 +66,23 @@ function Invoke-PMMLocalizeVisualTree($Root,[string]$LanguageCode=''){
 function Set-PMMLanguageDirection($Element,[string]$LanguageCode=''){
   if(-not$Element){return};$code=if($LanguageCode){Resolve-PMMLanguageCode $LanguageCode}else{Get-PMMCurrentLanguage};$def=Get-PMMLanguageDefinition $code
   try{$Element.FlowDirection=if($def -and [string]$def.direction -eq 'rtl'){[Windows.FlowDirection]::RightToLeft}else{[Windows.FlowDirection]::LeftToRight}}catch{}
+}
+$Script:PMMLiveLocalizationHandler=$null
+function Register-PMMLiveLocalization($Root,[string]$LanguageCode=''){
+  if(-not$Root){return}
+  $code=if($LanguageCode){Resolve-PMMLanguageCode $LanguageCode}else{Get-PMMCurrentLanguage}
+  if($code -eq 'en'){return}
+  Invoke-PMMLocalizeVisualTree $Root $code
+  Set-PMMLanguageDirection $Root $code
+  try{
+    $handler=[Windows.RoutedEventHandler]{
+      param($sender,$eventArgs)
+      try{
+        $target=$eventArgs.OriginalSource
+        if($target -is [Windows.DependencyObject]){Invoke-PMMLocalizeVisualTree $target $code}
+      }catch{}
+    }.GetNewClosure()
+    $Root.AddHandler([Windows.FrameworkElement]::LoadedEvent,$handler,$true)
+    $Script:PMMLiveLocalizationHandler=$handler
+  }catch{}
 }
