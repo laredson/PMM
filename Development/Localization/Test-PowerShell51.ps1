@@ -30,21 +30,29 @@ if([string]::IsNullOrWhiteSpace($translated) -or $translated -ceq 'Settings'){
   throw "Catalog lookup did not return a translated value for Settings. Value='$translated'"
 }
 
-$expectedNativeNames=@{
-  'en'='English'
-  'es'='Español'
-  'zh-CN'='简体中文'
+$registry=Get-PMMLanguageRegistry
+$expectedNativeNames=@{}
+foreach($definition in @($registry.languages)){
+  $expectedNativeNames[[string]$definition.code]=[string]$definition.nativeName
 }
+foreach($requiredCode in @('en','es','zh-CN')){
+  if(-not $expectedNativeNames.ContainsKey($requiredCode)){
+    throw "Required language '$requiredCode' is missing from languages.json."
+  }
+}
+if([string]$expectedNativeNames['en'] -cne 'English'){
+  throw "English nativeName must remain exactly 'English'."
+}
+
 $languageOptions=@(Get-PMMLanguageOptions)
 foreach($option in $languageOptions){
   $code=[string]$option.Code
-  if($expectedNativeNames.ContainsKey($code)){
-    if([string]$option.Label -cne [string]$expectedNativeNames[$code]){
-      throw "Language option '$code' lost its native name. Expected '$($expectedNativeNames[$code])', got '$($option.Label)'."
-    }
-    if(-not($option.PSObject.Properties.Name -contains 'PMMLocalizeLabel') -or [bool]$option.PMMLocalizeLabel){
-      throw "Language option '$code' must opt out of label localization."
-    }
+  if(-not $expectedNativeNames.ContainsKey($code)){throw "Unexpected language option '$code'."}
+  if([string]$option.Label -cne [string]$expectedNativeNames[$code]){
+    throw "Language option '$code' lost its nativeName from languages.json."
+  }
+  if(-not($option.PSObject.Properties.Name -contains 'PMMLocalizeLabel') -or [bool]$option.PMMLocalizeLabel){
+    throw "Language option '$code' must opt out of label localization."
   }
 }
 
@@ -57,8 +65,8 @@ $languageCombo.ItemsSource=$languageOptions
 Invoke-PMMLocalizeVisualTree $languageCombo $Language
 foreach($option in @($languageCombo.ItemsSource)){
   $code=[string]$option.Code
-  if($expectedNativeNames.ContainsKey($code) -and [string]$option.Label -cne [string]$expectedNativeNames[$code]){
-    throw "Visual-tree localization translated native language name '$code' to '$($option.Label)'."
+  if([string]$option.Label -cne [string]$expectedNativeNames[$code]){
+    throw "Visual-tree localization changed nativeName for '$code'."
   }
 }
 
@@ -80,4 +88,4 @@ Invoke-PMMLocalizeVisualTree $window $Language
 Set-PMMLanguageDirection $window $Language
 $window.Close()
 
-Write-Host "Windows PowerShell 5.1 localization OK: language=$Language strings=$($catalog.Count) settings='$translated' nativeNames=OK"
+Write-Host "Windows PowerShell 5.1 localization OK: language=$Language strings=$($catalog.Count) nativeNames=OK"
