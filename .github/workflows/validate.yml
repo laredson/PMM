@@ -1,6 +1,7 @@
 # Current-release CI: version-aware package integrity, localization, Windows PowerShell 5.1, WPF and runtime checks.
 # Desktop/workspace regression fixtures are deterministic and independent of the hosted runner's installed apps.
 # This workflow intentionally validates the current release contract rather than historical RC-only assumptions.
+# Final v1.3.4.1 CI refresh verification.
 name: PMM validation
 
 on:
