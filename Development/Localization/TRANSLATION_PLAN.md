@@ -16,7 +16,8 @@ This file is the close translation-work ledger for PMM 1.5. Update it whenever a
 - When a language is finished, populate every canonical English key, preserve placeholders and invariant technical terms, validate it, then change its registry entry to `enabled: true` / `status: complete`.
 - `rtl` languages must be registered with right-to-left direction.
 - Language names in selectors always remain in their own native form.
-- Translation work is normally done in pairs so terminology and visual review remain manageable.
+- Translation work is now scoped conservatively: one language stage per intervention. A fresh 1,291-string locale should normally be reviewed in chunks of roughly 300-400 strings, followed by a separate completion/activation pass. A locale that already has a complete draft may use one intervention for finalization and activation.
+- Language changes require restarting PMM. The experimental live-switch path was reverted because it increased startup cost and produced incorrect/slow in-session refreshes.
 - The branch development identity is `1.5.0.0`. `PMM/Resources/Metadata/VERSION.txt` is the runtime UI version source; changing Git branches alone does not rewrite this file or rebuild an executable.
 
 ## Priority model: Palworld audience first, global language reach as tie-break
@@ -69,7 +70,7 @@ Normal post-baseline market queue:
 
 `pt-BR -> ko -> ru -> fr -> de -> zh-TW -> ja -> tr -> pl -> it -> th -> id -> vi -> nl -> uk -> cs -> hi -> ar`
 
-Hindi and Modern Standard Arabic are intentionally being completed before their normal market position as the first v1.5 quality pair. Hindi exercises Devanagari/non-Latin rendering; Arabic is the first complete RTL locale and validates the generic right-to-left layout path. After that pair, work resumes at the start of the market queue with Brazilian Portuguese + Korean.
+Hindi and Modern Standard Arabic were intentionally moved ahead of their normal market position as early v1.5 quality targets. Hindi exercises Devanagari/non-Latin rendering and is now complete/enabled for user testing. Arabic remains the next active localization task and is the first complete RTL validation target. After Arabic is complete, work resumes at the start of the market queue with Brazilian Portuguese, then Korean.
 
 The older worldwide-speaker backlog remains as reserve templates rather than being deleted: Bengali (`bn`), Urdu (`ur`), Nigerian Pidgin (`pcm`), Egyptian Arabic (`arz`), Marathi (`mr`), Telugu (`te`) and Hausa (`ha`).
 
@@ -96,8 +97,8 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 | 17 | `nl` | Nederlands | Dutch | ltr | disabled | template pending |
 | 18 | `uk` | Українська | Ukrainian | ltr | disabled | template pending |
 | 19 | `cs` | Čeština | Czech | ltr | disabled | template pending |
-| 20 | `hi` | हिन्दी | Hindi | ltr | disabled | **translation pair 1: in progress** |
-| 21 | `ar` | العربية | Modern Standard Arabic | rtl | disabled | **translation pair 1: in progress / RTL validation** |
+| 20 | `hi` | हिन्दी | Hindi | ltr | enabled | **complete; user runtime/visual test pending** |
+| 21 | `ar` | العربية | Modern Standard Arabic | rtl | disabled | **in progress; next active task / RTL validation** |
 | reserve | `bn` | বাংলা | Bengali | ltr | disabled | reserve template |
 | reserve | `ur` | اردو | Urdu | rtl | disabled | reserve template |
 | reserve | `pcm` | Naijá | Nigerian Pidgin | ltr | disabled | reserve template |
@@ -117,10 +118,21 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 7. Run `python Development/Localization/audit_localization.py`.
 8. Run the Windows PowerShell 5.1 localization regression before release.
 9. Visually inspect principal WPF screens for truncation, dynamic English residue, and layout problems. RTL languages additionally require navigation/order/alignment review.
-10. Change registry to `enabled: true` / `status: complete` only after validation.
+10. Change registry to `enabled: true` / `status: complete` when the catalog is complete enough for the user's runtime test; release acceptance still requires the validation and visual checks above.
 11. Update this ledger and `Development/AI/WORKBENCH_STATE.md` in the same intervention.
 
 ## Work log
+
+### 2026-09-16 — scope recalibration + Hindi activation
+
+- Recalibrated translation scope after repeated stream/tool timeouts. Two full 1,291-string languages in one intervention was too aggressive for quality and recoverability.
+- New default unit: roughly 300-400 fresh/reviewed strings per prompt, or one finalization/activation pass when a complete draft already exists. Do not claim multiple languages complete merely because template files exist.
+- Preserved the earlier revert of live language switching. PMM again saves the selected language and applies it after restart; no live localization handler is active.
+- Promoted the complete Hindi draft into the canonical `hi.json`. Its key order reaches the same canonical tail as `en.json` with the expected one-line metadata offset, and reviewed samples preserve placeholders/format specifiers and product identifiers.
+- Enabled `हिन्दी` in `languages.json` with `status: complete`, making it available for the user's runtime/visual test. This is not a claim of final release acceptance; the user's visual review and release validation remain required.
+- Arabic remains `in-progress`, disabled, and is the next localization task. Work will continue from the existing `ar.json` instead of starting over.
+- Removed temporary recovery/checkpoint files and the temporary Hindi draft filename from the branch; Git history still preserves those checkpoints.
+- No release, tag, main merge or GitHub Actions run was created.
 
 ### 2026-09-16 — v1.5 runtime identity correction
 
@@ -128,7 +140,7 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 - Root cause: `Modules/Bootstrap/Start-PalModMerger.ps1` builds the window title from `Resources/Metadata/VERSION.txt`, and that file had never been advanced from the 1.3.4.1 release baseline.
 - Updated `Resources/Metadata/VERSION.txt` to `1.5.0.0` and `Resources/Metadata/BUILD_ID.txt` to `PMM-v1.5.0.0-localization-dev` on this branch only.
 - No release/tag/main merge was created. The existing 1.3.4.1 release manifest/hash inventory remains release provenance and will be regenerated when 1.5 is actually packaged.
-- The language selector still intentionally exposes only `English`, `Español`, `简体中文`; all unfinished locales remain registered but disabled until their translations pass validation.
+- The language selector still intentionally exposes only completed languages; unfinished locales remain registered but disabled until their translations reach user-test quality.
 - GitHub Desktop branch switching changes the checked-out source files. It does not by itself rebuild/replace a binary; the current editable UI nevertheless reads `VERSION.txt` at startup, so after fetching/pulling this commit and restarting PMM from this checkout the title should report `v1.5.0.0`.
 
 ### 2026-09-16 — registry/progress synchronization correction
@@ -137,7 +149,7 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 - Corrected the architecture so `languages.json` now inventories **all planned v1.5 locales** and records `enabled` plus `status` for each.
 - Preserved the first three active entries exactly as `English`, `Español`, and `简体中文`.
 - Added runtime filtering so unfinished entries remain visible in Git/repository state but cannot appear in the PMM selector or be resolved as normal active UI languages.
-- Hindi and Arabic remain `in-progress` and disabled; their current translated work is stored directly in `hi.json` and `ar.json` on this branch.
+- Hindi and Arabic were registered as `in-progress` and disabled at that stage; subsequent work now records Hindi as complete/enabled while Arabic remains in progress.
 - Updated localization documentation and the shared workbench state in the same intervention.
 
 ### 2026-09-16 — Palworld-market priority refresh + first translation pair
@@ -145,8 +157,8 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 - Replaced the original pure total-speaker order with a Palworld-market-first priority model; worldwide speakers now break close ties.
 - Added pending market templates that were missing from the original speaker-based scaffold: Korean (`ko`), Traditional Chinese (`zh-TW`), Polish (`pl`), Italian (`it`), Thai (`th`), Ukrainian (`uk`), Dutch (`nl`) and Czech (`cs`).
 - Preserved the previous high-speaker templates as a reserve backlog instead of deleting them.
-- Started Hindi (`hi`) + Modern Standard Arabic (`ar`) as the first quality-controlled pair to validate Devanagari/non-Latin rendering and RTL behavior.
-- After this pair, the next planned pair is Brazilian Portuguese (`pt-BR`) + Korean (`ko`).
+- Started Hindi (`hi`) + Modern Standard Arabic (`ar`) as early quality targets to validate Devanagari/non-Latin rendering and RTL behavior.
+- After Hindi and Arabic, the market queue resumes with Brazilian Portuguese (`pt-BR`) and Korean (`ko`), now handled one language/stage at a time rather than two complete locales in one prompt.
 
 ### 2026-09-16 — v1.5 translation scaffolding
 

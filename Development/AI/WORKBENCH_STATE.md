@@ -6,15 +6,19 @@ Branch `v1.5.0.0-PMM-translated` starts from validated `main` commit `70d106e871
 
 ### Current translation state
 
-The user correctly identified a repository-state inconsistency: the branch already contained many locale JSON files, but `PMM/Resources/Localization/languages.json` still listed only the three completed languages. That made the branch look like it had only English, Spanish and Simplified Chinese from the application's point of view.
+`PMM/Resources/Localization/languages.json` is the complete locale inventory for v1.5. Pending/in-progress/reserve languages remain traceable in Git but are filtered from normal runtime language resolution until enabled.
 
-This has been corrected. `languages.json` is now the complete locale inventory for v1.5. Every planned locale is recorded there with `enabled` and `status`. Only completed locales are enabled, so the runtime selector still exposes exactly the three already-finished native labels: `English`, `Español`, `简体中文`. Pending/in-progress/reserve languages are visible and traceable in Git but remain unavailable to users until validation is complete.
+The active selector now contains four completed native labels: `English`, `Español`, `简体中文`, and `हिन्दी`. Hindi has been promoted from the completed draft into canonical `hi.json`, is `enabled: true` / `status: complete`, and is ready for the user's runtime and visual test. Release acceptance is still separate and requires the normal localization/PowerShell/WPF validation plus visual review.
 
-The localization runtime now filters disabled language definitions during normal resolution and selector construction. This preserves the existing UI behavior while allowing the branch itself to represent all translation work accurately.
+Modern Standard Arabic (`ar`) remains `in-progress` / `enabled: false`. It already contains real translated work and is the next active localization task; continue from the committed `ar.json`, do not restart it. Arabic is the first full RTL validation target.
 
-The backlog is prioritized by estimated **Palworld audience**, not world population alone. The detailed evidence model, ordered locale queue and intervention log live in `Development/Localization/TRANSLATION_PLAN.md`.
+The experimental live-language-switch implementation was reverted because the user observed slow startup, slow in-session changes and incorrect refresh results. PMM is back to the stable behavior: selecting a language saves it, and the complete interface adopts it after PMM is restarted.
 
-Hindi (`hi`) and Modern Standard Arabic (`ar`) are translation pair 1 even though their normal Palworld-market priority is later. Both have real translated content committed on this branch and remain `in-progress` / `enabled: false`. Arabic is the first full RTL validation target. Do not mark either complete until every canonical English key is translated, placeholder checks pass, PowerShell 5.1/WPF validation passes, and Arabic receives a visual RTL review. After this pair, resume with `pt-BR` + `ko`.
+Translation workload has been recalibrated for reliability. Two complete 1,291-string languages per prompt was too aggressive. The default working unit is now roughly 300-400 newly translated/reviewed strings, or one contained finalization/activation pass if a complete draft already exists. Every intervention must leave a recoverable Git checkpoint and update `Development/Localization/TRANSLATION_PLAN.md` plus this file.
+
+The backlog is prioritized by estimated **Palworld audience**, not world population alone. The detailed evidence model, ordered locale queue and intervention log live in `Development/Localization/TRANSLATION_PLAN.md`. After Arabic, resume the commercial queue with Brazilian Portuguese, then Korean, one language/stage at a time.
+
+Temporary recovery artifacts used during the interrupted Hindi/Arabic work are removed again once their useful state is represented in canonical files and this ledger. Git history remains the recovery source if an interrupted step must be inspected.
 
 ### v1.5 runtime identity correction
 
