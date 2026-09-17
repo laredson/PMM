@@ -70,7 +70,7 @@ Normal post-baseline market queue:
 
 `pt-BR -> ko -> ru -> fr -> de -> zh-TW -> ja -> tr -> pl -> it -> th -> id -> vi -> nl -> uk -> cs -> hi -> ar`
 
-Hindi and Modern Standard Arabic were intentionally moved ahead of their normal market position as early v1.5 quality targets. Hindi exercises Devanagari/non-Latin rendering and is now complete/enabled for user testing. Arabic remains the next active localization task and is the first complete RTL validation target. After Arabic is complete, work resumes at the start of the market queue with Brazilian Portuguese, then Korean.
+Hindi and Modern Standard Arabic were intentionally moved ahead of their normal market position as early v1.5 quality targets. Both catalogs are now complete and enabled for user testing: Hindi validates Devanagari/non-Latin rendering, while Arabic is the first RTL locale. The next active translation target returns to the commercial queue with Brazilian Portuguese (`pt-BR`), followed by Korean (`ko`).
 
 The older worldwide-speaker backlog remains as reserve templates rather than being deleted: Bengali (`bn`), Urdu (`ur`), Nigerian Pidgin (`pcm`), Egyptian Arabic (`arz`), Marathi (`mr`), Telugu (`te`) and Hausa (`ha`).
 
@@ -97,8 +97,8 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 | 17 | `nl` | Nederlands | Dutch | ltr | disabled | template pending |
 | 18 | `uk` | Українська | Ukrainian | ltr | disabled | template pending |
 | 19 | `cs` | Čeština | Czech | ltr | disabled | template pending |
-| 20 | `hi` | हिन्दी | Hindi | ltr | enabled | **complete; user runtime/visual test pending** |
-| 21 | `ar` | العربية | Modern Standard Arabic | rtl | disabled | **in progress; next active task / RTL validation** |
+| 20 | `hi` | हिन्दी | Hindi | ltr | enabled | **complete; user runtime/visual test in progress** |
+| 21 | `ar` | العربية | Modern Standard Arabic | rtl | enabled | **complete; user RTL/runtime visual test pending** |
 | reserve | `bn` | বাংলা | Bengali | ltr | disabled | reserve template |
 | reserve | `ur` | اردو | Urdu | rtl | disabled | reserve template |
 | reserve | `pcm` | Naijá | Nigerian Pidgin | ltr | disabled | reserve template |
@@ -123,6 +123,15 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 
 ## Work log
 
+### 2026-09-16 — Arabic completion + first RTL user-test handoff
+
+- Continued from the committed partial `ar.json`; the Arabic work was not restarted from zero.
+- Expanded Modern Standard Arabic through the complete current canonical English sequence. The Arabic file keeps the same key order and reaches the same canonical tail as `en.json`; its one-line offset is the Arabic-only `translationStatus` metadata line. This provides a direct key-parity check against the 1,291-string source catalog.
+- Preserved format placeholders and technical/product identifiers while translating PMM-facing prose. Arabic is registered with `direction: rtl` and is now `enabled: true` / `status: complete` for the user's runtime test.
+- The user's Hindi screenshot showed stable Devanagari rendering and no obvious severe clipping in the visible Fix Lab screen. It also exposed dynamic English suffix residue such as `0 candidate(s)`, `0 variant(s)` and `0 case backup(s)`. Those are dynamic-format localization gaps rather than missing Hindi catalog entries and should be cleaned up generically before the final v1.5 release.
+- Final release acceptance for Arabic is still pending the user's real Windows RTL/layout screenshot plus the normal PowerShell/WPF localization validation before release. No GitHub Actions were run in this development intervention.
+- Next translation target returns to the market queue: Brazilian Portuguese (`pt-BR`), then Korean (`ko`).
+
 ### 2026-09-16 — scope recalibration + Hindi activation
 
 - Recalibrated translation scope after repeated stream/tool timeouts. Two full 1,291-string languages in one intervention was too aggressive for quality and recoverability.
@@ -130,7 +139,7 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 - Preserved the earlier revert of live language switching. PMM again saves the selected language and applies it after restart; no live localization handler is active.
 - Promoted the complete Hindi draft into the canonical `hi.json`. Its key order reaches the same canonical tail as `en.json` with the expected one-line metadata offset, and reviewed samples preserve placeholders/format specifiers and product identifiers.
 - Enabled `हिन्दी` in `languages.json` with `status: complete`, making it available for the user's runtime/visual test. This is not a claim of final release acceptance; the user's visual review and release validation remain required.
-- Arabic remains `in-progress`, disabled, and is the next localization task. Work will continue from the existing `ar.json` instead of starting over.
+- Arabic remained `in-progress` at that checkpoint and subsequent work continued from the existing `ar.json` instead of starting over.
 - Removed temporary recovery/checkpoint files and the temporary Hindi draft filename from the branch; Git history still preserves those checkpoints.
 - No release, tag, main merge or GitHub Actions run was created.
 
@@ -149,7 +158,7 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 - Corrected the architecture so `languages.json` now inventories **all planned v1.5 locales** and records `enabled` plus `status` for each.
 - Preserved the first three active entries exactly as `English`, `Español`, and `简体中文`.
 - Added runtime filtering so unfinished entries remain visible in Git/repository state but cannot appear in the PMM selector or be resolved as normal active UI languages.
-- Hindi and Arabic were registered as `in-progress` and disabled at that stage; subsequent work now records Hindi as complete/enabled while Arabic remains in progress.
+- Hindi and Arabic were registered as `in-progress` and disabled at that stage; subsequent work now records both as complete/enabled for user testing.
 - Updated localization documentation and the shared workbench state in the same intervention.
 
 ### 2026-09-16 — Palworld-market priority refresh + first translation pair
