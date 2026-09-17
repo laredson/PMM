@@ -14,6 +14,7 @@ This file is the close translation-work ledger for PMM 1.5. Update it whenever a
 - Registry `status` values are `complete`, `in-progress`, `template`, or `reserve`.
 - Every planned locale also has its own independent JSON catalog under `PMM/Resources/Localization/`.
 - When a language is finished, populate every canonical English key, preserve placeholders and invariant technical terms, validate it, then change its registry entry to `enabled: true` / `status: complete`.
+- `complete` is catalog readiness for development testing, not automatic release acceptance. Record which checks actually ran; matching line counts alone are not a machine-run key/placeholder audit.
 - `rtl` languages must be registered with right-to-left direction.
 - Language names in selectors always remain in their own native form.
 - Translation work is now scoped conservatively: one language stage per intervention. A fresh 1,291-string locale should normally be reviewed in chunks of roughly 300-400 strings, followed by a separate completion/activation pass. A locale that already has a complete draft may use one intervention for finalization and activation.
@@ -70,7 +71,7 @@ Normal post-baseline market queue:
 
 `pt-BR -> ko -> ru -> fr -> de -> zh-TW -> ja -> tr -> pl -> it -> th -> id -> vi -> nl -> uk -> cs -> hi -> ar`
 
-Hindi and Modern Standard Arabic were intentionally moved ahead of their normal market position as early v1.5 quality targets. Both catalogs are now complete and enabled for user testing: Hindi validates Devanagari/non-Latin rendering, while Arabic is the first RTL locale. The next active translation target returns to the commercial queue with Brazilian Portuguese (`pt-BR`), followed by Korean (`ko`).
+Hindi and Modern Standard Arabic were intentionally moved ahead of their normal market position as early v1.5 quality targets. Both are enabled for user testing. Brazilian Portuguese is now also committed and enabled. Korean remains next in the existing commercial queue unless the user changes the order; Italian was proposed as an alternative but has not been translated or enabled in this recovery.
 
 The older worldwide-speaker backlog remains as reserve templates rather than being deleted: Bengali (`bn`), Urdu (`ur`), Nigerian Pidgin (`pcm`), Egyptian Arabic (`arz`), Marathi (`mr`), Telugu (`te`) and Hausa (`ha`).
 
@@ -81,7 +82,7 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 | baseline | `en` | English | English | ltr | enabled | complete + active |
 | baseline | `es` | Español | Spanish | ltr | enabled | complete + active |
 | baseline | `zh-CN` | 简体中文 | Chinese (Simplified) | ltr | enabled | complete + active |
-| 3 | `pt-BR` | Português (Brasil) | Portuguese (Brazil) | ltr | disabled | template pending |
+| 3 | `pt-BR` | Português (Brasil) | Portuguese (Brazil) | ltr | enabled | **catalog complete; development QA pending** |
 | 4 | `ko` | 한국어 | Korean | ltr | disabled | template pending |
 | 5 | `ru` | Русский | Russian | ltr | disabled | template pending |
 | 6 | `fr` | Français | French | ltr | disabled | template pending |
@@ -98,7 +99,7 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 | 18 | `uk` | Українська | Ukrainian | ltr | disabled | template pending |
 | 19 | `cs` | Čeština | Czech | ltr | disabled | template pending |
 | 20 | `hi` | हिन्दी | Hindi | ltr | enabled | **complete; user runtime/visual test in progress** |
-| 21 | `ar` | العربية | Modern Standard Arabic | rtl | enabled | **complete; user RTL/runtime visual test pending** |
+| 21 | `ar` | العربية | Modern Standard Arabic | rtl | enabled | **catalog complete; RTL polishing and runtime QA in progress** |
 | reserve | `bn` | বাংলা | Bengali | ltr | disabled | reserve template |
 | reserve | `ur` | اردو | Urdu | rtl | disabled | reserve template |
 | reserve | `pcm` | Naijá | Nigerian Pidgin | ltr | disabled | reserve template |
@@ -121,16 +122,33 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 10. Change registry to `enabled: true` / `status: complete` when the catalog is complete enough for the user's runtime test; release acceptance still requires the validation and visual checks above.
 11. Update this ledger and `Development/AI/WORKBENCH_STATE.md` in the same intervention.
 
+## Open runtime localization QA
+
+- Dynamic counters (`candidate(s)`, `variant(s)`, `case backup(s)`, library/patch counts) still contain English at runtime. Catalog completeness alone does not fix interpolation paths that never call localization with a canonical key.
+- Arabic mixed prose/path text in `TxtGamePathStatus` needs separate inline bidi scopes in the rendering path. Do not force the entire sentence or status/log controls to LTR merely because it contains a Latin token.
+- The technical allowlist now includes actual library bindings `HashShort`, `SizeText` and `Priority`. Pure paths/IDs/versions and supported DataGrid technical cell content use LTR; column order and captions stay RTL. Virtualized/template-created cells still need Windows review.
+- `Refresh-UI` in `Presentation/Library.UI.ps1` was found to retain an old English/Spanish-only selector assignment. It is not changed in this bounded recovery; verify selection persistence/refresh before release and replace it with the language resolver in a focused correction.
+- Full machine-run catalog validation and Windows PowerShell/WPF validation were not executed in the 2026-09-17 recovery environment. The registry enables Portuguese for user testing, not as a release-accepted build.
+
 ## Work log
+
+### 2026-09-17 — recover Portuguese publication and bound RTL exceptions
+
+- Confirmed the previously interrupted Portuguese write really reached GitHub in `9bcc60ff96da11c39c05cdf5b97b7561f84ca879`. Reused that committed translation; no restart from zero and no second language added.
+- Found two malformed embedded-quote lines and fixed them in `fcd966a8ce921574ab2eaff864295a29dd3aa6a8`. The remote diff contains only those two fixes. Corrected catalog blob: `8bb8888779c60fe4c22ab6d7c8ac3944077cf5e0`.
+- A local Python check confirmed the two corrected quoted-placeholder snippets parse and preserve `{0}`. This was a snippet check, not a full-catalog audit. Earlier statements that automated checks passed must not be reused as evidence of a new run.
+- Enabled `Português (Brasil)` while preserving `English`, `Español`, `简体中文` as the first three native labels. Arabic and Hindi remain enabled; all other templates remain disabled.
+- Recovered the partial LTR work from `38bd5a934488ac11a6200d3142b889ca86a82f57`. Narrowed the exception list by excluding status/log sentences and adding actual technical library binding names. No RTL layout reversal, stored-data mutation, global event handler, timer or live language switching was introduced.
+- Updated both tracking documents with the work performed and the remaining runtime checks. No release, tag, PR, main update or GitHub Actions run was requested or created in this recovery.
 
 ### 2026-09-16 — Arabic completion + first RTL user-test handoff
 
 - Continued from the committed partial `ar.json`; the Arabic work was not restarted from zero.
-- Expanded Modern Standard Arabic through the complete current canonical English sequence. The Arabic file keeps the same key order and reaches the same canonical tail as `en.json`; its one-line offset is the Arabic-only `translationStatus` metadata line. This provides a direct key-parity check against the 1,291-string source catalog.
+- Expanded Modern Standard Arabic through the complete current canonical English sequence. The Arabic file keeps the same key order and reaches the same canonical tail as `en.json`; its one-line offset is the Arabic-only `translationStatus` metadata line. This was a visual sequence comparison, not an executed machine key-parity audit.
 - Preserved format placeholders and technical/product identifiers while translating PMM-facing prose. Arabic is registered with `direction: rtl` and is now `enabled: true` / `status: complete` for the user's runtime test.
 - The user's Hindi screenshot showed stable Devanagari rendering and no obvious severe clipping in the visible Fix Lab screen. It also exposed dynamic English suffix residue such as `0 candidate(s)`, `0 variant(s)` and `0 case backup(s)`. Those are dynamic-format localization gaps rather than missing Hindi catalog entries and should be cleaned up generically before the final v1.5 release.
 - Final release acceptance for Arabic is still pending the user's real Windows RTL/layout screenshot plus the normal PowerShell/WPF localization validation before release. No GitHub Actions were run in this development intervention.
-- Next translation target returns to the market queue: Brazilian Portuguese (`pt-BR`), then Korean (`ko`).
+- Next translation target returned to the market queue: Brazilian Portuguese (`pt-BR`), then Korean (`ko`).
 
 ### 2026-09-16 — scope recalibration + Hindi activation
 

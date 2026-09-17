@@ -1,6 +1,6 @@
 # PMM shared implementation state
 
-## v1.5.0.0 translation branch — 2026-09-16
+## v1.5.0.0 translation branch — 2026-09-17
 
 Branch `v1.5.0.0-PMM-translated` starts from validated `main` commit `70d106e871099e4936dc5f81eef3e4ea15529d93`. This branch is the working line for the next PMM localization release; the discarded historical 1.4 line is not reused.
 
@@ -8,19 +8,30 @@ Branch `v1.5.0.0-PMM-translated` starts from validated `main` commit `70d106e871
 
 `PMM/Resources/Localization/languages.json` is the complete locale inventory for v1.5. Pending/template/reserve languages remain traceable in Git but are filtered from normal runtime language resolution until enabled.
 
-The active selector now contains five completed native labels: `English`, `Español`, `简体中文`, `हिन्दी`, and `العربية`.
+The active selector now contains six native labels, in this order: `English`, `Español`, `简体中文`, `Português (Brasil)`, `हिन्दी`, and `العربية`. The first three remain fixed. Registry `complete` means catalog ready for development/user testing, not release acceptance or proof that every runtime-generated string is localized.
 
-Hindi (`hi`) is `enabled: true` / `status: complete`. The user's first runtime screenshot shows that Devanagari renders correctly and the visible Fix Lab layout has no obvious severe clipping. The screenshot also revealed generic dynamic English suffixes such as `0 candidate(s)`, `0 variant(s)` and `0 case backup(s)`; those are dynamic-format localization gaps to fix generically before final v1.5 release acceptance rather than missing Hindi catalog keys.
+Brazilian Portuguese (`pt-BR`) is now committed and enabled for user testing. The interrupted write did succeed in commit `9bcc60ff96da11c39c05cdf5b97b7561f84ca879`; it must not be translated from scratch again. Recovery found unescaped embedded quotes in two catalog lines (Delete draft and Replace the installed user scheme). Commit `fcd966a8ce921574ab2eaff864295a29dd3aa6a8` corrects only those two lines. The corrected catalog blob is `8bb8888779c60fe4c22ab6d7c8ac3944077cf5e0`. The registry is enabled only after that correction. Italian has not been started or enabled.
 
-Modern Standard Arabic (`ar`) has now been completed from the previously committed partial catalog, not restarted. Its catalog follows the complete current canonical English key sequence, is marked `translationStatus: complete`, and its registry entry is now `enabled: true` / `status: complete` with `direction: rtl`. It is ready for the user's first real Windows RTL/layout test after Fetch/Pull, language selection, Apply language, and PMM restart. Release acceptance remains separate and still requires the normal localization/PowerShell/WPF checks plus the user's visual RTL review.
+Hindi (`hi`) is enabled. The user's first runtime screenshot shows Devanagari text and no obvious severe clipping in the visible Fix Lab screen. Generic dynamic English suffixes such as `0 candidate(s)`, `0 variant(s)` and `0 case backup(s)` remain open localization defects; catalog completion must not hide those runtime gaps.
+
+Modern Standard Arabic (`ar`) is enabled with `direction: rtl`. The user has now supplied real RTL screenshots; mirrored panel/tab layout is retained. Partial technical-data direction support was committed in `38bd5a934488ac11a6200d3142b889ca86a82f57` during the interrupted work. This recovery narrows that support: `TxtStatus` and `TxtLog` are not forced LTR because they also carry localized sentences; `HashShort`, `SizeText` and `Priority` join the technical binding names actually used by the library. Existing paths, IDs, versions and supported DataGrid technical cells remain LTR without reversing the surrounding Arabic layout or changing the stored data. No new timer, global Loaded handler or live-language switch is added.
+
+Arabic QA is not fully closed. Mixed prose/path text in `TxtGamePathStatus` needs proper separate inline scopes in its rendering path, not a blanket LTR override. Virtualized/template-created cells and technical text must be checked on Windows. The dynamic counters noted above also remain open.
+
+### Recovery verification and limits — 2026-09-17
+
+- Re-read the branch HEAD, saved Portuguese file, language inventory and localization implementation through the GitHub connector.
+- Verified the exact remote diff of the Portuguese correction: only the two malformed quoted-placeholder lines changed. A local Python check of the corrected quoted-placeholder snippets parsed successfully; this was not a full-catalog test.
+- Reviewed the Portuguese catalog against the supplied canonical source text. Do not treat previous claims of zero automated errors or matching line offsets as a new executed validation report.
+- A complete machine-run catalog audit and Windows PowerShell 5.1/WPF tests were not executed in this recovery environment. They remain required before release, alongside the user's runtime/visual test. No GitHub Actions were started to substitute for local execution.
+- Reviewed the RTL change against Microsoft's WPF bidirectional guidance: data can use its own FlowDirection while surrounding layout remains RTL. This does not constitute visual verification on Windows.
+- Updated the registry, the bounded RTL allowlist and both tracking documents together. Retain Git history as the checkpoint; do not create scratch branches or temporary marker files.
 
 The experimental live-language-switch implementation remains reverted because the user observed slow startup, slow in-session changes and incorrect refresh results. PMM uses the stable behavior: selecting a language saves it, and the complete interface adopts it after PMM is restarted.
 
-Translation workload remains conservatively scoped. Two complete 1,291-string languages per prompt was too aggressive. The default working unit is roughly 300-400 newly translated/reviewed strings, or one contained finalization/activation pass when a sufficiently complete draft already exists. Every intervention must leave a recoverable Git checkpoint and update `Development/Localization/TRANSLATION_PLAN.md` plus this file.
+Translation workload remains conservatively scoped. Prefer one contained language/stage per intervention; a complete draft can be finalized without restarting its translation. Every intervention must leave a recoverable Git checkpoint and update `Development/Localization/TRANSLATION_PLAN.md` plus this file.
 
-The backlog is prioritized by estimated **Palworld audience**, not world population alone. The detailed evidence model, ordered locale queue and intervention log live in `Development/Localization/TRANSLATION_PLAN.md`. With the early Hindi/Arabic quality targets complete for user testing, the next commercial target is Brazilian Portuguese (`pt-BR`), followed by Korean (`ko`), one language/stage at a time.
-
-Temporary recovery artifacts used during interrupted translation work are removed once their useful state is represented in canonical files and this ledger. Git history remains the recovery source if an interrupted step must be inspected.
+The backlog is prioritized by estimated Palworld audience. The detailed model and ordered locale queue live in `Development/Localization/TRANSLATION_PLAN.md`. Portuguese is now available for testing; Korean is next in the existing commercial queue unless the user chooses otherwise.
 
 ### v1.5 runtime identity correction
 
