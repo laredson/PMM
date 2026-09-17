@@ -6,19 +6,21 @@ Branch `v1.5.0.0-PMM-translated` starts from validated `main` commit `70d106e871
 
 ### Current translation state
 
-`PMM/Resources/Localization/languages.json` is the complete locale inventory for v1.5. Pending/in-progress/reserve languages remain traceable in Git but are filtered from normal runtime language resolution until enabled.
+`PMM/Resources/Localization/languages.json` is the complete locale inventory for v1.5. Pending/template/reserve languages remain traceable in Git but are filtered from normal runtime language resolution until enabled.
 
-The active selector now contains four completed native labels: `English`, `Español`, `简体中文`, and `हिन्दी`. Hindi has been promoted from the completed draft into canonical `hi.json`, is `enabled: true` / `status: complete`, and is ready for the user's runtime and visual test. Release acceptance is still separate and requires the normal localization/PowerShell/WPF validation plus visual review.
+The active selector now contains five completed native labels: `English`, `Español`, `简体中文`, `हिन्दी`, and `العربية`.
 
-Modern Standard Arabic (`ar`) remains `in-progress` / `enabled: false`. It already contains real translated work and is the next active localization task; continue from the committed `ar.json`, do not restart it. Arabic is the first full RTL validation target.
+Hindi (`hi`) is `enabled: true` / `status: complete`. The user's first runtime screenshot shows that Devanagari renders correctly and the visible Fix Lab layout has no obvious severe clipping. The screenshot also revealed generic dynamic English suffixes such as `0 candidate(s)`, `0 variant(s)` and `0 case backup(s)`; those are dynamic-format localization gaps to fix generically before final v1.5 release acceptance rather than missing Hindi catalog keys.
 
-The experimental live-language-switch implementation was reverted because the user observed slow startup, slow in-session changes and incorrect refresh results. PMM is back to the stable behavior: selecting a language saves it, and the complete interface adopts it after PMM is restarted.
+Modern Standard Arabic (`ar`) has now been completed from the previously committed partial catalog, not restarted. Its catalog follows the complete current canonical English key sequence, is marked `translationStatus: complete`, and its registry entry is now `enabled: true` / `status: complete` with `direction: rtl`. It is ready for the user's first real Windows RTL/layout test after Fetch/Pull, language selection, Apply language, and PMM restart. Release acceptance remains separate and still requires the normal localization/PowerShell/WPF checks plus the user's visual RTL review.
 
-Translation workload has been recalibrated for reliability. Two complete 1,291-string languages per prompt was too aggressive. The default working unit is now roughly 300-400 newly translated/reviewed strings, or one contained finalization/activation pass if a complete draft already exists. Every intervention must leave a recoverable Git checkpoint and update `Development/Localization/TRANSLATION_PLAN.md` plus this file.
+The experimental live-language-switch implementation remains reverted because the user observed slow startup, slow in-session changes and incorrect refresh results. PMM uses the stable behavior: selecting a language saves it, and the complete interface adopts it after PMM is restarted.
 
-The backlog is prioritized by estimated **Palworld audience**, not world population alone. The detailed evidence model, ordered locale queue and intervention log live in `Development/Localization/TRANSLATION_PLAN.md`. After Arabic, resume the commercial queue with Brazilian Portuguese, then Korean, one language/stage at a time.
+Translation workload remains conservatively scoped. Two complete 1,291-string languages per prompt was too aggressive. The default working unit is roughly 300-400 newly translated/reviewed strings, or one contained finalization/activation pass when a sufficiently complete draft already exists. Every intervention must leave a recoverable Git checkpoint and update `Development/Localization/TRANSLATION_PLAN.md` plus this file.
 
-Temporary recovery artifacts used during the interrupted Hindi/Arabic work are removed again once their useful state is represented in canonical files and this ledger. Git history remains the recovery source if an interrupted step must be inspected.
+The backlog is prioritized by estimated **Palworld audience**, not world population alone. The detailed evidence model, ordered locale queue and intervention log live in `Development/Localization/TRANSLATION_PLAN.md`. With the early Hindi/Arabic quality targets complete for user testing, the next commercial target is Brazilian Portuguese (`pt-BR`), followed by Korean (`ko`), one language/stage at a time.
+
+Temporary recovery artifacts used during interrupted translation work are removed once their useful state is represented in canonical files and this ledger. Git history remains the recovery source if an interrupted step must be inspected.
 
 ### v1.5 runtime identity correction
 
