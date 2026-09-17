@@ -22,7 +22,7 @@
     {"code":"uk","nativeName":"Українська","englishName":"Ukrainian","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
     {"code":"cs","nativeName":"Čeština","englishName":"Czech","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
     {"code":"hi","nativeName":"हिन्दी","englishName":"Hindi","fallback":"en","direction":"ltr","xaml":null,"enabled":true,"status":"complete"},
-    {"code":"ar","nativeName":"العربية","englishName":"Modern Standard Arabic","fallback":"en","direction":"rtl","xaml":null,"enabled":false,"status":"in-progress"},
+    {"code":"ar","nativeName":"العربية","englishName":"Modern Standard Arabic","fallback":"en","direction":"rtl","xaml":null,"enabled":true,"status":"complete"},
     {"code":"bn","nativeName":"বাংলা","englishName":"Bengali","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"reserve"},
     {"code":"ur","nativeName":"اردو","englishName":"Urdu","fallback":"en","direction":"rtl","xaml":null,"enabled":false,"status":"reserve"},
     {"code":"pcm","nativeName":"Naijá","englishName":"Nigerian Pidgin","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"reserve"},
