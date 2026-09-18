@@ -1,0 +1,9 @@
+{
+  "schema": "PMM_LANGUAGE_V1",
+  "language": "ga",
+  "nativeName": "Gaeilge",
+  "fallback": "en",
+  "templateStatus": "pending",
+  "templateSource": "en.json",
+  "strings": {}
+}

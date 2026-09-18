@@ -1,4 +1,19 @@
-## Traditional Chinese localization published — 2026-09-18
+## Japanese localization complete; user-defined queue and selector order updated — 2026-09-18
+
+日本語 now covers **1,291/1,291 canonical English keys** and is enabled for user testing. Japanese blob: `0523fa7a906e7b7a13e24217c1b5142efb8feff5`; SHA-256 `2444aedd657e925cfde04436b5d02671b67651f490456627ca6f6ec0b4fa252c`; 159,854 bytes. Structural checks passed with 109 parameterized entries, 26 intentional invariants and zero recorded structural errors. Runtime/visual and native-speaker QA remain pending.
+
+The user-defined translation execution queue is now:
+`ja -> it -> tr -> pl -> nl -> ga`
+(**日本語 -> Italiano -> Türkçe -> Polski -> Nederlands -> Gaeilge**).
+Japanese is complete, so **Italiano is next**.
+
+The selector/product order is deliberately separate from the Palworld market-evidence ranking. Leading order:
+`en -> es -> pt-BR -> it -> fr -> de -> pl -> nl -> ja -> zh-CN -> zh-TW -> ko -> ru -> tr ...`.
+Thus Polish and Dutch are reserved immediately after German, while Simplified and Traditional Chinese remain adjacent. Disabled locales do not appear until complete. Irish has been registered as `ga` / `Gaeilge` with a disabled template.
+
+No runtime code, binaries, main, releases, tags or workflows are changed by this localization checkpoint.
+
+## Historical checkpoint — Traditional Chinese localization published — 2026-09-18
 
 繁體中文 now covers all **1,291 canonical English keys** on `v1.5.0.0-PMM-translated` and is enabled for user testing. This publication uses the exact prepared catalog validated against canonical English; Simplified Chinese and the ten previously enabled catalogs are unchanged.
 
@@ -89,9 +104,13 @@ English-speaking countries cannot be separated reliably from one another by the 
 
 The first three existing locales remain fixed at the top of the product because they are already complete: **English**, **Español**, **简体中文**.
 
-Normal post-baseline market queue:
+Historical market-evidence queue (kept for demand analysis only):
 
 `pt-BR -> ko -> ru -> fr -> de -> zh-TW -> ja -> tr -> pl -> it -> th -> id -> vi -> nl -> uk -> cs -> hi -> ar`
+
+Current user-directed execution queue after completed locales:
+
+`it -> tr -> pl -> nl -> ga`
 
 Hindi and Modern Standard Arabic were intentionally moved ahead of their normal market position as early v1.5 quality targets. Both are enabled for user testing. Brazilian Portuguese, Korean and French have passed the user's reported runtime test. Russian has positive preliminary user feedback. German is complete and published for user QA; Traditional Chinese is the next translation target. Italian was proposed as an alternative but has not been translated or enabled. The user's positive reports do not by themselves close the specific runtime issues listed below.
 
@@ -110,7 +129,7 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 | 6 | `fr` | Français | French | ltr | enabled | **catalog complete, 1,291/1,291; user confirmed French** |
 | 7 | `de` | Deutsch | German | ltr | enabled | **catalog complete, 1,291/1,291; published; structural recheck passed; user QA pending** |
 | 9 | `zh-TW` | 繁體中文 | Chinese (Traditional) | ltr | enabled | **catalog complete, 1,291/1,291; published; user QA pending** |
-| 10 | `ja` | 日本語 | Japanese | ltr | disabled | **next translation target; template pending** |
+| product | `ja` | 日本語 | Japanese | ltr | enabled | **catalog complete, 1,291/1,291; user QA pending** |
 | 11 | `tr` | Türkçe | Turkish | ltr | disabled | template pending |
 | 12 | `pl` | Polski | Polish | ltr | disabled | template pending |
 | 13 | `it` | Italiano | Italian | ltr | disabled | template pending |
@@ -122,6 +141,7 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 | 19 | `cs` | Čeština | Czech | ltr | disabled | template pending |
 | 20 | `hi` | हिन्दी | Hindi | ltr | enabled | **complete; user runtime/visual test in progress** |
 | 21 | `ar` | العربية | Modern Standard Arabic | rtl | enabled | **catalog complete; RTL polishing and runtime QA in progress** |
+| product | `ga` | Gaeilge | Irish | ltr | disabled | **user-requested template; translate after Nederlands** |
 | reserve | `bn` | বাংলা | Bengali | ltr | disabled | reserve template |
 | reserve | `ur` | اردو | Urdu | rtl | disabled | reserve template |
 | reserve | `pcm` | Naijá | Nigerian Pidgin | ltr | disabled | reserve template |

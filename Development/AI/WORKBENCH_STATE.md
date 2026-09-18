@@ -1,4 +1,18 @@
-## Active checkpoint — Traditional Chinese published — 2026-09-18
+## Active checkpoint — Japanese complete; Italian next — 2026-09-18
+
+Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. Japanese (`ja`, `日本語`) is complete and enabled: **1,291/1,291 canonical keys**, fallback `en`, direction `ltr`, no separate XAML. Exact Japanese blob: `0523fa7a906e7b7a13e24217c1b5142efb8feff5`; SHA-256 `2444aedd657e925cfde04436b5d02671b67651f490456627ca6f6ec0b4fa252c`; 159,854 bytes.
+
+Structural validation recorded zero missing/extra/empty keys, zero placeholder/format errors across 109 parameterized strings and zero numeric/whitespace/Unicode/extension/protected-token errors. There are 26 intentional invariant values. Japanese runtime/visual and native-speaker QA are pending.
+
+User-directed translation queue: **Italiano -> Türkçe -> Polski -> Nederlands -> Gaeilge**. Do not substitute the historical market queue for this execution order. Irish is standardized as `ga` / `Gaeilge` and is registered as a disabled template.
+
+User-defined selector/product order starts:
+`English -> Español -> Português (Brasil) -> Italiano -> Français -> Deutsch -> Polski -> Nederlands -> 日本語 -> 简体中文 -> 繁體中文 -> 한국어 -> Русский -> Türkçe ...`.
+Polish and Dutch therefore occupy positions immediately after German when enabled; both Chinese variants remain adjacent. Keep native language names literal.
+
+Preserve restart-based switching, all completed catalogs, runtime/native binaries, Arabic bidi behavior, main, releases, tags and workflows. Existing dynamic-runtime localization gaps remain open separately. **Next translation: Italian (`it`, Italiano).**
+
+## Historical checkpoint — Traditional Chinese published — 2026-09-18
 
 Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. Traditional Chinese (`zh-TW`, `繁體中文`) is complete and enabled: **1,291/1,291 canonical keys**, fallback `en`, direction `ltr`, no separate XAML. It was authored against canonical English and published from the exact locally validated payload; do not retranslate it from Simplified Chinese.
 
