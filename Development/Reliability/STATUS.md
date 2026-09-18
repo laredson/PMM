@@ -1,33 +1,35 @@
 # Estado de la linea v1.5.0.1
 
-## Entregado en la inicializacion
+Ultimo checkpoint: tanda 01, 2026-09-18. **PARCIAL, con bloqueo de entrada.**
+Entrada: df4b2417d3278096f9f66f115bd1237e8d908068.
+Retomar: [NEXT_SESSION.md](NEXT_SESSION.md).
 
-Rama independiente desde `38bd5a934488ac11a6200d3142b889ca86a82f57`, ancestro comun registrado, instrucciones para continuacion, plan de fiabilidad, contrato de integracion de idiomas y herramienta de inventario de diferencias en modo solo lectura.
+## Hecho
 
-No se modifican los archivos de `PMM/`, los fuentes anteriores ni los workflows. No se hace merge, no se crea tag/release y no se selecciona Latest. La version objetivo se registra en BASELINE.json; todavia no cambia la version que muestra el programa heredado.
+Rama independiente y ancestro comun conservados. Tanda 01: trazado el origen de Host/Runtime al commit Guided Flow y contrastada la estructura anterior; documentados los contratos de splash/primer plano y la referencia no localizada de FixLab. Preparada herramienta offline de captura nativa y generacion conjunta de cuatro metadatos. Sintaxis Python comprobada y 12 tests sinteticos locales superados.
 
-## Trabajo pendiente
+## No hecho
 
-| ID | Entrega | Estado |
+No se recuperaron fuentes nativas exactas. No se obtuvieron los bytes completos del paquete en este entorno. No se reconstruyeron/reemplazaron binarios, ni se aplico la propuesta de identidad, ni se regenero el SHA256SUMS del paquete real. No se ejecutaron PMM, Windows/WPF, antivirus, Actions ni tests remotos. No se creo release/tag/PR.
+
+El paquete de la rama sigue siendo el heredado: VERSION.txt = 1.5.0.0; RELEASE_MANIFEST.version = 1.3.4.1. **No presentar ambos asuntos como resueltos.** Las salidas de tests son de la herramienta y sus fixtures, no del paquete real.
+
+| ID | Estado real | Siguiente entrega |
 | --- | --- | --- |
-| REL-00 | Inventario de artefactos, SHA-256 real y correspondencia del informe de VirusTotal | Pendiente; no se ha establecido la identidad del archivo reportado |
-| REL-01 | Fuentes nativas actuales recuperadas/reconciliadas y paridad documentada | Prioridad maxima; la advertencia de SOURCE_STATUS.md sigue vigente |
-| REL-02 | Identidad 1.5.0.1 coherente en VERSION, BUILD_ID, manifiesto, UI e inventarios | Pendiente; VERSION heredado 1.5.0.0 y manifiesto heredado 1.3.4.1 |
-| REL-03 | Invocaciones y permisos revisados, sin Bypass innecesario y con contratos de herramientas | Pendiente; no se ha modificado el arranque ni eliminado PowerShell |
-| REL-04 | Arranque local verificable, reparacion explicita y transaccional, respeto a cuarentena | Pendiente; comportamiento actual conservado |
-| REL-05 | Compilacion repetible, recursos estandar y procedencia completa | Pendiente; depende de REL-01 |
-| REL-06 | Firma de codigo y scripts cuando corresponda | Pendiente; certificado/servicio no seleccionado ni provisionado |
-| REL-07 | Preflight de distribucion, pruebas locales Windows y evidencia de escaneos reales | Pendiente; no equivale a un emulador de Nexus |
-| LOC-MERGE | Integracion de las traducciones posteriores al punto de partida | Preparada documentalmente; no ejecutada |
+| REL-00 | Investigacion parcial; objetos Git identificados, SHA-256 heredados aun no recalculados aqui | Obtener bytes y producir captura local verificable |
+| REL-01 | BLOCKED: paridad fuente/binario no demostrada | Tandas 02/03/04; conservar binarios actuales |
+| REL-02 | Preparador implementado y probado con fixtures; propuesta NO aplicada | Tanda 01B: identidad y checksums del paquete real |
+| REL-03 a REL-07 | Pendientes; plan dividido en tandas acotadas | SESSION_PLAN.md |
+| LOC-MERGE | No realizado; rama de traducciones intacta | Integrar solo tras autorizacion y revision semantica |
 
-## Evidencia y limites de esta entrega
+## Archivos de referencia
 
-- Inspeccion por lectura de la rama, fuentes de referencia, metadatos, contrato de localizacion y triggers de los tres workflows presentes.
-- Los filtros push leidos no incluyen `v1.5.0.1-PMM-reliability`. No se solicita workflow_dispatch ni se abre un PR. El commit de preparacion incluye `[skip ci]`.
-- La sintaxis Python de `plan_translation_integration.py` se ha analizado localmente con AST. No se ha ejecutado sobre una copia local completa de PMM ni se presenta como herramienta funcionalmente validada.
-- No se han ejecutado compilaciones, PMM, pruebas funcionales ni antivirus. La comprobacion del commit y su diff por la API de GitHub es inspeccion del repositorio, no CI.
-- La conservacion del arbol `PMM/` se verifica por identidad Git al cerrar la inicializacion. Esto demuestra ausencia de cambios de contenido, no ausencia de malware ni ausencia de errores preexistentes.
+SESSION01_FINDINGS.md: evidencia, limitaciones y alcance exacto.
+NATIVE_ARTIFACTS.json: tres artefactos, pins declarados y estado no verificado.
+session01_prepare.py: preparacion local sin mutar checkout ni hacer red.
+test_session01_prepare.py: 12 tests de la herramienta, no de PMM.
+SESSION_PLAN.md: entradas y salidas de cada tanda.
 
-## Siguiente intervencion
+## Regla al retomar
 
-REL-00 y REL-01: identificar artefactos y recuperar fuentes nativas actuales antes de reconstruir. Registrar hallazgos con rutas/commits y distinguir hechos, hipotesis y comportamiento verificado en Windows. Si la recuperacion exige otros ZIP o backups, detallar exactamente que se necesita; no sustituir ejecutables funcionales por una reconstruccion incompleta.
+No repetir la busqueda inicial a ciegas ni reabrir toda la arquitectura. Leer el bloqueo concreto y cerrar 01B cuando los bytes esten disponibles. No reinterpretar una referencia de source, un hash heredado o un test sintetico como demostracion de paridad de los binarios.

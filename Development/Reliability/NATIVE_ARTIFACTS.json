@@ -1,0 +1,36 @@
+{
+  "schema": "PMM_NATIVE_PROVENANCE_CHECKPOINT_V1",
+  "inspectedCommit": "df4b2417d3278096f9f66f115bd1237e8d908068",
+  "status": "UNRESOLVED_SOURCE_PARITY",
+  "binaryBytesAvailableInThisSession": false,
+  "sha256Origin": "Inherited RELEASE_MANIFEST.json, not recomputed in this session",
+  "artifacts": [
+    {
+      "path": "PMM/PMM.exe",
+      "gitBlob": "a49a3edd4c6dca197f02a7a58b0249d351463d4b",
+      "declaredSha256": "010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d",
+      "sourceReference": "Development/Source/Host/main.go",
+      "sourceMatchVerified": false,
+      "recoveryTarget": "Guided Flow splash stages, HWND foreground handoff, supervision and diagnostics"
+    },
+    {
+      "path": "PMM/Engine/PMMRuntime.exe",
+      "gitBlob": "068cb479ef4746de7cf360f6ab50113529af07c0",
+      "declaredSha256": "e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a",
+      "sourceReference": "Development/Source/Runtime/",
+      "sourceMatchVerified": false,
+      "recoveryTarget": "Actual start/UI dispatch, dependency contracts, WPF process creation and cancellation"
+    },
+    {
+      "path": "PMM/Engine/PMMFixLab.exe",
+      "gitBlob": "e2a7c8269215f5f02db1408429ddee58fc445b52",
+      "declaredSha256": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe",
+      "sourceReference": "Development/Source/FixLabEngine/",
+      "sourceMatchVerified": false,
+      "recoveryTarget": "Locate source reference absent from inspected source tree; verify 0.2.0 variant-recipes engine"
+    }
+  ],
+  "reportedVirusTotalSha256": "5be86567f597aefb64f1645a9b924c7de213da49206d7591b9e4f7f685fbcade",
+  "virusTotalArtifactMatchVerified": false,
+  "nativeReplacementAllowedByThisCheckpoint": false
+}
