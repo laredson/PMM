@@ -1,20 +1,19 @@
 # PMM v1.5.0.1 - fiabilidad independiente
 
-Rama v1.5.0.1-PMM-reliability. Ultima tanda **04A-4: lectura/estructura UAsset**.
-PMMDLT1, PAKV11 y UAsset son bibliotecas aisladas, no motor FixLab completo.
-El programa distribuido sigue intacto: 1.5.0.1 / build s01b, 629 archivos/628 hashes.
+Rama v1.5.0.1-PMM-reliability. Ultima entrega: 04A-4B, reescritura acotada
+UAsset de nombres/offsets con identidad fijada. No motor FixLab completo.
 
-UAsset agrega perfil explicito, summary/names/imports/exports/dependencias,
-limites, rangos y referencias, con secciones opacas identificadas. Header-only no
-prueba que exista .uexp. No se decodifican propiedades ni se reescriben assets.
-23 tests Go, 12 Python, seis fixtures leidas independientemente, race Linux y
-fuzz acotado. Harness TEST Windows reproducido; Windows/game/AV NO ejecutados.
+El paquete mantiene 1.5.0.1 / PMM-v1.5.0.1-reliability-s01b y 629 archivos intactos.
+Host/Runtime/UIBridge/Supervision, PMMDLT1, PAKV11 y recetas productivas conservados.
 
-Host/Runtime/UIBridge/Supervision C2B, PMMDLT1/PAKV11, recetas, pins y traducciones
-no cambian. Source original, motor completo, REL-01 y gates reales pendientes.
+El componente importa nombres/hashes serializados desde headers de referencia
+con SHA-256 esperado. Cambios de ancho solo sin regiones opacas, datos .uexp ni
+bulk offsets; el resto se rechaza, no se simula soporte de relocalizacion general.
+No hay sustitucion de ejecutables ni aceptacion Windows/Unreal/Palworld.
 
-Retomar [NEXT_SESSION](Development/Reliability/NEXT_SESSION.md): 04A-4B,
-serializacion/relocalizacion acotadas. [STATUS](Development/Reliability/STATUS.md),
-[hallazgos](Development/Reliability/SESSION04A4_FINDINGS.md) y
-[checks](Development/Reliability/SESSION04A4_CHECKS.json) registran el cierre.
-No reinstalar harnesses como PMM.exe/PMMRuntime.exe/PMMFixLab.exe.
+[Continuar](Development/Reliability/NEXT_SESSION.md),
+[estado](Development/Reliability/STATUS.md),
+[hallazgos](Development/Reliability/SESSION04A4B_FINDINGS.md),
+[comprobaciones](Development/Reliability/SESSION04A4B_CHECKS.json).
+Siguiente 04A-4C: contratos de payload/core R1 y postProcess; no comparar un motor
+inexistente en 04B. REL-01 sigue abierto. No release/tag/PR ni workflows lanzados.

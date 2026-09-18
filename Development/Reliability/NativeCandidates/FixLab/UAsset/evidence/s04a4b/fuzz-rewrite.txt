@@ -1,0 +1,7 @@
+fuzz: elapsed: 0s, gathering baseline coverage: 0/14 completed
+fuzz: elapsed: 0s, gathering baseline coverage: 14/14 completed, now fuzzing with 2 workers
+fuzz: elapsed: 3s, execs: 19849 (6614/sec), new interesting: 2 (total: 16)
+fuzz: elapsed: 6s, execs: 19849 (0/sec), new interesting: 2 (total: 16)
+fuzz: elapsed: 6s, execs: 19849 (0/sec), new interesting: 2 (total: 16)
+PASS
+ok  	pmm.local/fixlab/uasset	6.011s

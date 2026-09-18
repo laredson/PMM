@@ -1,0 +1,52 @@
+{
+  "schema": "PMM_UASSET_REWRITE_STATIC_ORIGIN_V1",
+  "originalSha256": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe",
+  "sourceRecovered": false,
+  "originalExecuted": false,
+  "functionRanges": [
+    {
+      "name": "main.encodeNameEntry",
+      "entryVA": 5476512,
+      "endVA": 5476736,
+      "sizeBytes": 224,
+      "rawCodeSha256": "8886867415b3741dee9157c3f7252e33af4848dcebaab97569e68ee2fe8b1a10",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/uasset.go",
+      "sourceLine": 638
+    },
+    {
+      "name": "main.patchPostProcess",
+      "entryVA": 5477920,
+      "endVA": 5480448,
+      "sizeBytes": 2528,
+      "rawCodeSha256": "aec3d7d49929f5e46d03565ceb059967446d67e920e8066a4671fdb061bffc00",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/uasset.go",
+      "sourceLine": 694
+    },
+    {
+      "name": "main.relocatePackage",
+      "entryVA": 5480448,
+      "endVA": 5487840,
+      "sizeBytes": 7392,
+      "rawCodeSha256": "8b3583b8712568b42f68934d78f274819fedbe07ab151ee78a7130a50b3a55a0",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/uasset.go",
+      "sourceLine": 759
+    },
+    {
+      "name": "main.serializeSummary",
+      "entryVA": 5473312,
+      "endVA": 5476512,
+      "sizeBytes": 3200,
+      "rawCodeSha256": "b5a66bc747379efc52c8c2dd8a29d25351597cf5ba5b4a530e640235465323ad",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/uasset.go",
+      "sourceLine": 570
+    }
+  ],
+  "rangeHashesRecomputed": true,
+  "scope": "Range/call/field inspection and fixed reader profile; not full decompilation or semantic parity. Core R1 transformations deferred.",
+  "coreRecipeSha256": "3f08c8da1dbc799b0c47a8a00d88819280e14ad7e21dce9f0622c7974a0c4f9c",
+  "referenceCommit": "3228c1e86261aa08131f7ec0ff1a395f5d0b2a84",
+  "epicReferences": [
+    "https://dev.epicgames.com/documentation/unreal-engine/API/Runtime/CoreUObject/FPackageFileSummary",
+    "https://dev.epicgames.com/documentation/unreal-engine/API/Runtime/CoreUObject/FObjectExport"
+  ]
+}

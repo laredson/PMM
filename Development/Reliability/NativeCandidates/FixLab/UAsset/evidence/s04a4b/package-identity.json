@@ -1,0 +1,12 @@
+{
+  "schema": "PMM_STATIC_PACKAGE_IDENTITY_V1",
+  "inputMode": "verified package subtree; partial checkout, no .git",
+  "version": "1.5.0.1",
+  "buildId": "PMM-v1.5.0.1-reliability-s01b",
+  "packageFiles": 629,
+  "checksumRows": 628,
+  "checksumMismatches": 0,
+  "originalsExecuted": false,
+  "packageTree": "09df5c45aee3390c6b8ea235c8afa4e149a9f1fa",
+  "note": "verify_identity CLI requires a Git checkout and was not used as a successful check; checksums were independently checked over all package bytes."
+}

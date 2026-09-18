@@ -1,0 +1,54 @@
+{
+  "schema": "PMM_UASSET_INDEPENDENT_READ_V1",
+  "method": "Python cursor/struct parser of synthetic fixtures vs Go output",
+  "fixtureCount": 6,
+  "fixtures": [
+    {
+      "fixture": "basic",
+      "headerSha256": "73fa003f11012d791d0209f5a03cee246ddd10ca05f28bb0262b7196c30a1445",
+      "names": 6,
+      "imports": 2,
+      "exports": 2
+    },
+    {
+      "fixture": "unicode",
+      "headerSha256": "cb770be3b87b7b6b36ea9863b686ad2fb93b0889c6dc4a1708fe7d9c60d9254a",
+      "names": 6,
+      "imports": 2,
+      "exports": 2
+    },
+    {
+      "fixture": "unversioned",
+      "headerSha256": "05184cee18ce94a685bd6f5034cbaf4e2f163279b728c27db3ed0978ac3df18e",
+      "names": 6,
+      "imports": 2,
+      "exports": 2
+    },
+    {
+      "fixture": "empty",
+      "headerSha256": "78aaee7c51b1fdea13e3bbc28e84f97a7f8ead04c67b78535909c1bf00745ec5",
+      "names": 0,
+      "imports": 0,
+      "exports": 0
+    },
+    {
+      "fixture": "opaque",
+      "headerSha256": "150809b934d6db39d03d00c76a50ca5a9f6ee77c41e977c543fb13b911f6c7d1",
+      "names": 6,
+      "imports": 2,
+      "exports": 2
+    },
+    {
+      "fixture": "multi",
+      "headerSha256": "6d74cd7575ce164200c394b6073f4f8fb52a467962c946d14b75f3ab7af4366f",
+      "names": 6,
+      "imports": 2,
+      "exports": 3
+    }
+  ],
+  "allCompared": true,
+  "gameAssetsRead": false,
+  "originalExecuted": false,
+  "compatibilityWithUnrealVerified": false,
+  "limit": "Shared format assumptions; not an independent Unreal writer or actual game sample."
+}

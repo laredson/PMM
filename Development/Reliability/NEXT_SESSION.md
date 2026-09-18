@@ -1,56 +1,55 @@
-# Retomar despues de 04A-4 - lectura UAsset
+# Retomar despues de 04A-4B - nombres y offsets UAsset
 
-Rama exclusiva v1.5.0.1-PMM-reliability. 04A-4 cerrada en componente de lectura;
-04A completa/REL-01 siguen abiertas. No pasar todavia a comparacion 04B.
-Leer AGENTS -> este archivo -> STATUS -> SESSION04A4_FINDINGS/CHECKS ->
-NativeCandidates/FixLab/UAsset/README.md y FORMAT.md.
+Rama exclusiva v1.5.0.1-PMM-reliability. Leer AGENTS -> este archivo -> STATUS ->
+SESSION04A4B_FINDINGS/CHECKS -> UAsset/REWRITE_CONTRACT.md.
+04A-4B cerrada solo en su alcance; 04A completa y REL-01 siguen abiertas.
 
-## Conservado
+## Lo ya conservado
 
-PMMDLT1, PAKV11 y UAsset son bibliotecas separadas con codigo/fixtures/recetas,
-NO un motor FixLab completo. No repetirlos ni reabrir la busqueda del overlay
-invalido sin una pista nueva. No usar ZIP viejos como autoridad de Host/Runtime.
-Paquete 1.5.0.1 / PMM-v1.5.0.1-reliability-s01b, 629 archivos/628 hashes.
-PMM tree 09df5c45aee3390c6b8ea235c8afa4e149a9f1fa. Candidatas C2B intactas.
+PMMDLT1/PAKV11 y Read UAsset no cambiaron. RewriteNames agrega reconstruccion de
+la tabla por entradas crudas de referencias con hash esperado, preservando hashes,
+encoding, indices y contadores. Summary se preserva salvo offsets conocidos.
+Los nombres NO se regeneran desde texto ni se calculan CRC de sustitucion.
 
-UAsset admite el perfil explicito cooked-ue4-522-ue5-1008. 0/0 solo por afirmacion
-externa AllowUnversioned; nunca adivinar. Imports 32/exports 96 bytes, names,
-summary/offsets, depends/preload, comprobacion de rangos .uexp cuando se suministra.
-AssetRegistry y gaps/tail son OPACOS. Propiedades/bulkdata no decodificados.
-Metadata read no equivale a transformacion o carga valida por Unreal.
+No-op e inversa son byte-exactos en fixtures. Reemplazos de igual ancho conservan
+todos los offsets y bytes ajenos. Si cambia cualquier ancho (incluso delta total 0),
+se rechazan regiones opacas en header, .uexp no vacio y BulkDataStart != 0.
+No hay flag de bypass: no copiar un payload opaco con offsets antiguos por comodidad.
+Esta restriccion impide todavia relocalizar meshes reales por esta API.
 
-23 tests Go con aserciones (export fixture opt-in incluido), 12 Python, seis
-fixtures comparadas con lector independiente y race Linux. Dos builds TEST
-Windows iguales: 12a8a4e96d739061389cb61d934f78b2da749d0cd6ed963c03c88c8c69a98feb.
-NO es PMMFixLab.exe; no reemplazar binarios. Go1.23.2 local/offline.
+39 tests Go/20 Python; doce reescrituras sinteticas comparadas en Python independiente.
+Windows harness compilado dos veces con igualdad, no ejecutado. Ninguna muestra
+real de juego/donante se leyo o reparo. Recetas y pins productivos intactos.
+PMM conserva arbol 09df5c45aee3390c6b8ea235c8afa4e149a9f1fa (629 archivos/628 hashes),
+1.5.0.1 / PMM-v1.5.0.1-reliability-s01b. Candidatas C2B no tocadas.
 
-## Siguiente 04A-4B - serializacion y relocalizacion acotadas
+## Siguiente 04A-4C - export payload/core R1, no V2/CLI ficticio
 
-1. Fijar HEAD y leer SOURCE_CONTRACT, la receta core R1 original y mapa estatico
-   de serializeSummary/encodeNameEntry/relocatePackage/patchPostProcess. Original
-   FixLab pin 8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe.
-2. Definir ANTES un alcance terminado: reconstruir header/names y ajustar offsets
-   en fixtures sinteticos, con las invariantes de lector 04A-4. Si las operaciones
-   postProcess/core no caben, registrarlas como proximo bloque, no fingir motor.
-3. Conservar todos los bytes opacos o rechazar el asset si no se conoce como
-   relocalizarlos. Un span reportado como opaco NO significa que no contenga
-   offsets internos. No sustituir CRC/name hashes actuales por valores inventados.
-4. Verificar identidad inmutable de entradas, expected deltas/offsets, no cambios
-   fuera del alcance, roundtrip sin cambios y lectura independiente del resultado.
-   Ajustar SerialOffset con respecto a TotalHeaderSize, no a posiciones deducidas.
-5. Solo fixtures propios. No leer/redistribuir assets donantes/juego ni ejecutar
-   original, reparaciones, Unreal o repak. No tocar CKL, pins, traducciones,
-   PMMDLT1/PAKV11 o Host/Runtime/UIBridge/Supervision en esa tanda.
-6. Guardar codigo, evidencia y siguiente paso. Commit [skip ci] autorizado,
-   sin Actions/PR/tag/release ni sustitucion. 04B requiere motor completo V2/CLI.
+1. Fijar HEAD y releer core recipe R1 (hash en registro 04A-4B), SOURCE_CONTRACT y
+   mapas estaticos originales de patchPostProcess/relocatePackage. No repetir la
+   busqueda del overlay invalido ni pedir otra copia del mismo ZIP.
+2. Delimitar ANTES una transformacion de payload verificable. La receta menciona
+   staleClass ABP_Gura_C, safeClass Body y expectedSerializedOffsets [120]. Ese
+   numero NO autoriza escribir bytes sin establecer formato, identidad, longitud,
+   campo, valor previo y referencias. No hacer reemplazos globales de strings.
+3. Investigar que offsets pueden vivir dentro de exports/bulkdata, usando fuentes
+   primarias y evidencia estatica. Implementar el subconjunto demostrado con
+   fixtures sinteticos; lo desconocido sigue UNSUPPORTED. No retirar la proteccion
+   de RewriteNames porque un buffer vuelva a pasar el lector de cabecera.
+4. Conservar bytes no afectados y verificar pre/post-condiciones externas,
+   cancelacion, errores, rangos y rechazo. No modificar recetas ni sus pins,
+   PMMDLT1/PAKV11 o candidatos Host/Runtime. No integrar una CLI de relleno.
+5. Solo despues conectar el core R1 a las primitivas verificadas y construir V2/CLI;
+   04B requiere motor completo. Si una evidencia concreta falta, registrarla sin
+   inventar compatibilidad. Guardar codigo y proxima entrada exacta en la rama.
+6. Un commit [skip ci] autorizado por la intervencion. Sin Actions, PR, tag,
+   release, fuentes originales sobrescritas ni ejecutables distribuidos reemplazados.
 
-## Reproduccion actual
+## Reproduccion
 
-En UAsset: go test -count=1 ./... ; python -B -m unittest -v test_reference.
-PMM_UASSET_FIXTURE_OUTPUT=<directorio nuevo> activa la exportacion sintetica;
-python -B verify_reference.py <directorio> realiza la segunda lectura.
-python -B build.py --out <directorio nuevo EXTERNO> compila harness sin ejecutarlo.
-
-Gates Windows/Unreal/Palworld NOT_RUN; source original NO recuperado. Siguen
-familias/Job Objects, manifests/pins/rutas R03B-02/04 y repair 06/07. No confundir
-arranque del PMM original o fixtures correctas con aceptacion de las candidatas.
+En UAsset: go test -count=1 ./... y python -B -m unittest -v test_reference test_rewrite_reference.
+PMM_UASSET_FIXTURE_OUTPUT y PMM_UASSET_REWRITE_OUTPUT activan exports a directorios
+nuevos; sin ellos sus tests SKIP. verify_rewrite.py compara doce packets sinteticos.
+El builder offline genera UAsset-tests.exe, NO PMMFixLab.exe. No instalarlo.
+Todos los gates Windows/Unreal/Palworld siguen NOT_RUN; familias/Job Objects,
+manifiestos/pins/rutas R03B-02/04 y repair 06/07 permanecen pendientes.

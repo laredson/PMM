@@ -1,0 +1,130 @@
+=== RUN   TestIndependentVectors
+=== RUN   TestIndependentVectors/basic
+=== RUN   TestIndependentVectors/unicode
+=== RUN   TestIndependentVectors/unversioned
+=== RUN   TestIndependentVectors/empty
+=== RUN   TestIndependentVectors/opaque
+=== RUN   TestIndependentVectors/multi
+--- PASS: TestIndependentVectors (0.00s)
+    --- PASS: TestIndependentVectors/basic (0.00s)
+    --- PASS: TestIndependentVectors/unicode (0.00s)
+    --- PASS: TestIndependentVectors/unversioned (0.00s)
+    --- PASS: TestIndependentVectors/empty (0.00s)
+    --- PASS: TestIndependentVectors/opaque (0.00s)
+    --- PASS: TestIndependentVectors/multi (0.00s)
+=== RUN   TestHeaderOnlyDoesNotClaimExportData
+--- PASS: TestHeaderOnlyDoesNotClaimExportData (0.00s)
+=== RUN   TestExplicitVersionPolicy
+--- PASS: TestExplicitVersionPolicy (0.00s)
+=== RUN   TestAllHeaderTruncationsAndSuffix
+--- PASS: TestAllHeaderTruncationsAndSuffix (0.00s)
+=== RUN   TestMagicAndCookedFlags
+--- PASS: TestMagicAndCookedFlags (0.00s)
+=== RUN   TestCountsAndOffsets
+--- PASS: TestCountsAndOffsets (0.00s)
+=== RUN   TestOptionalSectionsFailClosed
+--- PASS: TestOptionalSectionsFailClosed (0.00s)
+=== RUN   TestNarrowStringAndTerminators
+--- PASS: TestNarrowStringAndTerminators (0.00s)
+=== RUN   TestUTF16Validation
+--- PASS: TestUTF16Validation (0.00s)
+=== RUN   TestFNameBoundsAndSuffix
+--- PASS: TestFNameBoundsAndSuffix (0.00s)
+=== RUN   TestBooleans
+--- PASS: TestBooleans (0.00s)
+=== RUN   TestObjectReferencesAndOuterCycles
+--- PASS: TestObjectReferencesAndOuterCycles (0.00s)
+=== RUN   TestDependencyRanges
+--- PASS: TestDependencyRanges (0.00s)
+=== RUN   TestSerialBoundsAndOverlap
+--- PASS: TestSerialBoundsAndOverlap (0.00s)
+=== RUN   TestOpaqueAndNonCanonicalGapsRemainExplicit
+--- PASS: TestOpaqueAndNonCanonicalGapsRemainExplicit (0.00s)
+=== RUN   TestLimitsCannotBeRaised
+--- PASS: TestLimitsCannotBeRaised (0.00s)
+=== RUN   TestNilAndCancelledContext
+--- PASS: TestNilAndCancelledContext (0.00s)
+=== RUN   TestCancellationAtEveryReadBoundary
+--- PASS: TestCancellationAtEveryReadBoundary (0.00s)
+=== RUN   TestNoInputAliasing
+--- PASS: TestNoInputAliasing (0.00s)
+=== RUN   TestDeterminism
+--- PASS: TestDeterminism (0.00s)
+=== RUN   TestHeaderHashIsNotAuthenticity
+--- PASS: TestHeaderHashIsNotAuthenticity (0.00s)
+=== RUN   TestExportMetadataJSON
+--- PASS: TestExportMetadataJSON (0.00s)
+=== RUN   TestDisabledPreloadAndZeroSizeExport
+--- PASS: TestDisabledPreloadAndZeroSizeExport (0.00s)
+=== RUN   TestRewriteNoopByteIdentity
+=== RUN   TestRewriteNoopByteIdentity/basic
+=== RUN   TestRewriteNoopByteIdentity/unicode
+=== RUN   TestRewriteNoopByteIdentity/unversioned
+=== RUN   TestRewriteNoopByteIdentity/empty
+=== RUN   TestRewriteNoopByteIdentity/opaque
+=== RUN   TestRewriteNoopByteIdentity/multi
+--- PASS: TestRewriteNoopByteIdentity (0.00s)
+    --- PASS: TestRewriteNoopByteIdentity/basic (0.00s)
+    --- PASS: TestRewriteNoopByteIdentity/unicode (0.00s)
+    --- PASS: TestRewriteNoopByteIdentity/unversioned (0.00s)
+    --- PASS: TestRewriteNoopByteIdentity/empty (0.00s)
+    --- PASS: TestRewriteNoopByteIdentity/opaque (0.00s)
+    --- PASS: TestRewriteNoopByteIdentity/multi (0.00s)
+=== RUN   TestRewriteFixedWidthPreservesOpaque
+--- PASS: TestRewriteFixedWidthPreservesOpaque (0.00s)
+=== RUN   TestRewriteGrowthShrinkAndUnicode
+--- PASS: TestRewriteGrowthShrinkAndUnicode (0.00s)
+=== RUN   TestRewriteNetZeroReflowStillProtected
+--- PASS: TestRewriteNetZeroReflowStillProtected (0.00s)
+=== RUN   TestRewriteOpaqueRelocationRejected
+--- PASS: TestRewriteOpaqueRelocationRejected (0.00s)
+=== RUN   TestRewriteInactiveMarkersAndZeroSentinel
+--- PASS: TestRewriteInactiveMarkersAndZeroSentinel (0.00s)
+=== RUN   TestRewriteNamesAfterOtherTables
+--- PASS: TestRewriteNamesAfterOtherTables (0.00s)
+=== RUN   TestRewritePinsMandatoryBeforeParse
+--- PASS: TestRewritePinsMandatoryBeforeParse (0.00s)
+=== RUN   TestRewriteEditsAndSourceBounds
+--- PASS: TestRewriteEditsAndSourceBounds (0.00s)
+=== RUN   TestRewriteExplicitProfileAndData
+--- PASS: TestRewriteExplicitProfileAndData (0.00s)
+=== RUN   TestRewriteLimits
+--- PASS: TestRewriteLimits (0.00s)
+=== RUN   TestRewriteNoInputOrResultAlias
+--- PASS: TestRewriteNoInputOrResultAlias (0.00s)
+=== RUN   TestRewriteCancellationEveryBoundary
+--- PASS: TestRewriteCancellationEveryBoundary (0.01s)
+=== RUN   TestRewriteDeterminismAndInverse
+--- PASS: TestRewriteDeterminismAndInverse (0.00s)
+=== RUN   TestRewriteMalformedPinnedInput
+--- PASS: TestRewriteMalformedPinnedInput (0.00s)
+=== RUN   TestRewriteIndependentCorpusExport
+--- PASS: TestRewriteIndependentCorpusExport (0.01s)
+=== RUN   FuzzRead
+=== RUN   FuzzRead/seed#0
+=== RUN   FuzzRead/seed#1
+=== RUN   FuzzRead/seed#2
+=== RUN   FuzzRead/seed#3
+=== RUN   FuzzRead/seed#4
+=== RUN   FuzzRead/seed#5
+--- PASS: FuzzRead (0.00s)
+    --- PASS: FuzzRead/seed#0 (0.00s)
+    --- PASS: FuzzRead/seed#1 (0.00s)
+    --- PASS: FuzzRead/seed#2 (0.00s)
+    --- PASS: FuzzRead/seed#3 (0.00s)
+    --- PASS: FuzzRead/seed#4 (0.00s)
+    --- PASS: FuzzRead/seed#5 (0.00s)
+=== RUN   FuzzTables
+=== RUN   FuzzTables/seed#0
+=== RUN   FuzzTables/seed#1
+--- PASS: FuzzTables (0.00s)
+    --- PASS: FuzzTables/seed#0 (0.00s)
+    --- PASS: FuzzTables/seed#1 (0.00s)
+=== RUN   FuzzRewritePinned
+=== RUN   FuzzRewritePinned/seed#0
+=== RUN   FuzzRewritePinned/seed#1
+--- PASS: FuzzRewritePinned (0.00s)
+    --- PASS: FuzzRewritePinned/seed#0 (0.00s)
+    --- PASS: FuzzRewritePinned/seed#1 (0.00s)
+PASS
+ok  	pmm.local/fixlab/uasset	0.050s

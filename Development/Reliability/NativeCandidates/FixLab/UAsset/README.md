@@ -1,68 +1,47 @@
-# UAsset structure reader - 04A-4
+# UAsset - read and bounded name rewriting
 
-Isolated Go library: RECONSTRUCTION, not recovered original source and not a
-complete FixLab engine. No CLI that pretends to repair mods. No file writes,
-extraction, loading objects, subprocesses or network in the library.
+Isolated RECONSTRUCTION, not original source or a full FixLab engine.
+04A-4 implemented Read; 04A-4B adds RewriteNames. The original reader and FORMAT.md
+remain unchanged. The new transformation contract is REWRITE_CONTRACT.md.
 
-## API
+Read accepts explicit cooked-ue4-522-ue5-1008; unversioned requires caller assertion.
+RewriteNames requires pinned header/export bytes and pinned reference headers.
+NameEdit selects an existing destination index and a source index; stored hashes
+and serialization come from the source, not invented CRCs. Indices/counts stay put.
 
-```go
-opts := uasset.Options{Profile: uasset.CookedUE51}
-pkg, err := uasset.Read(ctx, uassetBytes, nil, opts) // header-only
-// Read(ctx, uassetBytes, uexpBytes, opts) checks serial extents in supplied .uexp.
-// opts.AllowUnversioned = true only after establishing the layout externally.
-```
+Fixed-width name changes preserve all other bytes and positions. Width-changing
+rewrites REJECT opaque header regions, nonempty .uexp and nonzero bulk offsets,
+including net-zero changes to multiple slot widths. There is no unsafe override.
+Growth/shrink tests use completely parsed, export-data-free synthetic headers.
+This limitation is a prerequisite for the future payload/core work, not a full
+implementation of the recipe's relocatePackage or postProcess operations.
 
-Results include summary/field offsets, name entries and stored hashes, FNames,
-imports/exports, dependency maps, section spans, explicit opaque spans and input
-SHA-256. Header-only results do not claim export data has been supplied.
-Failure returns nil, never a partially validated Package. Inputs must remain
-immutable for the duration of a call; returned metadata does not alias them.
-SHA-256 is an identity report, not a trusted expected hash or authenticity proof.
+Inputs remain immutable during calls. Output is in memory with owned buffers;
+errors return nil. No network, subprocess, file write or installation side effect.
+Pins identify bytes; the caller must establish their provenance and authorization.
 
-Profile and rejected features: FORMAT.md. In particular this is NOT a general
-UAsset reader for every Unreal version. Unversioned layouts require explicit
-caller assertion; an old/new donor's compatibility still needs actual evidence.
-This session did not read, transform or redistribute game or donor assets.
+## Reproduce
 
-## Limits per call
+From this directory with installed Go1.23.2, module/toolchain downloads disabled:
 
-64 MiB header, 256 MiB supplied export data/logical export span, 8192 bytes per
-serialized string, 65536 names, 16384 total objects, 262144 dependency entries per
-map, 128 generations/chunk IDs. Zero option selects the default; callers can lower
-but cannot raise it. Limits are not original-engine limits or an RSS guarantee.
-Cancellation is checked during primitive reads, graph traversal and chunked hashes.
-Unsupported input errors are explicit rather than guessed or silently skipped.
+    go test -count=1 ./...
+    python -B -m unittest -v test_reference test_rewrite_reference
+    python -B build.py --out <NEW directory OUTSIDE repository>
 
-## Reproduction
+Set GOTOOLCHAIN=local, GOPROXY=off, GOSUMDB=off, GOWORK=off for Go commands.
+The builder sets them itself. Its UAsset-tests.exe is NOT PMMFixLab.exe and must
+not replace it. Windows test execution and Unreal compatibility are NOT_RUN.
 
-From this directory, using installed Go1.23.2 (no module dependencies):
+Optional test exports (set environment in your shell):
+PMM_UASSET_FIXTURE_OUTPUT=<new directory> exports the six reader results.
+PMM_UASSET_REWRITE_OUTPUT=<new directory> exports twelve synthetic rewrite packets.
+Then run verify_reference.py or verify_rewrite.py with that respective directory.
+Without these variables two export tests SKIP; never count skips as passes.
 
-```text
-GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off go test -count=1 ./...
-python -B -m unittest -v test_reference
-python -B build.py --out <NEW directory OUTSIDE repo>
-```
+39 Go assertion tests passed with both exports enabled (23 reader + 16 rewrite),
+20 Python tests (12 earlier + 8 new), race Linux and bounded FuzzRewritePinned.
+Two FINAL Windows TEST builds matched in the recorded Go1.23.2 Linux environment.
+Historical evidence is unchanged; new results are under evidence/s04a4b/.
 
-The first line uses POSIX environment syntax; on Windows set those variables
-in the shell first. The Python builder sets offline variables itself and refuses
-existing/internal output paths. It creates UAsset-tests.exe, NOT PMMFixLab.exe,
-and never executes it. Windows execution/Unreal compatibility remain NOT_RUN.
-
-`PMM_UASSET_FIXTURE_OUTPUT=<new directory>` activates Go's synthetic result export;
-then `python -B verify_reference.py <that directory>` compares its output with an
-independent Python reader. All six base64 fixture vectors are artificial; their
-standalone generator is testdata/make_fixtures.py. Without the opt-in, the export
-test SKIPs: do not count that skip as PASS. Fuzz seeds are not separate Test cases.
-
-23 Go Test functions passed with export enabled, 12 Python tests, race Linux,
-plus two bounded fuzz runs. Evidence includes exact commands and counts.
-Two final Windows TEST harness builds match, not the original FixLab executable.
-
-## Continuity
-
-04A-4 closes structure reading only. PMMDLT1/PAKV11 and all packaged PMM files are
-unchanged. Next 04A-4B is serialization/relocation with protected opaque regions,
-synthetic fixtures and exact recipe constraints. This reader does not authorize
-rewriting a header it cannot fully account for. Complete core/V2/CLI, original
-comparison and real Windows/game acceptance remain later gates.
+Next: payload/core R1 transformation contracts, not a full engine comparison yet.
+No real donor/game assets were read or transformed, and no original EXE ran.

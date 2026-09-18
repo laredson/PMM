@@ -1,0 +1,25 @@
+test_existing_output_rejected (test_reference.BuildGuardTests.test_existing_output_rejected) ... ok
+test_internal_output_rejected (test_reference.BuildGuardTests.test_internal_output_rejected) ... ok
+test_bad_profile (test_reference.ReferenceTests.test_bad_profile) ... ok
+test_boolean_invalid (test_reference.ReferenceTests.test_boolean_invalid) ... ok
+test_cursor_bounds (test_reference.ReferenceTests.test_cursor_bounds) ... ok
+test_expected_names_and_offsets (test_reference.ReferenceTests.test_expected_names_and_offsets) ... ok
+test_frozen_vectors_reproduce (test_reference.ReferenceTests.test_frozen_vectors_reproduce) ... ok
+test_short_export_data (test_reference.ReferenceTests.test_short_export_data) ... ok
+test_string_terminator (test_reference.ReferenceTests.test_string_terminator) ... ok
+test_truncated_input (test_reference.ReferenceTests.test_truncated_input) ... ok
+test_unknown_optional (test_reference.ReferenceTests.test_unknown_optional) ... ok
+test_utf16_invalid (test_reference.ReferenceTests.test_utf16_invalid) ... ok
+test_duplicate_edit_rejected (test_rewrite_reference.RewriteReferenceTests.test_duplicate_edit_rejected) ... ok
+test_input_hash_required (test_rewrite_reference.RewriteReferenceTests.test_input_hash_required) ... ok
+test_names_truncation_rejected (test_rewrite_reference.RewriteReferenceTests.test_names_truncation_rejected) ... ok
+test_negative_index_rejected (test_rewrite_reference.RewriteReferenceTests.test_negative_index_rejected) ... ok
+test_noop (test_rewrite_reference.RewriteReferenceTests.test_noop) ... ok
+test_opaque_growth_rejected (test_rewrite_reference.RewriteReferenceTests.test_opaque_growth_rejected) ... ok
+test_source_hash_required (test_rewrite_reference.RewriteReferenceTests.test_source_hash_required) ... ok
+test_strict_base64 (test_rewrite_reference.RewriteReferenceTests.test_strict_base64) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 1.421s
+
+OK

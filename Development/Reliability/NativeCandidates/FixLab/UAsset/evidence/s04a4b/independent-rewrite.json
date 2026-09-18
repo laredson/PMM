@@ -1,0 +1,105 @@
+{
+  "schema": "PMM_UASSET_REWRITE_INDEPENDENT_V1",
+  "fixtureCount": 12,
+  "fixtures": [
+    {
+      "fixture": "fixed-basic",
+      "headerSha256": "d20228e35bee0c3881bd2886993aeb20e26e4e05b0c6cbff36e733a2f132a8af",
+      "exportSha256": "ace33513ead91c58e72a2f865ba9405f93bbb13aeea153d829da8ec19e6e9053",
+      "headerBytes": 664,
+      "delta": 0,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "fixed-opaque",
+      "headerSha256": "15089b7689ec5ccbdb99d594c903cb9c3da54e03f2a1dad5c974cdaed94667c8",
+      "exportSha256": "ace33513ead91c58e72a2f865ba9405f93bbb13aeea153d829da8ec19e6e9053",
+      "headerBytes": 689,
+      "delta": 0,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "fixed-unicode",
+      "headerSha256": "5909a704177a569e2de500b1eb3ea67223e07f52a486e231530832eb0cb4dd78",
+      "exportSha256": "ace33513ead91c58e72a2f865ba9405f93bbb13aeea153d829da8ec19e6e9053",
+      "headerBytes": 685,
+      "delta": 0,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "grow-unicode",
+      "headerSha256": "19ca03405cf6fa9157d92b7ceaee6ada5303d55fe97c4f41dbce86a762db72f1",
+      "exportSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "headerBytes": 686,
+      "delta": 22,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "net-zero",
+      "headerSha256": "2f37c6ced6c50372e287d6d16af174db1ffd6ba89bb015d5b739a04b3464738f",
+      "exportSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "headerBytes": 664,
+      "delta": 0,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "noop-basic",
+      "headerSha256": "73fa003f11012d791d0209f5a03cee246ddd10ca05f28bb0262b7196c30a1445",
+      "exportSha256": "ace33513ead91c58e72a2f865ba9405f93bbb13aeea153d829da8ec19e6e9053",
+      "headerBytes": 664,
+      "delta": 0,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "noop-empty",
+      "headerSha256": "78aaee7c51b1fdea13e3bbc28e84f97a7f8ead04c67b78535909c1bf00745ec5",
+      "exportSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "headerBytes": 276,
+      "delta": 0,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "noop-multi",
+      "headerSha256": "6d74cd7575ce164200c394b6073f4f8fb52a467962c946d14b75f3ab7af4366f",
+      "exportSha256": "04bc2c78ca785141dc790529f8395674188da61bc4dbd81e18dda167c67b0ab0",
+      "headerBytes": 772,
+      "delta": 0,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "noop-opaque",
+      "headerSha256": "150809b934d6db39d03d00c76a50ca5a9f6ee77c41e977c543fb13b911f6c7d1",
+      "exportSha256": "ace33513ead91c58e72a2f865ba9405f93bbb13aeea153d829da8ec19e6e9053",
+      "headerBytes": 689,
+      "delta": 0,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "noop-unicode",
+      "headerSha256": "cb770be3b87b7b6b36ea9863b686ad2fb93b0889c6dc4a1708fe7d9c60d9254a",
+      "exportSha256": "ace33513ead91c58e72a2f865ba9405f93bbb13aeea153d829da8ec19e6e9053",
+      "headerBytes": 685,
+      "delta": 0,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "noop-unversioned",
+      "headerSha256": "05184cee18ce94a685bd6f5034cbaf4e2f163279b728c27db3ed0978ac3df18e",
+      "exportSha256": "ace33513ead91c58e72a2f865ba9405f93bbb13aeea153d829da8ec19e6e9053",
+      "headerBytes": 664,
+      "delta": 0,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "shrink",
+      "headerSha256": "1b1f4464b23daef90b8dfd15e51ed156b1e526dba4a5d9fd09a09ffb95cf2d70",
+      "exportSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "headerBytes": 649,
+      "delta": -15,
+      "allBytesCompared": true
+    }
+  ],
+  "gameAssetsUsed": false,
+  "engineCompatibilityVerified": false,
+  "limit": "Independent Python reconstruction and readback of synthetic bytes; not Unreal or original FixLab acceptance."
+}

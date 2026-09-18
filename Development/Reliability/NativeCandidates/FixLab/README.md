@@ -1,24 +1,16 @@
-# FixLab - reconstruccion por componentes
+# FixLab reconstruction - checkpoint 04A-4B
 
-Fuente original no recuperada. El motor completo todavia no esta construido ni
-instalado. Las herramientas de 04A documentan la fuente ausente y overlay invalido.
-No reintentar ese bootstrap ni presentar sus datos parciales como fuente valida.
+Original source remains unavailable; the historical overlay remains invalid.
+Do not repeat its recovery without a new source. PMMFixLab.exe is unchanged.
 
-## Componentes conservados
+PMMDLT1 and PAKV11 are preserved. UAsset contains the 04A-4 reader and the new
+04A-4B pinned name-table rewriter. No complete core R1 / V2 / CLI exists yet.
 
-- PMMDLT1/ (04A-2): lectura/aplicacion en memoria con hashes/limites y fixtures.
-- PAKV11/ (04A-3): Build/Read/Verify, perfil sin cifrar/comprimir y lectura independiente.
-- UAsset/ (04A-4): lectura de perfil cooked 522/1008, nombres/mapas/dependencias;
-  header-only y export ranges diferenciados, secciones desconocidas opacas.
+The rewriter imports exact name/hash bytes from approved reference headers.
+Fixed-width changes preserve all other positions/bytes. Growth or shrink rejects
+opaque header data, nonempty .uexp and nonzero bulk offsets. General mesh/core
+relocation is NOT implemented by accepting opaque data on trust.
 
-Son codigo funcional de bibliotecas, no un main que simula PMMFixLab completo.
-Cada carpeta conserva contrato, pruebas, receta offline y evidencia de su alcance.
-Los harnesses TEST no son actualizaciones de PMMFixLab.exe.
-
-Auditor/lector de 04A siguen disponibles: audit_source.py e inspect_binary.py.
-SOURCE_CONTRACT.md es evidencia historica del contrato esperado, no source recuperado.
-Original conservado: 8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe.
-
-Siguiente 04A-4B: serializacion/relocalizacion con proteccion de regiones opacas.
-Despues core R1/V2/CLI y solo entonces comparacion 04B/gates reales. No modificar
-recetas o pins para aceptar resultados; no afirmar compatibilidad Unreal sin pruebas.
+Read UAsset/REWRITE_CONTRACT.md and ../../NEXT_SESSION.md. Tools and evidence from
+04A remain historical. Never copy test harnesses over the installed engine.
+No production recipes/payloads/hashes, translations or other candidates changed.
