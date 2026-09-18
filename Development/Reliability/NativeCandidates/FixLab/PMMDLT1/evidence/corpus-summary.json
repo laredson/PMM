@@ -1,0 +1,20 @@
+{
+  "schema": "PMM_PMMDLT1_CORPUS_STRUCTURE_V1",
+  "method": "independent Python zlib/struct parser",
+  "recipeCount": 5,
+  "recipePatchReferences": 260,
+  "uniquePayloads": 137,
+  "operations": 4425,
+  "sourceAssetsRead": false,
+  "patchesApplied": false,
+  "outputHashesVerified": false,
+  "metadataSha256": "35cf1b8d2ca57b3063c577d2372ed3d2b0d93db820297f5e15728fadc191b4fe",
+  "maxima": {
+    "patchBytes": 390781,
+    "decodedBytes": 1441794,
+    "outputBytes": 4509003,
+    "operations": 480
+  },
+  "copyOperations": 2547,
+  "literalOperations": 1878
+}

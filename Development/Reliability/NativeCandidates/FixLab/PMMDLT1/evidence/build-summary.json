@@ -1,0 +1,18 @@
+{
+  "schema": "PMM_PMMDLT1_BUILD_SUMMARY_V1",
+  "artifact": "codec test harness, not FixLab engine",
+  "goVersion": "go1.23.2",
+  "buildHost": "linux/amd64",
+  "target": "windows/amd64",
+  "sha256": "7ac6f7647b4ade31e8c623cdcaea157e54b6b3422631fd61d2097ad5476459e7",
+  "bytes": 3883008,
+  "repeatSha256": "7ac6f7647b4ade31e8c623cdcaea157e54b6b3422631fd61d2097ad5476459e7",
+  "byteIdentical": true,
+  "windowsVetExitCode": 0,
+  "windowsExecuted": false,
+  "engineBuilt": false,
+  "buildReportsSha256": [
+    "e0ad1ba661f3c7fe2dfe3255c82a25690c8d7581c7cfc074738724c1a6c54a99",
+    "e0ad1ba661f3c7fe2dfe3255c82a25690c8d7581c7cfc074738724c1a6c54a99"
+  ]
+}

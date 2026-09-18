@@ -1,0 +1,15 @@
+test_bad_magic (test_audit_corpus.WireToolTests.test_bad_magic) ... ok
+test_canonical_aggregate (test_audit_corpus.WireToolTests.test_canonical_aggregate) ... ok
+test_copy_literal (test_audit_corpus.WireToolTests.test_copy_literal) ... ok
+test_corrupt_checksum (test_audit_corpus.WireToolTests.test_corrupt_checksum) ... ok
+test_empty (test_audit_corpus.WireToolTests.test_empty) ... ok
+test_output_guard (test_audit_corpus.WireToolTests.test_output_guard) ... ok
+test_trailing_compressed (test_audit_corpus.WireToolTests.test_trailing_compressed) ... ok
+test_trailing_decoded (test_audit_corpus.WireToolTests.test_trailing_decoded) ... ok
+test_truncated_literal (test_audit_corpus.WireToolTests.test_truncated_literal) ... ok
+test_unknown_opcode (test_audit_corpus.WireToolTests.test_unknown_opcode) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.001s
+
+OK

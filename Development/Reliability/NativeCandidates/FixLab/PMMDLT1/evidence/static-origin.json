@@ -1,0 +1,13 @@
+{
+  "schema": "PMM_PMMDLT1_STATIC_ORIGIN_V1",
+  "originalSha256": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe",
+  "function": "main.applyDeltaPatch",
+  "entryVA": "0x527020",
+  "endVA": "0x528940",
+  "rawCodeSha256": "c08a7cc1075a0c778bbae01aa766e41563e399a71e519eae936d88b1b22db917",
+  "method": "Go pclntab / objdump AMD64 static disassembly and independent corpus parsing",
+  "originalExecuted": false,
+  "sourceOriginalRecovered": false,
+  "formatDoc": "FORMAT.md",
+  "fullDisassemblySha256": "f7e89140a02dcee192617eb9d811cafbabcff62a88fc36d9f3c8fed5e25fc3ef"
+}

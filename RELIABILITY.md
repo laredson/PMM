@@ -1,25 +1,22 @@
 # PMM v1.5.0.1 - fiabilidad independiente
 
-Rama: v1.5.0.1-PMM-reliability. Ultimo checkpoint: **04A parcial, fuente FixLab bloqueada**.
-Host/Runtime/UIBridge C2B permanecen como candidatas, sin sustitucion del programa.
+Rama v1.5.0.1-PMM-reliability. **04A-2 cerrada: componente PMMDLT1 reconstruido.**
+No es la fuente original ni un motor FixLab completo. 04A/REL-01 siguen abiertos.
 
-El paquete conserva 1.5.0.1 / PMM-v1.5.0.1-reliability-s01b: 629 archivos y
-628 hashes correctos. La prueba informal de arranque del usuario se refiere a
-ese paquete original; no acepta las candidatas ni las reparaciones FixLab.
+PMMDLT1 lee/aplica parches en memoria con hashes obligatorios de entrada,
+referencias y salida; lectura completa, limites y cancelacion. Las pruebas
+sinteticas pasan y dos lectores independientes coinciden en la estructura
+de los 137 payloads distribuidos. No se transformaron assets reales.
 
-04A identifica el EXE FixLab y seis nombres de fuente mediante metadata Go.
-La carpeta source declarada falta y el overlay historico tiene Base64 invalido;
-agregar padding no repara el pin/XZ. No hay una fuente recuperada ni motor nuevo.
-Se entregan auditor de procedencia y lector de metadata, con 15 tests Python y
-5 Go de herramientas. Cinco recetas y 137 payloads unicos verificados por lectura.
-No ejecutar ni aplicar el bootstrap antiguo como intento de recuperacion.
+Los 629 archivos PMM/ conservan 628 hashes y build 1.5.0.1/s01b. Host/Runtime/
+UIBridge/Supervision y traducciones no cambiaron. No hay ejecutable nuevo instalado,
+release ni aceptacion Windows. Los nuevos EXE de prueba NO sustituyen PMMFixLab.
 
-Continuar en [NEXT_SESSION](Development/Reliability/NEXT_SESSION.md).
+Leer [NEXT_SESSION](Development/Reliability/NEXT_SESSION.md),
 [STATUS](Development/Reliability/STATUS.md),
-[hallazgos 04A](Development/Reliability/SESSION04A_FINDINGS.md) y
-[checks 04A](Development/Reliability/SESSION04A_CHECKS.json) contienen el estado real.
-[FixLab](Development/Reliability/NativeCandidates/FixLab/README.md) tiene herramientas
-reproducibles y contrato de la recuperacion/reconstruccion pendiente.
-
-REL-01 sigue abierto y los gates Windows siguen NOT_RUN. No promover binarios,
-no alterar recetas ni pins para simular equivalencia. No hay release/tag/PR.
+[hallazgos](Development/Reliability/SESSION04A2_FINDINGS.md) y
+[checks](Development/Reliability/SESSION04A2_CHECKS.json).
+[PMMDLT1](Development/Reliability/NativeCandidates/FixLab/PMMDLT1/README.md)
+guarda API, formato, limites, fuentes y recetas offline.
+Siguiente 04A-3: PAK v11/readback, despues UAsset/core y orquestacion.
+No repetir la busqueda fallida del overlay sin una pista nueva.

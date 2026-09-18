@@ -1,0 +1,61 @@
+=== RUN   TestApplyMixedReferencesAndInputImmutability
+--- PASS: TestApplyMixedReferencesAndInputImmutability (0.00s)
+=== RUN   TestInspectReportsSortedReferenceBounds
+--- PASS: TestInspectReportsSortedReferenceBounds (0.00s)
+=== RUN   TestLiteralOnlyAndEmpty
+--- PASS: TestLiteralOnlyAndEmpty (0.00s)
+=== RUN   TestZeroLengthInstructionsAtReferenceEnd
+--- PASS: TestZeroLengthInstructionsAtReferenceEnd (0.00s)
+=== RUN   TestRequiredDigests
+--- PASS: TestRequiredDigests (0.00s)
+=== RUN   TestDigestMismatchAtEachBoundary
+--- PASS: TestDigestMismatchAtEachBoundary (0.00s)
+=== RUN   TestUppercaseDigestAccepted
+--- PASS: TestUppercaseDigestAccepted (0.00s)
+=== RUN   TestInvalidMagicAndCompression
+--- PASS: TestInvalidMagicAndCompression (0.00s)
+=== RUN   TestChecksumTrailerAndCompressedSuffix
+--- PASS: TestChecksumTrailerAndCompressedSuffix (0.00s)
+=== RUN   TestEveryCompressedTruncationRejected
+--- PASS: TestEveryCompressedTruncationRejected (0.00s)
+=== RUN   TestTruncatedBodiesAndUnknownOpcodes
+--- PASS: TestTruncatedBodiesAndUnknownOpcodes (0.01s)
+=== RUN   TestOutputSizeMismatch
+--- PASS: TestOutputSizeMismatch (0.00s)
+=== RUN   TestCopyBoundsAndOverflow
+--- PASS: TestCopyBoundsAndOverflow (0.00s)
+=== RUN   TestDeclaredAllocationAndOperationLimits
+--- PASS: TestDeclaredAllocationAndOperationLimits (0.00s)
+=== RUN   TestCompressedDecodedAndOutputCaps
+--- PASS: TestCompressedDecodedAndOutputCaps (0.00s)
+=== RUN   TestReferenceCapsAndOperationCap
+--- PASS: TestReferenceCapsAndOperationCap (0.00s)
+=== RUN   TestNilAndCancelledContext
+--- PASS: TestNilAndCancelledContext (0.00s)
+=== RUN   TestCancellationAtHashInflateParseAndCopyCheckpoints
+--- PASS: TestCancellationAtHashInflateParseAndCopyCheckpoints (0.01s)
+=== RUN   TestDeterministicRandomPrograms
+--- PASS: TestDeterministicRandomPrograms (0.02s)
+=== RUN   TestReferenceIndexIsLittleEndianUint16
+--- PASS: TestReferenceIndexIsLittleEndianUint16 (0.00s)
+=== RUN   TestExternalDictionaryNotAccepted
+--- PASS: TestExternalDictionaryNotAccepted (0.00s)
+=== RUN   TestPackagedCorpusAgainstIndependentParser
+    corpus_test.go:84: 137 payloads, 4425 operations; all metadata agrees with independent Python parser. No asset transformation.
+--- PASS: TestPackagedCorpusAgainstIndependentParser (0.03s)
+=== RUN   FuzzInstructions
+=== RUN   FuzzInstructions/seed#0
+=== RUN   FuzzInstructions/seed#1
+=== RUN   FuzzInstructions/seed#2
+--- PASS: FuzzInstructions (0.00s)
+    --- PASS: FuzzInstructions/seed#0 (0.00s)
+    --- PASS: FuzzInstructions/seed#1 (0.00s)
+    --- PASS: FuzzInstructions/seed#2 (0.00s)
+=== RUN   FuzzEnvelope
+=== RUN   FuzzEnvelope/seed#0
+=== RUN   FuzzEnvelope/seed#1
+--- PASS: FuzzEnvelope (0.00s)
+    --- PASS: FuzzEnvelope/seed#0 (0.00s)
+    --- PASS: FuzzEnvelope/seed#1 (0.00s)
+PASS
+ok  	pmm.local/fixlab/pmmdlt1	0.079s

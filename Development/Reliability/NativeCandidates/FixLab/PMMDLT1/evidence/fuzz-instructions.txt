@@ -1,0 +1,6 @@
+fuzz: elapsed: 0s, gathering baseline coverage: 0/3 completed
+fuzz: elapsed: 0s, gathering baseline coverage: 3/3 completed, now fuzzing with 2 workers
+fuzz: elapsed: 3s, execs: 38317 (12769/sec), new interesting: 58 (total: 61)
+fuzz: elapsed: 4s, execs: 52004 (12020/sec), new interesting: 68 (total: 71)
+PASS
+ok  	pmm.local/fixlab/pmmdlt1	4.142s
