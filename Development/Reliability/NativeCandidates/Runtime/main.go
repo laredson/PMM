@@ -101,11 +101,11 @@ func main() {
 			os.Exit(processCommand(args[2:]))
 		}
 	case "start":
-		os.Exit(startApplication(root))
+		os.Exit(withRuntimeUIBridge(root, func() int { return startApplication(root) }))
 	case "ui":
-		os.Exit(launchUserInterface(root, has(args[1:], "--native")))
+		os.Exit(withRuntimeUIBridge(root, func() int { return launchUserInterface(root, has(args[1:], "--native")) }))
 	case "ui-native":
-		os.Exit(launchUserInterface(root, true))
+		os.Exit(withRuntimeUIBridge(root, func() int { return launchUserInterface(root, true) }))
 	case "self-test":
 		os.Exit(selfTest(root))
 	}

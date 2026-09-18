@@ -1,76 +1,59 @@
-# 02C-2B integration contract - NOT implemented in 02C-2A
+# UIBridge integration - S02C-2B
 
-Start from the current remote commit, not old chat ZIPs. At the start of 2A it
-was 054e16404e1e45fcc614e24645c7fb651db80afb; C1 candidate hashes there are Host
-96e6e6b024207257e7777d7ad72711bf8f8c0966c86929d6f5528ec177ddb059 and Runtime
-db39fb942ebf9ba2c8d78c71abf4df43ec918a4040fe09dfaad65cba9a97ac77.
-The earlier downloadable C1 archive contains DIFFERENT candidate sources and
-hashes. It is not the integration baseline. All old reports remain historical.
+Implemented in the isolated Host/Runtime candidates, NOT in packaged PMM/.
+Input remote commit: 318666ca8beb828529b49d7ce245c0652b616d28.
+Windows transport/GUI acceptance is NOT_RUN. See SESSION02C2B_FINDINGS.md.
 
-## Required wiring, not merely importing the module
+## Source map
 
-1. Add a local pmm/uibridge replace to Host/Runtime recipes and include its complete
-   sources/hashes in offline staging. Keep the existing Supervision module and
-   all output_complete/error behavior. Never substitute packaged EXEs here.
-2. Host creates Server before Runtime Start; supplies Descriptor through a
-   controlled, case-insensitive de-duplicated environment (not a shared file).
-   CaptureProcess(RuntimePID) before Wait can release the original handle. Check
-   the CURRENT Supervision OnStart/Wait ordering and introduce a bounded capture
-   hook if necessary. Do not invent identities from a later PID lookup.
-3. Runtime connects early, before long dependency work, not after it: otherwise
-   the Host's 5-second accept deadline expires. It validates the live launching
-   Host, keeps the authenticated channel and serializes complete transactions.
-   No transport descriptors should be passed on to tools or WPF. PING/ACK must
-   keep the session responsive during UI waits and long initialization.
-4. Host Accept returns an OS-peer-checked Conn. NewAuthenticatedGate(Conn) obtains
-   a duplicate of that verified Runtime handle. Never call NewGate with a process
-   identity taken from state.txt. Any channel/parse/ACK error retires focus; the
-   visible application may continue with a diagnostic, NOT a legacy unsafe
-   fallback that activates an unverified window.
-5. Runtime allocates a fresh generation and EMPTY per-UI state directory. Preserve
-   its own Host-session diagnostics. Start WPF directly, capture its OS identity
-   before Wait, REGISTER, then wait for ValidateAck. Readiness arriving early may
-   be held as at most one hint, then revalidated after ACK. Never reuse a previous
-   UI's state directory or ready file for a new generation.
-6. For Win32 native UI register the Runtime process itself. Publish that HWND
-   when the actual window is ready; do not let the splash wait forever for a WPF
-   message that native UI never emits. If no usable HWND is available, retire
-   the splash WITHOUT a focus action; do not synthesize a handle.
-7. Enforce one focus-owner UI per generation. Repeated native-shell WPF buttons
-   must not create competing registrations. Native -> WPF needs explicit EXIT
-   of native registration, new generation and new per-UI state. The native window
-   can remain visible but no longer owns the focus token.
-8. Send EXIT/FAILED on observed UI completion; connection loss/current Runtime
-   exit closes Gate immediately. Host state-file monitor becomes PROGRESS ONLY.
-   Remove every direct HandoffTo(raw HWND from state.txt) route from the candidate.
-   Post a bounded notification to the splash's own thread, then TryHandoff on
-   that thread with a short callback respecting current foreground. Close/failure
-   must win if already observed; do not cache handles for later use.
-9. Review error paths: capture denied, server collision, peer mismatch, registration
-   failure, EOF, slow startup, missing UI script, old Runtime without protocol,
-   stale frames, inherited descriptors, native/WPF transitions and process exit.
-   Missing coordination never permits broadening ACLs, disabling protection,
-   forcing focus or silently trusting a file again.
-10. Test models/adapters with controlled stubs; compile both candidates twice,
-    persist evidence and exact hashes. No PMM/ changes, no WPF translation edits,
-    no repair/download redesign. Windows visual/IPC tests remain a separate gate.
+| Caller | Integration |
+| --- | --- |
+| Host main.go / bridge_windows.go | Server before controlled Runtime Start; capture hook before Wait; Accept / NewAuthenticatedGate; server loop; revocation on exit |
+| Host splash_windows.go | One Gate/generation notification slot; TryHandoff on splash thread; no stored raw HWND; foreground-respecting callback |
+| Host splash_state.go | progressOnlyView strips readiness/window authorization from all file hints |
+| Runtime main.go / bridge_windows.go | withRuntimeUIBridge before long UI/start work; OS launching parent, Dial, HELLO; locator scrub before descendants |
+| Runtime bridge.go | Single WPF reservation; fresh UI state directory; capture before Wait; REGISTER/ACK then readiness; bounded cleanup; native ownership |
+| Runtime native_shell_windows.go | Actual native HWND ready notification; copied button arguments; immediate close revocation |
+| Supervision process.go | Capture hook before starting Cmd.Wait, without changing output_complete / limits |
+| UIBridge client.go | Serialized exchanges, heartbeat, generation retirement and ServeGate ACK commit |
+| UIBridge environment.go / hint.go | Controlled locator environment, strict single-record hints, fresh per-UI directory |
 
-## What remains deliberately outside
+## Invariants
 
-The source only package does not implement Host/Runtime message loops, per-UI
-state directory routing, heartbeat scheduling, single-WPF ownership or splash
-callbacks. Those are actual integration tasks, not tests already completed.
-Do not count the 25 library model tests as real named-pipe/GUI acceptance.
-Process-family cancellation/Job Objects, manifest/pin validation, old paths and
-transactional dependency repair remain separate unresolved work.
+Production authentication always goes through Accept/Dial and NewAuthenticatedGate.
+NewGate is used only by synthetic tests. Declared PIDs, titles, AppUserModelID or
+files do not authenticate an endpoint. OS process references retain creation
+identity; HWND ownership and life are checked immediately before Host action.
 
-## Primary references consulted for the adapter
+A locator is NOT a secret. Host issues it only to the exact native Runtime start
+route, via deduplicated environment. Runtime strips it before probes/dependencies;
+WPF environment is scrubbed again. Runtime retains its own Host-session directory;
+WPF receives a new UIInstances/ui-* directory. If creation fails, empty SESSION_DIR
+suppresses hints rather than falling back to a previous instance's state file.
 
-- https://learn.microsoft.com/en-us/windows/win32/ipc/named-pipe-security-and-access-rights
-- https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getnamedpipeclientprocessid
-- https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getnamedpipeserverprocessid
-- https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-cancelioex
+Only one WPF child can start/run per coordinator. REGISTER waits for an exact ACK;
+READY is never replayed. Transition to WPF retires native ownership first. The
+native window may stay visible, but startup focus is not repeatedly transferred.
+Host destroys its splash after the first attempted verified handoff or retirement.
 
-The cancellation documentation requires retaining OVERLAPPED data until actual
-completion. A requested cancellation is not proof that cleanup finished. These
-references do not replace running the opt-in Windows adapter fixtures.
+Native close immediately cancels/revokes; it never waits for pipe I/O inside its
+Win32 callback. WPF Wait triggers cancellation and EXIT, with Host independently
+checking the retained owner's life. Any malformed message, stale generation,
+wrong HWND, ACK failure or disconnected channel disables coordination. There is
+no insecure file/TCP fallback. The application may continue without Host focus.
+
+Client exchanges including lock acquisition are bounded to 3 seconds. Heartbeat
+runs every second. Pipe operations retain their 5-second adapter cap. UI hint
+readiness expires after 30 seconds, retiring coordination, NOT killing application
+work. Kernel/driver cleanup is not promised to finish in a strict wall-clock bound.
+
+## Remaining limits and gates
+
+The real adapters were cross-compiled, not run. OS permissions, actual process and
+HWND reuse, close races and foreground behavior need the Windows integration gate.
+Same-process HWND reuse and validation/action races are not made atomic by Go.
+WPF's own activation logic is unchanged. Job Objects/process-family shutdown,
+manifest/pin validation, historical paths and transactional dependency repair
+remain separate requirements. No test/compile result authorizes installation.
+
+Read ../../WINDOWS_UIBRIDGE_ACCEPTANCE.md and ../../NEXT_SESSION.md before continuing.

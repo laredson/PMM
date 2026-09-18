@@ -20,15 +20,7 @@ func launchLegacyPowerShellUI(root string, sec SecurityStatus) int {
 		fmt.Fprintln(os.Stderr, "PowerShell is unavailable; legacy UI cannot start.")
 		return 30
 	}
-	cmd := legacyUICommand(root, sec)
-	if err := cmd.Run(); err != nil {
-		if ee, ok := err.(*exec.ExitError); ok {
-			return ee.ExitCode()
-		}
-		fmt.Fprintln(os.Stderr, err)
-		return 30
-	}
-	return 0
+	return coordinatedLegacyUI(root, sec)
 }
 
 // Construction only: no process is started until the caller invokes Run.

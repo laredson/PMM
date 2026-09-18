@@ -198,12 +198,21 @@ func (h *Host) run(operation string, args []string) int {
 	cmd := plan.Cmd
 	configureChildProcess(cmd)
 	cmd.Dir = h.Root
-	cmd.Env = append(os.Environ(),
-		"PMM_HOST_SESSION_ID="+h.SessionID,
-		"PMM_HOST_SESSION_DIR="+h.SessionDir,
-		"PMM_HOST_ROOT="+h.Root,
-		"PMM_HOST_POWERSHELL="+sec.PowerShell,
-	)
+	var bridge *hostUIBridge
+	// Only the expected direct Runtime start participates. Other routes get no locator.
+	if operation == "start" && plan.Kind == "native" && strings.EqualFold(filepath.Clean(cmd.Path), filepath.Join(h.Root, "Engine", "PMMRuntime.exe")) {
+		bridge, err = newHostUIBridge(h.SessionID, splash)
+		if err != nil {
+			h.log("UIBRIDGE", "Coordination unavailable: "+err.Error())
+			splash.requestClose()
+		}
+	} else {
+		splash.requestClose()
+	}
+	if bridge != nil {
+		defer bridge.close()
+	}
+	cmd.Env = bridgeLaunchEnvironment(h, sec.PowerShell, bridge)
 	// Child bytes go to exclusive bounded raw logs. Do not synchronously tee
 	// them to a potentially blocked console pipe; doctor/security still print JSON.
 	monitorDone := make(chan struct{})
@@ -212,15 +221,34 @@ func (h *Host) run(operation string, args []string) int {
 	result := supervision.Run(context.Background(), cmd, supervision.Options{
 		Stdout: supervision.Output{Path: h.OutLog, Limit: supervision.HostLogLimit},
 		Stderr: supervision.Output{Path: h.ErrLog, Limit: supervision.HostLogLimit},
+		Capture: func(pid int) {
+			if bridge != nil {
+				bridge.capture(pid)
+			}
+		},
 		Started: func(pid int) {
+			if bridge != nil {
+				bridge.start()
+			}
 			h.log("HOST", fmt.Sprintf("CHILD START kind=%s name=%s pid=%d", plan.Kind, plan.Name, pid))
 			if splash != nil {
 				go h.monitorStartupSplash(splash, monitorDone)
 			}
 		},
-		Exited: stopMonitor,
+		Exited: func() {
+			stopMonitor()
+			if bridge != nil {
+				bridge.close()
+			}
+		},
 	})
 	stopMonitor()
+	if bridge != nil {
+		bridge.close()
+		if msg := bridge.report(); msg != "" {
+			h.log("UIBRIDGE", msg)
+		}
+	}
 	code := result.ExitCode
 	if !result.Started {
 		code = 22
@@ -503,7 +531,7 @@ func (h *Host) monitorStartupSplash(splash *startupSplash, done <-chan struct{})
 			f.Close()
 			if err == nil {
 				if state, complete := completeStartupRecord(string(b)); complete {
-					splash.Update(state)
+					splash.UpdateProgress(state)
 				}
 			}
 		}

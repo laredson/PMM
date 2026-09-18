@@ -14,6 +14,8 @@ import (
 	"syscall"
 	"time"
 	"unsafe"
+
+	"pmm/uibridge"
 )
 
 var (
@@ -74,15 +76,17 @@ type splashClass struct {
 }
 
 type startupSplash struct {
-	mu        sync.Mutex
-	view      startupView
-	stop      chan struct{}
-	done      chan struct{}
-	ready     chan struct{}
-	closeOnce sync.Once
-	readyOnce sync.Once
-	root      string
-	log       func(string)
+	mu                sync.Mutex
+	handoffGate       *uibridge.Gate
+	handoffGeneration uint64
+	view              startupView
+	stop              chan struct{}
+	done              chan struct{}
+	ready             chan struct{}
+	closeOnce         sync.Once
+	readyOnce         sync.Once
+	root              string
+	log               func(string)
 	// Native handles below are owned/read exclusively by the locked UI thread.
 	window, label, progress uintptr
 }
@@ -123,6 +127,30 @@ func (s *startupSplash) Update(state string) {
 	s.mu.Unlock()
 }
 
+// requestClose publishes terminal state without waiting on the GUI thread.
+func (s *startupSplash) requestClose() {
+	if s != nil {
+		s.closeOnce.Do(func() { close(s.stop) })
+	}
+}
+func (s *startupSplash) UpdateProgress(state string) {
+	if s == nil {
+		return
+	}
+	s.mu.Lock()
+	s.view = progressOnlyView(s.view, state)
+	s.mu.Unlock()
+}
+func (s *startupSplash) queueVerifiedHandoff(g *uibridge.Gate, generation uint64) {
+	if s == nil {
+		return
+	}
+	s.mu.Lock()
+	// Single coalescing slot, containing NO cached HWND. Timer owns all Win32 calls.
+	s.handoffGate, s.handoffGeneration = g, generation
+	s.mu.Unlock()
+}
+
 func (s *startupSplash) Close() {
 	if s == nil {
 		return
@@ -137,30 +165,28 @@ func (s *startupSplash) Close() {
 	}
 }
 
-func (s *startupSplash) HandoffTo(target uintptr) {
+func (s *startupSplash) handoffVerified(target uintptr) string {
 	if target == 0 {
-		s.log("WPF readiness received without a window handle.")
-		return
+		return "UI readiness received without a window handle."
 	}
 	valid, _, _ := spIsWindow.Call(target)
 	if valid == 0 {
-		s.log("WPF readiness handle is no longer a window.")
-		return
+		return "UI readiness handle is no longer a window."
 	}
 	// Do not attach input queues, synthesize keystrokes, force TOPMOST, or
 	// change foreground-lock settings. Windows retains the final decision.
 	foreground, _, _ := spForeground.Call()
 	if foreground != s.window {
-		s.log("UI ready; focus left unchanged because splash is not foreground.")
-		return
+		return "UI ready; focus left unchanged because splash is not foreground."
 	}
 	// Check foreground BEFORE SW_SHOW too: it is itself a window action.
-	// IsWindow still does not authenticate the target process; see the 02B gate.
+	// Caller is Gate.TryHandoff; it has just checked the retained owner instance.
 	spShowAsync.Call(target, 5) // SW_SHOW, asynchronous across process boundaries.
 	ok, _, _ := spSetForeground.Call(target)
 	if ok == 0 {
-		s.log("Windows declined the foreground handoff; UI remains available.")
+		return "Windows declined the foreground handoff; UI remains available."
 	}
+	return ""
 }
 
 func (s *startupSplash) run() {
@@ -297,13 +323,29 @@ func (s *startupSplash) windowProc(hwnd uintptr, message uint32, wParam, lParam 
 			stopping = true
 		default:
 		}
-		switch nextStartupAction(view, stopping) {
-		case startupClose:
+		if stopping || view.Closed || view.Failed {
 			spDestroy.Call(hwnd)
 			return 0
-		case startupHandoff:
-			// Only a live readiness decision may attempt handoff.
-			s.HandoffTo(view.Window)
+		}
+		s.mu.Lock()
+		gate, generation := s.handoffGate, s.handoffGeneration
+		s.handoffGate, s.handoffGeneration = nil, 0
+		s.mu.Unlock()
+		if gate != nil {
+			// This is the ONLY HWND activation path; executed on the splash owner thread.
+			var diagnostic string
+			gate.TryHandoff(generation, func(target uint64) {
+				select {
+				case <-s.stop:
+					return
+				default:
+				}
+				diagnostic = s.handoffVerified(uintptr(target))
+			})
+			// No logging or pipe I/O occurs under Gate.TryHandoff.
+			if diagnostic != "" {
+				s.log(diagnostic)
+			}
 			spDestroy.Call(hwnd)
 			return 0
 		}
@@ -316,10 +358,12 @@ func (s *startupSplash) windowProc(hwnd uintptr, message uint32, wParam, lParam 
 		}
 		return 0
 	case splashWMClose:
+		s.requestClose()
 		// Closing this auxiliary window never kills the child or the supervisor.
 		spDestroy.Call(hwnd)
 		return 0
 	case splashWMDestroy:
+		s.requestClose()
 		spQuit.Call(0)
 		return 0
 	}

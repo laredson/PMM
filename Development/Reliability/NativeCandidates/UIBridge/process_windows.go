@@ -5,6 +5,7 @@ package uibridge
 import (
 	"errors"
 	"fmt"
+	"os"
 	"sync"
 	"syscall"
 	"unsafe"
@@ -174,4 +175,13 @@ func (WindowsPlatform) WindowOwnedBy(hwnd uint64, owner ProcessRef) bool {
 	}
 	valid, _, _ := procIsWindow.Call(h)
 	return valid != 0 && p.Alive()
+}
+
+// CaptureLaunchingParent derives the parent from the OS, not descriptor fields.
+func CaptureLaunchingParent() (*WinProcess, error) {
+	pid, err := parentPID(uint32(os.Getpid()))
+	if err != nil {
+		return nil, err
+	}
+	return CaptureProcess(pid)
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build S02C1 OUTSIDE the checkout, offline. Never execute/install the Host candidate."""
+"""Build S02C2B OUTSIDE the checkout, offline. Never execute/install the Host candidate."""
 from pathlib import Path
 import argparse
 import difflib
@@ -68,6 +68,11 @@ def main():
         if any(p.is_symlink() or not p.is_file() for p in support_inputs):
             raise ValueError('Invalid shared supervision source')
         support_hashes = {p.name: sha(p) for p in support_inputs}
+        bridge = src.parent/'UIBridge'
+        bridge_inputs = sorted([*bridge.glob('*.go'), bridge/'go.mod'])
+        if bridge.is_symlink() or any(p.is_symlink() or not p.is_file() for p in bridge_inputs):
+            raise ValueError('Invalid shared UIBridge source')
+        bridge_hashes = {p.name: sha(p) for p in bridge_inputs}
         inputs = sorted([*src.glob('*.go'), src/'go.mod', src/'build.py', src/'inspect_pe.py'])
         input_hashes = {p.name: sha(p) for p in inputs}
         original_before = inspect(original)
@@ -81,6 +86,10 @@ def main():
         support_stage.mkdir()
         for file in support_inputs:
             shutil.copyfile(file, support_stage/file.name)
+        bridge_stage = out/'UIBridge'
+        bridge_stage.mkdir()
+        for file in bridge_inputs:
+            shutil.copyfile(file, bridge_stage/file.name)
         native_env = dict(env, GOOS=host_os, GOARCH=host_arch)
         win_env = dict(env, GOOS='windows', GOARCH='amd64', GOAMD64='v1')
         candidate = out/'PMMHost-candidate.exe'
@@ -104,7 +113,7 @@ def main():
         if any(sha(p) != support_hashes[p.name] for p in support_inputs):
             raise ValueError('Shared supervision source changed during build')
         report = {
-            'schema': 'PMM_HOST_CANDIDATE_BUILD_V1', 'session': '02C-1',
+            'schema': 'PMM_HOST_CANDIDATE_BUILD_V1', 'session': '02C-2B',
             'classification': 'RECONSTRUCTION_NOT_ORIGINAL_RECOVERED',
             'goVersion': GO_VERSION, 'buildHost': host_os+'/'+host_arch,
             'target': 'windows/amd64', 'sourceSha256': input_hashes,
@@ -116,6 +125,9 @@ def main():
             'warning': 'Static build evidence only. No equivalence or release approval.',
         }
         report['sharedSupervisionSha256'] = support_hashes
+        if any(sha(p) != bridge_hashes[p.name] for p in bridge_inputs):
+            raise ValueError('Shared UIBridge source changed during build')
+        report['sharedUIBridgeSha256'] = bridge_hashes
         (out/'build-report.json').write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')
         old = (repo/'Development/Source/Host/main.go').read_text().splitlines(keepends=True)
         new = (src/'main.go').read_text().splitlines(keepends=True)

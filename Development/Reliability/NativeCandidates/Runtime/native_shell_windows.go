@@ -149,6 +149,9 @@ func launchNativeUIShell(root string, sec SecurityStatus) int {
 	nativeShellRefresh()
 	uiShowWindow.Call(hwnd, swShow)
 	uiUpdateWindow.Call(hwnd)
+	if activeUIBridge != nil {
+		activeUIBridge.nativeReady(uint64(hwnd))
+	}
 
 	var m msg
 	for {
@@ -215,7 +218,8 @@ func nativeShellWndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) ui
 			}
 		case btnLegacyUI:
 			if strings.EqualFold(nativeShell.sec.PowerShellLanguageMode, "FullLanguage") && nativeShell.sec.PowerShell != "" {
-				go launchLegacyPowerShellUI(nativeShell.root, nativeShell.sec)
+				root, sec := nativeShell.root, nativeShell.sec
+				go launchLegacyPowerShellUI(root, sec)
 			}
 		case btnSelfTest:
 			rc := selfTest(nativeShell.root)
@@ -225,13 +229,16 @@ func nativeShellWndProc(hwnd uintptr, message uint32, wParam, lParam uintptr) ui
 				nativeShellAppend(fmt.Sprintf("\r\nRuntime self-test: FAIL (%d)", rc))
 			}
 		case btnClose:
+			activeUIBridge.retireImmediately()
 			uiPostQuitMessage.Call(0)
 		}
 		return 0
 	case wmClose:
+		activeUIBridge.retireImmediately()
 		uiPostQuitMessage.Call(0)
 		return 0
 	case wmDestroy:
+		activeUIBridge.retireImmediately()
 		uiPostQuitMessage.Call(0)
 		return 0
 	}

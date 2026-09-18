@@ -1,0 +1,24 @@
+{
+  "goVersion": "go1.23.2",
+  "host": "linux/amd64",
+  "target": "windows/amd64",
+  "buildCommand": "python -B NativeCandidates/{Host,Runtime}/build.py --out NEW_EXTERNAL_DIRECTORY",
+  "offline": true,
+  "candidateExecuted": false,
+  "builds": {
+    "Host": {
+      "sha256": "a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c",
+      "sizeBytes": 2744832,
+      "repeatBuildByteIdentical": true
+    },
+    "Runtime": {
+      "sha256": "b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f",
+      "sizeBytes": 6506496,
+      "repeatBuildByteIdentical": true
+    }
+  },
+  "fullReports": {
+    "Host-build-report.json": "b12eb2b6c34500a87533c1bd3b64bdb4f714865dfd67c40b21fc5ef8cbb1393e",
+    "Runtime-build-report.json": "86ef84550f478f7ea7b04130268a5b3af1ec90b6af4d870ebe081301756fb172"
+  }
+}

@@ -10,7 +10,6 @@ import (
 	"io"
 	"os"
 	"runtime"
-	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -18,7 +17,6 @@ import (
 )
 
 const OperationTimeout = 5 * time.Second
-const pipePrefix = `\\.\pipe\PMM.UIBridge.`
 const pipeRights = 0x00120083 // data read/write, read attributes/control, synchronize; NOT create instance.
 var createPipe = kernel.NewProc("CreateNamedPipeW")
 var connectPipe = kernel.NewProc("ConnectNamedPipe")
@@ -30,29 +28,6 @@ var localFree = kernel.NewProc("LocalFree")
 var advapi = syscall.NewLazyDLL("advapi32.dll")
 var convertSD = advapi.NewProc("ConvertStringSecurityDescriptorToSecurityDescriptorW")
 
-// Descriptor is a locator, NOT a credential. Deliver only via controlled launch;
-// Dial also requires an independently captured expected Host process handle.
-type Descriptor struct {
-	Name    string
-	Session string
-	Host    Identity
-}
-
-func (d Descriptor) valid() bool {
-	if !ValidSession(d.Session) || !d.Host.Valid() || !strings.HasPrefix(d.Name, pipePrefix) {
-		return false
-	}
-	tail := strings.TrimPrefix(d.Name, pipePrefix)
-	if len(tail) != 32 {
-		return false
-	}
-	for _, c := range tail {
-		if !(c >= '0' && c <= '9' || c >= 'a' && c <= 'f') {
-			return false
-		}
-	}
-	return true
-}
 func pipeAPIs() error {
 	for _, p := range []*syscall.LazyProc{createPipe, connectPipe, clientPID, serverPID, createEvent, overlappedResult, localFree, convertSD} {
 		if e := p.Find(); e != nil {

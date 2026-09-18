@@ -31,6 +31,9 @@ type Options struct {
 	Stdout, Stderr            Output
 	DrainTimeout, ReapTimeout time.Duration
 	// Hooks must return promptly. Exited is called BEFORE draining inherited pipes.
+	// Capture is synchronous BEFORE Wait can release the original process handle.
+	// It must only perform prompt identity capture (no logging or IPC waits).
+	Capture func(pid int)
 	Started func(pid int)
 	Exited  func()
 }
@@ -228,6 +231,9 @@ func run(ctx context.Context, cmd *exec.Cmd, opt Options, open opener) (res Resu
 	failed := make(chan struct{}, 2)
 	go pump(0, ro, out, done, failed)
 	go pump(1, re, errout, done, failed)
+	if opt.Capture != nil {
+		opt.Capture(res.PID)
+	}
 	waited := make(chan error, 1)
 	go func() { waited <- cmd.Wait() }()
 	if opt.Started != nil {

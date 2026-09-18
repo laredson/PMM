@@ -1,57 +1,55 @@
-# Retomar despues de 02C-2A
+# Retomar despues de 02C-2B
 
-Rama exclusiva: v1.5.0.1-PMM-reliability.
-**02C-2A cerrada como biblioteca aislada; 02C-2 completa todavia NO.**
-Siguiente: **02C-2B - conectar Host/Runtime a UIBridge**.
-Leer AGENTS -> este archivo -> STATUS -> SESSION02C2A_FINDINGS ->
-NativeCandidates/UIBridge/README.md e INTEGRATION.md.
+Rama exclusiva v1.5.0.1-PMM-reliability. 02C-2B cerrada para integracion candidata;
+Windows/IPC/GUI siguen NOT_RUN. Leer AGENTS -> este archivo -> STATUS ->
+SESSION02C2B_FINDINGS/CHECKS. No repetir tandas ni pedir el ZIP de nuevo.
 
-## Base real, no reconstruir desde la conversacion
+## Estado conservado
 
-La rama ya tenia C1 publicada en 054e16404e1e45fcc614e24645c7fb651db80afb.
-El viejo ZIP C1 no contiene las mismas candidatas; NO sobreescribir con el.
-Conservar las fuentes de HEAD remoto, incluyendo Supervision y sus recetas.
-Host C1: 96e6e6b024207257e7777d7ad72711bf8f8c0966c86929d6f5528ec177ddb059.
-Runtime C1: db39fb942ebf9ba2c8d78c71abf4df43ec918a4040fe09dfaad65cba9a97ac77.
-PMM/: 629 archivos, 628 hashes, build PMM-v1.5.0.1-reliability-s01b.
-No volver a pedir el ZIP ni repetir 01B/02A/02B/03A/03B/02C-1.
+Paquete original intacto: 1.5.0.1, build PMM-v1.5.0.1-reliability-s01b,
+629 archivos, 628 hashes, arbol PMM 09df5c45aee3390c6b8ea235c8afa4e149a9f1fa.
+Host C2B a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c.
+Runtime C2B b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f.
+Fuentes/recetas y dependencias LOCALES Supervision/UIBridge estan en NativeCandidates.
+No copiar estos EXE sobre PMM.exe/Engine/PMMRuntime.exe. No se recupero fuente original.
 
-## Entrega guardada
+02C-2A fue biblioteca; 02C-2B ya la conecta. No reimplementar el canal. Host captura
+Runtime antes de Wait; Runtime conecta antes de tareas largas, acks serializados
++ heartbeat, una WPF por coordinador, directorios nuevos, READY posterior a ACK,
+retirada terminal y handoff por Gate desde el hilo del splash. state.txt del Host
+es solo progreso. Leer UIBridge/INTEGRATION.md antes de modificar esa cadena.
 
-NativeCandidates/UIBridge/: protocolo, Gate y adapters Windows con transporte
-local y referencias vivas de procesos. build.py offline Go1.23.2; 25 tests del
-modelo/protocolo y race Linux; Windows test EXE compilado, NO ejecutado.
-SHA-256 de ese EXE: 8d76336d55ef814c6fbdbcb852939b91ca8bf42884399baf96911f3b239b8414.
-NO es una candidata PMM instalable, NO importar como PMM.exe/PMMRuntime.exe.
+## Siguiente tanda 04A - SOLO procedencia/fuente FixLab
 
-## Alcance 02C-2B
+1. Verificar HEAD y leer NATIVE_ARTIFACTS, SOURCE_STATUS y documentos FixLab.
+   No tocar Host/Runtime/UIBridge ni el paquete. Original PMM/Engine/PMMFixLab.exe:
+   8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe.
+2. Localizar fuente verificable de 0.2.0-variant-recipes. Revisar como DATOS el
+   historial/entregas y el overlay .github/bootstrap/fixlab-r2-overlay.patch.xz.b64.part*
+   si resulta pertinente; NO ejecutar workflows/bootstrap ni aplicar un overlay
+   completo sobre la rama. Una referencia de manifiesto no demuestra existencia.
+3. Si se recupera una fuente, registrar origen y hash exactos. Si se reconstruye,
+   etiquetar RECONSTRUCTION. Guardar SOLO candidata aislada en NativeCandidates/FixLab;
+   contratos/recetas/output hashes originales no se sustituyen para hacerla pasar.
+4. Receta offline y evidencia si puede compilarse; no ejecutar reparaciones reales,
+   herramientas del juego ni distribuir datos propietarios. Fixtures sinteticos
+   y lectura de metadatos no se presentan como aceptacion en Palworld/Windows.
+5. Registrar hallazgos y alcance terminado o bloqueo concreto, con entrada precisa
+   de 04B (comparacion) o la recuperacion pendiente. Un commit [skip ci] autorizado,
+   sin Actions/PR/tag/release. Conservar identidad y los archivos de PMM.
 
-1. Verificar HEAD, leer fuentes C1 remotas y UIBridge. Agregar dependencia LOCAL
-   y staging/hashes de UIBridge en ambos builds. No cambiar el paquete PMM.
-2. Capturar identidades/handles inmediatamente tras Start y ANTES de Wait; revisar
-   el orden de callbacks del Supervision actual. Host crea pipe antes de Start.
-   Runtime conecta antes de tareas largas y serializa send/ACK mas heartbeat.
-3. Usar Accept/Dial y NewAuthenticatedGate, no NewGate con PID de state.txt.
-   Ante errores, retirar la coordinacion del foco sin activar fallback inseguro.
-4. Cablear REGISTER/ACK/READY/EXIT para WPF y ruta nativa, con un directorio NUEVO
-   por UI/generation. Resolver readiness temprano y repeticion del boton WPF.
-   El fichero de estado es indicio, no prueba de identidad ni renderizado.
-5. El monitor Host de state.txt pasa a progreso solamente. La entrega de foco usa
-   Gate.TryHandoff desde el hilo propietario y respeta foreground del usuario.
-   Captura/ACK/cierre concurrentes deben tener pruebas reproducibles con stubs.
-6. Preservar limites de supervision C1 y output_complete. No redisenar repair,
-   manifiestos o traducciones en esta integracion. No afirmar kill-tree Windows.
-7. Compilar candidatas separadas, conservar codigo/evidencia/hashes. Windows IPC
-   y GUI siguen NOT_RUN hasta su sesion real autorizada. Ningun PASS de Linux
-   permite sustituir ejecutables. Commit [skip ci], sin Actions/PR/tag/release.
+## Gates antes de cualquier promocion
 
-El usuario indico que el paquete actual arranca y parece funcionar; eso NO
-acepta las candidatas aun no instaladas. H02B-04/REL-01 siguen abiertos.
+WINDOWS_HOST_ACCEPTANCE, WINDOWS_RUNTIME_ACCEPTANCE y WINDOWS_UIBRIDGE_ACCEPTANCE
+siguen NOT_RUN. El ultimo incluye casos integrados de C2B. No confundir abrir el
+PMM original con probar los candidatos. Falta gestion de familia/Job Objects,
+validacion manifiesto/pins/rutas R03B-02/04 y politica/reparacion 06/07. Activacion
+propia de WPF y carreras de HWND mismo proceso necesitan observacion Windows.
 
 ## Prompt
 
-"Completa 02C-2B en reliability: lee NEXT_SESSION e integra el modulo UIBridge
-ya guardado en las candidatas C1 de HEAD remoto, con vida/registro/ACK/READY/cierre
-y pruebas acotadas. No uses las viejas candidatas del ZIP, no sustituyas PMM/, no
-modifiques idiomas ni dependencias de red. Guarda pruebas reales, limites Windows,
-hashes y siguiente paso. Un commit [skip ci], sin Actions, PR, tags ni release."
+"Completa solo 04A en reliability: lee NEXT_SESSION y recupera/reconcilia la fuente
+candidata de FixLab con procedencia y receta conservadas. No sustituyas binarios ni
+toques Host/Runtime/UIBridge, traducciones o recetas productivas. No ejecutes bootstrap,
+reparaciones o juego. Registra evidencia, limites y 04B; commit [skip ci], sin Actions,
+PR, tags ni release."

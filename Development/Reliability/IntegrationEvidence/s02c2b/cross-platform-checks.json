@@ -1,0 +1,31 @@
+[
+  {
+    "component": "UIBridge",
+    "windowsVetExitCode": 0,
+    "windowsTestCompileExitCode": 0,
+    "windowsTestsExecuted": false
+  },
+  {
+    "component": "Supervision",
+    "windowsVetExitCode": 0,
+    "windowsTestCompileExitCode": 0,
+    "windowsTestsExecuted": false
+  },
+  {
+    "component": "Host",
+    "windowsVetExitCode": 0,
+    "windowsTestCompileExitCode": 0,
+    "windowsTestsExecuted": false
+  },
+  {
+    "component": "Runtime",
+    "windowsVetExitCode": 0,
+    "windowsTestCompileExitCode": 0,
+    "windowsTestsExecuted": false
+  },
+  {
+    "scope": "Python output guards/PE fixtures",
+    "HostTests": 9,
+    "RuntimeTests": 9
+  }
+]

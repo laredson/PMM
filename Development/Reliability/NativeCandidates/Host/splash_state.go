@@ -140,3 +140,11 @@ func nextStartupAction(view startupView, stopping bool) startupAction {
 	}
 	return startupUpdate
 }
+
+// Progress from state.txt must never turn into a focus capability.
+func progressOnlyView(current startupView, raw string) startupView {
+	next := nextStartupView(current, raw)
+	next.Ready = false
+	next.Window = 0
+	return next
+}

@@ -1,24 +1,26 @@
 # PMM v1.5.0.1 - fiabilidad independiente
 
-Rama: v1.5.0.1-PMM-reliability. Ultima entrega: **02C-2A, biblioteca de canal UI**.
-Siguiente: **02C-2B, integracion en Host/Runtime**. 02C-2 completa aun no cerrada.
+Rama: v1.5.0.1-PMM-reliability. **Ultimo cierre 02C-2B; siguiente 04A (FixLab).**
+Los IDs son areas de trabajo; no implican volver a pasos ya cerrados.
 
-El modulo local UIBridge implementa protocolo, registro/generation/ACK/cierre,
-validacion de procesos/ventanas y transporte named pipe Windows. Sus 25 pruebas
-Go del modelo/protocolo y race Linux pasan; el codigo Windows compila. **Todavia
-no se ha conectado a PMM ni se ha ejecutado el transporte real en Windows.**
+UIBridge ya esta integrado en las FUENTES CANDIDATAS de Host y Runtime: identidad
+por SO, captura antes de Wait, ACK/heartbeat, generacion, directorio nuevo por UI,
+y handoff validado en el hilo del splash. El state.txt del Host es solo progreso.
+No se modifican los 629 archivos del programa instalado: build 1.5.0.1/s01b.
 
-C1 ya consta en GitHub en 054e164; conservar esas candidatas, no las versiones
-anteriores de ZIP. 01B mantiene 1.5.0.1 / PMM-v1.5.0.1-reliability-s01b; los 629
-archivos del paquete y sus ejecutables originales permanecen intactos.
+91 tests Go de modelos/fixtures con aserciones y cuatro suites race Linux; 18 tests
+Python; compilacion/vet de cuatro modulos Windows. Dos builds iguales por candidata
+en el entorno registrado. **No IPC/GUI/PowerShell/PMM/antivirus Windows ejecutados.**
+Estas comprobaciones no autorizan reemplazar ejecutables ni cierran REL-01.
 
 Leer [NEXT_SESSION](Development/Reliability/NEXT_SESSION.md),
 [STATUS](Development/Reliability/STATUS.md),
-[hallazgos 2A](Development/Reliability/SESSION02C2A_FINDINGS.md),
-[checks](Development/Reliability/SESSION02C2A_CHECKS.json) y
-[UIBridge](Development/Reliability/NativeCandidates/UIBridge/README.md).
-La guia INTEGRATION.md evita reconstruir el trabajo desde el resumen del chat.
+[hallazgos C2B](Development/Reliability/SESSION02C2B_FINDINGS.md),
+[checks](Development/Reliability/SESSION02C2B_CHECKS.json) e
+[integracion](Development/Reliability/NativeCandidates/UIBridge/INTEGRATION.md).
+Fuentes completos y recetas offline bajo NativeCandidates; evidencia en
+IntegrationEvidence/s02c2b. No utilizar los ZIP C1 antiguos como fuente de HEAD.
 
-El arranque correcto comunicado por el usuario corresponde al paquete actual,
-no a las candidatas no instaladas. REL-01 y el gate Windows siguen abiertos.
-No tocar traducciones/main ni publicar releases sin la autorizacion correspondiente.
+Quedan Windows real, familias de procesos, manifiesto/pins/rutas, FixLab,
+dependencias/reparacion y traducciones finales. No release/tag/PR ni cambios en
+main o rama de idiomas. La version visible no significa hardening terminado.

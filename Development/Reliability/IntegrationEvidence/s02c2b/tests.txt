@@ -1,0 +1,103 @@
+S02C-2B: actual Linux Go test results (top-level assertions only).
+Command per module: go test -json -count=1 -timeout=35s ./...
+Repeat per module: go test -race -json -count=1 -timeout=35s ./...
+No Windows artifact, PMM, PowerShell, WPF or .NET execution.
+
+PASS UIBridge.TestIntegratedConversationHandoffOnceAndExit
+PASS UIBridge.TestRegistrationAckMustFinishBeforeReady
+PASS UIBridge.TestAckFailureRevokesConversation
+PASS UIBridge.TestConcurrentTransactionsRemainSerialized
+PASS UIBridge.TestHeartbeatDuringIdleInitialization
+PASS UIBridge.TestNativeToWPFReplacesGenerationAndRejectsOldReady
+PASS UIBridge.TestClientCloseCancelsPendingAckWithoutLockWait
+PASS UIBridge.TestLocatorRoundTripAndNoChildLeak
+PASS UIBridge.TestAmbiguousLocatorsRejected
+PASS UIBridge.TestHintsRequireWholeRecordsAndCanonicalHandles
+PASS UIBridge.TestFreshStateNeverReusesOldReady
+PASS UIBridge.TestReadyWaitsForAckAndRevalidates
+PASS UIBridge.TestDuplicateRegistrationIsIdempotent
+PASS UIBridge.TestExitBeatsPendingReady
+PASS UIBridge.TestLivenessCheckedAtAction
+PASS UIBridge.TestRejectsForeignWindowAndReusedPID
+PASS UIBridge.TestGenerationRequiresRetirement
+PASS UIBridge.TestNativeToWPFGeneration
+PASS UIBridge.TestOldGenerationRejected
+PASS UIBridge.TestWrongSequenceSessionAndHello
+PASS UIBridge.TestHelloMustMatchVerifiedOSPeer
+PASS UIBridge.TestObserveExitAndTransportCloseRevoke
+PASS UIBridge.TestWrongNativeOwner
+PASS UIBridge.TestConcurrentCloseNeverAllowsSubsequentAction
+PASS UIBridge.TestProtocolConversationThroughFrames
+PASS UIBridge.TestSequenceOverflowFailsClosed
+PASS UIBridge.TestAckFailureLeavesNoCapability
+PASS UIBridge.TestTransportRevocationCheckedWithoutWatcherScheduling
+PASS UIBridge.TestRevocationDuringWindowCheck
+PASS UIBridge.TestWireRoundTrip
+PASS UIBridge.TestDecoderRejectsAmbiguity
+PASS UIBridge.TestCanonicalIntegers
+PASS UIBridge.TestFramingRejectsPartialAndOversize
+PASS UIBridge.TestWriterErrors
+PASS UIBridge.TestTypedMessageConstraints
+PASS UIBridge.TestAckBoundToExactRequest
+UIBridge race: exit 0
+PASS Supervision.TestCapturePrecedesWaitAndStartedHook
+PASS Supervision.TestFailedStartDoesNotCapture
+PASS Supervision.TestProbeResponseContracts
+PASS Supervision.TestProbeUsesBoundedRunner
+PASS Supervision.TestProbeDoesNotRequestPolicyOverride
+PASS Supervision.TestLongLineAndNoFinalNewline
+PASS Supervision.TestExactDiskOutputAndExclusiveCreation
+PASS Supervision.TestOutputLimitFailsExplicitly
+PASS Supervision.TestDeadlineKillsOnlyDirectChild
+PASS Supervision.TestCancellation
+PASS Supervision.TestCancelledBeforeStart
+PASS Supervision.TestInheritedPipesDeadlineIndependentOfChildExit
+PASS Supervision.TestFailedStorageAndShortWrite
+PASS Supervision.TestStorageCloseError
+PASS Supervision.TestNonzeroExitKeepsOutput
+PASS Supervision.TestStartFailure
+PASS Supervision.TestNonUTF8NotSilent
+PASS Supervision.TestInvalidOptions
+Supervision race: exit 0
+PASS Host.TestFileReadinessNeverGrantsHandoff
+PASS Host.TestStartupWindowHandle
+PASS Host.TestStageSequenceDoesNotTreatFirstPaintAsReady
+PASS Host.TestIncompleteOrUnknownStatesCannotRetireSplash
+PASS Host.TestFailureIsNotReadyAndDoesNotGetOverwritten
+PASS Host.TestFallbackAndReadyAreTerminal
+PASS Host.TestCompleteRecordsRejectPartialHandleAndMultipleRecords
+PASS Host.TestTerminalStateInvalidatesReadyAndCannotReopen
+PASS Host.TestStopWinsOverReadinessAtDecision
+PASS Host.TestPartialExitIsNotTerminal
+Host race: exit 0
+PASS Runtime.TestWPFReadyBeforeRegistrationWaitsForAck
+PASS Runtime.TestForeignWPFHintRevokesWithoutReady
+PASS Runtime.TestExitedWPFNeverRegisters
+PASS Runtime.TestDuplicateWPFButtonDoesNotLaunchAnotherChild
+PASS Runtime.TestNativeCloseRevokesWithoutIOWait
+PASS Runtime.TestInventoryRejectsIncompleteScan
+PASS Runtime.TestInventoryRejectsDuplicateRecords
+PASS Runtime.TestInventoryAcceptsCompleteAndRejectsMissingOrExtraFiles
+PASS Runtime.TestInventoryRejectsInvalidRecordAndPin
+PASS Runtime.TestProcessArgumentsRejectInvalidTimeouts
+PASS Runtime.TestProcessArgumentsKeepArgvAndBoundary
+PASS Runtime.TestRuntimeIncompleteOutputReturnsError
+PASS Runtime.TestRuntimeCancellationIsNotStartFailure
+PASS Runtime.TestRuntimeNoNativeToolSelectionOnLinux
+PASS Runtime.TestCleanRelPathRejectsTraversal
+PASS Runtime.TestZipRoundTrip
+PASS Runtime.TestZipManyFilesDoesNotLeakDescriptors
+PASS Runtime.TestZipRejectsSymlink
+PASS Runtime.TestZipCreateRejectsOutputInsideSource
+PASS Runtime.TestZipExtractRejectsSymlinkEntry
+PASS Runtime.TestZipExtractRejectsCaseCollidingFiles
+PASS Runtime.TestUIRouteContract
+PASS Runtime.TestUIArgumentsAreSeparateAndFresh
+PASS Runtime.TestWPFPresentationDiffersOnlyInHideWindow
+PASS Runtime.TestUICommandPreservesSessionDirectoryStreamsAndArgv
+PASS Runtime.TestMissingPowerShellDoesNotLaunch
+PASS Runtime.TestRuntimeStateSessionScopedAndCRLF
+Runtime race: exit 0
+
+Excluded from assertions: two process fixture dispatchers; FuzzDecode seed-only entry.
+Python output guards/PE fixtures: Host 9, Runtime 9; exit 0 each.
