@@ -1,10 +1,10 @@
-## Russian localization completed; Korean user QA accepted — 2026-09-18
+## French localization completed; Russian preliminary user feedback positive — 2026-09-18
 
-Русский now covers all 1,291 canonical English keys on `v1.5.0.0-PMM-translated` and is enabled for user testing. The user reports Korean works perfectly, as do the previously added languages; no existing language catalog was retranslated or changed.
-The Russian catalog passed local structural checks against a byte-identical copy of canonical `en.json`, including full keys/order, nonempty values, placeholders, numbers, whitespace, selected technical tokens, file-dialog patterns and Unicode controls. There are 109 parameterized entries, 18 intentional invariant values and zero remaining entries.
-The uploaded Russian Git blob `ffa3bfb80ef2aa4ae3268b0c557e3a38bb4b1b18` matches the validated local bytes. Detailed evidence, glossary and limits are in `RUSSIAN_HANDOFF.md` and `Progress/ru.json`.
+Français now covers all 1,291 canonical English keys on `v1.5.0.0-PMM-translated` and is enabled for user testing. The user reports Russian apparently works well; this is preliminary feedback, not exhaustive acceptance. The eight previously active catalogs are unchanged.
+The French catalog passed local structural checks against a byte-identical copy of canonical `en.json`, including full keys/order, nonempty values, placeholders, numbers, whitespace, selected technical tokens, file-dialog patterns and Unicode controls. There are 109 parameterized entries, 31 intentional invariant values (including valid French homographs) and zero remaining entries.
+The uploaded French Git blob `09b29bddef3fe13d7bc0f0fdd4d7d476f1050deb` matches the validated local bytes. Detailed evidence, glossary and limits are in `FRENCH_HANDOFF.md` and `Progress/fr.json`.
 No GitHub Actions, full repository audit, Windows PowerShell 5.1 or WPF visual/runtime test was run for this checkpoint. Language switching remains restart-based; existing runtime QA issues remain separately tracked.
-Next step: user runtime/visual QA of Russian. Next translation: **French (`fr`, Français)**. Do not restart Korean, Portuguese or Russian from scratch.
+Next step: user runtime/visual QA of French. Next translation: **German (`de`, Deutsch)**. Do not restart completed languages from scratch.
 
 # PMM v1.5.0.0 translation plan
 
@@ -15,7 +15,7 @@ This file is the close translation-work ledger for PMM 1.5. Update it whenever a
 
 ## Current checkpoint — 2026-09-18
 
-Russian is complete at the catalog level: **1,291/1,291 entries**, enabled with native label `Русский`, fallback `en`, direction `ltr`, no separate XAML. The source commit is `d9442cff26b8ac84a1f85fe0db023baf2d6c89f8`; canonical English blob is `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`. The user requested a whole language in one prompt where feasible, and this checkpoint completes Russian without changing runtime code. `Progress/ru.json` records the executed structural checks; user runtime/visual QA is pending. Korean is already complete and user-accepted, not a partial task. French is next in the unchanged market queue.
+French is complete at the catalog level: **1,291/1,291 entries**, enabled with native label `Français`, fallback `en`, direction `ltr`, no separate XAML. The source commit is `7da32ce5fb043105690219d90f86ad0cf514d1bb`; canonical English blob is `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`. This checkpoint completes one whole language without changing runtime code. `Progress/fr.json` records the executed structural checks; French user runtime/visual QA is pending. Russian has positive preliminary user feedback; Korean and Portuguese remain user-accepted. German is next in the unchanged market queue.
 
 ## Policy
 
@@ -83,7 +83,7 @@ Normal post-baseline market queue:
 
 `pt-BR -> ko -> ru -> fr -> de -> zh-TW -> ja -> tr -> pl -> it -> th -> id -> vi -> nl -> uk -> cs -> hi -> ar`
 
-Hindi and Modern Standard Arabic were intentionally moved ahead of their normal market position as early v1.5 quality targets. Both are enabled for user testing. Brazilian Portuguese and Korean are committed, enabled, and have passed the user's reported runtime test. Russian is complete and enabled for user QA; French is the next translation target. Italian was proposed as an alternative but has not been translated or enabled. The user's positive report on existing languages does not by itself close the specific runtime issues listed below.
+Hindi and Modern Standard Arabic were intentionally moved ahead of their normal market position as early v1.5 quality targets. Both are enabled for user testing. Brazilian Portuguese and Korean are committed, enabled, and have passed the user's reported runtime test. Russian has positive preliminary user feedback. French is complete and enabled for user QA; German is the next translation target. Italian was proposed as an alternative but has not been translated or enabled. The user's positive reports do not by themselves close the specific runtime issues listed below.
 
 The older worldwide-speaker backlog remains as reserve templates rather than being deleted: Bengali (`bn`), Urdu (`ur`), Nigerian Pidgin (`pcm`), Egyptian Arabic (`arz`), Marathi (`mr`), Telugu (`te`) and Hausa (`ha`).
 
@@ -96,9 +96,9 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 | baseline | `zh-CN` | 简体中文 | Chinese (Simplified) | ltr | enabled | complete + active |
 | 3 | `pt-BR` | Português (Brasil) | Portuguese (Brazil) | ltr | enabled | **catalog complete; user reports it works perfectly** |
 | 4 | `ko` | 한국어 | Korean | ltr | enabled | **catalog complete, 1,291/1,291; user reports it works perfectly** |
-| 5 | `ru` | Русский | Russian | ltr | enabled | **catalog complete, 1,291/1,291; structural checks passed; user QA pending** |
-| 6 | `fr` | Français | French | ltr | disabled | **next translation target; template pending** |
-| 7 | `de` | Deutsch | German | ltr | disabled | template pending |
+| 5 | `ru` | Русский | Russian | ltr | enabled | **catalog complete, 1,291/1,291; user reports it apparently works well** |
+| 6 | `fr` | Français | French | ltr | enabled | **catalog complete, 1,291/1,291; structural checks passed; user QA pending** |
+| 7 | `de` | Deutsch | German | ltr | disabled | **next translation target; template pending** |
 | 9 | `zh-TW` | 繁體中文 | Chinese (Traditional) | ltr | disabled | template pending |
 | 10 | `ja` | 日本語 | Japanese | ltr | disabled | template pending |
 | 11 | `tr` | Türkçe | Turkish | ltr | disabled | template pending |
@@ -144,6 +144,16 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 
 ## Work log
 
+### 2026-09-18 — Russian preliminary user feedback positive; French completed
+
+- Recorded the user's exact Russian feedback: "funciona bien aparentemente". This is positive preliminary feedback, not exhaustive runtime or linguistic acceptance.
+- Continued from `7da32ce5fb043105690219d90f86ad0cf514d1bb`, where French was an empty disabled template and the next queued language.
+- Translated all 1,291 canonical entries and preserved exact source keys/order. The reconstructed English file matched Git blob `2fa3c4712619cc5f811ce2251cef3daf5b0e2024` byte for byte.
+- Local Python checks passed strict JSON/duplicate rejection, metadata, full key parity/order, nonempty values, full placeholders/format specifiers, remaining braces, numeric literals, edge whitespace, literal escapes, selected technical identifiers, ~mods references, extensions, file-dialog patterns, Unicode controls and NFC normalization. There are 109 parameterized entries and 31 intentional invariant values, including valid French homographs.
+- French Git blob `09b29bddef3fe13d7bc0f0fdd4d7d476f1050deb` matches the checked local bytes; SHA-256 `de54d8d56b2bf6d488215ebcc6f401662b17af0cff475c5b04ca085330b1ad8e`, 149,134 bytes. Added `FRENCH_HANDOFF.md` and `Progress/fr.json`.
+- Enabled only French in the registry. The eight previously active language catalogs, runtime code, binaries, Arabic bidi behavior, main, releases, tags and workflows remain unchanged. No GitHub Actions were dispatched, and no PowerShell 5.1/WPF or full repository localization audit was run.
+- French user QA is pending. German (`de`, Deutsch) is the next target; do not restart completed catalogs. Both ledgers are updated in the same `[skip ci]` development checkpoint.
+
 ### 2026-09-18 — Korean user QA accepted; Russian completed in one prompt
 
 - Recorded the user's report that Korean works perfectly and the previously added languages also work. This is user feedback, not an automated or exhaustive runtime audit.
@@ -179,7 +189,7 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 - Continued from the committed partial `ar.json`; the Arabic work was not restarted from zero.
 - Expanded Modern Standard Arabic through the complete current canonical English sequence. The Arabic file keeps the same key order and reaches the same canonical tail as `en.json`; its one-line offset is the Arabic-only `translationStatus` metadata line. This was a visual sequence comparison, not an executed machine key-parity audit.
 - Preserved format placeholders and technical/product identifiers while translating PMM-facing prose. Arabic is registered with `direction: rtl` and is now `enabled: true` / `status: complete` for the user's runtime test.
-- The user's Hindi screenshot showed stable Devanagari rendering and no obvious severe clipping in the visible Fix Lab screen. It also exposed dynamic English suffix residue such as `0 candidate(s)`, `0 variant(s)` and `0 case backup(s)`. Those are dynamic-format localization gaps rather than missing Hindi catalog entries and should be cleaned up generically before the final v1.5 release.
+- The user's Hindi screenshot showed stable Devanagari text and no obvious severe clipping in the visible Fix Lab screen. It also exposed dynamic English suffix residue such as `0 candidate(s)`, `0 variant(s)` and `0 case backup(s)`. Those are dynamic-format localization gaps rather than missing Hindi catalog entries and should be cleaned up generically before the final v1.5 release.
 - Final release acceptance for Arabic is still pending the user's real Windows RTL/layout screenshot plus the normal PowerShell/WPF localization validation before release. No GitHub Actions were run in this development intervention.
 - Next translation target returned to the market queue: Brazilian Portuguese (`pt-BR`), then Korean (`ko`).
 
@@ -201,7 +211,7 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 - Updated `Resources/Metadata/VERSION.txt` to `1.5.0.0` and `Resources/Metadata/BUILD_ID.txt` to `PMM-v1.5.0.0-localization-dev` on this branch only.
 - No release/tag/main merge was created. The existing 1.3.4.1 release manifest/hash inventory remains release provenance and will be regenerated when 1.5 is actually packaged.
 - The language selector still intentionally exposes only completed languages; unfinished locales remain registered but disabled until their translations reach user-test quality.
-- GitHub Desktop branch switching changes the checked-out source files. It does not by itself rebuild/replace a binary; the current editable UI nevertheless reads `VERSION.txt` at startup, so after fetching/pulling this commit and restarting PMM from this checkout the title should report `v1.5.0.0`.
+- GitHub Desktop branch switching changes the checked-out source files. It does not by itself rebuild/replace a binary; the current editable UI nevertheless reads `VERSION.txt` at startup, so after fetching/pulling this commit and restarting PMM from the repository checkout the title should report `v1.5.0.0`.
 
 ### 2026-09-16 — registry/progress synchronization correction
 
