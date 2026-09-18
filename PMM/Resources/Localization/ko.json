@@ -3,7 +3,7 @@
   "language": "ko",
   "nativeName": "한국어",
   "fallback": "en",
-  "translationStatus": "in-progress",
+  "translationStatus": "complete",
   "strings": {
     "(not detected)": "(감지되지 않음)",
     "+ New case": "+ 새 케이스",
