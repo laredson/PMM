@@ -1,0 +1,25 @@
+{
+  "schema": "PMM_R1_CAPTURE_INDEPENDENT_FIXTURES_V1",
+  "fixtures": {
+    "without-schema": {
+      "files": 21,
+      "assetFiles": 19,
+      "dossiers": 0,
+      "snapshotBytes": 716,
+      "archiveBytes": 72,
+      "reportSHA256": "be2708359c71ccbf0ac83208a70ebf9f537b8b345e44e5b1de5cc50a94233f0d",
+      "transformationAuthorized": false
+    },
+    "with-schema": {
+      "files": 23,
+      "assetFiles": 19,
+      "dossiers": 1,
+      "snapshotBytes": 1677,
+      "archiveBytes": 72,
+      "reportSHA256": "400a1e2b67a6973fe8a3bf1db1b6db5a0533f0fcbdd6ea09b125eb3402c3222f",
+      "transformationAuthorized": false
+    }
+  },
+  "realAssetsRead": false,
+  "scope": "Artificial exports only; not archive membership or schema semantics"
+}

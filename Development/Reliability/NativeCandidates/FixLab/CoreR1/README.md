@@ -1,69 +1,52 @@
-# CoreR1 - planificador y requisitos, 04A-5A
+# CoreR1 - planificacion y captura, cierre 04A-5B
 
-Biblioteca Go aislada, RECONSTRUCTION. No contiene main ni executor de FixLab.
-No lee archivos del juego, no ejecuta las primitivas, no construye PAK y no instala.
-La receta y los inventarios son bytes JSON aportados por el caller con SHA-256
-esperado externo. Ver CONTRACT.md antes de interpretar un resultado.
+Biblioteca aislada, RECONSTRUCTION. No es el motor FixLab y no instala nada.
+PlanCore conserva su contrato declarativo. CaptureCore agrega adquisicion por
+handles, snapshots verificados y lectura de layout/review. No transforma assets.
+Leer CONTRACT.md para el planner y CAPTURE_CONTRACT.md para captura/dossiers.
 
-## API
+## APIs separadas
 
-`PlanCore(ctx, Request) (*Plan, error)` valida receta e inventarios DECLARADOS,
-selecciona uno de los donantes permitidos, resuelve destinos, minimos, soporte,
-exclusiones, colisiones y referencias de nombres. Devuelve un plan determinista.
-Un requisito necesario para planificar ausente/ambiguo devuelve nil y error con
-Code/Subject/Detail. No produce un prefijo de plan aparentemente correcto.
+PlanCore(ctx, Request) produce PLAN_VALID con requisitos: no hace I/O.
+CaptureCore(ctx, CaptureRequest) recalcula ese plan, lee archivos declarados,
+verifica providers y documentos schema y retorna CapturedInputs o nil,error.
+Bytes(role,path), ReportJSON y PlanJSON devuelven copias de buffers privados.
+Los archives se hashean por streaming, no se retienen ni se extraen.
 
-PLAN_VALID significa coherencia del plan sobre metadatos. NO significa que el
-archivo PAK, su extraccion o los assets existan o coincidan con sus hashes.
-InputBytesVerified, TransformReady, BuildReady, Validated e Installed son false.
-No hay flag del caller para convertir una declaracion en permiso de ejecucion.
-Requisitos faltantes permanecen en Requirements. Todo consumidor debe recalcular
-el plan y establecer sus propias verificaciones, no confiar en booleans de JSON.
+CaptureRequest incorpora Plan, Roots, DonorArchive, CurrentProviderSet, Dossiers
+y Limits. Los roots deben existir, ser absolutos/canonicos/locales. Todos los
+SHA-256 esperados se aportan externamente; no hay generador de pins autoaceptados.
+Las structs/exported fields del codigo definen la API exacta. No hay CLI de build
+ni main ficticio: la integracion de UI/command line corresponde al motor futuro.
 
-## Alcance
+Un snapshot correcto NO prueba pertenencia al PAK, build autentico, ausencia de
+archivos extra, schema real correcto o aptitud para reparar. El informe conserva
+esas limitaciones y readiness=false. Los schemas complejos siguen UNSUPPORTED.
+Windows tiene adaptador compilado, sin pruebas reales; ver WINDOWS_CAPTURE_ACCEPTANCE.md.
 
-- Receta PMM_FIXLAB_RECIPE_V1, version 1, mount ../../../, seed 0.
-- Inventarios PMM_R1_INVENTORY_V1; rutas PAK ASCII relativas seguras para Windows.
-- Seleccion por coincidencia TOTAL y sensible a mayusculas del targetRegex Go.
-- Minimo obligatorio; knownBaselineCount es referencia, no maximo ni prueba.
-- Familias .uasset + .uexp; .ubulk/.uptnl se enumeran pero siguen UNSUPPORTED
-  para relocalizacion. Referencias para hashes de nombres requieren solo header.
-- Soporte por raiz con frontera '/' y archivos explicitos; exclusiones con
-  precedencia, salvo conflicto con archivo explicito, que se rechaza.
-- Cada raiz debe seleccionar datos; familias parciales, ejecutables de soporte,
-  outputs prohibidos y colisiones archivo/directorio/case se rechazan.
-- El build actual declarado debe coincidir EXACTAMENTE con targetBuild. Otras
-  versiones requieren revision: no se infiere compatibilidad hacia delante.
+## Reproducir
 
-Claims opcionales de procedencia de schema se vinculan a receta, donante y
-proveedor actual; se guardan como DECLARED_UNVERIFIED, nunca como aprobacion.
-No se cargan los bytes del schema/layout ni del review record referenciados.
-El schema real de SkeletalMesh y el executor completo siguen pendientes.
+Go1.23.2 local, GOPROXY=off, GOSUMDB=off, GOTOOLCHAIN=local, GOWORK=off.
+En esta carpeta: go test -count=1 ./... y go test -race -count=1 ./...
+Las pruebas crean SOLO archivos sinteticos bajo carpetas temporales y los borran.
+No leen el juego, ejecutables originales ni el Workspace.
 
-## Reproduccion
+PMM_R1_PLAN_OUTPUT=<nuevo directorio> activa cuatro exports de planner.
+PMM_R1_PACKAGE=<ruta PMM> activa solo la receta productiva con inventarios simulados.
+PMM_R1_CAPTURE_OUTPUT=<nuevo directorio> activa dos exports de captura SINTETICA.
+Sin esas variables hay tres tests de entrega SKIP, no PASS.
 
-Go1.23.2 instalado; GOPROXY=off, GOSUMDB=off, GOTOOLCHAIN=local, GOWORK=off.
-Desde esta carpeta:
+python -B verify_fixtures.py <plan-output>
+python -B verify_capture.py <capture-output>
 
-```text
-go test -count=1 -v ./...
-go test -race -count=1 ./...
-python -B -m unittest -v test_tools
-```
+PMM_R1_TOOL_FIXTURES=<plan-output> y PMM_R1_CAPTURE_FIXTURES=<capture-output>
+activan todas las pruebas Python:
+python -B -m unittest -v test_tools test_capture_reference
 
-28 tests Go por defecto; dos tests opt-in quedan SKIP, no PASS, sin variables.
-PMM_R1_PLAN_OUTPUT=<directorio NUEVO externo> activa cuatro planes artificiales.
-PMM_R1_PACKAGE=<ruta absoluta PMM> activa lectura SOLO de la receta pinneada,
-con inventarios completamente simulados, nunca assets ni el PAK donante.
-PMM_R1_TOOL_FIXTURES=<salida anterior> activa cinco pruebas negativas del oracle.
+python -B build.py --out <directorio NUEVO externo> genera CoreR1-tests.exe y su
+receta/hashes. NO lo ejecuta, ni construye PMMFixLab.exe. No instalarlo sobre PMM.
 
-`python -B verify_fixtures.py <salida>` compara planes con un escenario manual
-independiente; no es otro planificador general ni verificador de archivos reales.
-`python -B build.py --out <directorio NUEVO externo>` genera CoreR1-tests.exe,
-receta/hashes/source. No lo ejecuta ni construye PMMFixLab.exe. No instalarlo.
-
-En 04A-5A: 30 tests Go y 10 Python con opt-ins, race Linux y vet Windows correctos.
-Dos builds TEST iguales. Fuzz acotado: 173539 entradas. Ninguna prueba Windows,
-Unreal/Palworld, reparacion real ni antivirus. Logs completos en ZIP de evidencia;
-resumen y hashes en evidence/. Proximo bloque: captura/procedencia de inputs,
-schemas y precondiciones, no un executor de relleno.
+En 04A-5B pasaron 55 tests Go Linux (30 previos, 25 nuevos), 20 Python, race con
+opt-ins y vet Windows. Dos builds finales TEST Windows iguales. Los dos tests
+exclusivos Windows solo se compilaron, no cuentan como PASS. Ver evidence/s04a5b/.
+Siguiente: vincular pertenencia de archivos a proveedores, no asumirla por hashes.

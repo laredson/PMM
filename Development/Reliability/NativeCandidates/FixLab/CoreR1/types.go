@@ -1,4 +1,5 @@
-// Package corer1 plans declared inputs only. It never reads assets or runs repairs.
+// Package corer1 separates declarative planning from explicit read-only capture.
+// PlanCore never reads assets; CaptureCore verifies snapshots. Neither runs repairs.
 package corer1
 
 import "fmt"

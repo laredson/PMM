@@ -1,3 +1,6 @@
+> Contrato de **PlanCore** (04A-5A), conservado. Desde 04A-5B existe una API
+> separada CaptureCore con lecturas explicitas; ver CAPTURE_CONTRACT.md.
+
 # Contrato de planificacion R1 y procedencia - 04A-5A
 
 ## Estados y responsabilidades

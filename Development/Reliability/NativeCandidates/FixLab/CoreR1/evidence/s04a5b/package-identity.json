@@ -1,0 +1,16 @@
+{
+  "schema": "PMM_R1_CAPTURE_PACKAGE_IDENTITY_V1",
+  "inputCommit": "a97966e351a307902d6d66ecd012a017ad6febb1",
+  "verifiedSubtrees": {
+    "PMM": "09df5c45aee3390c6b8ea235c8afa4e149a9f1fa",
+    ".github": "cb881ba48502f8dcea8cead16f47f275069d5945",
+    "Development/Source": "0cfad865e6fd63663b29f5ec92b76618bc6e4a02"
+  },
+  "packageFiles": 629,
+  "checksumRows": 628,
+  "checksumMismatches": 0,
+  "version": "1.5.0.1",
+  "buildId": "PMM-v1.5.0.1-reliability-s01b",
+  "scope": "Selective working copy; not a complete checkout of current candidate sources",
+  "originalsExecuted": false
+}
