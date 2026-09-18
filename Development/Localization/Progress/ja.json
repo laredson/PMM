@@ -13,7 +13,14 @@
   "remainingEntries": 0,
   "nextKey": null,
   "nextLanguage": "it",
-  "userRuntimeVisualQA": "pending",
+  "userRuntimeVisualQA": "user-confirmed",
+  "userFeedback": {
+    "date": "2026-09-18",
+    "userText": "comprobado el japones funciona.",
+    "scope": "User-confirmed runtime feedback; not a new exhaustive automated or native-speaker audit."
+  },
+  "currentQueueReference": "Development/Localization/TRANSLATION_PLAN.md",
+  "checkpointNote": "The source, validation, nextLanguage and queue snapshots below describe Japanese completion. Italian completion and the later visual grouping supersede the next-language and order snapshots; follow the current translation plan.",
   "nativeSpeakerQA": "pending",
   "sourceByteIdentityVerified": true,
   "uploadedBlobMatchesLocal": true,
@@ -72,7 +79,7 @@
     ]
   },
   "productOrder": {
-    "note": "Selector order is user-defined and independent of the Palworld market-evidence table.",
+    "note": "Historical selector-order snapshot at Japanese completion; superseded by the current translation plan's quasi-continental visual grouping.",
     "codes": [
       "en",
       "es",

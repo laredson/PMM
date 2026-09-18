@@ -1,4 +1,22 @@
-## Active checkpoint — Japanese complete; Italian next — 2026-09-18
+## Active checkpoint — Italian complete; Japanese user-confirmed; Turkish next — 2026-09-18
+
+Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. The user confirmed "comprobado el japones funciona." Japanese is user-confirmed; its catalog is unchanged. Italian (`it`, `Italiano`) is now complete and enabled: **1,291/1,291 canonical keys**, fallback `en`, direction `ltr`, no separate XAML. The twelve previously active catalogs remain unchanged.
+
+Source checkpoint: `a11985b8608f00f64282af4817de71cfa5dad84f`; English blob: `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`. Italian blob: `622c9ff286037bb9c4d878cc9bcee06daff41879`; SHA-256 `98ceb5bfe7b4dec705a9485b16b4f4477a19135765a25b9a80e1aac205c27932`; 145,035 bytes. Both local reconstructions match the corresponding Git blobs byte for byte.
+
+Local structural checks passed JSON/duplicate rejection, exact case-sensitive keys/order, metadata, nonempty values, full placeholders/formats, numeric literals, braces, whitespace, literal escapes, selected technical identifiers, extensions/dialog filters, units, color syntax, `~mods`, Unicode controls and NFC. There are **109 parameterized entries**, **26 intentional invariants**, zero remaining structural errors and one documented grammatical Steam-qualifier elision. Read `Development/Localization/ITALIAN_HANDOFF.md` and `Development/Localization/Progress/it.json` for evidence, glossary and limits. No PMM/WPF runtime, Windows PowerShell 5.1, full source-code localization audit or native-speaker review was performed here; Italian user QA remains pending.
+
+The user clarified a quasi-continental visual layout, not a market ranking. English remains first/default; the complete selector order is:
+`en -> es -> fr -> it -> pt-BR -> de -> pl -> nl -> ga -> cs -> uk -> ru -> ja -> zh-CN -> zh-TW -> ko -> hi -> bn -> ur -> mr -> te -> th -> id -> vi -> tr -> ar -> arz -> pcm -> ha`.
+Romance languages follow English; the remaining European locales, including Irish and Russian, precede Asia. Polish/Dutch remain immediately after German. Japanese begins the Asian block; both Chinese variants remain adjacent. South Asian and Southeast Asian locales follow, then the pragmatic Turkey/Middle-East display block and the remaining African reserve. These are display conventions, not exclusive geographic classifications. All names remain native; `Português (Brasil)` retains its actual locale. Romanian is only a possible future addition, not registered or enabled. Disabled locales retain their positions but stay hidden. Registry blob: `0bbac7221e8bd16c128758a50710e63c9b5d73e9`; 29 registered locales, 13 enabled.
+
+**Next translation execution queue: Türkçe -> Polski -> Nederlands -> Gaeilge.** Keep this queue separate from display order. Japanese feedback is recorded in `Progress/ja.json`; older next-language/order fields there and in historical handoffs are snapshots, not current instructions.
+
+Preserve restart-based language switching, all other catalogs, runtime code, native binaries, Arabic bidi behavior, main, releases, tags and workflows. Existing dynamic counters, the old Library.UI selector path and Arabic technical-text/virtualized-cell QA remain separate. Japanese confirmation does not automatically close those defects or confirm other languages. Publish by one normal fast-forward development commit with `[skip ci]`, without rewriting branch history.
+
+## Historical checkpoint — Japanese complete; Italian next — 2026-09-18
+
+> Superseded above for Japanese user QA, current selector order and the next translation. Historical validation evidence is retained below.
 
 Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. Japanese (`ja`, `日本語`) is complete and enabled: **1,291/1,291 canonical keys**, fallback `en`, direction `ltr`, no separate XAML. Exact Japanese blob: `0523fa7a906e7b7a13e24217c1b5142efb8feff5`; SHA-256 `2444aedd657e925cfde04436b5d02671b67651f490456627ca6f6ec0b4fa252c`; 159,854 bytes.
 
@@ -42,7 +60,7 @@ Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. The user reported
 
 Source checkpoint: `7da32ce5fb043105690219d90f86ad0cf514d1bb`. English blob: `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`, reconstructed locally with byte-identical content. Uploaded French blob: `09b29bddef3fe13d7bc0f0fdd4d7d476f1050deb`, identical to the checked local UTF-8/LF file. SHA-256: `de54d8d56b2bf6d488215ebcc6f401662b17af0cff475c5b04ca085330b1ad8e`; size 149,134 bytes.
 
-Local structural checks passed strict JSON/duplicate rejection, metadata, exact keys/order, nonempty strings, full placeholder/format multisets, remaining brace counts, numeric literals, edge whitespace, literal escapes, selected technical identifiers, ~mods references, extensions and file-dialog patterns, Unicode controls and NFC. There are 109 parameterized entries and 31 intentional invariant values, including French homographs.
+Local structural checks passed strict JSON/duplicate rejection, metadata, exact keys/order, nonempty strings, full placeholder/format multisets, remaining braces, numeric literals, edge whitespace, literal escapes, selected technical identifiers, ~mods references, extensions and file-dialog patterns, Unicode controls and NFC. There are 109 parameterized entries and 31 intentional invariant values, including French homographs.
 
 Read `Development/Localization/FRENCH_HANDOFF.md` and `Development/Localization/Progress/fr.json` for evidence, glossary and limits. French user runtime/visual QA is pending. No PMM/WPF runtime, PowerShell 5.1, native-speaker acceptance or full repository localization audit was performed. No GitHub Actions were dispatched. Existing dynamic-runtime/Arabic QA issues remain open separately.
 
@@ -72,7 +90,7 @@ Korean user runtime feedback is accepted; do not retranslate Korean from scratch
 
 ## Historical checkpoint — Korean part 1 of 2 — 2026-09-18
 
-> Superseded by Korean completion and the active German checkpoint above. The following cursor and disabled status describe that earlier snapshot only.
+> Superseded by Korean completion and the active checkpoint above. The following cursor and disabled status describe that earlier snapshot only.
 
 Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. The user has confirmed that Portuguese works perfectly and asked to split the next language into two bounded prompts with enough context to resume in another chat.
 
@@ -84,11 +102,13 @@ The partial Korean catalog passed local Python JSON/duplicate/nonempty, full-pla
 
 This intervention changes catalogs/progress/documentation only. Keep restart-based language changes, Arabic RTL/LTR code, main, releases, workflows, game files and the existing active catalogs unchanged. Push with `[skip ci]`; update both ledgers and the Korean handoff/progress file in each subsequent checkpoint.
 
-## v1.5.0.0 translation branch — 2026-09-17
+## v1.5.0.0 translation branch — 2026-09-17 (historical recovery record)
 
 Branch `v1.5.0.0-PMM-translated` starts from validated `main` commit `70d106e871099e4936dc5f81eef3e4ea15529d93`. This branch is the working line for the next PMM localization release; the discarded historical 1.4 line is not reused.
 
-### Current translation state
+### Translation state at the historical recovery checkpoint
+
+> The active checkpoint at the top of this file and `languages.json` supersede the old counts, ordering and next-language statements below. They are retained here as historical recovery context.
 
 `PMM/Resources/Localization/languages.json` is the complete locale inventory for v1.5. Pending/template/reserve languages remain traceable in Git but are filtered from normal runtime language resolution until enabled.
 

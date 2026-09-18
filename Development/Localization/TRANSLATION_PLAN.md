@@ -1,4 +1,22 @@
-## Japanese localization complete; user-defined queue and selector order updated — 2026-09-18
+## Italian localization complete; Japanese user-confirmed; visual grouping clarified — 2026-09-18
+
+Italiano covers **1,291/1,291 canonical English keys** and is enabled for user testing. The user confirmed "comprobado el japones funciona." Japanese is now user-confirmed; its catalog and the other eleven previously enabled catalogs are unchanged. Italian user runtime/visual QA remains pending.
+
+Italian blob: `622c9ff286037bb9c4d878cc9bcee06daff41879`; SHA-256 `98ceb5bfe7b4dec705a9485b16b4f4477a19135765a25b9a80e1aac205c27932`; 145,035 bytes. Local structural checks passed with **109 parameterized entries**, **26 intentional whole-value invariants**, and zero remaining errors. Source and target reconstructions match their Git blobs byte for byte. Details and the single documented Steam grammatical-elision exception are in `ITALIAN_HANDOFF.md` and `Progress/it.json`. No PMM/WPF runtime, Windows PowerShell 5.1, full source-code localization audit or native-speaker acceptance was performed here.
+
+**Next execution queue: `tr -> pl -> nl -> ga` (Türkçe -> Polski -> Nederlands -> Gaeilge).** This queue is separate from the selector order and the historical market estimates below.
+
+The user clarified a quasi-continental **visual grouping**, not a strict geographic taxonomy or commercial ranking. English remains first and `default: en`; the flat selector order is now:
+
+`en -> es -> fr -> it -> pt-BR -> de -> pl -> nl -> ga -> cs -> uk -> ru -> ja -> zh-CN -> zh-TW -> ko -> hi -> bn -> ur -> mr -> te -> th -> id -> vi -> tr -> ar -> arz -> pcm -> ha`
+
+Romance locales follow English; other European locales remain above Asia. Polish and Dutch keep their reserved positions immediately after German. Japanese begins the Asian block, the two Chinese variants remain adjacent, and South Asian locales follow East Asian locales. Turkish and Arabic locales form the subsequent Turkey/Middle-East visual block. The remaining African reserve locales follow. These are pragmatic display groups, not exclusive linguistic/geographic classifications. Portuguese keeps the actual `pt-BR` locale and `Português (Brasil)` label. Disabled locales stay hidden in their reserved positions. **Romanian was mentioned only as a possibility; it is not registered, enabled or translated.**
+
+There are **29 registered locales, 13 enabled**. This checkpoint changes only the Italian catalog, registry ordering/Italian activation and continuity records. It does not change runtime code, binaries, language-switch behavior, main, tags, releases or workflows. Publish as a normal fast-forward development commit with `[skip ci]`; do not rewrite history.
+
+## Historical checkpoint — Japanese localization complete; user-defined queue and selector order updated — 2026-09-18
+
+> The Italian checkpoint above supersedes this snapshot's Japanese QA status, next-language pointer and selector ordering. Japanese completion evidence remains historical evidence.
 
 日本語 now covers **1,291/1,291 canonical English keys** and is enabled for user testing. Japanese blob: `0523fa7a906e7b7a13e24217c1b5142efb8feff5`; SHA-256 `2444aedd657e925cfde04436b5d02671b67651f490456627ca6f6ec0b4fa252c`; 159,854 bytes. Structural checks passed with 109 parameterized entries, 26 intentional invariants and zero recorded structural errors. Runtime/visual and native-speaker QA remain pending.
 
@@ -40,11 +58,11 @@ This file is the close translation-work ledger for PMM 1.5. Update it whenever a
 
 ## Current checkpoint — 2026-09-18
 
-German is complete at the catalog level: **1,291/1,291 entries**, enabled with native label `Deutsch`, fallback `en`, direction `ltr`, no separate XAML. The source commit is `d5e293b690e863501684adc2f77ef7d603222386`; canonical English blob is `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`. German was first delivered locally; the user then requested direct GitHub publication. This commit publishes the unchanged catalog and its activation, without runtime changes. `Progress/de.json` records the reexecuted structural checks and publication status; German user runtime/visual QA is pending. French is user-confirmed. Russian has positive preliminary user feedback; Korean and Portuguese remain user-accepted. Traditional Chinese is next in the unchanged market queue.
+Italian is complete at the catalog level: **1,291/1,291 entries**, enabled with native label `Italiano`, fallback `en`, direction `ltr`, no separate XAML. The source checkpoint is `a11985b8608f00f64282af4817de71cfa5dad84f`; canonical English blob remains `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`. `Progress/it.json` records the executed local structural checks. Japanese is user-confirmed; Italian user runtime/visual QA is pending. French, Korean and Portuguese remain user-confirmed; Russian has positive preliminary feedback. No additional German or Traditional Chinese confirmation is inferred. Turkish is next in the user-directed execution queue. The current quasi-continental selector order is defined in the top checkpoint and `languages.json`.
 
 ## Policy
 
-- English (`en`) is the canonical source catalog.
+- English (`en`) is the canonical source catalog and remains first/default in the selector.
 - Spanish (`es`) and Simplified Chinese (`zh-CN`) are already translated and active.
 - `languages.json` is the **complete inventory** of this branch. Planned languages must appear there even while unfinished.
 - Every unfinished locale is registered with `enabled: false`; therefore it is visible in repository state but does not appear in the PMM language selector.
@@ -53,12 +71,14 @@ German is complete at the catalog level: **1,291/1,291 entries**, enabled with n
 - When a language is finished, populate every canonical English key, preserve placeholders and invariant technical terms, validate it, then change its registry entry to `enabled: true` / `status: complete`.
 - `complete` is catalog readiness for development testing, not automatic release acceptance. Record which checks actually ran; matching line counts alone are not a machine-run key/placeholder audit.
 - `rtl` languages must be registered with right-to-left direction.
-- Language names in selectors always remain in their own native form.
+- Language names in selectors always remain in their own native form. Display order follows the user's visual grouping, independently of translation execution priority and historical market estimates.
 - Scope is one language or bounded stage per intervention. Korean was completed in two stages; the user subsequently requested a complete next language in one prompt where feasible. Keep a recoverable catalog, exact counts/cursor, glossary and validation status. Never mark unfinished work complete to meet a prompt quota.
 - Language changes require restarting PMM. The experimental live-switch path was reverted because it increased startup cost and produced incorrect/slow in-session refreshes.
 - The branch development identity is `1.5.0.0`. `PMM/Resources/Metadata/VERSION.txt` is the runtime UI version source; changing Git branches alone does not rewrite this file or rebuild an executable.
 
-## Priority model: Palworld audience first, global language reach as tie-break
+## Historical priority model: Palworld audience first, global language reach as tie-break
+
+> Retained from the 2026-09-16 planning record; these estimates were not re-researched in the Italian checkpoint. They no longer determine selector order or override the user's execution queue.
 
 The queue is not a pure ranking by world population. PMM is a Palworld tool, so the primary signal is estimated Palworld demand by market/language. Total worldwide speakers are used when two Palworld signals are close.
 
@@ -74,7 +94,7 @@ Evidence used for the 2026-09-16 priority refresh:
 
 English-speaking countries cannot be separated reliably from one another by the Steam language proxy, and Spanish reviews combine Spain and Latin-American markets. Treat those as language-market groups rather than fabricated country percentages.
 
-## Estimated Palworld market order
+## Estimated Palworld market order (historical planning evidence)
 
 | Priority | Country / market | Main PMM locale | Evidence interpretation |
 |---:|---|---|---|
@@ -102,7 +122,7 @@ English-speaking countries cannot be separated reliably from one another by the 
 
 ## PMM locale target queue
 
-The first three existing locales remain fixed at the top of the product because they are already complete: **English**, **Español**, **简体中文**.
+English remains first/default. The old rule fixing English, Español and 简体中文 as the first three has been superseded by the user's visual grouping; Simplified and Traditional Chinese are now adjacent in the Asian block.
 
 Historical market-evidence queue (kept for demand analysis only):
 
@@ -110,17 +130,19 @@ Historical market-evidence queue (kept for demand analysis only):
 
 Current user-directed execution queue after completed locales:
 
-`it -> tr -> pl -> nl -> ga`
+`tr -> pl -> nl -> ga`
 
-Hindi and Modern Standard Arabic were intentionally moved ahead of their normal market position as early v1.5 quality targets. Both are enabled for user testing. Brazilian Portuguese, Korean and French have passed the user's reported runtime test. Russian has positive preliminary user feedback. German is complete and published for user QA; Traditional Chinese is the next translation target. Italian was proposed as an alternative but has not been translated or enabled. The user's positive reports do not by themselves close the specific runtime issues listed below.
+Hindi and Modern Standard Arabic were intentionally moved ahead of their normal market position as early v1.5 quality targets. Both are enabled for user testing. Brazilian Portuguese, Korean, French and Japanese have passed the user's reported runtime test. Russian has positive preliminary user feedback. German and Traditional Chinese are complete and published; their separately tracked QA remains pending. Italian is complete and enabled for user QA. The user's positive reports do not by themselves close the specific runtime issues listed below.
 
-The older worldwide-speaker backlog remains as reserve templates rather than being deleted: Bengali (`bn`), Urdu (`ur`), Nigerian Pidgin (`pcm`), Egyptian Arabic (`arz`), Marathi (`mr`), Telugu (`te`) and Hausa (`ha`).
+The older worldwide-speaker backlog remains as reserve templates rather than being deleted: Bengali (`bn`), Urdu (`ur`), Nigerian Pidgin (`pcm`), Egyptian Arabic (`arz`), Marathi (`mr`), Telugu (`te`) and Hausa (`ha`). Romanian is a possible future Romance-block addition, not a committed locale or part of the active execution queue.
 
 ## Current locale state
 
+The first column preserves historical market labels; actual selector order is in `languages.json` and the current checkpoint above.
+
 | Market order | Code | Native name | English name / target | Direction | Registry | State |
 |---:|---|---|---|---|---|---|
-| baseline | `en` | English | English | ltr | enabled | complete + active |
+| baseline | `en` | English | English | ltr | enabled | complete + active; default |
 | baseline | `es` | Español | Spanish | ltr | enabled | complete + active |
 | baseline | `zh-CN` | 简体中文 | Chinese (Simplified) | ltr | enabled | complete + active |
 | 3 | `pt-BR` | Português (Brasil) | Portuguese (Brazil) | ltr | enabled | **catalog complete; user reports it works perfectly** |
@@ -129,14 +151,14 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 | 6 | `fr` | Français | French | ltr | enabled | **catalog complete, 1,291/1,291; user confirmed French** |
 | 7 | `de` | Deutsch | German | ltr | enabled | **catalog complete, 1,291/1,291; published; structural recheck passed; user QA pending** |
 | 9 | `zh-TW` | 繁體中文 | Chinese (Traditional) | ltr | enabled | **catalog complete, 1,291/1,291; published; user QA pending** |
-| product | `ja` | 日本語 | Japanese | ltr | enabled | **catalog complete, 1,291/1,291; user QA pending** |
-| 11 | `tr` | Türkçe | Turkish | ltr | disabled | template pending |
-| 12 | `pl` | Polski | Polish | ltr | disabled | template pending |
-| 13 | `it` | Italiano | Italian | ltr | disabled | template pending |
+| product | `ja` | 日本語 | Japanese | ltr | enabled | **catalog complete, 1,291/1,291; user confirms it works** |
+| 11 | `tr` | Türkçe | Turkish | ltr | disabled | **next user-directed translation target; template pending** |
+| 12 | `pl` | Polski | Polish | ltr | disabled | template pending; after Turkish |
+| 13 | `it` | Italiano | Italian | ltr | enabled | **catalog complete, 1,291/1,291; structural checks passed; user QA pending** |
 | 14 | `th` | ไทย | Thai | ltr | disabled | template pending |
 | 15 | `id` | Bahasa Indonesia | Indonesian | ltr | disabled | template pending |
 | 16 | `vi` | Tiếng Việt | Vietnamese | ltr | disabled | template pending |
-| 17 | `nl` | Nederlands | Dutch | ltr | disabled | template pending |
+| 17 | `nl` | Nederlands | Dutch | ltr | disabled | template pending; after Polish |
 | 18 | `uk` | Українська | Ukrainian | ltr | disabled | template pending |
 | 19 | `cs` | Čeština | Czech | ltr | disabled | template pending |
 | 20 | `hi` | हिन्दी | Hindi | ltr | enabled | **complete; user runtime/visual test in progress** |
@@ -173,6 +195,16 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 - Full machine-run catalog validation and Windows PowerShell/WPF validation were not executed in the 2026-09-17 recovery environment. The registry enables Portuguese for user testing, not as a release-accepted build.
 
 ## Work log
+
+### 2026-09-18 — Japanese confirmed; Italian completed; visual grouping clarified
+
+- Recorded the user's exact Japanese feedback: "comprobado el japones funciona." Updated Japanese progress as user-confirmed without changing the Japanese catalog or presenting old automated checks as a new runtime test.
+- Continued from `a11985b8608f00f64282af4817de71cfa5dad84f`, where Italian was an empty disabled template. Completed every canonical entry and preserved exact keys/order and case distinctions.
+- Italian blob `622c9ff286037bb9c4d878cc9bcee06daff41879` matches the locally checked file byte for byte; SHA-256 `98ceb5bfe7b4dec705a9485b16b4f4477a19135765a25b9a80e1aac205c27932`, 145,035 bytes. Canonical English blob remains `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`.
+- Local Python checks passed JSON/duplicates, metadata, keys/order, nonempty strings, full placeholders/formats, numeric literals, whitespace, literal escapes, selected technical identifiers, file extensions/dialog filters, units, color syntax, `~mods`, Unicode controls and NFC. There are 109 parameterized entries and 26 intentional invariants. A single Steam qualifier elision is documented in `Progress/it.json` and `ITALIAN_HANDOFF.md`.
+- Enabled only Italian and applied the user's quasi-continental grouping. Registry blob `0bbac7221e8bd16c128758a50710e63c9b5d73e9` preserves all existing names/fallbacks/directions/XAML/statuses except Italian activation. English remains first/default, Polish/Dutch immediately after German, Irish/Russian above Asia, and the Chinese variants together. Romanian stays a possibility only.
+- Next execution order is Turkish, Polish, Dutch, Irish, independent of display order. Updated both ledgers and added the Italian handoff/progress. No other catalog or runtime/native binary changed.
+- No PMM/WPF runtime, Windows PowerShell 5.1, full source-code localization audit or native-speaker review ran; these remain release/user QA work. No Actions were dispatched. Use a single `[skip ci]` fast-forward development commit, with no main, PR, tag or release changes.
 
 ### 2026-09-18 — French confirmed; prepared German package published
 
@@ -252,7 +284,7 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 - Updated `Resources/Metadata/VERSION.txt` to `1.5.0.0` and `Resources/Metadata/BUILD_ID.txt` to `PMM-v1.5.0.0-localization-dev` on this branch only.
 - No release/tag/main merge was created. The existing 1.3.4.1 release manifest/hash inventory remains release provenance and will be regenerated when 1.5 is actually packaged.
 - The language selector still intentionally exposes only completed languages; unfinished locales remain registered but disabled until their translations reach user-test quality.
-- GitHub Desktop branch switching changes the checked-out source files. It does not by itself rebuild/replace a binary; the current editable UI nevertheless reads `VERSION.txt` at startup, so after fetching/pulling this commit and restarting PMM from this checkout the title should report `v1.5.0.0`.
+- GitHub Desktop branch switching changes the checked-out repository files. It does not by itself rebuild/replace a binary; the current editable UI nevertheless reads `VERSION.txt` at startup, so after fetching/pulling this commit and restarting PMM from this checkout the title should report `v1.5.0.0`.
 
 ### 2026-09-16 — registry/progress synchronization correction
 

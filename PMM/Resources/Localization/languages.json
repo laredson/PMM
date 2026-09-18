@@ -23,9 +23,9 @@
       "status": "complete"
     },
     {
-      "code": "pt-BR",
-      "nativeName": "Português (Brasil)",
-      "englishName": "Portuguese (Brazil)",
+      "code": "fr",
+      "nativeName": "Français",
+      "englishName": "French",
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
@@ -39,13 +39,13 @@
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
-      "enabled": false,
-      "status": "template"
+      "enabled": true,
+      "status": "complete"
     },
     {
-      "code": "fr",
-      "nativeName": "Français",
-      "englishName": "French",
+      "code": "pt-BR",
+      "nativeName": "Português (Brasil)",
+      "englishName": "Portuguese (Brazil)",
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
@@ -81,6 +81,46 @@
       "xaml": null,
       "enabled": false,
       "status": "template"
+    },
+    {
+      "code": "ga",
+      "nativeName": "Gaeilge",
+      "englishName": "Irish",
+      "fallback": "en",
+      "direction": "ltr",
+      "xaml": null,
+      "enabled": false,
+      "status": "template"
+    },
+    {
+      "code": "cs",
+      "nativeName": "Čeština",
+      "englishName": "Czech",
+      "fallback": "en",
+      "direction": "ltr",
+      "xaml": null,
+      "enabled": false,
+      "status": "template"
+    },
+    {
+      "code": "uk",
+      "nativeName": "Українська",
+      "englishName": "Ukrainian",
+      "fallback": "en",
+      "direction": "ltr",
+      "xaml": null,
+      "enabled": false,
+      "status": "template"
+    },
+    {
+      "code": "ru",
+      "nativeName": "Русский",
+      "englishName": "Russian",
+      "fallback": "en",
+      "direction": "ltr",
+      "xaml": null,
+      "enabled": true,
+      "status": "complete"
     },
     {
       "code": "ja",
@@ -123,9 +163,9 @@
       "status": "complete"
     },
     {
-      "code": "ru",
-      "nativeName": "Русский",
-      "englishName": "Russian",
+      "code": "hi",
+      "nativeName": "हिन्दी",
+      "englishName": "Hindi",
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
@@ -133,34 +173,44 @@
       "status": "complete"
     },
     {
-      "code": "tr",
-      "nativeName": "Türkçe",
-      "englishName": "Turkish",
+      "code": "bn",
+      "nativeName": "বাংলা",
+      "englishName": "Bengali",
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
       "enabled": false,
-      "status": "template"
+      "status": "reserve"
     },
     {
-      "code": "cs",
-      "nativeName": "Čeština",
-      "englishName": "Czech",
+      "code": "ur",
+      "nativeName": "اردو",
+      "englishName": "Urdu",
       "fallback": "en",
-      "direction": "ltr",
+      "direction": "rtl",
       "xaml": null,
       "enabled": false,
-      "status": "template"
+      "status": "reserve"
     },
     {
-      "code": "uk",
-      "nativeName": "Українська",
-      "englishName": "Ukrainian",
+      "code": "mr",
+      "nativeName": "मराठी",
+      "englishName": "Marathi",
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
       "enabled": false,
-      "status": "template"
+      "status": "reserve"
+    },
+    {
+      "code": "te",
+      "nativeName": "తెలుగు",
+      "englishName": "Telugu",
+      "fallback": "en",
+      "direction": "ltr",
+      "xaml": null,
+      "enabled": false,
+      "status": "reserve"
     },
     {
       "code": "th",
@@ -193,14 +243,14 @@
       "status": "template"
     },
     {
-      "code": "hi",
-      "nativeName": "हिन्दी",
-      "englishName": "Hindi",
+      "code": "tr",
+      "nativeName": "Türkçe",
+      "englishName": "Turkish",
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
-      "enabled": true,
-      "status": "complete"
+      "enabled": false,
+      "status": "template"
     },
     {
       "code": "ar",
@@ -213,46 +263,6 @@
       "status": "complete"
     },
     {
-      "code": "ga",
-      "nativeName": "Gaeilge",
-      "englishName": "Irish",
-      "fallback": "en",
-      "direction": "ltr",
-      "xaml": null,
-      "enabled": false,
-      "status": "template"
-    },
-    {
-      "code": "bn",
-      "nativeName": "বাংলা",
-      "englishName": "Bengali",
-      "fallback": "en",
-      "direction": "ltr",
-      "xaml": null,
-      "enabled": false,
-      "status": "reserve"
-    },
-    {
-      "code": "ur",
-      "nativeName": "اردو",
-      "englishName": "Urdu",
-      "fallback": "en",
-      "direction": "rtl",
-      "xaml": null,
-      "enabled": false,
-      "status": "reserve"
-    },
-    {
-      "code": "pcm",
-      "nativeName": "Naijá",
-      "englishName": "Nigerian Pidgin",
-      "fallback": "en",
-      "direction": "ltr",
-      "xaml": null,
-      "enabled": false,
-      "status": "reserve"
-    },
-    {
       "code": "arz",
       "nativeName": "العربية المصرية",
       "englishName": "Egyptian Arabic",
@@ -263,19 +273,9 @@
       "status": "reserve"
     },
     {
-      "code": "mr",
-      "nativeName": "मराठी",
-      "englishName": "Marathi",
-      "fallback": "en",
-      "direction": "ltr",
-      "xaml": null,
-      "enabled": false,
-      "status": "reserve"
-    },
-    {
-      "code": "te",
-      "nativeName": "తెలుగు",
-      "englishName": "Telugu",
+      "code": "pcm",
+      "nativeName": "Naijá",
+      "englishName": "Nigerian Pidgin",
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,

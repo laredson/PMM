@@ -1,0 +1,111 @@
+{
+  "schema": "PMM_TRANSLATION_CHECKPOINT_V1",
+  "language": "it",
+  "nativeName": "Italiano",
+  "date": "2026-09-18",
+  "branch": "v1.5.0.0-PMM-translated",
+  "sourceCommit": "a11985b8608f00f64282af4817de71cfa5dad84f",
+  "catalogPath": "PMM/Resources/Localization/it.json",
+  "sourceCatalogPath": "PMM/Resources/Localization/en.json",
+  "status": "complete",
+  "enabled": true,
+  "completedEntries": 1291,
+  "remainingEntries": 0,
+  "nextKey": null,
+  "nextLanguage": "tr",
+  "userRuntimeVisualQA": "pending",
+  "nativeSpeakerQA": "pending",
+  "sourceByteIdentityVerified": true,
+  "uploadedBlobMatchesLocal": true,
+  "validation": {
+    "sourceGitBlobSha": "2fa3c4712619cc5f811ce2251cef3daf5b0e2024",
+    "targetGitBlobSha": "622c9ff286037bb9c4d878cc9bcee06daff41879",
+    "targetSha256": "98ceb5bfe7b4dec705a9485b16b4f4477a19135765a25b9a80e1aac205c27932",
+    "sourceBytes": 132005,
+    "targetBytes": 145035,
+    "sourceEntries": 1291,
+    "targetEntries": 1291,
+    "parameterizedEntries": 109,
+    "intentionalInvariantEntries": 26,
+    "intentionalInvariants": [
+      "Auto", "AUTO", "Backup: {0}", "ChatGPT Desktop", "Codex Desktop", "en",
+      "English", "Español", "FIX LAB", "Fix Lab", "Git", "Hash", "Mod", "Nexus",
+      "PALWORLD", "Palworld Modding Kit", "Patch", "PMM", "SemiAUTO",
+      "Unreal Engine / Epic Launcher", "Visual Studio 2022 + MSVC", "Volume:",
+      "Windows SDK", "Wwise SDK", "X", "简体中文"
+    ],
+    "missingKeys": [],
+    "extraKeys": [],
+    "emptyValues": [],
+    "errors": [],
+    "passed": true,
+    "checks": [
+      "Strict JSON with duplicate rejection",
+      "Schema and locale metadata",
+      "Exact case-sensitive key parity and order",
+      "Nonempty values",
+      "Complete placeholder and format multisets",
+      "Remaining braces and numeric literals",
+      "Leading and trailing whitespace",
+      "Literal PowerShell escapes",
+      "Selected technical identifiers with documented contextual rules",
+      "File extensions and file-dialog filter patterns",
+      "Units, color formats and ~mods references",
+      "Unicode controls, replacement characters and NFC",
+      "Native source-language labels remain unchanged",
+      "Source and target Git blob byte identity",
+      "Registry entries unchanged except Italian activation and list order"
+    ],
+    "technicalTokenPolicy": {
+      "pluralNormalization": ["PAKs -> PAK", "ZIPs -> ZIP"],
+      "localizedProse": ["AI -> IA", "Vanilla", "Knowledge", "cooked"],
+      "grammaticalElision": {
+        "sourceKey": "Select a Steam installation or Steam library. PMM will inspect steamapps and registered Steam libraries.",
+        "token": "Steam",
+        "sourceCount": 3,
+        "targetCount": 2,
+        "reason": "Italian shares di Steam across installazione o una libreria; neither installation nor library identity is omitted."
+      },
+      "unprovenWarning": "NON VERIFICATO (UNPROVEN)"
+    },
+    "limitations": [
+      "No PMM/WPF runtime or Windows PowerShell 5.1 execution.",
+      "No full repository/source-code localization audit or native-speaker acceptance.",
+      "Catalog validation does not close separately tracked dynamic-runtime localization gaps."
+    ]
+  },
+  "registryValidation": {
+    "beforeGitBlobSha": "a088f943d2b36abf4e0bca7d766a812f5f60bccc",
+    "afterGitBlobSha": "0bbac7221e8bd16c128758a50710e63c9b5d73e9",
+    "registeredLocales": 29,
+    "enabledLocales": 13,
+    "default": "en",
+    "preservesExistingNamesFallbacksDirectionsAndXaml": true,
+    "onlyActivatedLocale": "it"
+  },
+  "productOrder": {
+    "note": "User-requested quasi-continental visual grouping; separate from execution priority and historical market estimates.",
+    "codes": [
+      "en", "es", "fr", "it", "pt-BR", "de", "pl", "nl", "ga", "cs", "uk", "ru",
+      "ja", "zh-CN", "zh-TW", "ko", "hi", "bn", "ur", "mr", "te", "th", "id", "vi",
+      "tr", "ar", "arz", "pcm", "ha"
+    ],
+    "romanian": "Mentioned as a possibility only; not registered, activated or translated."
+  },
+  "nextQueueAfterThisCheckpoint": ["tr", "pl", "nl", "ga"],
+  "previousLanguageUserFeedback": {
+    "language": "ja",
+    "date": "2026-09-18",
+    "userText": "comprobado el japones funciona.",
+    "result": "User-confirmed Japanese runtime feedback",
+    "scope": "Not an exhaustive automated or native-speaker review; does not confirm other languages or generic runtime issues."
+  },
+  "scopePreserved": [
+    "Twelve previously active catalogs",
+    "English default and native language names",
+    "Restart-based language changes",
+    "Runtime code, binaries and Arabic bidi behavior",
+    "Main, releases, tags and workflows",
+    "Existing branch history; normal fast-forward publication"
+  ]
+}
