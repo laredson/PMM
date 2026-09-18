@@ -1,65 +1,64 @@
-# Retomar exactamente aqui
+# Retomar exactamente aqui - despues de 02A
 
-Rama unica: `v1.5.0.1-PMM-reliability`.
-**01B terminada: no repetir identidad/inventario ni pedir de nuevo el ZIP.**
-Version: 1.5.0.1. Build: PMM-v1.5.0.1-reliability-s01b.
-Leer AGENTS.md -> este archivo -> STATUS.md -> SESSION01B_FINDINGS.md ->
-NATIVE_ARTIFACTS.json -> Development/Source/SOURCE_STATUS.md.
+Rama: `v1.5.0.1-PMM-reliability`.
+**01B y 02A cerradas en sus alcances. No repetirlas ni pedir el ZIP otra vez.**
+Paquete: 1.5.0.1, build `PMM-v1.5.0.1-reliability-s01b`, sin cambios en 02A.
+Fuente candidata: `Development/Reliability/NativeCandidates/Host/`.
 
-## Siguiente tanda 02A: SOLO fuente candidata del Host
+Leer AGENTS.md -> este archivo -> STATUS.md -> SESSION02A_FINDINGS.md ->
+NativeCandidates/Host/README.md y evidence/build-report.json.
+Development/Source/SOURCE_STATUS.md sigue vigente para los binarios distribuidos.
 
-Objetivo: recuperar o reconstruir una fuente candidata verificable de PMM.exe.
-No modificar Runtime, FixLab, UI, idiomas ni dependencias en esta tanda.
-No sustituir PMM.exe ni cambiar sus pins para aceptar un candidato no probado.
+## Siguiente tanda 02B - SOLO comparar Host y fijar aceptacion
 
-Entrada comprobada:
+Entradas guardadas:
 
-- Host original PMM/PMM.exe: SHA-256
-  010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d.
-- Go 1.23.2, windows/amd64, CGO_ENABLED=0, trimpath=true; hashes PE en NATIVE_ARTIFACTS.json.
-- Snapshot Development/Source/Host/; la advertencia de desfase sigue vigente.
-- Importacion Guided Flow: 683a46df474c5f576e0bf5543d070da0dab7478a;
-  padre bc04d18d677e8f6bf754518e342184761d6527a3.
-- Contrato splash/handoff HWND: RELEASE_MANIFEST.host y documentacion RC21.
-- Referencia historica de fuente splash, todavia no ligada a un archivo recuperado:
-  91e7531d9018ba1cbf7a3cbe20ed4736df3210c1ebad467cc80536959404ded9.
+- Original PMM/PMM.exe: 010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d.
+- Candidato S02A: 62fc4b234ea145c6e3dadcc51366c0ebbca109f7b5a11dcb17deda32e927257f.
+- Go 1.23.2. Receta build.py, .go completos, diff y hashes en la carpeta candidata.
+- Cinco tests Go de estados y nueve tests Python; NO se ejecuto el candidato.
+- Dos builds en directorios distintos fueron identicos entre si. Original y
+  candidato NO son identicos. No hay paridad de secciones ni de Windows afirmada.
 
-La busqueda anterior ya consulto 1.3.0-fix-lab, 1.3.0-stable, 1.3.0final,
-1.2.1-stable, 1.4.0-ReUI y 1.3.1-mod-creation: el main.go era el mismo snapshot.
-archive-main-before-1.2.1 y release/1.2 tenian el Host anterior. No repetir estas
-consultas sin una pista nueva. No se afirma haber agotado todos los backups.
+## Trabajo acotado
 
-La charla menciono candidatos casi equivalentes, pero solo persistieron README,
-no sus .go/binarios/informes. No dar por recuperadas esas fuentes ni por probada
-su paridad. Conservar en esta tanda los resultados antes de prometer continuidad.
+1. Verificar HEAD y los hashes de entrada. Regenerar candidato en carpeta nueva
+   fuera del checkout con build.py; no copiarlo sobre PMM/PMM.exe.
+2. Preparar comparacion reproducible del original y candidato: PE/buildinfo,
+   contratos CLI, rutas, variables de sesion, codigos de salida, errores,
+   monitor de estado, cierre y handoff. Distinguir strings de funciones de
+   codigo real, y evidencia de build de evidencia de ejecucion.
+3. Revisar especialmente origen del HWND, carreras ready/close, estados parciales,
+   fallo de UI/splash y cierre temprano. Si hay una correccion imprescindible,
+   hacerla solo en la candidata, explicar el delta y regenerar sus hashes.
+   No convertir esta tanda en la migracion de PowerShell/dependencias.
+4. Guardar un informe de comparacion y una lista concreta de pruebas Windows:
+   arranque/cierre, splash, foco, tarea visible, errores, diagnosticos y retorno.
+   Las pruebas reales de escritorio pertenecen a 05 o a una tanda autorizada;
+   no fingirlas ni instalar el candidato sin aceptacion.
+5. Comprobar PMM/ intacto, actualizar STATUS/NEXT_SESSION y evidencia. Un commit
+   silencioso [skip ci], sin Actions, PR, tags, release ni cambios en idiomas.
 
-## Trabajo y cierre
+Salida: comparacion y gate Windows explicitados, no un certificado de equivalencia.
+Despues corresponde 03 (Runtime), conservando el Host original hasta su aceptacion.
+La fuente candidata es RECONSTRUCTION, nunca ORIGINAL_RECOVERED sin evidencia nueva.
 
-1. Leer snapshot/contrato y buscar una fuente exacta solo con pistas nuevas.
-2. Si no aparece, reconstruir cambios acotados desde contratos y evidencia
-   estatica. Etiquetar RECONSTRUCTION, no ORIGINAL_RECOVERED.
-3. Guardar los .go, diff, receta de build y hashes bajo
-   Development/Reliability/NativeCandidates/Host/. Explicar diferencias y limites.
-4. Compilar candidatos fuera del paquete. No ejecutar PMM ni hacer pruebas
-   funcionales Windows sin el alcance/autorizacion correspondientes.
-5. Cerrar con fuente candidata/evidencia guardadas o con bloqueo concreto.
-   Actualizar STATUS, este archivo y el registro antes del commit [skip ci].
-   No declarar equivalencia solo porque una seccion .text coincida.
+## Comandos
 
-La siguiente tanda 02B tratara SOLO comparacion reproducible/paridad del Host.
-Runtime queda para 03. Ningun resultado depende exclusivamente de directorios
-temporales o de la memoria de una conversacion. Binarios originales intactos
-hasta la aceptacion Windows pertinente. Sin Actions, PR, tags ni release.
+Desde la raiz del repositorio:
 
-## Comprobacion disponible
+```text
+python -B Development/Reliability/NativeCandidates/Host/build.py --out ../PMM-Host-S02B
+python Development/Reliability/verify_identity.py --expected-build PMM-v1.5.0.1-reliability-s01b
+```
 
-`python Development/Reliability/verify_identity.py --expected-build PMM-v1.5.0.1-reliability-s01b`
-comprueba identidad y hashes versionados, sin ejecutar PMM ni hacer red.
+La primera ruta de salida debe ser nueva. La segunda orden necesita checkout Git;
+para una distribucion extraida usar --package PMM y el mismo expected-build.
 
-## Prompt para continuar
+## Prompt de continuacion
 
-"Completa solo 02A en v1.5.0.1-PMM-reliability. Lee AGENTS.md y NEXT_SESSION.md.
-Recupera/reconstruye la fuente candidata del Host y guarda codigo, receta, hashes
-y diferencias. No cambies binarios, Runtime, idiomas ni pins. Documenta limites
-y la entrada exacta de 02B; un commit [skip ci], sin Actions, PR, tags ni release.
-No certifiques comparaciones anteriores sin disponer de sus archivos."
+"Completa solo 02B en v1.5.0.1-PMM-reliability. Lee AGENTS.md y NEXT_SESSION.md.
+Parte del Host S02A guardado, prepara comparacion reproducible y gate Windows.
+No sustituyas binarios, no modifiques Runtime/idiomas y no repitas 01B.
+Guarda codigo e informes de cualquier correccion, registra limites y la entrada
+exacta de 03. Un commit [skip ci], sin Actions, PR, tags ni release."

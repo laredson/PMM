@@ -1,0 +1,99 @@
+--- Development/Source/Host/main.go
++++ Development/Reliability/NativeCandidates/Host/main.go
+@@ -1,3 +1,6 @@
++//go:build windows
++
++// RECONSTRUCTION candidate S02A. Not approved to replace PMM/PMM.exe.
+ package main
+ 
+ import (
+@@ -81,6 +84,7 @@
+ }
+ 
+ func main() {
++	setPMMAppUserModelID()
+ 	root, err := executableRoot()
+ 	if err != nil {
+ 		fatalConsole("Cannot resolve PMM root", err)
+@@ -159,6 +163,13 @@
+ }
+ 
+ func (h *Host) run(operation string, args []string) int {
++	// Only normal startup owns a splash. Diagnostic/script routes remain headless.
++	var splash *startupSplash
++	if operation == "start" {
++		splash = startStartupSplash(h.Root, func(message string) { h.log("SPLASH", message) })
++	}
++	defer splash.Close()
++	splash.Update("startup:security")
+ 	h.log("HOST", "SESSION START id="+h.SessionID+" operation="+operation)
+ 	sec := securityStatus(h.Root)
+ 	secBytes, _ := json.MarshalIndent(sec, "", "  ")
+@@ -167,11 +178,13 @@
+ 		h.log("SECURITY", "PowerShell ConstrainedLanguage detected. Native routes remain available and do not request FullLanguage.")
+ 	}
+ 
++	splash.Update("startup:runtime")
+ 	plan, err := h.resolveChild(operation, args, sec)
+ 	if err != nil {
+ 		msg := err.Error()
+ 		h.log("ERROR", msg)
+ 		p, _ := h.createHandoff("DISPATCH_FAILURE", 20, msg)
++		splash.Close()
+ 		notify("Palworld Manager Merger", msg+"\n\nDiagnostic handoff:\n"+p)
+ 		return 20
+ 	}
+@@ -191,10 +204,16 @@
+ 		msg := "Could not start PMM child process: " + err.Error()
+ 		h.log("ERROR", msg)
+ 		p, _ := h.createHandoff("CHILD_START_FAILURE", 22, msg)
++		splash.Close()
+ 		notify("Palworld Manager Merger", msg+"\n\n"+p)
+ 		return 22
+ 	}
+ 	h.log("HOST", fmt.Sprintf("CHILD START kind=%s name=%s pid=%d", plan.Kind, plan.Name, cmd.Process.Pid))
++	monitorDone := make(chan struct{})
++	defer close(monitorDone)
++	if splash != nil {
++		go h.monitorStartupSplash(splash, monitorDone)
++	}
+ 	done := make(chan struct{}, 2)
+ 	go h.pipe(stdout, h.OutLog, os.Stdout, done)
+ 	go h.pipe(stderr, h.ErrLog, os.Stderr, done)
+@@ -210,6 +229,7 @@
+ 			code = 23
+ 		}
+ 	}
++	splash.Close()
+ 	h.log("HOST", fmt.Sprintf("CHILD END kind=%s exit=%d", plan.Kind, code))
+ 	h.writeSummary(operation, args, code)
+ 	if code != 0 {
+@@ -498,3 +518,28 @@
+ // Keep bytes imported for deterministic future host extensions without adding dependencies.
+ var _ = bytes.MinRead
+ var _ = sort.Strings
++
++// monitorStartupSplash reads only the session created by this Host. It does not
++// run processes, repair dependencies or interpret state content as code.
++func (h *Host) monitorStartupSplash(splash *startupSplash, done <-chan struct{}) {
++	ticker := time.NewTicker(100 * time.Millisecond)
++	defer ticker.Stop()
++	for {
++		select {
++		case <-done:
++			return
++		case <-splash.done:
++			return
++		case <-ticker.C:
++			f, err := os.Open(h.StateFile)
++			if err != nil {
++				continue
++			}
++			b, err := io.ReadAll(io.LimitReader(f, 65537))
++			f.Close()
++			if err == nil && len(b) <= 65536 {
++				splash.Update(string(b))
++			}
++		}
++	}
++}

@@ -1,32 +1,33 @@
 # Estado de la linea v1.5.0.1
 
-**01B cerrada para identidad e inventario estatico**, 2026-09-18.
-Entrada: `74a47df7072f651c91ec114ff235e69bc8d1042a`.
-Build: `PMM-v1.5.0.1-reliability-s01b`.
-Retomar: [NEXT_SESSION.md](NEXT_SESSION.md).
+**02A cerrada: fuente candidata del Host, build y evidencia guardados.**
+Fecha: 2026-09-18. Entrada: a0c74b8fe2210ba55b1c0eed47eb6c701e3de330.
+Retomar [NEXT_SESSION.md](NEXT_SESSION.md): 02B, solo comparacion del Host.
 
-VERSION, BUILD_ID y RELEASE_MANIFEST estan alineados; SHA256SUMS contiene
-628 entradas para 629 archivos. Los otros 625 archivos de PMM no cambian.
-El ZIP versionado reproduce el arbol Git de entrada. Los tres nativos coinciden
-con sus pins reales. Oodle local no se incluye ni se publica.
+01B sigue cerrada: version/build/inventario coherentes. En 02A los 629 archivos
+de PMM/ permanecen identicos, con build PMM-v1.5.0.1-reliability-s01b.
+La candidata vive fuera del paquete, bajo NativeCandidates/Host/.
 
 | ID | Estado real | Proxima accion |
 | --- | --- | --- |
-| REL-00 | Hashes nativos verificados; hash reportado asociado al ZIP RC30 por metadata GitHub | Tabla VirusTotal y superficie funcional/red pendientes |
-| REL-01 | PENDIENTE: fuente/paridad no certificadas | 02A: SOLO fuente candidata del Host |
-| REL-02 | CERRADO: identidad 1.5.0.1 e inventario estatico | Mantener coherencia en cada tanda |
+| REL-00 | Identidades binarias conocidas; relacion del hash VT con ZIP RC30 documentada | Tabla de motores y superficie funcional/red pendientes |
+| REL-01 / Host | Candidata reconstruida, compilada y conservada; NO equivalencia certificada | 02B comparacion; 05 aceptacion Windows antes de reemplazar |
+| REL-01 / Runtime y FixLab | Pendientes, sin cambios | 03 y 04 |
+| REL-02 | CERRADO desde 01B; preservado en 02A | Mantener version/hashes coherentes |
 | REL-03 a REL-07 | Pendientes | SESSION_PLAN.md |
-| LOC-MERGE | No realizado; traducciones no modificadas | Integracion posterior autorizada |
+| LOC-MERGE | No realizado; traducciones intactas | Integracion posterior autorizada |
 
-No se reemplazaron/recompilaron ejecutables del paquete ni se ejecutaron PMM,
-Windows/WPF, antivirus o CI remoto. Los 20 tests locales son de herramientas,
-no del programa. No hay release, tag ni PR. La identidad nueva no significa
-hardening terminado ni aprobacion de Nexus.
+El candidato tiene SHA-256 62fc4b234ea145c6e3dadcc51366c0ebbca109f7b5a11dcb17deda32e927257f.
+Dos builds en rutas distintas fueron byte-identicos en el entorno usado.
+Cinco tests Go de estados (incluidos 16 subcasos HWND) y nueve tests Python
+pasaron. No prueban Win32: no se ejecutaron PMM, candidato, WPF, Runtime,
+FixLab ni antivirus. El helper de icono ejecutado es una herramienta de build.
 
-Los candidatos Host/Runtime descritos en la charla anterior no persistieron
-con codigo e informes; sus comparaciones quedan NO REPRODUCIDAS. No se aceptan
-como evidencia de equivalencia. Development/Source/SOURCE_STATUS.md sigue vigente.
+El original y candidato difieren; la fuente es RECONSTRUCTION, no recuperacion
+del original. No se ha reemplazado, firmado o publicado ningun ejecutable.
+La advertencia SOURCE_STATUS.md se conserva. Los campos de verificacion
+historicos no se reescriben como si hubiese habido paridad Windows.
 
-SESSION01B_FINDINGS.md, SESSION01B_CHECKS.json y NATIVE_ARTIFACTS.json documentan
-los resultados. BASELINE.json y SESSION01_FINDINGS.md son registros historicos;
-no se reescriben para aparentar que estos resultados ya existian entonces.
+SESSION02A_FINDINGS.md, SESSION02A_CHECKS.json y NativeCandidates/Host/evidence/
+conservan los hechos, hashes, comandos, diff y logs de esta tanda. Los fuentes
+estan en Git y pueden recompilarse; no dependen solo de temporales del chat.

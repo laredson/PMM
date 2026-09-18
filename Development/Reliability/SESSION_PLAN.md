@@ -10,7 +10,7 @@ Leer HEAD y NEXT_SESSION al entrar. Fijar entrada/alcance. Trabajar sin Actions.
 | --- | --- | --- | --- |
 | 01 | Procedencia e identidad inicial | Rama de fiabilidad | PARCIAL: historial documentado y preparador offline con 12 tests sinteticos; no cierre de fuentes/identidad |
 | 01B | Identidad y checksums | ZIP real y arbol Git verificados | CERRADA: cuatro metadatos coherentes, 628 hashes/629 archivos, otros 625 intactos |
-| 02A | Fuente candidata de Host | Original y contrato; no repetir busquedas sin pistas | Codigo, diff, receta y evidencia GUARDADOS; reconstruccion etiquetada; original intacto |
+| 02A | Fuente candidata de Host | Original y contrato; no repetir busquedas sin pistas | CERRADA: candidato RECONSTRUCTION, dos builds identicos, tests de modelo/herramientas y evidencia guardados; original intacto |
 | 02B | Comparacion del Host | Candidato conservado de 02A | Comparacion reproducible y limites; sin sustitucion por coincidencia parcial ni sin aceptacion Windows |
 | 03 | Fuente de Runtime | Binario y contratos de dependencias/UI | Fuente reconciliada, mapa de diferencias y candidato separado; pruebas de arranque Windows pendientes si no ejecutadas |
 | 04 | Fuente de FixLab | Binario 0.2.0 y referencia de source | Procedencia y fuente verificables; recetas/datos intactos; no ejecutar reparaciones en el juego |

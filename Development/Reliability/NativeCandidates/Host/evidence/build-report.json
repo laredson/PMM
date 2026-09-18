@@ -1,0 +1,362 @@
+{
+  "schema": "PMM_HOST_CANDIDATE_BUILD_V1",
+  "session": "02A",
+  "classification": "RECONSTRUCTION_NOT_ORIGINAL_RECOVERED",
+  "goVersion": "go1.23.2",
+  "buildHost": "linux/amd64",
+  "target": "windows/amd64",
+  "sourceSha256": {
+    "build.py": "0761c3b2b34a83bc7d33fa1aceaaabcb12114d4a353d3cb0d36438f1c05190c9",
+    "go.mod": "f3a38c697906ab0f79b86976f621c5d74cc9e8c2923ff0ee9886405e375a4b06",
+    "inspect_pe.py": "03e5b87fc5e5c161de7a5b6f0931488c4792db2cf2fadf224779cb110990c5c5",
+    "main.go": "4249c730175d35c86053db588a4ab00e73e06bdb109a2d17f47d08706c744b43",
+    "splash_state.go": "4b20870f70766a310f1d19b27c15050ef8118eb5647a47ef6cf5084fa5cbed18",
+    "splash_state_test.go": "23f533a5b3c17cedb521df7db0f77fa7f41ec03ade097d8649f327aa61ebae6e",
+    "splash_windows.go": "c1d4f881a194c6d5cb1722ceedaa3730e2fb22a17e066f7c4df810cf51afaa6b"
+  },
+  "iconSha256": "6037c135e7651ac9bc799c8ba0d43c0be53021cb88def6649171709fe80a00fe",
+  "peIconHelperSha256": "ca2d070517d943936aae58855ebb98d9ceac87a861dd1b390405890cde2efd5d",
+  "original": {
+    "sha256": "010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d",
+    "sizeBytes": 2567168,
+    "machine": "amd64",
+    "subsystem": 2,
+    "certificateTableBytes": 0,
+    "sections": [
+      {
+        "name": ".text",
+        "rva": 4096,
+        "virtualSize": 1117141,
+        "rawSize": 1117184,
+        "sha256": "7025be9d2c6a4614af652e7d7fc4e5aff987e69854e837632db58825d79c1017"
+      },
+      {
+        "name": ".rdata",
+        "rva": 1122304,
+        "virtualSize": 1209456,
+        "rawSize": 1209856,
+        "sha256": "923f5627262f7875ec1179b0921025833df0e57ab79db0d265073d531f6e766f"
+      },
+      {
+        "name": ".data",
+        "rva": 2334720,
+        "virtualSize": 379424,
+        "rawSize": 77824,
+        "sha256": "f92b49add7a3df7f1bf9525b76fda5881af9ca77400de7d104ce1045252c26f9"
+      },
+      {
+        "name": ".pdata",
+        "rva": 2715648,
+        "virtualSize": 28716,
+        "rawSize": 29184,
+        "sha256": "f14d11a14ebed203ff06a5d22445a11d2226244dec7db57b79f56702d04c8ee6"
+      },
+      {
+        "name": ".xdata",
+        "rva": 2748416,
+        "virtualSize": 180,
+        "rawSize": 512,
+        "sha256": "fd2f037065c725bb4f9e0757d0db67e83e572c552208edb0214c1a92910975c9"
+      },
+      {
+        "name": ".idata",
+        "rva": 2752512,
+        "virtualSize": 1342,
+        "rawSize": 1536,
+        "sha256": "e6e4e3d9532a53890514232f8a74e0be68d5a8e299f4f69d7f954aa696ff3dfe"
+      },
+      {
+        "name": ".reloc",
+        "rva": 2756608,
+        "virtualSize": 21136,
+        "rawSize": 21504,
+        "sha256": "b8d1895ab06970433db74a36227c8c2799343bbe4244820a877ee800c7ab9fee"
+      },
+      {
+        "name": ".symtab",
+        "rva": 2781184,
+        "virtualSize": 4,
+        "rawSize": 512,
+        "sha256": "3e67f4a7d14b832ff2a2433e9cf0f6f5720821f67148a87c0ee2595a20c96c68"
+      },
+      {
+        "name": ".rsrc",
+        "rva": 2785280,
+        "virtualSize": 107112,
+        "rawSize": 107520,
+        "sha256": "dec55758a933a325551686d547ab87f8f98ea6742f018e424a68d8719edd8b36"
+      }
+    ],
+    "executed": false,
+    "authenticodeChainVerified": false,
+    "embeddedHostFunctionNames": [
+      "main.(*Host).createHandoff",
+      "main.(*Host).createHandoff.deferwrap1",
+      "main.(*Host).createHandoff.deferwrap2",
+      "main.(*Host).log",
+      "main.(*Host).monitorStartupSplash",
+      "main.(*Host).pipe",
+      "main.(*Host).pipe.deferwrap1",
+      "main.(*Host).pipe.func1",
+      "main.(*Host).resolveChild",
+      "main.(*Host).run",
+      "main.(*Host).run.gowrap1",
+      "main.(*Host).run.gowrap2",
+      "main.(*Host).run.gowrap3",
+      "main.(*Host).writeSummary",
+      "main.(*startupSplash).Close",
+      "main.(*startupSplash).HandoffTo",
+      "main.(*startupSplash).Update",
+      "main.(*startupSplash).run",
+      "main.(*startupSplash).run.deferwrap1",
+      "main.addZipBytes",
+      "main.classifyFailure",
+      "main.configureChildProcess",
+      "main.doctor",
+      "main.executableRoot",
+      "main.fatalConsole",
+      "main.fileSHA",
+      "main.fileSHA.deferwrap1",
+      "main.findPowerShell",
+      "main.hasArg",
+      "main.init",
+      "main.main",
+      "main.newHost",
+      "main.notify",
+      "main.parseStartupWindowHandle",
+      "main.printObject",
+      "main.readFileBounded",
+      "main.readSmall",
+      "main.readTail",
+      "main.securityStatus",
+      "main.setPMMAppUserModelID",
+      "main.splashUTF16",
+      "main.startStartupSplash",
+      "main.startStartupSplash.gowrap1",
+      "main.startupSplashWndProc"
+    ],
+    "embeddedSourcePathNames": [
+      "github.com/laredson/pmm-host/main.go",
+      "github.com/laredson/pmm-host/splash_windows.go"
+    ]
+  },
+  "candidate": {
+    "sha256": "62fc4b234ea145c6e3dadcc51366c0ebbca109f7b5a11dcb17deda32e927257f",
+    "sizeBytes": 2577920,
+    "machine": "amd64",
+    "subsystem": 2,
+    "certificateTableBytes": 0,
+    "sections": [
+      {
+        "name": ".text",
+        "rva": 4096,
+        "virtualSize": 1122328,
+        "rawSize": 1122816,
+        "sha256": "3a362ffc13bbabf91f41cd381fbd5a344cd504398c4b69e945f8045568194f91"
+      },
+      {
+        "name": ".rdata",
+        "rva": 1130496,
+        "virtualSize": 1214136,
+        "rawSize": 1214464,
+        "sha256": "700bf5cf99c73d242dfd64da6dc6581d23c25d04d0a863a009b849fd07506911"
+      },
+      {
+        "name": ".data",
+        "rva": 2347008,
+        "virtualSize": 379552,
+        "rawSize": 78336,
+        "sha256": "59d3214d59495e90a471dd9fcef4feb2b3513a9db39695e88b1fd8a234ef584d"
+      },
+      {
+        "name": ".pdata",
+        "rva": 2727936,
+        "virtualSize": 28896,
+        "rawSize": 29184,
+        "sha256": "9df6de64263125bb10323412ce549c0ceccc644a8a29f732f7a928ff48e0ad95"
+      },
+      {
+        "name": ".xdata",
+        "rva": 2760704,
+        "virtualSize": 180,
+        "rawSize": 512,
+        "sha256": "ee36d38b44fcc95e659e169449cfec56dafc13402668cb9c816ab054732096b2"
+      },
+      {
+        "name": ".idata",
+        "rva": 2764800,
+        "virtualSize": 1342,
+        "rawSize": 1536,
+        "sha256": "499a579c47cdebd39f268a749d998574994d7ec53d9232a013e9420d9e9c409e"
+      },
+      {
+        "name": ".reloc",
+        "rva": 2768896,
+        "virtualSize": 21196,
+        "rawSize": 21504,
+        "sha256": "0724d599ae08439803cf72d4540933e7aed5f6a0c3d54560ab3bb148249011a3"
+      },
+      {
+        "name": ".symtab",
+        "rva": 2793472,
+        "virtualSize": 4,
+        "rawSize": 512,
+        "sha256": "3e67f4a7d14b832ff2a2433e9cf0f6f5720821f67148a87c0ee2595a20c96c68"
+      },
+      {
+        "name": ".rsrc",
+        "rva": 2797568,
+        "virtualSize": 107112,
+        "rawSize": 107520,
+        "sha256": "bc4a1c2c33061cb7876d6fa8cc3d09644fcccbded3653990006f7ecf595d6275"
+      }
+    ],
+    "executed": false,
+    "authenticodeChainVerified": false,
+    "embeddedHostFunctionNames": [
+      "main.(*Host).createHandoff",
+      "main.(*Host).createHandoff.deferwrap1",
+      "main.(*Host).createHandoff.deferwrap2",
+      "main.(*Host).log",
+      "main.(*Host).monitorStartupSplash",
+      "main.(*Host).monitorStartupSplash.deferwrap1",
+      "main.(*Host).pipe",
+      "main.(*Host).pipe.deferwrap1",
+      "main.(*Host).pipe.func1",
+      "main.(*Host).resolveChild",
+      "main.(*Host).run",
+      "main.(*Host).run.deferwrap1",
+      "main.(*Host).run.deferwrap2",
+      "main.(*Host).run.func1",
+      "main.(*Host).run.gowrap3",
+      "main.(*Host).run.gowrap4",
+      "main.(*Host).run.gowrap5",
+      "main.(*Host).writeSummary",
+      "main.(*startupSplash).Close",
+      "main.(*startupSplash).Close.func1",
+      "main.(*startupSplash).HandoffTo",
+      "main.(*startupSplash).Update",
+      "main.(*startupSplash).control",
+      "main.(*startupSplash).run",
+      "main.(*startupSplash).run.deferwrap1",
+      "main.(*startupSplash).run.deferwrap2",
+      "main.(*startupSplash).run.func1",
+      "main.(*startupSplash).run.func1.1",
+      "main.(*startupSplash).run.func2",
+      "main.(*startupSplash).run.func3",
+      "main.(*startupSplash).windowProc",
+      "main.(*startupSplash).windowProc-fm",
+      "main.addZipBytes",
+      "main.classifyFailure",
+      "main.configureChildProcess",
+      "main.doctor",
+      "main.executableRoot",
+      "main.fatalConsole",
+      "main.fileSHA",
+      "main.fileSHA.deferwrap1",
+      "main.findPowerShell",
+      "main.hasArg",
+      "main.init",
+      "main.main",
+      "main.newHost",
+      "main.nextStartupView",
+      "main.notify",
+      "main.parseStartupWindowHandle",
+      "main.printObject",
+      "main.readFileBounded",
+      "main.readSmall",
+      "main.readTail",
+      "main.securityStatus",
+      "main.setPMMAppUserModelID",
+      "main.splashUTF16",
+      "main.startStartupSplash",
+      "main.startStartupSplash.gowrap1",
+      "main.startupState"
+    ],
+    "embeddedSourcePathNames": [
+      "github.com/laredson/pmm-host/main.go",
+      "github.com/laredson/pmm-host/splash_state.go",
+      "github.com/laredson/pmm-host/splash_windows.go"
+    ]
+  },
+  "buildInfo": "/mnt/data/pmm_host_s02a_checked1/PMMHost-candidate.exe: go1.23.2\n\tpath\tgithub.com/laredson/pmm-host\n\tmod\tgithub.com/laredson/pmm-host\t(devel)\t\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tCGO_ENABLED=0\n\tbuild\tGOARCH=amd64\n\tbuild\tGOOS=windows\n\tbuild\tGOAMD64=v1\n",
+  "commands": [
+    {
+      "command": [
+        "go",
+        "version"
+      ],
+      "exitCode": 0,
+      "stdout": "go version go1.23.2 linux/amd64\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "env",
+        "GOHOSTOS",
+        "GOHOSTARCH"
+      ],
+      "exitCode": 0,
+      "stdout": "linux\namd64\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "build",
+        "-trimpath",
+        "-buildvcs=false",
+        "-ldflags=-s -w -H=windowsgui",
+        "-o",
+        "<OUT>/PMMHost-candidate.exe",
+        "."
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "build",
+        "-trimpath",
+        "-buildvcs=false",
+        "-o",
+        "<OUT>/peicon-helper",
+        "<REPO>/Development/Source/PEIcon/inject.go"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<OUT>/peicon-helper",
+        "-exe",
+        "<OUT>/PMMHost-candidate.exe",
+        "-ico",
+        "<REPO>/PMM/Resources/UI/PMM.ico"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "version",
+        "-m",
+        "<OUT>/PMMHost-candidate.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "<OUT>/PMMHost-candidate.exe: go1.23.2\n\tpath\tgithub.com/laredson/pmm-host\n\tmod\tgithub.com/laredson/pmm-host\t(devel)\t\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tCGO_ENABLED=0\n\tbuild\tGOARCH=amd64\n\tbuild\tGOOS=windows\n\tbuild\tGOAMD64=v1\n",
+      "stderr": ""
+    }
+  ],
+  "candidateExecuted": false,
+  "packagedBinaryReplaced": false,
+  "functionalParityVerified": false,
+  "antivirusScanned": false,
+  "warning": "Static build evidence only. No equivalence or release approval."
+}

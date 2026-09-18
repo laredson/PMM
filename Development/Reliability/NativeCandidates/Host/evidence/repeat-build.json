@@ -1,0 +1,14 @@
+{
+  "schema": "PMM_HOST_REPEAT_BUILD_V1",
+  "buildHost": "linux/amd64",
+  "goVersion": "go1.23.2",
+  "candidateBuild1Sha256": "62fc4b234ea145c6e3dadcc51366c0ebbca109f7b5a11dcb17deda32e927257f",
+  "candidateBuild2Sha256": "62fc4b234ea145c6e3dadcc51366c0ebbca109f7b5a11dcb17deda32e927257f",
+  "sourceHashesEqual": true,
+  "byteIdentical": true,
+  "differentOutputDirectories": true,
+  "crossHostReproducibilityVerified": false,
+  "originalCandidateByteIdentical": false,
+  "candidateExecuted": false,
+  "comparisonToOriginalDeferredTo": "02B"
+}
