@@ -1,0 +1,130 @@
+=== RUN   TestReadyWaitsForAckAndRevalidates
+--- PASS: TestReadyWaitsForAckAndRevalidates (0.00s)
+=== RUN   TestDuplicateRegistrationIsIdempotent
+--- PASS: TestDuplicateRegistrationIsIdempotent (0.00s)
+=== RUN   TestExitBeatsPendingReady
+=== RUN   TestExitBeatsPendingReady/EXIT
+--- PASS: TestExitBeatsPendingReady/EXIT (0.00s)
+=== RUN   TestExitBeatsPendingReady/FAILED
+--- PASS: TestExitBeatsPendingReady/FAILED (0.00s)
+=== RUN   TestExitBeatsPendingReady/CLOSE
+--- PASS: TestExitBeatsPendingReady/CLOSE (0.00s)
+--- PASS: TestExitBeatsPendingReady (0.00s)
+=== RUN   TestLivenessCheckedAtAction
+=== RUN   TestLivenessCheckedAtAction/owner
+--- PASS: TestLivenessCheckedAtAction/owner (0.00s)
+=== RUN   TestLivenessCheckedAtAction/runtime
+--- PASS: TestLivenessCheckedAtAction/runtime (0.00s)
+=== RUN   TestLivenessCheckedAtAction/window-reused
+--- PASS: TestLivenessCheckedAtAction/window-reused (0.00s)
+=== RUN   TestLivenessCheckedAtAction/during-check
+--- PASS: TestLivenessCheckedAtAction/during-check (0.00s)
+--- PASS: TestLivenessCheckedAtAction (0.00s)
+=== RUN   TestRejectsForeignWindowAndReusedPID
+=== RUN   TestRejectsForeignWindowAndReusedPID/foreign-HWND
+--- PASS: TestRejectsForeignWindowAndReusedPID/foreign-HWND (0.00s)
+=== RUN   TestRejectsForeignWindowAndReusedPID/PID-reused
+--- PASS: TestRejectsForeignWindowAndReusedPID/PID-reused (0.00s)
+=== RUN   TestRejectsForeignWindowAndReusedPID/access-denied
+--- PASS: TestRejectsForeignWindowAndReusedPID/access-denied (0.00s)
+--- PASS: TestRejectsForeignWindowAndReusedPID (0.00s)
+=== RUN   TestGenerationRequiresRetirement
+--- PASS: TestGenerationRequiresRetirement (0.00s)
+=== RUN   TestNativeToWPFGeneration
+--- PASS: TestNativeToWPFGeneration (0.00s)
+=== RUN   TestOldGenerationRejected
+--- PASS: TestOldGenerationRejected (0.00s)
+=== RUN   TestWrongSequenceSessionAndHello
+=== RUN   TestWrongSequenceSessionAndHello/sequence
+--- PASS: TestWrongSequenceSessionAndHello/sequence (0.00s)
+=== RUN   TestWrongSequenceSessionAndHello/session
+--- PASS: TestWrongSequenceSessionAndHello/session (0.00s)
+=== RUN   TestWrongSequenceSessionAndHello/hello
+--- PASS: TestWrongSequenceSessionAndHello/hello (0.00s)
+=== RUN   TestWrongSequenceSessionAndHello/ack
+--- PASS: TestWrongSequenceSessionAndHello/ack (0.00s)
+=== RUN   TestWrongSequenceSessionAndHello/ready-before-register
+--- PASS: TestWrongSequenceSessionAndHello/ready-before-register (0.00s)
+--- PASS: TestWrongSequenceSessionAndHello (0.00s)
+=== RUN   TestHelloMustMatchVerifiedOSPeer
+--- PASS: TestHelloMustMatchVerifiedOSPeer (0.00s)
+=== RUN   TestObserveExitAndTransportCloseRevoke
+--- PASS: TestObserveExitAndTransportCloseRevoke (0.00s)
+=== RUN   TestWrongNativeOwner
+--- PASS: TestWrongNativeOwner (0.00s)
+=== RUN   TestConcurrentCloseNeverAllowsSubsequentAction
+--- PASS: TestConcurrentCloseNeverAllowsSubsequentAction (0.00s)
+=== RUN   TestProtocolConversationThroughFrames
+--- PASS: TestProtocolConversationThroughFrames (0.00s)
+=== RUN   TestSequenceOverflowFailsClosed
+--- PASS: TestSequenceOverflowFailsClosed (0.00s)
+=== RUN   TestAckFailureLeavesNoCapability
+--- PASS: TestAckFailureLeavesNoCapability (0.00s)
+=== RUN   TestTransportRevocationCheckedWithoutWatcherScheduling
+--- PASS: TestTransportRevocationCheckedWithoutWatcherScheduling (0.00s)
+=== RUN   TestRevocationDuringWindowCheck
+--- PASS: TestRevocationDuringWindowCheck (0.00s)
+=== RUN   TestWireRoundTrip
+--- PASS: TestWireRoundTrip (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity
+=== RUN   TestDecoderRejectsAmbiguity/invalid-utf8
+--- PASS: TestDecoderRejectsAmbiguity/invalid-utf8 (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/truncated
+--- PASS: TestDecoderRejectsAmbiguity/truncated (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/root-null
+--- PASS: TestDecoderRejectsAmbiguity/root-null (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/escaped-duplicate
+--- PASS: TestDecoderRejectsAmbiguity/escaped-duplicate (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/case
+--- PASS: TestDecoderRejectsAmbiguity/case (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/overlong
+--- PASS: TestDecoderRejectsAmbiguity/overlong (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/version
+--- PASS: TestDecoderRejectsAmbiguity/version (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/duplicate
+--- PASS: TestDecoderRejectsAmbiguity/duplicate (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/unknown
+--- PASS: TestDecoderRejectsAmbiguity/unknown (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/object
+--- PASS: TestDecoderRejectsAmbiguity/object (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/numeric
+--- PASS: TestDecoderRejectsAmbiguity/numeric (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/float
+--- PASS: TestDecoderRejectsAmbiguity/float (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/trailing
+--- PASS: TestDecoderRejectsAmbiguity/trailing (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/missing
+--- PASS: TestDecoderRejectsAmbiguity/missing (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/root-array
+--- PASS: TestDecoderRejectsAmbiguity/root-array (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/null
+--- PASS: TestDecoderRejectsAmbiguity/null (0.00s)
+=== RUN   TestDecoderRejectsAmbiguity/array
+--- PASS: TestDecoderRejectsAmbiguity/array (0.00s)
+--- PASS: TestDecoderRejectsAmbiguity (0.00s)
+=== RUN   TestCanonicalIntegers
+--- PASS: TestCanonicalIntegers (0.00s)
+=== RUN   TestFramingRejectsPartialAndOversize
+--- PASS: TestFramingRejectsPartialAndOversize (0.00s)
+=== RUN   TestWriterErrors
+--- PASS: TestWriterErrors (0.00s)
+=== RUN   TestTypedMessageConstraints
+--- PASS: TestTypedMessageConstraints (0.00s)
+=== RUN   TestAckBoundToExactRequest
+=== RUN   TestAckBoundToExactRequest/session
+--- PASS: TestAckBoundToExactRequest/session (0.00s)
+=== RUN   TestAckBoundToExactRequest/sequence
+--- PASS: TestAckBoundToExactRequest/sequence (0.00s)
+=== RUN   TestAckBoundToExactRequest/generation
+--- PASS: TestAckBoundToExactRequest/generation (0.00s)
+=== RUN   TestAckBoundToExactRequest/kind
+--- PASS: TestAckBoundToExactRequest/kind (0.00s)
+--- PASS: TestAckBoundToExactRequest (0.00s)
+=== RUN   FuzzDecode
+=== RUN   FuzzDecode/seed#0
+--- PASS: FuzzDecode/seed#0 (0.00s)
+=== RUN   FuzzDecode/seed#1
+--- PASS: FuzzDecode/seed#1 (0.00s)
+--- PASS: FuzzDecode (0.00s)
+PASS
+ok  	pmm/uibridge	0.003s

@@ -1,0 +1,126 @@
+{
+  "schema": "PMM_UIBRIDGE_S02C2A_BUILD_V1",
+  "goVersion": "go version go1.23.2 linux/amd64",
+  "scope": "isolated library and Windows adapter test compilation, NOT Host/Runtime integration",
+  "inputSourceSha256": {
+    "build.py": "01334c0ba358b31330d73c47ec1081173c8bb7a1c2f627b84a3cb47382e6e7ff",
+    "gate.go": "ef61cb04572b6d8fa6c1ed636f86dd7cf21e12779eee4b100f69a4b3867e3ae2",
+    "gate_test.go": "55d66f19355db300527615cf1d9ffc64912a95f1e54cd7f21ce7aa2888972490",
+    "go.mod": "7650b4cf3b77afe703879b959760361f90ebe19ffde1c0ae8c59652339fd8b4d",
+    "pipe_windows.go": "3970cbe3f5b6b2459cfc95109653d58b00c3bdd3d1bb67b2e5a55c82735b6941",
+    "pipe_windows_test.go": "6023954c2db926fb48299f7a2f54ffba7653e93f5a3858c270ef3f79bbeaf47c",
+    "platform_other.go": "0f0ae6c539059058f6b8de8f8295f20c88801fd542b57b5260d883a257b8c61a",
+    "process_windows.go": "ec440e8b3b5d939f5f6f9eae0ca212a9373bdca8b7e1e9194330b3e3fc31eeeb",
+    "protocol.go": "e3da25e97c4906d734ec699378691870e0989c106ea4f31b09be845b829df70d",
+    "protocol_test.go": "a5039f71810b03e4595788d047d2194d005415c01aee061a21c1d11b335c69a7"
+  },
+  "windowsTestExecutableSha256": "8d76336d55ef814c6fbdbcb852939b91ca8bf42884399baf96911f3b239b8414",
+  "windowsTestExecutableBytes": 5619712,
+  "modelTestFunctionsPassed": [
+    "TestReadyWaitsForAckAndRevalidates",
+    "TestDuplicateRegistrationIsIdempotent",
+    "TestExitBeatsPendingReady",
+    "TestLivenessCheckedAtAction",
+    "TestRejectsForeignWindowAndReusedPID",
+    "TestGenerationRequiresRetirement",
+    "TestNativeToWPFGeneration",
+    "TestOldGenerationRejected",
+    "TestWrongSequenceSessionAndHello",
+    "TestHelloMustMatchVerifiedOSPeer",
+    "TestObserveExitAndTransportCloseRevoke",
+    "TestWrongNativeOwner",
+    "TestConcurrentCloseNeverAllowsSubsequentAction",
+    "TestProtocolConversationThroughFrames",
+    "TestSequenceOverflowFailsClosed",
+    "TestAckFailureLeavesNoCapability",
+    "TestTransportRevocationCheckedWithoutWatcherScheduling",
+    "TestRevocationDuringWindowCheck",
+    "TestWireRoundTrip",
+    "TestDecoderRejectsAmbiguity",
+    "TestCanonicalIntegers",
+    "TestFramingRejectsPartialAndOversize",
+    "TestWriterErrors",
+    "TestTypedMessageConstraints",
+    "TestAckBoundToExactRequest"
+  ],
+  "modelTestFunctionCount": 25,
+  "linuxRaceTested": true,
+  "windowsAdaptersExecuted": false,
+  "hostRuntimeIntegrated": false,
+  "pmmExecuted": false,
+  "antivirusScanned": false,
+  "packagedFilesModified": false,
+  "buildInfo": "/mnt/data/UIBridge_S02C2A_closed1/UIBridge-S02C2A.test.exe: go1.23.2\n",
+  "commands": [
+    {
+      "command": [
+        "go",
+        "version"
+      ],
+      "exitCode": 0,
+      "stdout": "go version go1.23.2 linux/amd64\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "env",
+        "GOHOSTOS",
+        "GOHOSTARCH"
+      ],
+      "exitCode": 0,
+      "stdout": "linux\namd64\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-count=1",
+        "-json",
+        "."
+      ],
+      "exitCode": 0,
+      "stdout": "<model-tests.jsonl sha256=b3bfc576504f56bdd94516099e0a9b27c6ccfe6cbfcb98c9200a2bb0280fadeb>",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "."
+      ],
+      "exitCode": 0,
+      "stdout": "ok  \tpmm/uibridge\t1.021s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "test",
+        "-c",
+        "-trimpath",
+        "-buildvcs=false",
+        "-o",
+        "<OUT>/UIBridge-S02C2A.test.exe",
+        "."
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "version",
+        "-m",
+        "<OUT>/UIBridge-S02C2A.test.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "<OUT>/UIBridge-S02C2A.test.exe: go1.23.2\n",
+      "stderr": ""
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "schema": "PMM_UIBRIDGE_S02C2A_REPEAT_V1",
+  "sameToolchain": "go1.23.2",
+  "buildHost": "linux/amd64",
+  "sha256Build1": "8d76336d55ef814c6fbdbcb852939b91ca8bf42884399baf96911f3b239b8414",
+  "sha256Build2": "8d76336d55ef814c6fbdbcb852939b91ca8bf42884399baf96911f3b239b8414",
+  "differentOutputPaths": true,
+  "bytesEqual": true,
+  "windowsExecuted": false,
+  "hostRuntimeIntegrated": false,
+  "limit": "Only this environment; not cross-host reproducibility or functional Windows acceptance."
+}
