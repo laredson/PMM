@@ -1,4 +1,14 @@
-## German localization published; French user confirmation recorded — 2026-09-18
+## Traditional Chinese localization published — 2026-09-18
+
+繁體中文 now covers all **1,291 canonical English keys** on `v1.5.0.0-PMM-translated` and is enabled for user testing. This publication uses the exact prepared catalog validated against canonical English; Simplified Chinese and the ten previously enabled catalogs are unchanged.
+
+Traditional Chinese blob: `1360cf6ae05998cb8170aac47b9714972a70fa86`; SHA-256 `8abfe1603399d60d9d20be961c45237a9b6dc77a9c771016443abb73e9904b56`; 131,024 bytes. Structural checks passed with 109 parameterized entries, 21 intentional invariants, zero missing keys, zero empty values and zero structural errors. Native language names remain literal, including `简体中文`.
+
+The temporary transfer-only commits were replaced by this clean publication checkpoint. No PR, tag, release, main update, runtime code, binary or workflow was added. PMM/WPF runtime QA, Windows PowerShell 5.1 and native-speaker review remain pending. Existing dynamic-runtime and Arabic bidi QA issues remain separate.
+
+Next step: user runtime/visual QA of Traditional Chinese. Next translation: **Japanese (`ja`, 日本語)**. German QA remains pending.
+
+## Historical published checkpoint — German; French user confirmation recorded — 2026-09-18
 
 Deutsch covers all 1,291 canonical English keys on `v1.5.0.0-PMM-translated` and is enabled for user testing. The user confirmed French and explicitly authorized publishing the previously prepared German package. The nine previously active catalogs are unchanged.
 The German catalog was reused byte for byte from the local delivery, not retranslated. Its structural validation was rerun before publication: exact keys/order, nonempty values, placeholders, numbers, whitespace, selected technical tokens, file-dialog patterns and Unicode controls passed. There are 109 parameterized entries, 31 intentional invariants and zero remaining entries.
@@ -99,8 +109,8 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 | 5 | `ru` | Русский | Russian | ltr | enabled | **catalog complete, 1,291/1,291; user reports it apparently works well** |
 | 6 | `fr` | Français | French | ltr | enabled | **catalog complete, 1,291/1,291; user confirmed French** |
 | 7 | `de` | Deutsch | German | ltr | enabled | **catalog complete, 1,291/1,291; published; structural recheck passed; user QA pending** |
-| 9 | `zh-TW` | 繁體中文 | Chinese (Traditional) | ltr | disabled | **next translation target; template pending** |
-| 10 | `ja` | 日本語 | Japanese | ltr | disabled | template pending |
+| 9 | `zh-TW` | 繁體中文 | Chinese (Traditional) | ltr | enabled | **catalog complete, 1,291/1,291; published; user QA pending** |
+| 10 | `ja` | 日本語 | Japanese | ltr | disabled | **next translation target; template pending** |
 | 11 | `tr` | Türkçe | Turkish | ltr | disabled | template pending |
 | 12 | `pl` | Polski | Polish | ltr | disabled | template pending |
 | 13 | `it` | Italiano | Italian | ltr | disabled | template pending |
