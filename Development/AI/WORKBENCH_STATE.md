@@ -1,4 +1,14 @@
-## Active checkpoint — German published; French user-confirmed — 2026-09-18
+## Active checkpoint — Traditional Chinese published — 2026-09-18
+
+Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. Traditional Chinese (`zh-TW`, `繁體中文`) is complete and enabled: **1,291/1,291 canonical keys**, fallback `en`, direction `ltr`, no separate XAML. It was authored against canonical English and published from the exact locally validated payload; do not retranslate it from Simplified Chinese.
+
+Catalog blob: `1360cf6ae05998cb8170aac47b9714972a70fa86`; SHA-256 `8abfe1603399d60d9d20be961c45237a9b6dc77a9c771016443abb73e9904b56`; size 131,024 bytes. Structural checks passed with 109 parameterized entries and 21 intentional invariants. Native language labels remain in their own writing, including `English`, `Español`, `简体中文` and `繁體中文`.
+
+The temporary transfer-only commits were replaced by this clean publication commit. No runtime code, binaries, main, release, tag, PR or workflow changed. Language switching remains restart-based. Existing dynamic counters, Library.UI selector behavior, Arabic mixed prose/path bidi handling and virtualized technical-cell QA remain open separately.
+
+Traditional Chinese user runtime/visual QA and native-speaker review are pending. German QA also remains pending. **Next translation: Japanese (`ja`, 日本語`).** Read `Development/Localization/TRADITIONAL_CHINESE_HANDOFF.md` and `Development/Localization/Progress/zh-TW.json` before continuing.
+
+## Historical checkpoint — German published; French user-confirmed — 2026-09-18
 
 Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. The user confirmed French and then explicitly requested publishing the prepared German package to GitHub. German is now complete and enabled: **1,291/1,291 canonical keys**, `enabled: true` / `status: complete`, native label `Deutsch`, fallback `en`, direction `ltr`, no separate XAML. The nine previously active language catalogs are unchanged.
 
