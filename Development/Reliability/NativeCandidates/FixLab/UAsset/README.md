@@ -1,47 +1,38 @@
-# UAsset - read and bounded name rewriting
+# UAsset - componentes reconstruidos de FixLab
 
-Isolated RECONSTRUCTION, not original source or a full FixLab engine.
-04A-4 implemented Read; 04A-4B adds RewriteNames. The original reader and FORMAT.md
-remain unchanged. The new transformation contract is REWRITE_CONTRACT.md.
+Read (04A-4), RewriteNames (04A-4B) y PatchPostProcess (04A-4C) permanecen aislados.
+No es PMMFixLab.exe ni source original recuperado. No instalar el harness de tests.
 
-Read accepts explicit cooked-ue4-522-ue5-1008; unversioned requires caller assertion.
-RewriteNames requires pinned header/export bytes and pinned reference headers.
-NameEdit selects an existing destination index and a source index; stored hashes
-and serialization come from the source, not invented CRCs. Indices/counts stay put.
+- FORMAT.md define el perfil de lectura cooked-ue4-522-ue5-1008.
+- REWRITE_CONTRACT.md limita la reescritura de nombres y mantiene el rechazo de
+  movimientos con header/export opaco. No se ha ampliado ese permiso.
+- POSTPROCESS_CONTRACT.md define la nueva operacion fija: precarga stale->safe,
+  propiedad PostProcessAnimBlueprint stale->null. No reemplazos globales.
 
-Fixed-width name changes preserve all other bytes and positions. Width-changing
-rewrites REJECT opaque header regions, nonempty .uexp and nonzero bulk offsets,
-including net-zero changes to multiple slot widths. There is no unsafe override.
-Growth/shrink tests use completely parsed, export-data-free synthetic headers.
-This limitation is a prerequisite for the future payload/core work, not a full
-implementation of the recipe's relocatePackage or postProcess operations.
+PatchPostProcess requiere snapshots, pins externos de entrada Y salida, identidad
+completa de imports/export y un schema escalar externo revisado. No autodetecta
+el schema ni lo extrae de la receta. No soporta arrays/structs/custom serializers;
+no se ha validado un schema real de SkeletalMesh. Los schemas de tests son ficticios.
+Todos los API de transformacion devuelven memoria, no instalan ni escriben archivos.
 
-Inputs remain immutable during calls. Output is in memory with owned buffers;
-errors return nil. No network, subprocess, file write or installation side effect.
-Pins identify bytes; the caller must establish their provenance and authorization.
+## Reproduccion
 
-## Reproduce
-
-From this directory with installed Go1.23.2, module/toolchain downloads disabled:
+Desde esta carpeta, Go1.23.2 local y Python 3.9+:
 
     go test -count=1 ./...
-    python -B -m unittest -v test_reference test_rewrite_reference
-    python -B build.py --out <NEW directory OUTSIDE repository>
+    python -B -m unittest -v test_reference test_rewrite_reference test_postprocess_reference
 
-Set GOTOOLCHAIN=local, GOPROXY=off, GOSUMDB=off, GOWORK=off for Go commands.
-The builder sets them itself. Its UAsset-tests.exe is NOT PMMFixLab.exe and must
-not replace it. Windows test execution and Unreal compatibility are NOT_RUN.
+PMM_UASSET_FIXTURE_OUTPUT, PMM_UASSET_REWRITE_OUTPUT y PMM_POSTPROCESS_FIXTURE_OUTPUT
+activan exports sinteticos a directorios NUEVOS; sin ellos tres tests se saltan.
+No sumar SKIP como PASS. Verificadores independientes:
 
-Optional test exports (set environment in your shell):
-PMM_UASSET_FIXTURE_OUTPUT=<new directory> exports the six reader results.
-PMM_UASSET_REWRITE_OUTPUT=<new directory> exports twelve synthetic rewrite packets.
-Then run verify_reference.py or verify_rewrite.py with that respective directory.
-Without these variables two export tests SKIP; never count skips as passes.
+    python -B verify_reference.py <reader-packets>
+    python -B verify_rewrite.py <rewrite-packets>
+    python -B verify_postprocess.py <postprocess-packets>
 
-39 Go assertion tests passed with both exports enabled (23 reader + 16 rewrite),
-20 Python tests (12 earlier + 8 new), race Linux and bounded FuzzRewritePinned.
-Two FINAL Windows TEST builds matched in the recorded Go1.23.2 Linux environment.
-Historical evidence is unchanged; new results are under evidence/s04a4b/.
+    python -B build.py --out <directorio nuevo fuera del repositorio>
 
-Next: payload/core R1 transformation contracts, not a full engine comparison yet.
-No real donor/game assets were read or transformed, and no original EXE ran.
+El builder offline conserva hashes de fuentes y genera un harness TEST Windows,
+no el motor. No descarga toolchain/dependencias y nunca ejecuta el EXE generado.
+56 tests Go/31 Python y las regresiones pasaron en Linux; Windows/Unreal siguen
+NOT_RUN. Evidencia nueva en evidence/s04a4c; evidencia previa preservada aparte.

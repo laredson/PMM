@@ -1,16 +1,15 @@
-# FixLab reconstruction - checkpoint 04A-4B
+# FixLab - reconstruccion por componentes
 
-Original source remains unavailable; the historical overlay remains invalid.
-Do not repeat its recovery without a new source. PMMFixLab.exe is unchanged.
+Ultima entrega: 04A-4C, postProcess acotado por schema externo. NO motor completo.
+Original PMMFixLab.exe y recetas productivas permanecen intactos.
 
-PMMDLT1 and PAKV11 are preserved. UAsset contains the 04A-4 reader and the new
-04A-4B pinned name-table rewriter. No complete core R1 / V2 / CLI exists yet.
+PMMDLT1 y PAKV11 conservan sus componentes. UAsset contiene Read, RewriteNames y
+PatchPostProcess: esta ultima modifica precarga y una propiedad sin mover offsets.
+No puede utilizarse en meshes reales sin un schema validado y pins externos; los
+schemas de fixtures son sinteticos y los serializers complejos no estan soportados.
+La restriccion de relocalizacion opaca de 04A-4B sigue vigente, sin bypass.
 
-The rewriter imports exact name/hash bytes from approved reference headers.
-Fixed-width changes preserve all other positions/bytes. Growth or shrink rejects
-opaque header data, nonempty .uexp and nonzero bulk offsets. General mesh/core
-relocation is NOT implemented by accepting opaque data on trust.
-
-Read UAsset/REWRITE_CONTRACT.md and ../../NEXT_SESSION.md. Tools and evidence from
-04A remain historical. Never copy test harnesses over the installed engine.
-No production recipes/payloads/hashes, translations or other candidates changed.
+SOURCE_CONTRACT.md y evidencia 04A son historicos: el source original sigue ausente,
+el overlay invalido no debe ejecutarse y no se ha demostrado paridad del motor.
+Leer UAsset/POSTPROCESS_CONTRACT.md y ../../NEXT_SESSION.md para continuar 04A-5A.
+No ejecutar el harness de tests como si fuera PMMFixLab.exe ni sustituir binarios.

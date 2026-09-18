@@ -1,0 +1,65 @@
+{
+  "schema": "PMM_POSTPROCESS_INDEPENDENT_V1",
+  "fixtures": [
+    {
+      "fixture": "basic",
+      "headerSha256": "97bbc1c88734161cbfc7c41aa3a4b472d770c013663f537cc0973a56b452bcac",
+      "exportSha256": "5e9ad5f14773668e5179af3d56d0787fea4a53cac4b79a315eb4dda9cedf3386",
+      "propertyUexpOffset": 120,
+      "preloadHeaderOffset": 954,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "decoy",
+      "headerSha256": "d2f2b364de747d2293db811fbb0a315d73828057c4f76fb79f0806885784a459",
+      "exportSha256": "b9b2f83508b313008592e18dd05450280213ad0d4e00b29820cd0a3e1357b3be",
+      "propertyUexpOffset": 120,
+      "preloadHeaderOffset": 954,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "masked",
+      "headerSha256": "afceb7a9c5218c68d92aa0dd735476c7704d8907767e316acee01bb1660cbb1e",
+      "exportSha256": "441200f029ba0362f8bb6692640670cf65bc5760348c0a7489938eafba046aa1",
+      "propertyUexpOffset": 112,
+      "preloadHeaderOffset": 954,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "mixed",
+      "headerSha256": "99b78795c09b8de5cbc92c96cbf3874547d8644c2d97dd884dd886b405d9a586",
+      "exportSha256": "e22fc3c15683486edaf46105d339057e9dc249e5354f2dc9fcdaeb575dfddbc6",
+      "propertyUexpOffset": 34,
+      "preloadHeaderOffset": 954,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "opaque",
+      "headerSha256": "9363a726d6e9233063e94cc7ab40fcdc359132275e9d57a16a84ed4e7822ced2",
+      "exportSha256": "5e9ad5f14773668e5179af3d56d0787fea4a53cac4b79a315eb4dda9cedf3386",
+      "propertyUexpOffset": 120,
+      "preloadHeaderOffset": 954,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "skipped",
+      "headerSha256": "afceb7a9c5218c68d92aa0dd735476c7704d8907767e316acee01bb1660cbb1e",
+      "exportSha256": "3b476ab57be3c70ebf9b0b010cadb50f1db6943877b5c1fec65880585638ab02",
+      "propertyUexpOffset": 112,
+      "preloadHeaderOffset": 954,
+      "allBytesCompared": true
+    },
+    {
+      "fixture": "unicode",
+      "headerSha256": "ba338a1ab08d8f98b744fc3ca8f98e6a253c214b94015ca501d1daa9b98c63c1",
+      "exportSha256": "5e9ad5f14773668e5179af3d56d0787fea4a53cac4b79a315eb4dda9cedf3386",
+      "propertyUexpOffset": 120,
+      "preloadHeaderOffset": 998,
+      "allBytesCompared": true
+    }
+  ],
+  "allCompared": true,
+  "syntheticOnly": true,
+  "gameAssetsRead": false,
+  "engineCompatibilityVerified": false
+}

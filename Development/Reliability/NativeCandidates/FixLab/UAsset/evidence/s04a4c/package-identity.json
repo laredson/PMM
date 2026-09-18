@@ -1,0 +1,16 @@
+{
+  "schema": "PMM_STATIC_PACKAGE_IDENTITY_V1",
+  "packageFiles": 629,
+  "checksumRows": 628,
+  "checksumMismatches": 0,
+  "packageTree": "09df5c45aee3390c6b8ea235c8afa4e149a9f1fa",
+  "version": "1.5.0.1",
+  "buildId": "PMM-v1.5.0.1-reliability-s01b",
+  "preservedTrees": {
+    "PMM": "09df5c45aee3390c6b8ea235c8afa4e149a9f1fa",
+    ".github": "cb881ba48502f8dcea8cead16f47f275069d5945",
+    "Development/Source": "0cfad865e6fd63663b29f5ec92b76618bc6e4a02"
+  },
+  "scope": "Hash-verified package and historical source only; not a complete HEAD checkout",
+  "pmmExecuted": false
+}

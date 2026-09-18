@@ -26,7 +26,7 @@ def main():
             return p.stdout
         version=run([go,'version'],src).split()
         if version[2]!='go1.23.2':raise ValueError('Expected go1.23.2')
-        files=sorted([*src.glob('*.go'),src/'go.mod',src/'build.py',src/'testdata/vectors.json'])
+        files=sorted([*src.glob('*.go'),src/'go.mod',src/'build.py',src/'testdata/vectors.json',src/'testdata/postprocess-vectors.json'])
         if any(p.is_symlink() or not p.is_file() for p in files):raise ValueError('Invalid source input')
         hashes={p.relative_to(src).as_posix():sha(p) for p in files}
         out.mkdir(parents=True,exist_ok=False);stage=out/'source'
@@ -38,7 +38,7 @@ def main():
         # Vet Unix/Windows syscall-free parser; warnings abort this recipe.
         run([go,'vet','./...'],stage)
         if any(sha(p)!=hashes[p.relative_to(src).as_posix()] for p in files):raise ValueError('Source changed during build')
-        report=dict(schema='PMM_UASSET_TEST_BUILD_V1',session='04A-4B',artifact='UAsset TEST harness, not FixLab',
+        report=dict(schema='PMM_UASSET_TEST_BUILD_V1',session='04A-4C',artifact='UAsset TEST harness, not FixLab',
                     goVersion='go1.23.2',buildHost=version[3],target='windows/amd64',sourceSha256=hashes,
                     sha256=sha(exe),bytes=exe.stat().st_size,commands=commands,windowsExecuted=False,engineBuilt=False,packagedBinaryReplaced=False)
         (out/'build-report.json').write_text(json.dumps(report,indent=2)+'\n')
