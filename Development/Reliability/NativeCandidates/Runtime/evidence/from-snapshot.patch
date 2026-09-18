@@ -1,0 +1,228 @@
+--- snapshot/nativeui.go
++++ candidate/nativeui.go
+@@ -5,12 +5,11 @@
+ 	"os"
+ 	"os/exec"
+ 	"path/filepath"
+-	"strings"
+ )
+ 
+ func launchUserInterface(root string, forceNative bool) int {
+ 	sec := runtimeSecurity(root)
+-	if forceNative || !strings.EqualFold(sec.PowerShellLanguageMode, "FullLanguage") || sec.PowerShell == "" {
++	if selectUIRoute(forceNative, sec.PowerShell, sec.PowerShellLanguageMode) == uiRouteNative {
+ 		return launchNativeUIShell(root, sec)
+ 	}
+ 	return launchLegacyPowerShellUI(root, sec)
+@@ -21,13 +20,7 @@
+ 		fmt.Fprintln(os.Stderr, "PowerShell is unavailable; legacy UI cannot start.")
+ 		return 30
+ 	}
+-	script := filepath.Join(root, "Modules", "Bootstrap", "Start-PalModMerger.ps1")
+-	cmd := exec.Command(sec.PowerShell, "-STA", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script)
+-	configureProcess(cmd)
+-	cmd.Dir = root
+-	cmd.Stdout = os.Stdout
+-	cmd.Stderr = os.Stderr
+-	cmd.Stdin = os.Stdin
++	cmd := legacyUICommand(root, sec)
+ 	if err := cmd.Run(); err != nil {
+ 		if ee, ok := err.(*exec.ExitError); ok {
+ 			return ee.ExitCode()
+@@ -37,3 +30,16 @@
+ 	}
+ 	return 0
+ }
++
++// Construction only: no process is started until the caller invokes Run.
++func legacyUICommand(root string, sec SecurityStatus) *exec.Cmd {
++	script := filepath.Join(root, "Modules", "Bootstrap", "Start-PalModMerger.ps1")
++	cmd := exec.Command(sec.PowerShell, legacyUIArguments(script)...)
++	configureUIProcess(cmd)
++	cmd.Dir = root
++	cmd.Stdout = os.Stdout
++	cmd.Stderr = os.Stderr
++	cmd.Stdin = os.Stdin
++	// Env remains nil: the Host session environment is inherited unchanged.
++	return cmd
++}
+--- snapshot/process_other.go
++++ candidate/process_other.go
+@@ -5,3 +5,5 @@
+ import "os/exec"
+ 
+ func configureProcess(cmd *exec.Cmd) {}
++
++func configureUIProcess(cmd *exec.Cmd) {}
+--- snapshot/process_windows.go
++++ candidate/process_windows.go
+@@ -11,5 +11,16 @@
+ 	if cmd == nil {
+ 		return
+ 	}
+-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: 0x08000000} // CREATE_NO_WINDOW
++	applyPresentation(cmd, presentationForChild(false))
+ }
++
++func configureUIProcess(cmd *exec.Cmd) {
++	applyPresentation(cmd, presentationForChild(true))
++}
++
++func applyPresentation(cmd *exec.Cmd, p childPresentation) {
++	if cmd == nil {
++		return
++	}
++	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: p.HideWindow, CreationFlags: p.CreationFlags}
++}
+--- /dev/null
++++ candidate/ui_plan.go
+@@ -0,0 +1,33 @@
++package main
++
++import "strings"
++
++// Pure launch decisions. The inherited PowerShell selection/probe is unchanged.
++const (
++	uiRouteNative         = "native"
++	uiRouteWPF            = "powershell-wpf"
++	createNoWindow uint32 = 0x08000000
++)
++
++func selectUIRoute(forceNative bool, shell, languageMode string) string {
++	if forceNative || shell == "" || !strings.EqualFold(languageMode, "FullLanguage") {
++		return uiRouteNative
++	}
++	return uiRouteWPF
++}
++
++func legacyUIArguments(script string) []string {
++	// Preserved snapshot contract, NOT a claim of completed policy hardening.
++	return []string{"-STA", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script}
++}
++
++type childPresentation struct {
++	HideWindow    bool
++	CreationFlags uint32
++}
++
++func presentationForChild(editableUI bool) childPresentation {
++	// Suppress the console, but do not give WPF an initial SW_HIDE.
++	// Generic CLI helpers retain snapshot behavior.
++	return childPresentation{HideWindow: !editableUI, CreationFlags: createNoWindow}
++}
+--- /dev/null
++++ candidate/ui_plan_test.go
+@@ -0,0 +1,113 @@
++package main
++
++import (
++	"os"
++	"path/filepath"
++	"reflect"
++	"testing"
++)
++
++func TestUIRouteContract(t *testing.T) {
++	cases := []struct {
++		name              string
++		force             bool
++		shell, mode, want string
++	}{
++		{"full", false, "powershell.exe", "FullLanguage", uiRouteWPF},
++		{"case", false, "powershell.exe", "fulllanguage", uiRouteWPF},
++		{"forced", true, "powershell.exe", "FullLanguage", uiRouteNative},
++		{"constrained", false, "powershell.exe", "ConstrainedLanguage", uiRouteNative},
++		{"restricted", false, "powershell.exe", "RestrictedLanguage", uiRouteNative},
++		{"none", false, "powershell.exe", "NoLanguage", uiRouteNative},
++		{"probe-empty", false, "powershell.exe", "", uiRouteNative},
++		{"no-exe", false, "", "FullLanguage", uiRouteNative},
++		{"ambiguous-output", false, "powershell.exe", "FullLanguage\nnoise", uiRouteNative},
++	}
++	for _, c := range cases {
++		t.Run(c.name, func(t *testing.T) {
++			if got := selectUIRoute(c.force, c.shell, c.mode); got != c.want {
++				t.Fatalf("got %s want %s", got, c.want)
++			}
++		})
++	}
++}
++
++func TestUIArgumentsAreSeparateAndFresh(t *testing.T) {
++	// Unicode, spaces and shell metacharacters remain one argv item.
++	script := `C:\PMM space\` + string(rune(0x6d4b)) + ` & name\Start-PalModMerger.ps1`
++	want := []string{"-STA", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script}
++	a := legacyUIArguments(script)
++	if !reflect.DeepEqual(a, want) {
++		t.Fatal(a)
++	}
++	a[0] = "changed"
++	if !reflect.DeepEqual(legacyUIArguments(script), want) {
++		t.Fatal("arguments shared between launches")
++	}
++}
++
++func TestWPFPresentationDiffersOnlyInHideWindow(t *testing.T) {
++	ui, cli := presentationForChild(true), presentationForChild(false)
++	if ui.HideWindow || !cli.HideWindow || ui.CreationFlags != 0x08000000 || cli.CreationFlags != ui.CreationFlags {
++		t.Fatalf("ui=%+v cli=%+v", ui, cli)
++	}
++}
++
++func TestUICommandPreservesSessionDirectoryStreamsAndArgv(t *testing.T) {
++	root := filepath.Join(t.TempDir(), "PMM space "+string(rune(0xf1)))
++	shell := filepath.Join(root, "WindowsPowerShell", "powershell.exe")
++	values := map[string]string{
++		"PMM_HOST_SESSION_ID": "fixture-session", "PMM_HOST_SESSION_DIR": filepath.Join(root, "Workspace", "State", "HostSessions", "fixture"),
++		"PMM_HOST_ROOT": root, "PMM_HOST_POWERSHELL": shell,
++	}
++	for k, v := range values {
++		t.Setenv(k, v)
++	}
++	cmd := legacyUICommand(root, SecurityStatus{PowerShell: shell})
++	if cmd.Process != nil {
++		t.Fatal("constructor must not start a process")
++	}
++	if cmd.Path != shell || cmd.Dir != root || cmd.Env != nil {
++		t.Fatal("command contract changed")
++	}
++	if cmd.Stdin != os.Stdin || cmd.Stdout != os.Stdout || cmd.Stderr != os.Stderr {
++		t.Fatal("streams must be inherited directly")
++	}
++	want := append([]string{shell}, legacyUIArguments(filepath.Join(root, "Modules", "Bootstrap", "Start-PalModMerger.ps1"))...)
++	if !reflect.DeepEqual(cmd.Args, want) {
++		t.Fatal(cmd.Args)
++	}
++	for k, v := range values {
++		found := false
++		for _, item := range cmd.Environ() {
++			if item == k+"="+v {
++				found = true
++			}
++		}
++		if !found {
++			t.Fatal("missing inherited field", k)
++		}
++	}
++}
++
++func TestMissingPowerShellDoesNotLaunch(t *testing.T) {
++	if rc := launchLegacyPowerShellUI(t.TempDir(), SecurityStatus{}); rc != 30 {
++		t.Fatal(rc)
++	}
++}
++
++func TestRuntimeStateSessionScopedAndCRLF(t *testing.T) {
++	dir := t.TempDir()
++	t.Setenv("PMM_HOST_SESSION_DIR", dir)
++	runtimeState("startup:runtime-ui-dispatch")
++	b, err := os.ReadFile(filepath.Join(dir, "state.txt"))
++	if err != nil || string(b) != "startup:runtime-ui-dispatch\r\n" {
++		t.Fatalf("%q %v", b, err)
++	}
++	t.Setenv("PMM_HOST_SESSION_DIR", "")
++	runtimeState("must-not-be-written")
++	b, _ = os.ReadFile(filepath.Join(dir, "state.txt"))
++	if string(b) != "startup:runtime-ui-dispatch\r\n" {
++		t.Fatal("state leaked across session")
++	}
++}

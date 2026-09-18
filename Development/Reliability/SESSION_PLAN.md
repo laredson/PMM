@@ -34,3 +34,11 @@ Windows explicito. REL-01 sigue abierto. Dividir 03 en 03A (fuente/build Runtime
 y 03B (comparacion Runtime). Despues, 02C resuelve H02B-04/05/06 del Host con el
 contrato UI ya conocido: origen HWND, sondeo acotado y drenaje/logs. 04 FixLab y
 05 Windows permanecen separados. No promocionar candidatos con bloqueos abiertos.
+
+## Actualizacion al cerrar 03A
+
+03A completada: 20 .go de candidata Runtime, go.mod, receta offline y evidencia,
+contrato UI y riesgos R03A-01..06. Dos builds finales identicos, 13 tests Go y 9
+Python. PMM/ y Host no cambian; paridad Windows no verificada. Siguiente 03B:
+comparacion detallada/gate Runtime, despues 02C para el acuerdo Host/UI. No
+confundir candidata compilable con componente autorizado para reemplazo.

@@ -1,0 +1,42 @@
+{
+  "schema": "PMM_RUNTIME_BASIC_COMPARISON_V1",
+  "originalSha256": "e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a",
+  "candidateSha256": "10effcaf7a5d02836104a5bb2bd90eeb52c755ac78fc4670b5eea11b235b938f",
+  "byteIdentical": false,
+  "equalRawSections": [
+    ".xdata",
+    ".idata",
+    ".symtab",
+    ".rsrc"
+  ],
+  "originalApplicationFunctionCount": 80,
+  "candidateApplicationFunctionCount": 81,
+  "onlyInOriginal": [],
+  "onlyInCandidate": [
+    "main.legacyUICommand"
+  ],
+  "originalGoVersion": "go1.23.2",
+  "candidateGoVersion": "go1.23.2",
+  "originalSettings": {
+    "-buildmode": "exe",
+    "-compiler": "gc",
+    "-trimpath": "true",
+    "CGO_ENABLED": "0",
+    "GOAMD64": "v1",
+    "GOARCH": "amd64",
+    "GOOS": "windows"
+  },
+  "candidateSettings": {
+    "-buildmode": "exe",
+    "-compiler": "gc",
+    "-trimpath": "true",
+    "CGO_ENABLED": "0",
+    "GOAMD64": "v1",
+    "GOARCH": "amd64",
+    "GOOS": "windows"
+  },
+  "sourceRecovered": false,
+  "functionalParityVerified": false,
+  "windowsExecuted": false,
+  "limit": "PE/buildinfo/pclntab only; names and raw section equality are not semantic equivalence."
+}

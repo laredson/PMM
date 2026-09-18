@@ -1,0 +1,48 @@
+?   	pmmruntime/tools	[no test files]
+=== RUN   TestCleanRelPathRejectsTraversal
+--- PASS: TestCleanRelPathRejectsTraversal (0.00s)
+=== RUN   TestZipRoundTrip
+--- PASS: TestZipRoundTrip (0.00s)
+=== RUN   TestZipManyFilesDoesNotLeakDescriptors
+--- PASS: TestZipManyFilesDoesNotLeakDescriptors (0.04s)
+=== RUN   TestZipRejectsSymlink
+--- PASS: TestZipRejectsSymlink (0.00s)
+=== RUN   TestZipCreateRejectsOutputInsideSource
+--- PASS: TestZipCreateRejectsOutputInsideSource (0.00s)
+=== RUN   TestZipExtractRejectsSymlinkEntry
+--- PASS: TestZipExtractRejectsSymlinkEntry (0.00s)
+=== RUN   TestZipExtractRejectsCaseCollidingFiles
+--- PASS: TestZipExtractRejectsCaseCollidingFiles (0.00s)
+=== RUN   TestUIRouteContract
+=== RUN   TestUIRouteContract/full
+=== RUN   TestUIRouteContract/case
+=== RUN   TestUIRouteContract/forced
+=== RUN   TestUIRouteContract/constrained
+=== RUN   TestUIRouteContract/restricted
+=== RUN   TestUIRouteContract/none
+=== RUN   TestUIRouteContract/probe-empty
+=== RUN   TestUIRouteContract/no-exe
+=== RUN   TestUIRouteContract/ambiguous-output
+--- PASS: TestUIRouteContract (0.00s)
+    --- PASS: TestUIRouteContract/full (0.00s)
+    --- PASS: TestUIRouteContract/case (0.00s)
+    --- PASS: TestUIRouteContract/forced (0.00s)
+    --- PASS: TestUIRouteContract/constrained (0.00s)
+    --- PASS: TestUIRouteContract/restricted (0.00s)
+    --- PASS: TestUIRouteContract/none (0.00s)
+    --- PASS: TestUIRouteContract/probe-empty (0.00s)
+    --- PASS: TestUIRouteContract/no-exe (0.00s)
+    --- PASS: TestUIRouteContract/ambiguous-output (0.00s)
+=== RUN   TestUIArgumentsAreSeparateAndFresh
+--- PASS: TestUIArgumentsAreSeparateAndFresh (0.00s)
+=== RUN   TestWPFPresentationDiffersOnlyInHideWindow
+--- PASS: TestWPFPresentationDiffersOnlyInHideWindow (0.00s)
+=== RUN   TestUICommandPreservesSessionDirectoryStreamsAndArgv
+--- PASS: TestUICommandPreservesSessionDirectoryStreamsAndArgv (0.00s)
+=== RUN   TestMissingPowerShellDoesNotLaunch
+PowerShell is unavailable; legacy UI cannot start.
+--- PASS: TestMissingPowerShellDoesNotLaunch (0.00s)
+=== RUN   TestRuntimeStateSessionScopedAndCRLF
+--- PASS: TestRuntimeStateSessionScopedAndCRLF (0.00s)
+PASS
+ok  	pmmruntime	0.049s

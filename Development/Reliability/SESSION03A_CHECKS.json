@@ -1,0 +1,113 @@
+{
+  "schema": "PMM_REL_SESSION03A_CHECKS_V1",
+  "date": "2026-09-18",
+  "inputCommit": "f52101800b92b696b0600bb3382f89292a926cc8",
+  "inputTree": "183cc346b14ca543d79059a0d74a18cd92453818",
+  "inputZipSha256": "9836bd0ac3e91d520ea2c691bdd0a80183ee54459d2efed24b2c876a921831e4",
+  "localTreeMatchedRemote": true,
+  "scopeStatus": "COMPLETE_SOURCE_BUILD_AND_UI_CONTRACT_ONLY",
+  "classification": "RECONSTRUCTION_NOT_ORIGINAL_RECOVERED",
+  "originalRuntimeSha256": "e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a",
+  "candidateRuntimeSha256": "10effcaf7a5d02836104a5bb2bd90eeb52c755ac78fc4670b5eea11b235b938f",
+  "candidateSizeBytes": 6366208,
+  "goVersion": "go1.23.2",
+  "buildHost": "linux/amd64",
+  "target": "windows/amd64",
+  "repeatBuildIdentical": true,
+  "differentOutputDirectories": true,
+  "snapshotGoFilesCopied": 18,
+  "candidateRootGoFiles": 20,
+  "copiedGoAndModFilesUnchanged": 16,
+  "copiedGoFilesModified": [
+    "nativeui.go",
+    "process_other.go",
+    "process_windows.go"
+  ],
+  "newRootGoFiles": [
+    "ui_plan.go",
+    "ui_plan_test.go"
+  ],
+  "goModelFixtureTestsPassed": 13,
+  "routeSubcasesPassed": 9,
+  "pythonToolTestsPassed": 9,
+  "basicComparison": {
+    "schema": "PMM_RUNTIME_BASIC_COMPARISON_V1",
+    "originalSha256": "e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a",
+    "candidateSha256": "10effcaf7a5d02836104a5bb2bd90eeb52c755ac78fc4670b5eea11b235b938f",
+    "byteIdentical": false,
+    "equalRawSections": [
+      ".xdata",
+      ".idata",
+      ".symtab",
+      ".rsrc"
+    ],
+    "originalApplicationFunctionCount": 80,
+    "candidateApplicationFunctionCount": 81,
+    "onlyInOriginal": [],
+    "onlyInCandidate": [
+      "main.legacyUICommand"
+    ],
+    "originalGoVersion": "go1.23.2",
+    "candidateGoVersion": "go1.23.2",
+    "originalSettings": {
+      "-buildmode": "exe",
+      "-compiler": "gc",
+      "-trimpath": "true",
+      "CGO_ENABLED": "0",
+      "GOAMD64": "v1",
+      "GOARCH": "amd64",
+      "GOOS": "windows"
+    },
+    "candidateSettings": {
+      "-buildmode": "exe",
+      "-compiler": "gc",
+      "-trimpath": "true",
+      "CGO_ENABLED": "0",
+      "GOAMD64": "v1",
+      "GOARCH": "amd64",
+      "GOOS": "windows"
+    },
+    "sourceRecovered": false,
+    "functionalParityVerified": false,
+    "windowsExecuted": false,
+    "limit": "PE/buildinfo/pclntab only; names and raw section equality are not semantic equivalence."
+  },
+  "packageIdentity": {
+    "scope": "static identity and checksum consistency only",
+    "version": "1.5.0.1",
+    "buildId": "PMM-v1.5.0.1-reliability-s01b",
+    "packageFiles": 629,
+    "checksumRows": 628,
+    "checksumMismatches": 0,
+    "pmmExecuted": false,
+    "antivirusScanned": false,
+    "sourceParityVerified": false,
+    "inputMode": "Git-tracked PMM files only"
+  },
+  "packageFilesUnchanged": 629,
+  "packageTreeUnchanged": "09df5c45aee3390c6b8ea235c8afa4e149a9f1fa",
+  "hostCandidateTreeUnchanged": "82aa50075129e6eb6b40d60dd745f3642ab32a5e",
+  "sourceSnapshotUnchanged": true,
+  "fixLabUnchanged": true,
+  "translationsUnchanged": true,
+  "workflowsUnchanged": true,
+  "originalSourceRecovered": false,
+  "functionalParityVerified": false,
+  "windowsArtifactsExecuted": false,
+  "packagedBinaryReplaced": false,
+  "authenticodeChainVerified": false,
+  "antivirusScanned": false,
+  "githubActionsDispatched": false,
+  "releaseCreated": false,
+  "nextSession": "03B: compare Runtime contracts and define Windows acceptance; do not edit Host",
+  "evidenceSha256": {
+    "evidence/basic-comparison.json": "15cfaa66537a60f3d96acb9e986403f2bdc34a2c66bbf03c8ec7f124f9c7926e",
+    "evidence/build-report.json": "22edbb06f38c7ce265e83c38f7449792f9f72ea1b7e2af5dad707f7caec92363",
+    "evidence/from-snapshot.patch": "d27a989b5a45dfa6dbf5361e7ad60ef29b579b9f79e50a8047b00ff13ddc18af",
+    "evidence/go-model-tests.txt": "7b6aba65200272f5620601f7bf99dfe0fcdf81cc65a1d9d0307b2d53437e4973",
+    "evidence/pe-sections.json": "d357fb546793f487431dd900afb2ebc56c3a251659f04c95a0c4e83cd569eb61",
+    "evidence/python-tool-tests.txt": "92e82d857039a9356b56eee43ed778244da98461c33cc3886502045d1b8f8eb3",
+    "evidence/repeat-build.json": "60313fd73a9211ca21a6cd06ddc3bb59058ac0c485465f07ccdc1002aebd6865",
+    "evidence/source-provenance.json": "f727004e4be0e98b323140ecf5d37c165c235517bd88fb4d0d29a9c9734839db"
+  }
+}

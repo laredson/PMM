@@ -1,0 +1,147 @@
+{
+  "schema": "PMM_RUNTIME_CANDIDATE_BUILD_V1",
+  "session": "03A",
+  "classification": "RECONSTRUCTION_NOT_ORIGINAL_RECOVERED",
+  "goVersion": "go1.23.2",
+  "buildHost": "linux/amd64",
+  "target": "windows/amd64",
+  "sourceSha256": {
+    "archive.go": "12f342a4c5019e59abf6e1427e49a6f65b2232d63923ef0b7f321d7ab1899070",
+    "build.py": "c655d9b07b9b84fb294353570093f2697328b88444ec9ce3a6de219603711848",
+    "deps.go": "6c5689230e5885271085a39ea0e442f774fd72121b24fa83e0611acff17ddcf3",
+    "doctor.go": "f6d59e815f91368d33d4560998da3d25fbe833ebdea96e6d7f4426c2e2cc3361",
+    "game.go": "e2647af24fe6df89ec4d1d5de905b85a9e7d20b81f57193ad3c4377666835d83",
+    "go.mod": "040d48cc0286c8188083a9337f138204a675f4005a7cc36a33398b562d2a596f",
+    "inspect_pe.py": "e67e18a81280434be1b353515b9ea277c74c6e8b73410596558bdac697c98eed",
+    "knowledge.go": "dbbdfb47d0b25423f86316702ff3d62ef8d1eec3c6ef2eea4168402f72647d50",
+    "main.go": "11fb22503144a70e67356fa4ee6ae63cae6c9578e3986d4ae3f31b2308426e08",
+    "manifest.go": "76d21cdb3d3fda5176648cb69871fd19d51f0348d5e3acbb9c2310f46220e74c",
+    "native_shell_model.go": "831a6ec8fea94751ea03c3148f57fd28fca753021637d4e329fd206e12359e1a",
+    "native_shell_other.go": "6be7a6104d8cafe1518d13fb92f897a38b1cb63f0ff87189c44e71a59605cecc",
+    "native_shell_windows.go": "a0f10a18c856a032735c4388929cf24b4ac09c6654b0c6aac1051d5bf5b7b06f",
+    "nativeui.go": "35172f3e72443a5a43c9465be14ad467fc470776a49a65ee8f379202f945dda6",
+    "notify_other.go": "a3798566fdc29f4a3c64084418aa00f775039ef467e73824c2f26da0031cb0a5",
+    "notify_windows.go": "d19c65e5f6c0d413b02cc1d8fc3b498aa15afe8df8dbaccb7914a6ffe65be695",
+    "process.go": "5e97b790d3ddf9a4c64483aab79f3722838a7a4737ba6a43ed836903aa678416",
+    "process_other.go": "f5f2dd1443e075bfcbd5272261fdad9bb2708a3cab9f6f8171f9a0bca8657746",
+    "process_windows.go": "172d4ed8c7c941c9503ff749db801fb47014d172c185c3971667ed66dce7c84a",
+    "runtime_test.go": "ca7061f3e18a6cc8283736ef49be95136d43f16f59dc3c064e22072171f29a16",
+    "test_tools.py": "5d53648c4d2ee9521ec2ee6b5d330178797128bd5328c7a9e51fb3086bfb868c",
+    "tools/runtime_meta.go": "f71a5508a16dfc6c037234c9dfc05ab22522b885056d39be10f7e4bdab9a1f7c",
+    "ui_plan.go": "742cdedb21b586bb65ab1f6a70022480936d9a4009e233b64f7b1dde3a48bbb4",
+    "ui_plan_test.go": "f9645a2c464af1c87227926e14eaa6b87704a05629bb65120a89f7f887ca98bb",
+    "util.go": "0fc3aa90a13f4a4cd137ee02c094b4871add90d55aabf71fc71f0342393021c9"
+  },
+  "iconSha256": "6037c135e7651ac9bc799c8ba0d43c0be53021cb88def6649171709fe80a00fe",
+  "peIconHelperSha256": "ca2d070517d943936aae58855ebb98d9ceac87a861dd1b390405890cde2efd5d",
+  "originalSha256": "e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a",
+  "candidateSha256": "10effcaf7a5d02836104a5bb2bd90eeb52c755ac78fc4670b5eea11b235b938f",
+  "candidateSizeBytes": 6366208,
+  "commands": [
+    {
+      "command": [
+        "go",
+        "version"
+      ],
+      "exitCode": 0,
+      "stdout": "go version go1.23.2 linux/amd64\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "env",
+        "GOHOSTOS",
+        "GOHOSTARCH"
+      ],
+      "exitCode": 0,
+      "stdout": "linux\namd64\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "build",
+        "-trimpath",
+        "-buildvcs=false",
+        "-ldflags=-s -w",
+        "-o",
+        "<OUT>/PMMRuntime-candidate.exe",
+        "."
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "build",
+        "-trimpath",
+        "-buildvcs=false",
+        "-o",
+        "<OUT>/peicon-helper",
+        "<REPO>/Development/Source/PEIcon/inject.go"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<OUT>/peicon-helper",
+        "-exe",
+        "<OUT>/PMMRuntime-candidate.exe",
+        "-ico",
+        "<REPO>/PMM/Resources/UI/PMM.ico"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "build",
+        "-trimpath",
+        "-buildvcs=false",
+        "-o",
+        "<OUT>/runtime-meta",
+        "<OUT>/source/tools/runtime_meta.go"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<OUT>/runtime-meta",
+        "<REPO>/PMM/Engine/PMMRuntime.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "<see original-go.json>",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<OUT>/runtime-meta",
+        "<OUT>/PMMRuntime-candidate.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "<see candidate-go.json>",
+      "stderr": ""
+    }
+  ],
+  "evidenceSha256": {
+    "basic-comparison.json": "15cfaa66537a60f3d96acb9e986403f2bdc34a2c66bbf03c8ec7f124f9c7926e",
+    "candidate-go.json": "72ef1c8bd2039d93ba1a98dc786c57fd5fbc8a1f598ec55630234ad6ae20a584",
+    "candidate-pe.json": "1e660bd845d9ccf5b6f6aa5507d41e150a726312c4172e5009f305985e8bb171",
+    "original-go.json": "36e04da45adb63b7e888bf305b409a8bb565664a57f85181f9ffc7b42bfc281f",
+    "original-pe.json": "9fd4f205d36c95b62557602f76ce200ea3ae82b0b8d7121a16e653a26dd2354a"
+  },
+  "candidateExecuted": false,
+  "packagedBinaryReplaced": false,
+  "functionalParityVerified": false,
+  "antivirusScanned": false,
+  "warning": "Candidate only. Not a release or Windows acceptance."
+}

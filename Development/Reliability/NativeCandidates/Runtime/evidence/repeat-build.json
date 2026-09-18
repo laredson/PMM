@@ -1,0 +1,13 @@
+{
+  "schema": "PMM_RUNTIME_REPEAT_BUILD_V1",
+  "session": "03A",
+  "goVersion": "go1.23.2",
+  "buildHost": "linux/amd64",
+  "candidateSha256": "10effcaf7a5d02836104a5bb2bd90eeb52c755ac78fc4670b5eea11b235b938f",
+  "secondCandidateSha256": "10effcaf7a5d02836104a5bb2bd90eeb52c755ac78fc4670b5eea11b235b938f",
+  "differentOutputDirectories": true,
+  "byteIdentical": true,
+  "sourceHashesEqual": true,
+  "crossHostReproducibilityVerified": false,
+  "candidateExecuted": false
+}

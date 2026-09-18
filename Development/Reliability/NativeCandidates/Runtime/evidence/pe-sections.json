@@ -1,0 +1,150 @@
+{
+  "original": {
+    "sha256": "e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a",
+    "sizeBytes": 6365184,
+    "machine": "amd64",
+    "subsystem": 3,
+    "certificateTableBytes": 0,
+    "sections": [
+      {
+        "name": ".text",
+        "rva": 4096,
+        "virtualSize": 2929030,
+        "rawSize": 2929152,
+        "sha256": "287c8b49dd2f9314d500da434fc7a19eb3ac24b015b95bee2d86160cc2b54c7d"
+      },
+      {
+        "name": ".rdata",
+        "rva": 2936832,
+        "virtualSize": 2927512,
+        "rawSize": 2927616,
+        "sha256": "3596e50991c46f4d6b6d32e5d0bb12f7965b771daf9424b135bae5cb561a728b"
+      },
+      {
+        "name": ".data",
+        "rva": 5865472,
+        "virtualSize": 596480,
+        "rawSize": 277504,
+        "sha256": "b6b257e63a5cca65810fa4ccda299ae49dae0b033a5e35c3cb5bdd2ffea65cb8"
+      },
+      {
+        "name": ".pdata",
+        "rva": 6463488,
+        "virtualSize": 65376,
+        "rawSize": 65536,
+        "sha256": "51553461e172e26cdab6f2e9e452d4b9562e4786fff75a7124cf3731e8932ade"
+      },
+      {
+        "name": ".xdata",
+        "rva": 6529024,
+        "virtualSize": 180,
+        "rawSize": 512,
+        "sha256": "f6e98c1402a7ed9660dcdda13eede96d2a541f4e6307346290c8cbd37dd892be"
+      },
+      {
+        "name": ".idata",
+        "rva": 6533120,
+        "virtualSize": 1342,
+        "rawSize": 1536,
+        "sha256": "180f7247bdaf0893653ea9aab938de03ea23ef7a0aaad8059c3693487257ed96"
+      },
+      {
+        "name": ".reloc",
+        "rva": 6537216,
+        "virtualSize": 53388,
+        "rawSize": 53760,
+        "sha256": "7bb6287adab848f0a7a4eb2323d5508a19e247cd384d146dcd6a61963c5137a8"
+      },
+      {
+        "name": ".symtab",
+        "rva": 6594560,
+        "virtualSize": 4,
+        "rawSize": 512,
+        "sha256": "3e67f4a7d14b832ff2a2433e9cf0f6f5720821f67148a87c0ee2595a20c96c68"
+      },
+      {
+        "name": ".rsrc",
+        "rva": 6598656,
+        "virtualSize": 107112,
+        "rawSize": 107520,
+        "sha256": "a95832a05a5a139d84e442dbe6c9f3704e421440cd73f2534c88a5c9bb51def5"
+      }
+    ],
+    "executed": false,
+    "authenticodeChainVerified": false
+  },
+  "candidate": {
+    "sha256": "10effcaf7a5d02836104a5bb2bd90eeb52c755ac78fc4670b5eea11b235b938f",
+    "sizeBytes": 6366208,
+    "machine": "amd64",
+    "subsystem": 3,
+    "certificateTableBytes": 0,
+    "sections": [
+      {
+        "name": ".text",
+        "rva": 4096,
+        "virtualSize": 2929190,
+        "rawSize": 2929664,
+        "sha256": "afbf9f9fc841fef1a7e0113501226bef62551f3528c7a860b0d9580a6497d3fe"
+      },
+      {
+        "name": ".rdata",
+        "rva": 2936832,
+        "virtualSize": 2928056,
+        "rawSize": 2928128,
+        "sha256": "fa6829a15b130bf4e71bbb15742b84770663ee7367efcf51e6e4bffd8cf2ab70"
+      },
+      {
+        "name": ".data",
+        "rva": 5865472,
+        "virtualSize": 596480,
+        "rawSize": 277504,
+        "sha256": "3ae20d636637a432ca841ea19ceb0db113e3c6e3991253e1e1dc049ebabd1262"
+      },
+      {
+        "name": ".pdata",
+        "rva": 6463488,
+        "virtualSize": 65388,
+        "rawSize": 65536,
+        "sha256": "85b18b676acc5f4647ed542c7daffe1af87ad3f4b2a345c1abff921038117621"
+      },
+      {
+        "name": ".xdata",
+        "rva": 6529024,
+        "virtualSize": 180,
+        "rawSize": 512,
+        "sha256": "f6e98c1402a7ed9660dcdda13eede96d2a541f4e6307346290c8cbd37dd892be"
+      },
+      {
+        "name": ".idata",
+        "rva": 6533120,
+        "virtualSize": 1342,
+        "rawSize": 1536,
+        "sha256": "180f7247bdaf0893653ea9aab938de03ea23ef7a0aaad8059c3693487257ed96"
+      },
+      {
+        "name": ".reloc",
+        "rva": 6537216,
+        "virtualSize": 53392,
+        "rawSize": 53760,
+        "sha256": "a222caa0f5ec891b0dc88ce9594ce5ac82ba4d0f7650fe3a6e4e42546218dea4"
+      },
+      {
+        "name": ".symtab",
+        "rva": 6594560,
+        "virtualSize": 4,
+        "rawSize": 512,
+        "sha256": "3e67f4a7d14b832ff2a2433e9cf0f6f5720821f67148a87c0ee2595a20c96c68"
+      },
+      {
+        "name": ".rsrc",
+        "rva": 6598656,
+        "virtualSize": 107112,
+        "rawSize": 107520,
+        "sha256": "a95832a05a5a139d84e442dbe6c9f3704e421440cd73f2534c88a5c9bb51def5"
+      }
+    ],
+    "executed": false,
+    "authenticodeChainVerified": false
+  }
+}

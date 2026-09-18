@@ -1,34 +1,35 @@
-# Estado de v1.5.0.1 - cierre 02B
+# Estado de v1.5.0.1 - cierre 03A
 
-**02B CERRADA para comparacion y gate; REL-01 NO cerrado.** 2026-09-18.
-Entrada: baa063933c8940a7654d3350f728a81ed967f92c.
-Retomar NEXT_SESSION.md: 03A, candidato Runtime aislado.
+**03A CERRADA: candidata Runtime, receta, evidencia basica y contrato UI.**
+Fecha: 2026-09-18. Entrada: f52101800b92b696b0600bb3382f89292a926cc8.
+Retomar NEXT_SESSION.md: 03B, solo comparacion/gate Runtime.
 
 | Area | Estado | Siguiente accion |
 | --- | --- | --- |
-| Identidad REL-02 / 01B | Conservada: 1.5.0.1 / s01b, 629 archivos y 628 hashes correctos | No repetir; mantener |
-| Host 02A/02B | S02A reproducido; S02B con correcciones y comparacion persistidas | 02C: bloqueos origen HWND/sondeo/drenaje; 05: Windows |
-| Runtime | Fuente/paridad pendiente | 03A fuente/build; 03B comparacion |
-| FixLab | Fuente/paridad pendiente | 04 |
-| Hardening/distribucion | No terminado | Tandas de dependencias/procesos/recursos/firma despues de base verificable |
-| Traducciones | No modificadas ni fusionadas | Integracion autorizada posterior |
+| Identidad REL-02 / 01B | Conservada: 1.5.0.1 / s01b; 629 archivos y 628 hashes correctos | Mantener, no repetir |
+| Host 02A/02B | Fuente candidata S02B conservada, sin cambios en 03A | 02C bloqueos H02B-04/05/06; 05 Windows |
+| Runtime 03A | Fuente candidata RECONSTRUCTION compilada y guardada; no original recuperado | 03B contratos/gate; sin sustitucion |
+| FixLab | Fuente/paridad pendientes | 04 |
+| Hardening/distribucion | No terminado | 06..12 despues de base verificable |
+| Traducciones | Intactas y sin fusion | Integracion autorizada posterior |
 
-S02B: SHA-256 a5f50c5677608c9875eefb65fe75fd7efb3460808be2f53df7ea3ec6db195d97.
-Dos builds en salidas distintas fueron byte-identicos en el entorno registrado.
-Nueve tests Go del modelo (16 subcasos HWND previos) y trece tests Python pasaron.
-El original y candidato NO son identicos; .text difiere. La tabla Go pclntab
-mapea funciones reales, no prueba semantica ni recupera fuente original.
+Runtime S03A: SHA-256 10effcaf7a5d02836104a5bb2bd90eeb52c755ac78fc4670b5eea11b235b938f.
+Dos builds en rutas distintas son identicos en Linux/amd64 Go1.23.2. Pasaron 13
+funciones de test Go (9 subcasos de ruta) y 9 tests Python de herramientas.
+No se ejecutaron EXE Windows, WPF, PowerShell, PMM ni antivirus. La comparacion
+PE/pclntab es estatica: original y candidata son diferentes, incluida .text.
 
-Corregido solo en candidata: framing LF/CRLF, rechazo de registros parciales,
-prioridad cierre/fallo sobre ready y chequeo de foco antes de ShowWindowAsync.
-Siguen bloqueando promocion H02B-04/05/06 (origen del HWND, timeout/seleccion PS,
-lectura de pipes/logs). Las carreras y apariencia reales esperan Windows.
+Cambio funcional candidato limitado: WPF ya no recibe HideWindow/SW_HIDE;
+conserva CREATE_NO_WINDOW. Modelo de ruta/argv/entorno/streams comprobado con
+fixtures. Seleccion/sondeo PowerShell, dependencias, root y lifecycle se conservan
+con riesgos documentados R03A-01..06; no estan resueltos por extraer el modelo.
+El acuerdo de autenticacion del HWND con Host queda propuesto, no implementado.
 
-Los 629 archivos PMM/, el snapshot Development/Source/, Runtime/FixLab, idiomas
-y workflows permanecen identicos. No se ejecutaron PMM/candidata Windows/WPF,
-no hay escaneo AV, instalacion, firma, release/tag/PR ni CI remoto solicitado.
-Los tests son de herramientas/modelos, NO paridad del programa en Windows.
+Todos los archivos del paquete, Host candidato y snapshot historico permanecen
+intactos. REL-01 NO cerrado; SOURCE_STATUS.md sigue vigente. No hay instalacion,
+firma, PR, tag, release o CI remoto solicitado. Cada informe anterior permanece
+historico; no atribuir a S03A resultados de otras candidatas.
 
-SESSION02B_FINDINGS.md, SESSION02B_CHECKS.json, WINDOWS_HOST_ACCEPTANCE.md y
-NativeCandidates/Host/evidence/s02b/ guardan evidencia y limites. Los registros
-02A/01B se conservan historicos; no se atribuyen sus resultados a la nueva candidata.
+SESSION03A_FINDINGS.md, SESSION03A_CHECKS.json y NativeCandidates/Runtime/evidence/
+conservan el cierre. NativeCandidates/Runtime/UI_PROCESS_CONTRACT.md detalla el
+contrato real de fuente, riesgos y requisitos para 03B/02C.

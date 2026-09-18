@@ -1,0 +1,126 @@
+{
+  "schema": "PMM_RUNTIME_SOURCE_PROVENANCE_V1",
+  "inputCommit": "f52101800b92b696b0600bb3382f89292a926cc8",
+  "classification": "RECONSTRUCTION_NOT_ORIGINAL_RECOVERED",
+  "snapshotFiles": [
+    {
+      "file": "archive.go",
+      "snapshotSha256": "12f342a4c5019e59abf6e1427e49a6f65b2232d63923ef0b7f321d7ab1899070",
+      "candidateSha256": "12f342a4c5019e59abf6e1427e49a6f65b2232d63923ef0b7f321d7ab1899070",
+      "byteIdentical": true
+    },
+    {
+      "file": "deps.go",
+      "snapshotSha256": "6c5689230e5885271085a39ea0e442f774fd72121b24fa83e0611acff17ddcf3",
+      "candidateSha256": "6c5689230e5885271085a39ea0e442f774fd72121b24fa83e0611acff17ddcf3",
+      "byteIdentical": true
+    },
+    {
+      "file": "doctor.go",
+      "snapshotSha256": "f6d59e815f91368d33d4560998da3d25fbe833ebdea96e6d7f4426c2e2cc3361",
+      "candidateSha256": "f6d59e815f91368d33d4560998da3d25fbe833ebdea96e6d7f4426c2e2cc3361",
+      "byteIdentical": true
+    },
+    {
+      "file": "game.go",
+      "snapshotSha256": "e2647af24fe6df89ec4d1d5de905b85a9e7d20b81f57193ad3c4377666835d83",
+      "candidateSha256": "e2647af24fe6df89ec4d1d5de905b85a9e7d20b81f57193ad3c4377666835d83",
+      "byteIdentical": true
+    },
+    {
+      "file": "go.mod",
+      "snapshotSha256": "040d48cc0286c8188083a9337f138204a675f4005a7cc36a33398b562d2a596f",
+      "candidateSha256": "040d48cc0286c8188083a9337f138204a675f4005a7cc36a33398b562d2a596f",
+      "byteIdentical": true
+    },
+    {
+      "file": "knowledge.go",
+      "snapshotSha256": "dbbdfb47d0b25423f86316702ff3d62ef8d1eec3c6ef2eea4168402f72647d50",
+      "candidateSha256": "dbbdfb47d0b25423f86316702ff3d62ef8d1eec3c6ef2eea4168402f72647d50",
+      "byteIdentical": true
+    },
+    {
+      "file": "main.go",
+      "snapshotSha256": "11fb22503144a70e67356fa4ee6ae63cae6c9578e3986d4ae3f31b2308426e08",
+      "candidateSha256": "11fb22503144a70e67356fa4ee6ae63cae6c9578e3986d4ae3f31b2308426e08",
+      "byteIdentical": true
+    },
+    {
+      "file": "manifest.go",
+      "snapshotSha256": "76d21cdb3d3fda5176648cb69871fd19d51f0348d5e3acbb9c2310f46220e74c",
+      "candidateSha256": "76d21cdb3d3fda5176648cb69871fd19d51f0348d5e3acbb9c2310f46220e74c",
+      "byteIdentical": true
+    },
+    {
+      "file": "native_shell_model.go",
+      "snapshotSha256": "831a6ec8fea94751ea03c3148f57fd28fca753021637d4e329fd206e12359e1a",
+      "candidateSha256": "831a6ec8fea94751ea03c3148f57fd28fca753021637d4e329fd206e12359e1a",
+      "byteIdentical": true
+    },
+    {
+      "file": "native_shell_other.go",
+      "snapshotSha256": "6be7a6104d8cafe1518d13fb92f897a38b1cb63f0ff87189c44e71a59605cecc",
+      "candidateSha256": "6be7a6104d8cafe1518d13fb92f897a38b1cb63f0ff87189c44e71a59605cecc",
+      "byteIdentical": true
+    },
+    {
+      "file": "native_shell_windows.go",
+      "snapshotSha256": "a0f10a18c856a032735c4388929cf24b4ac09c6654b0c6aac1051d5bf5b7b06f",
+      "candidateSha256": "a0f10a18c856a032735c4388929cf24b4ac09c6654b0c6aac1051d5bf5b7b06f",
+      "byteIdentical": true
+    },
+    {
+      "file": "nativeui.go",
+      "snapshotSha256": "773e632f592896079f820cf28e87e884abad5dfb35b6768a3e35f35f1e1a27f9",
+      "candidateSha256": "35172f3e72443a5a43c9465be14ad467fc470776a49a65ee8f379202f945dda6",
+      "byteIdentical": false
+    },
+    {
+      "file": "notify_other.go",
+      "snapshotSha256": "a3798566fdc29f4a3c64084418aa00f775039ef467e73824c2f26da0031cb0a5",
+      "candidateSha256": "a3798566fdc29f4a3c64084418aa00f775039ef467e73824c2f26da0031cb0a5",
+      "byteIdentical": true
+    },
+    {
+      "file": "notify_windows.go",
+      "snapshotSha256": "d19c65e5f6c0d413b02cc1d8fc3b498aa15afe8df8dbaccb7914a6ffe65be695",
+      "candidateSha256": "d19c65e5f6c0d413b02cc1d8fc3b498aa15afe8df8dbaccb7914a6ffe65be695",
+      "byteIdentical": true
+    },
+    {
+      "file": "process.go",
+      "snapshotSha256": "5e97b790d3ddf9a4c64483aab79f3722838a7a4737ba6a43ed836903aa678416",
+      "candidateSha256": "5e97b790d3ddf9a4c64483aab79f3722838a7a4737ba6a43ed836903aa678416",
+      "byteIdentical": true
+    },
+    {
+      "file": "process_other.go",
+      "snapshotSha256": "28a857c0165221f8f3657bab76156b67cfc3e6bef67d2150740cba31d02d6f7e",
+      "candidateSha256": "f5f2dd1443e075bfcbd5272261fdad9bb2708a3cab9f6f8171f9a0bca8657746",
+      "byteIdentical": false
+    },
+    {
+      "file": "process_windows.go",
+      "snapshotSha256": "62a0ef0d9abe2478b52fa12ea9f6612f69eb499dc0cfb7b8b176448a2a70cfbc",
+      "candidateSha256": "172d4ed8c7c941c9503ff749db801fb47014d172c185c3971667ed66dce7c84a",
+      "byteIdentical": false
+    },
+    {
+      "file": "runtime_test.go",
+      "snapshotSha256": "ca7061f3e18a6cc8283736ef49be95136d43f16f59dc3c064e22072171f29a16",
+      "candidateSha256": "ca7061f3e18a6cc8283736ef49be95136d43f16f59dc3c064e22072171f29a16",
+      "byteIdentical": true
+    },
+    {
+      "file": "util.go",
+      "snapshotSha256": "0fc3aa90a13f4a4cd137ee02c094b4871add90d55aabf71fc71f0342393021c9",
+      "candidateSha256": "0fc3aa90a13f4a4cd137ee02c094b4871add90d55aabf71fc71f0342393021c9",
+      "byteIdentical": true
+    }
+  ],
+  "newRootGoFiles": [
+    "ui_plan.go",
+    "ui_plan_test.go"
+  ],
+  "copiedBuildWrappers": false
+}
