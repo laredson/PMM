@@ -26,3 +26,11 @@ Leer HEAD y NEXT_SESSION al entrar. Fijar entrada/alcance. Trabajar sin Actions.
 Cada fila admite subdivisiones A/B si aparece una dependencia real. Mantener 1.5.0.1 como objetivo y distinguir tandas con BUILD_ID; no cambiar la version de .NET, PMMCore o FixLab al cambiar la version del producto.
 
 Las validaciones auxiliares de scripts de mantenimiento usan fixtures y se etiquetan como tales. No sustituyen pruebas del programa, aprobacion humana ni resultados antivirus. No exigir un falso resultado global PASS para poder guardar un checkpoint honesto.
+
+## Actualizacion al cerrar 02B
+
+02B completada: comparacion estatica reproducible, correcciones acotadas y gate
+Windows explicito. REL-01 sigue abierto. Dividir 03 en 03A (fuente/build Runtime)
+y 03B (comparacion Runtime). Despues, 02C resuelve H02B-04/05/06 del Host con el
+contrato UI ya conocido: origen HWND, sondeo acotado y drenaje/logs. 04 FixLab y
+05 Windows permanecen separados. No promocionar candidatos con bloqueos abiertos.

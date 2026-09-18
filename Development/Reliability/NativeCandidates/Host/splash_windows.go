@@ -149,12 +149,14 @@ func (s *startupSplash) HandoffTo(target uintptr) {
 	}
 	// Do not attach input queues, synthesize keystrokes, force TOPMOST, or
 	// change foreground-lock settings. Windows retains the final decision.
-	spShowAsync.Call(target, 5) // SW_SHOW, asynchronous across process boundaries.
 	foreground, _, _ := spForeground.Call()
 	if foreground != s.window {
 		s.log("UI ready; focus left unchanged because splash is not foreground.")
 		return
 	}
+	// Check foreground BEFORE SW_SHOW too: it is itself a window action.
+	// IsWindow still does not authenticate the target process; see the 02B gate.
+	spShowAsync.Call(target, 5) // SW_SHOW, asynchronous across process boundaries.
 	ok, _, _ := spSetForeground.Call(target)
 	if ok == 0 {
 		s.log("Windows declined the foreground handoff; UI remains available.")
@@ -194,7 +196,7 @@ func (s *startupSplash) run() {
 	instance, _, _ := spModule.Call(0)
 	icon, _, _ := spIcon.Call(instance, 1)  // Same RT_GROUP_ICON as the historical build helper.
 	cursor, _, _ := spCursor.Call(0, 32512) // IDC_ARROW, shared resource.
-	name := splashUTF16("PMMStartupSplashCandidate02A")
+	name := splashUTF16("PMMStartupSplashCandidate02B")
 	callback := syscall.NewCallback(s.windowProc)
 	class := splashClass{
 		Size: uint32(unsafe.Sizeof(splashClass{})), WndProc: callback,
@@ -289,18 +291,23 @@ func (s *startupSplash) windowProc(hwnd uintptr, message uint32, wParam, lParam 
 		s.mu.Lock()
 		view := s.view
 		s.mu.Unlock()
-		if view.Ready {
-			// Handoff must precede splash destruction, as required by the WPF contract.
+		stopping := false
+		select {
+		case <-s.stop:
+			stopping = true
+		default:
+		}
+		switch nextStartupAction(view, stopping) {
+		case startupClose:
+			spDestroy.Call(hwnd)
+			return 0
+		case startupHandoff:
+			// Only a live readiness decision may attempt handoff.
 			s.HandoffTo(view.Window)
 			spDestroy.Call(hwnd)
 			return 0
 		}
-		select {
-		case <-s.stop:
-			spDestroy.Call(hwnd)
-			return 0
-		default:
-		}
+
 		if s.label != 0 {
 			label := splashUTF16(view.Label)
 			spSetText.Call(s.label, uintptr(unsafe.Pointer(label)))

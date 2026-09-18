@@ -1,0 +1,52 @@
+=== RUN   TestStartupWindowHandle
+=== RUN   TestStartupWindowHandle/decimal
+=== RUN   TestStartupWindowHandle/crlf
+=== RUN   TestStartupWindowHandle/bom
+=== RUN   TestStartupWindowHandle/leading-zero
+=== RUN   TestStartupWindowHandle/missing
+=== RUN   TestStartupWindowHandle/zero
+=== RUN   TestStartupWindowHandle/negative
+=== RUN   TestStartupWindowHandle/plus
+=== RUN   TestStartupWindowHandle/hex
+=== RUN   TestStartupWindowHandle/expression
+=== RUN   TestStartupWindowHandle/overflow
+=== RUN   TestStartupWindowHandle/signed-overflow
+=== RUN   TestStartupWindowHandle/wrong-prefix
+=== RUN   TestStartupWindowHandle/partial
+=== RUN   TestStartupWindowHandle/embedded-newline
+=== RUN   TestStartupWindowHandle/fallback
+--- PASS: TestStartupWindowHandle (0.00s)
+    --- PASS: TestStartupWindowHandle/decimal (0.00s)
+    --- PASS: TestStartupWindowHandle/crlf (0.00s)
+    --- PASS: TestStartupWindowHandle/bom (0.00s)
+    --- PASS: TestStartupWindowHandle/leading-zero (0.00s)
+    --- PASS: TestStartupWindowHandle/missing (0.00s)
+    --- PASS: TestStartupWindowHandle/zero (0.00s)
+    --- PASS: TestStartupWindowHandle/negative (0.00s)
+    --- PASS: TestStartupWindowHandle/plus (0.00s)
+    --- PASS: TestStartupWindowHandle/hex (0.00s)
+    --- PASS: TestStartupWindowHandle/expression (0.00s)
+    --- PASS: TestStartupWindowHandle/overflow (0.00s)
+    --- PASS: TestStartupWindowHandle/signed-overflow (0.00s)
+    --- PASS: TestStartupWindowHandle/wrong-prefix (0.00s)
+    --- PASS: TestStartupWindowHandle/partial (0.00s)
+    --- PASS: TestStartupWindowHandle/embedded-newline (0.00s)
+    --- PASS: TestStartupWindowHandle/fallback (0.00s)
+=== RUN   TestStageSequenceDoesNotTreatFirstPaintAsReady
+--- PASS: TestStageSequenceDoesNotTreatFirstPaintAsReady (0.00s)
+=== RUN   TestIncompleteOrUnknownStatesCannotRetireSplash
+--- PASS: TestIncompleteOrUnknownStatesCannotRetireSplash (0.00s)
+=== RUN   TestFailureIsNotReadyAndDoesNotGetOverwritten
+--- PASS: TestFailureIsNotReadyAndDoesNotGetOverwritten (0.00s)
+=== RUN   TestFallbackAndReadyAreTerminal
+--- PASS: TestFallbackAndReadyAreTerminal (0.00s)
+=== RUN   TestCompleteRecordsRejectPartialHandleAndMultipleRecords
+--- PASS: TestCompleteRecordsRejectPartialHandleAndMultipleRecords (0.00s)
+=== RUN   TestTerminalStateInvalidatesReadyAndCannotReopen
+--- PASS: TestTerminalStateInvalidatesReadyAndCannotReopen (0.00s)
+=== RUN   TestStopWinsOverReadinessAtDecision
+--- PASS: TestStopWinsOverReadinessAtDecision (0.00s)
+=== RUN   TestPartialExitIsNotTerminal
+--- PASS: TestPartialExitIsNotTerminal (0.00s)
+PASS
+ok  	command-line-arguments	0.002s

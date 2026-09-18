@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build S02A OUTSIDE the checkout, offline. Never execute/install the Host candidate."""
+"""Build S02B OUTSIDE the checkout, offline. Never execute/install the Host candidate."""
 from pathlib import Path
 import argparse
 import difflib
@@ -93,7 +93,7 @@ def main():
         if not any(s['name'] == '.rsrc' for s in candidate_report['sections']):
             raise ValueError('Candidate icon resources are missing')
         report = {
-            'schema': 'PMM_HOST_CANDIDATE_BUILD_V1', 'session': '02A',
+            'schema': 'PMM_HOST_CANDIDATE_BUILD_V1', 'session': '02B',
             'classification': 'RECONSTRUCTION_NOT_ORIGINAL_RECOVERED',
             'goVersion': GO_VERSION, 'buildHost': host_os+'/'+host_arch,
             'target': 'windows/amd64', 'sourceSha256': input_hashes,

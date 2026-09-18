@@ -54,7 +54,7 @@ func TestStageSequenceDoesNotTreatFirstPaintAsReady(t *testing.T) {
 func TestIncompleteOrUnknownStatesCannotRetireSplash(t *testing.T) {
 	view := nextStartupView(startupView{}, "startup:UI-window-created")
 	for _, state := range []string{"", "random-ready", "startup:UI-shell-ready:", "startup:UI-shell-ready:0",
-		"startup:UI-shell-ready:abc", "startup:UI-closed-normally", "startup:security"} {
+		"startup:UI-shell-ready:abc", "startup:security"} {
 		if got := nextStartupView(view, state); got != view {
 			t.Fatalf("state %q changed view to %+v", state, got)
 		}
@@ -80,5 +80,68 @@ func TestFallbackAndReadyAreTerminal(t *testing.T) {
 	}
 	if got := nextStartupView(view, "startup:workspace"); got != view {
 		t.Fatal("ready state regressed")
+	}
+}
+
+func TestCompleteRecordsRejectPartialHandleAndMultipleRecords(t *testing.T) {
+	cases := []struct {
+		input string
+		want  bool
+	}{
+		{"startup:UI-shell-ready:42\r\n", true},
+		{"\ufeffstartup:UI-ready\n", true},
+		{"startup:UI-shell-ready:4", false},
+		{"startup:UI-shell-ready:42\r", false},
+		{"startup:UI-ready\nstartup:UI-closed-normally\n", false},
+		{"startup:UI-ready\x00\n", false}, {"\n", false}, {"", false},
+	}
+	for _, c := range cases {
+		if _, ok := completeStartupRecord(c.input); ok != c.want {
+			t.Fatalf("record %q accepted=%v want %v", c.input, ok, c.want)
+		}
+	}
+	raw := make([]byte, 65537)
+	raw[len(raw)-1] = '\n'
+	if _, ok := completeStartupRecord(string(raw)); ok {
+		t.Fatal("oversize record accepted")
+	}
+}
+
+func TestTerminalStateInvalidatesReadyAndCannotReopen(t *testing.T) {
+	ready := nextStartupView(startupView{}, "startup:UI-shell-ready:42")
+	for _, state := range []string{"startup:UI-closed-normally", "startup:UI-runtime-exit:5", "startup:UI-runtime-exit:0", "startup:runtime-dependency-failed"} {
+		ended := nextStartupView(ready, state)
+		if ended.Ready || ended.Window != 0 || (!ended.Failed && !ended.Closed) {
+			t.Fatalf("stale readiness survives %q: %+v", state, ended)
+		}
+		if nextStartupView(ended, "startup:UI-shell-ready:42") != ended {
+			t.Fatal("ended startup reopened")
+		}
+		if nextStartupAction(ended, false) != startupClose {
+			t.Fatal("ended startup may hand off")
+		}
+	}
+}
+
+func TestStopWinsOverReadinessAtDecision(t *testing.T) {
+	for _, ready := range []bool{false, true} {
+		if nextStartupAction(startupView{Ready: ready, Window: 42}, true) != startupClose {
+			t.Fatal("stop lost")
+		}
+	}
+	if nextStartupAction(startupView{Ready: true, Window: 42}, false) != startupHandoff {
+		t.Fatal("live readiness lost")
+	}
+	if nextStartupAction(startupView{}, false) != startupUpdate {
+		t.Fatal("startup closed early")
+	}
+}
+
+func TestPartialExitIsNotTerminal(t *testing.T) {
+	v := nextStartupView(startupView{}, "startup:UI-window-created")
+	for _, bad := range []string{"startup:UI-runtime-exit:", "startup:UI-runtime-exit:abc", "startup:UI-runtime-exit:2147483648"} {
+		if nextStartupView(v, bad) != v {
+			t.Fatal("partial exit changed state")
+		}
 	}
 }

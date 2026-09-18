@@ -1,6 +1,6 @@
 //go:build windows
 
-// RECONSTRUCTION candidate S02A. Not approved to replace PMM/PMM.exe.
+// RECONSTRUCTION candidate S02B. Not approved to replace PMM/PMM.exe.
 package main
 
 import (
@@ -210,7 +210,6 @@ func (h *Host) run(operation string, args []string) int {
 	}
 	h.log("HOST", fmt.Sprintf("CHILD START kind=%s name=%s pid=%d", plan.Kind, plan.Name, cmd.Process.Pid))
 	monitorDone := make(chan struct{})
-	defer close(monitorDone)
 	if splash != nil {
 		go h.monitorStartupSplash(splash, monitorDone)
 	}
@@ -218,6 +217,10 @@ func (h *Host) run(operation string, args []string) int {
 	go h.pipe(stdout, h.OutLog, os.Stdout, done)
 	go h.pipe(stderr, h.ErrLog, os.Stderr, done)
 	err = cmd.Wait()
+	// Stop startup observation as soon as the supervised process has exited,
+	// before waiting for stream bookkeeping or presenting error dialogs.
+	close(monitorDone)
+	splash.Close()
 	<-done
 	<-done
 	code := 0
@@ -537,8 +540,10 @@ func (h *Host) monitorStartupSplash(splash *startupSplash, done <-chan struct{})
 			}
 			b, err := io.ReadAll(io.LimitReader(f, 65537))
 			f.Close()
-			if err == nil && len(b) <= 65536 {
-				splash.Update(string(b))
+			if err == nil {
+				if state, complete := completeStartupRecord(string(b)); complete {
+					splash.Update(state)
+				}
 			}
 		}
 	}

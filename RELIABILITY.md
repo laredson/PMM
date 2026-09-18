@@ -1,38 +1,29 @@
-# PMM v1.5.0.1 - linea independiente de fiabilidad
+# PMM v1.5.0.1 - linea de fiabilidad
 
-Rama: `v1.5.0.1-PMM-reliability`. Idiomas: `v1.5.0.0-PMM-translated`, independiente.
-Ancestro comun: `38bd5a934488ac11a6200d3142b889ca86a82f57`.
+Rama: v1.5.0.1-PMM-reliability. Ultima entrega: **02B, comparacion del Host y
+gate Windows guardados**. No es release ni aprobacion de sustitucion.
 
-**01B cerrada para identidad; 02A cerrada para fuente candidata del Host.**
-El paquete conserva 1.5.0.1 / PMM-v1.5.0.1-reliability-s01b y sus 629 archivos,
-sin cambios en 02A. Esto no es una release ni hardening antivirus terminado.
-
-La candidata se encuentra en
-[NativeCandidates/Host](Development/Reliability/NativeCandidates/Host/README.md):
-fuentes completos, build offline, diferencias, hashes y logs conservados.
-Esta compilada y es repetible en el entorno registrado, pero NO esta instalada,
-NO es la fuente original recuperada y NO tiene equivalencia Windows certificada.
-No copiar su EXE sobre PMM.exe. Runtime, FixLab e idiomas permanecen intactos.
+Paquete sin cambios desde 01B: 1.5.0.1, build PMM-v1.5.0.1-reliability-s01b.
+Los 629 archivos del programa conservan sus bytes; idiomas y rama donante intactos.
 
 ## Continuar
 
-[Development/Reliability/NEXT_SESSION.md](Development/Reliability/NEXT_SESSION.md)
-define 02B: solo comparacion del Host y lista de aceptacion Windows.
+[Development/Reliability/NEXT_SESSION.md](Development/Reliability/NEXT_SESSION.md):
+03A, SOLO Runtime candidato. No repetir las entregas cerradas ni pedir el ZIP.
+
 [STATUS.md](Development/Reliability/STATUS.md),
-[SESSION02A_FINDINGS.md](Development/Reliability/SESSION02A_FINDINGS.md) y
-[SESSION02A_CHECKS.json](Development/Reliability/SESSION02A_CHECKS.json)
-registran lo hecho y lo pendiente. No repetir 01B ni afirmar paridad anterior
-sin codigo e informes reproducibles.
+[SESSION02B_FINDINGS.md](Development/Reliability/SESSION02B_FINDINGS.md),
+[SESSION02B_CHECKS.json](Development/Reliability/SESSION02B_CHECKS.json) y
+[WINDOWS_HOST_ACCEPTANCE.md](Development/Reliability/WINDOWS_HOST_ACCEPTANCE.md)
+conservan lo hecho, lo no probado y los bloqueos.
 
-## Verificacion del paquete, solo lectura
+La fuente Host S02B esta en Development/Reliability/NativeCandidates/Host/.
+Su compilacion es repetible en el entorno registrado pero no equivalente al
+original por demostracion. No copiar el EXE candidato sobre el programa.
+Faltan validacion del origen HWND, revision del sondeo/drenaje y aceptacion
+Windows antes de promocion. REL-01 sigue abierto; no afirmar cero detecciones.
 
-```text
-python Development/Reliability/verify_identity.py --expected-build PMM-v1.5.0.1-reliability-s01b
-```
-
-Con --package PMM inspecciona todos los archivos de una distribucion limpia.
-Sin esa opcion usa archivos versionados del checkout. No ejecuta PMM ni repara.
-
-La advertencia Development/Source/SOURCE_STATUS.md sigue activa. Las pruebas de
-herramientas y hashes no sustituyen Windows ni un escaneo antivirus. No hay
-sincronizacion automatica con idiomas, CI de desarrollo ni publicacion automatica.
+Los registros 01B/02A son historicos. BASELINE.json conserva el ancestro comun;
+TRANSLATION_INTEGRATION.md y SESSION_PLAN.md conservan el plan de integracion.
+Toda tanda guarda fuentes e informes antes de cerrar y requiere su autorizacion
+de escritura, sin activar CI de desarrollo, PR, tags o releases por iniciativa propia.

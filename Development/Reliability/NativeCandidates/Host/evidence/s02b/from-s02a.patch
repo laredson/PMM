@@ -1,0 +1,282 @@
+--- S02A/main.go
++++ S02B/main.go
+@@ -1,6 +1,6 @@
+ //go:build windows
+ 
+-// RECONSTRUCTION candidate S02A. Not approved to replace PMM/PMM.exe.
++// RECONSTRUCTION candidate S02B. Not approved to replace PMM/PMM.exe.
+ package main
+ 
+ import (
+@@ -210,7 +210,6 @@
+ 	}
+ 	h.log("HOST", fmt.Sprintf("CHILD START kind=%s name=%s pid=%d", plan.Kind, plan.Name, cmd.Process.Pid))
+ 	monitorDone := make(chan struct{})
+-	defer close(monitorDone)
+ 	if splash != nil {
+ 		go h.monitorStartupSplash(splash, monitorDone)
+ 	}
+@@ -218,6 +217,10 @@
+ 	go h.pipe(stdout, h.OutLog, os.Stdout, done)
+ 	go h.pipe(stderr, h.ErrLog, os.Stderr, done)
+ 	err = cmd.Wait()
++	// Stop startup observation as soon as the supervised process has exited,
++	// before waiting for stream bookkeeping or presenting error dialogs.
++	close(monitorDone)
++	splash.Close()
+ 	<-done
+ 	<-done
+ 	code := 0
+@@ -537,8 +540,10 @@
+ 			}
+ 			b, err := io.ReadAll(io.LimitReader(f, 65537))
+ 			f.Close()
+-			if err == nil && len(b) <= 65536 {
+-				splash.Update(string(b))
++			if err == nil {
++				if state, complete := completeStartupRecord(string(b)); complete {
++					splash.Update(state)
++				}
+ 			}
+ 		}
+ 	}
+--- S02A/splash_state.go
++++ S02B/splash_state.go
+@@ -13,6 +13,7 @@
+ 	Ready  bool
+ 	Window uintptr
+ 	Failed bool
++	Closed bool
+ }
+ 
+ var startupLabels = [...]string{
+@@ -56,7 +57,19 @@
+ 		v.Stage, v.Ready = 5, true
+ 	case s == "startup:UI-ready":
+ 		v.Stage, v.Ready = 5, true // WPF fallback, without a target handle.
+-	case s == "startup:runtime-dependency-failed" || strings.HasPrefix(s, "startup:UI-runtime-exit:"):
++	case s == "startup:UI-closed-normally":
++		v.Closed = true
++		return v, true
++	case strings.HasPrefix(s, "startup:UI-runtime-exit:"):
++		code, err := strconv.ParseInt(strings.TrimPrefix(s, "startup:UI-runtime-exit:"), 10, 32)
++		if err != nil {
++			return v, false
++		}
++		v.Closed = code == 0
++		v.Failed = code != 0
++		v.Label = "Startup ended - see diagnostic report"
++		return v, true
++	case s == "startup:runtime-dependency-failed":
+ 		v.Stage, v.Failed, v.Label = 3, true, "Startup failed - see diagnostic report"
+ 		return v, true
+ 	case s == "startup:workspace":
+@@ -79,11 +92,51 @@
+ 
+ func nextStartupView(previous startupView, state string) startupView {
+ 	next, known := startupState(state)
+-	if !known || previous.Ready || previous.Failed {
++	if !known || previous.Closed || previous.Failed {
+ 		return previous
+ 	}
+-	if next.Failed || next.Stage >= previous.Stage {
++	// Closing or failure must invalidate a previously seen readiness handle.
++	if next.Closed || next.Failed {
++		return next
++	}
++	if previous.Ready {
++		return previous
++	}
++	if next.Stage >= previous.Stage {
+ 		return next
+ 	}
+ 	return previous
+ }
++
++// The current WPF and Runtime writers terminate records with LF/CRLF. Do not
++// turn a prefix of an in-progress decimal HWND write into a different handle.
++// This is framing validation, NOT authenticated/atomic IPC.
++func completeStartupRecord(raw string) (string, bool) {
++	if len(raw) == 0 || len(raw) > 65536 || !strings.HasSuffix(raw, "\n") {
++		return "", false
++	}
++	line := strings.TrimSuffix(strings.TrimSuffix(raw, "\n"), "\r")
++	line = strings.TrimPrefix(line, "\ufeff")
++	if line == "" || strings.ContainsAny(line, "\r\n\x00") {
++		return "", false
++	}
++	return line, true
++}
++
++type startupAction int
++
++const (
++	startupUpdate startupAction = iota
++	startupClose
++	startupHandoff
++)
++
++func nextStartupAction(view startupView, stopping bool) startupAction {
++	if stopping || view.Closed || view.Failed {
++		return startupClose
++	}
++	if view.Ready {
++		return startupHandoff
++	}
++	return startupUpdate
++}
+--- S02A/splash_state_test.go
++++ S02B/splash_state_test.go
+@@ -54,7 +54,7 @@
+ func TestIncompleteOrUnknownStatesCannotRetireSplash(t *testing.T) {
+ 	view := nextStartupView(startupView{}, "startup:UI-window-created")
+ 	for _, state := range []string{"", "random-ready", "startup:UI-shell-ready:", "startup:UI-shell-ready:0",
+-		"startup:UI-shell-ready:abc", "startup:UI-closed-normally", "startup:security"} {
++		"startup:UI-shell-ready:abc", "startup:security"} {
+ 		if got := nextStartupView(view, state); got != view {
+ 			t.Fatalf("state %q changed view to %+v", state, got)
+ 		}
+@@ -82,3 +82,66 @@
+ 		t.Fatal("ready state regressed")
+ 	}
+ }
++
++func TestCompleteRecordsRejectPartialHandleAndMultipleRecords(t *testing.T) {
++	cases := []struct {
++		input string
++		want  bool
++	}{
++		{"startup:UI-shell-ready:42\r\n", true},
++		{"\ufeffstartup:UI-ready\n", true},
++		{"startup:UI-shell-ready:4", false},
++		{"startup:UI-shell-ready:42\r", false},
++		{"startup:UI-ready\nstartup:UI-closed-normally\n", false},
++		{"startup:UI-ready\x00\n", false}, {"\n", false}, {"", false},
++	}
++	for _, c := range cases {
++		if _, ok := completeStartupRecord(c.input); ok != c.want {
++			t.Fatalf("record %q accepted=%v want %v", c.input, ok, c.want)
++		}
++	}
++	raw := make([]byte, 65537)
++	raw[len(raw)-1] = '\n'
++	if _, ok := completeStartupRecord(string(raw)); ok {
++		t.Fatal("oversize record accepted")
++	}
++}
++
++func TestTerminalStateInvalidatesReadyAndCannotReopen(t *testing.T) {
++	ready := nextStartupView(startupView{}, "startup:UI-shell-ready:42")
++	for _, state := range []string{"startup:UI-closed-normally", "startup:UI-runtime-exit:5", "startup:UI-runtime-exit:0", "startup:runtime-dependency-failed"} {
++		ended := nextStartupView(ready, state)
++		if ended.Ready || ended.Window != 0 || (!ended.Failed && !ended.Closed) {
++			t.Fatalf("stale readiness survives %q: %+v", state, ended)
++		}
++		if nextStartupView(ended, "startup:UI-shell-ready:42") != ended {
++			t.Fatal("ended startup reopened")
++		}
++		if nextStartupAction(ended, false) != startupClose {
++			t.Fatal("ended startup may hand off")
++		}
++	}
++}
++
++func TestStopWinsOverReadinessAtDecision(t *testing.T) {
++	for _, ready := range []bool{false, true} {
++		if nextStartupAction(startupView{Ready: ready, Window: 42}, true) != startupClose {
++			t.Fatal("stop lost")
++		}
++	}
++	if nextStartupAction(startupView{Ready: true, Window: 42}, false) != startupHandoff {
++		t.Fatal("live readiness lost")
++	}
++	if nextStartupAction(startupView{}, false) != startupUpdate {
++		t.Fatal("startup closed early")
++	}
++}
++
++func TestPartialExitIsNotTerminal(t *testing.T) {
++	v := nextStartupView(startupView{}, "startup:UI-window-created")
++	for _, bad := range []string{"startup:UI-runtime-exit:", "startup:UI-runtime-exit:abc", "startup:UI-runtime-exit:2147483648"} {
++		if nextStartupView(v, bad) != v {
++			t.Fatal("partial exit changed state")
++		}
++	}
++}
+--- S02A/splash_windows.go
++++ S02B/splash_windows.go
+@@ -149,12 +149,14 @@
+ 	}
+ 	// Do not attach input queues, synthesize keystrokes, force TOPMOST, or
+ 	// change foreground-lock settings. Windows retains the final decision.
+-	spShowAsync.Call(target, 5) // SW_SHOW, asynchronous across process boundaries.
+ 	foreground, _, _ := spForeground.Call()
+ 	if foreground != s.window {
+ 		s.log("UI ready; focus left unchanged because splash is not foreground.")
+ 		return
+ 	}
++	// Check foreground BEFORE SW_SHOW too: it is itself a window action.
++	// IsWindow still does not authenticate the target process; see the 02B gate.
++	spShowAsync.Call(target, 5) // SW_SHOW, asynchronous across process boundaries.
+ 	ok, _, _ := spSetForeground.Call(target)
+ 	if ok == 0 {
+ 		s.log("Windows declined the foreground handoff; UI remains available.")
+@@ -194,7 +196,7 @@
+ 	instance, _, _ := spModule.Call(0)
+ 	icon, _, _ := spIcon.Call(instance, 1)  // Same RT_GROUP_ICON as the historical build helper.
+ 	cursor, _, _ := spCursor.Call(0, 32512) // IDC_ARROW, shared resource.
+-	name := splashUTF16("PMMStartupSplashCandidate02A")
++	name := splashUTF16("PMMStartupSplashCandidate02B")
+ 	callback := syscall.NewCallback(s.windowProc)
+ 	class := splashClass{
+ 		Size: uint32(unsafe.Sizeof(splashClass{})), WndProc: callback,
+@@ -289,18 +291,23 @@
+ 		s.mu.Lock()
+ 		view := s.view
+ 		s.mu.Unlock()
+-		if view.Ready {
+-			// Handoff must precede splash destruction, as required by the WPF contract.
++		stopping := false
++		select {
++		case <-s.stop:
++			stopping = true
++		default:
++		}
++		switch nextStartupAction(view, stopping) {
++		case startupClose:
++			spDestroy.Call(hwnd)
++			return 0
++		case startupHandoff:
++			// Only a live readiness decision may attempt handoff.
+ 			s.HandoffTo(view.Window)
+ 			spDestroy.Call(hwnd)
+ 			return 0
+ 		}
+-		select {
+-		case <-s.stop:
+-			spDestroy.Call(hwnd)
+-			return 0
+-		default:
+-		}
++
+ 		if s.label != 0 {
+ 			label := splashUTF16(view.Label)
+ 			spSetText.Call(s.label, uintptr(unsafe.Pointer(label)))
+--- S02A/build.py
++++ S02B/build.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Build S02A OUTSIDE the checkout, offline. Never execute/install the Host candidate."""
++"""Build S02B OUTSIDE the checkout, offline. Never execute/install the Host candidate."""
+ from pathlib import Path
+ import argparse
+ import difflib
+@@ -93,7 +93,7 @@
+         if not any(s['name'] == '.rsrc' for s in candidate_report['sections']):
+             raise ValueError('Candidate icon resources are missing')
+         report = {
+-            'schema': 'PMM_HOST_CANDIDATE_BUILD_V1', 'session': '02A',
++            'schema': 'PMM_HOST_CANDIDATE_BUILD_V1', 'session': '02B',
+             'classification': 'RECONSTRUCTION_NOT_ORIGINAL_RECOVERED',
+             'goVersion': GO_VERSION, 'buildHost': host_os+'/'+host_arch,
+             'target': 'windows/amd64', 'sourceSha256': input_hashes,

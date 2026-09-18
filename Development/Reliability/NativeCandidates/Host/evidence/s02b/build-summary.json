@@ -1,0 +1,94 @@
+{
+  "schema": "PMM_HOST_S02B_BUILD_SUMMARY_V1",
+  "goVersion": "go1.23.2",
+  "buildHost": "linux/amd64",
+  "target": "windows/amd64",
+  "sourceSha256": {
+    "build.py": "bb8a4a061963adbb3f3c9a225fa2d5ab98ae532dfb116386fe2830c3a030200c",
+    "go.mod": "f3a38c697906ab0f79b86976f621c5d74cc9e8c2923ff0ee9886405e375a4b06",
+    "inspect_pe.py": "03e5b87fc5e5c161de7a5b6f0931488c4792db2cf2fadf224779cb110990c5c5",
+    "main.go": "ba6de7975333de0cc630e0e3bf48320e98635b470a4eda95ac22c967b75bb0be",
+    "splash_state.go": "06a37e58475fed0a2f8ecaf339266c024b43f5ec4d51fa040d95d47fd2463cf0",
+    "splash_state_test.go": "be74efdda9fa84f26f0060626b3aae870499d20894803f66e25fb65049eee95c",
+    "splash_windows.go": "819a543a7be7842200b6a664a010b5d94c33f72b786737e382aee5f10f7d8509"
+  },
+  "originalSha256": "010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d",
+  "candidateSha256": "a5f50c5677608c9875eefb65fe75fd7efb3460808be2f53df7ea3ec6db195d97",
+  "candidateSizeBytes": 2579456,
+  "candidateSections": [
+    {
+      "name": ".text",
+      "rva": 4096,
+      "virtualSize": 1123654,
+      "rawSize": 1123840,
+      "sha256": "db50cae58b63fad62f46c1e4f8379dc26e2164b8c8c71a94546a57875225af7e"
+    },
+    {
+      "name": ".rdata",
+      "rva": 1130496,
+      "virtualSize": 1214960,
+      "rawSize": 1214976,
+      "sha256": "d9d7a6c3c68e010808c9e08470f80e37af5ba6763154f3d42a67e37a133b308d"
+    },
+    {
+      "name": ".data",
+      "rva": 2347008,
+      "virtualSize": 379552,
+      "rawSize": 78336,
+      "sha256": "80dd07b7febd01e042113a2788a49a38781621a25691317fc54ea65ef85a9dfb"
+    },
+    {
+      "name": ".pdata",
+      "rva": 2727936,
+      "virtualSize": 28896,
+      "rawSize": 29184,
+      "sha256": "f6b75c9da2ee346e2c6be5fafe2931dff9d200a3ec8579b2c01da835a6bf7f10"
+    },
+    {
+      "name": ".xdata",
+      "rva": 2760704,
+      "virtualSize": 180,
+      "rawSize": 512,
+      "sha256": "ee36d38b44fcc95e659e169449cfec56dafc13402668cb9c816ab054732096b2"
+    },
+    {
+      "name": ".idata",
+      "rva": 2764800,
+      "virtualSize": 1342,
+      "rawSize": 1536,
+      "sha256": "499a579c47cdebd39f268a749d998574994d7ec53d9232a013e9420d9e9c409e"
+    },
+    {
+      "name": ".reloc",
+      "rva": 2768896,
+      "virtualSize": 21204,
+      "rawSize": 21504,
+      "sha256": "43332d4297e148249ee8aa3feac42d44969e92f7237fe8a1d7c3be9901086b99"
+    },
+    {
+      "name": ".symtab",
+      "rva": 2793472,
+      "virtualSize": 4,
+      "rawSize": 512,
+      "sha256": "3e67f4a7d14b832ff2a2433e9cf0f6f5720821f67148a87c0ee2595a20c96c68"
+    },
+    {
+      "name": ".rsrc",
+      "rva": 2797568,
+      "virtualSize": 107112,
+      "rawSize": 107520,
+      "sha256": "bc4a1c2c33061cb7876d6fa8cc3d09644fcccbded3653990006f7ecf595d6275"
+    }
+  ],
+  "iconSha256": "6037c135e7651ac9bc799c8ba0d43c0be53021cb88def6649171709fe80a00fe",
+  "peIconHelperSha256": "ca2d070517d943936aae58855ebb98d9ceac87a861dd1b390405890cde2efd5d",
+  "fullBuildReportSha256": "1b019212efd1dd493cfc5c8caee11e171acf875b4110f805fb545f6ea8bfd2dd",
+  "repeatBuildSha256": "a5f50c5677608c9875eefb65fe75fd7efb3460808be2f53df7ea3ec6db195d97",
+  "repeatBuildByteIdentical": true,
+  "s02aRebuildMatchedArchivedArtifact": true,
+  "candidateExecuted": false,
+  "packagedBinaryReplaced": false,
+  "functionalParityVerified": false,
+  "recipe": "python -B Development/Reliability/NativeCandidates/Host/build.py --out <NEW_OUTSIDE_REPO>",
+  "fullReportReproduction": "build.py writes build-report.json; full reports are also in the downloadable evidence ZIP"
+}

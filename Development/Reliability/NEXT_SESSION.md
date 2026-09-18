@@ -1,64 +1,53 @@
-# Retomar exactamente aqui - despues de 02A
+# Retomar despues de 02B
 
-Rama: `v1.5.0.1-PMM-reliability`.
-**01B y 02A cerradas en sus alcances. No repetirlas ni pedir el ZIP otra vez.**
-Paquete: 1.5.0.1, build `PMM-v1.5.0.1-reliability-s01b`, sin cambios en 02A.
-Fuente candidata: `Development/Reliability/NativeCandidates/Host/`.
+Rama: v1.5.0.1-PMM-reliability. 01B/02A/02B cerradas EN SUS ALCANCES.
+Paquete intacto: 1.5.0.1 / PMM-v1.5.0.1-reliability-s01b, 629 archivos.
+Leer AGENTS.md -> este archivo -> STATUS.md -> SESSION02B_FINDINGS.md.
+No repetir 01B/02A/02B ni pedir otra vez el ZIP.
 
-Leer AGENTS.md -> este archivo -> STATUS.md -> SESSION02A_FINDINGS.md ->
-NativeCandidates/Host/README.md y evidence/build-report.json.
-Development/Source/SOURCE_STATUS.md sigue vigente para los binarios distribuidos.
+## Siguiente tanda 03A - SOLO fuente candidata de Runtime
 
-## Siguiente tanda 02B - SOLO comparar Host y fijar aceptacion
+Entrada: HEAD de esta rama y PMM/Engine/PMMRuntime.exe, SHA-256
+`e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a`.
+Snapshot: Development/Source/Runtime/, runtimeVersion=1.2.1.
+La advertencia SOURCE_STATUS.md sigue vigente. No afirmar que fuentes/funciones
+mencionadas por una charla anterior equivalen a codigo recuperado.
 
-Entradas guardadas:
+1. Verificar HEAD/hashes, leer runtime-contract.json, rutas, main.go, nativeui.go,
+   process*.go y las notas de procedencia. No abrir trabajo de traducciones.
+2. Aislar el candidato en NativeCandidates/Runtime/. Recuperar original solo con
+   evidencia; de otro modo etiquetar RECONSTRUCTION. Conservar fuentes completos,
+   receta offline Go1.23.2 y hashes. Nunca compilar sobre Engine/PMMRuntime.exe.
+3. Revisar start, UI dispatch, seleccion de PowerShell/CLM y propagacion de sesion,
+   cwd, cierre y exit codes. Registrar como riesgos las reparaciones de red;
+   no redisenarlas ni ejecutarlas en esta tanda.
+4. Delimitar como se identifica la UI descendiente del Runtime: informacion
+   necesaria para H02B-04 (origen HWND). No editar Host en paralelo en 03A.
+5. Compilar candidato separado si es posible, pruebas de modelos/fixtures y
+   comparacion estatica basica; no ejecutar Windows ni declarar equivalencia.
+6. Guardar fuentes, evidencia, limites y siguiente paso 03B. Verificar PMM/ y
+   snapshot intactos. Un commit [skip ci] con autorizacion de esta intervencion;
+   sin Actions, PR, tag, release o modificacion de idiomas.
 
-- Original PMM/PMM.exe: 010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d.
-- Candidato S02A: 62fc4b234ea145c6e3dadcc51366c0ebbca109f7b5a11dcb17deda32e927257f.
-- Go 1.23.2. Receta build.py, .go completos, diff y hashes en la carpeta candidata.
-- Cinco tests Go de estados y nueve tests Python; NO se ejecuto el candidato.
-- Dos builds en directorios distintos fueron identicos entre si. Original y
-  candidato NO son identicos. No hay paridad de secciones ni de Windows afirmada.
+## Evidencia Host ya conservada
 
-## Trabajo acotado
+Candidata S02B: a5f50c5677608c9875eefb65fe75fd7efb3460808be2f53df7ea3ec6db195d97.
+Original: 010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d.
+S02A historica: 62fc4b234ea145c6e3dadcc51366c0ebbca109f7b5a11dcb17deda32e927257f.
+Codigo, build.py, compare_host.py, tools/hostmeta.go y evidence/s02b en
+Development/Reliability/NativeCandidates/Host/.
 
-1. Verificar HEAD y los hashes de entrada. Regenerar candidato en carpeta nueva
-   fuera del checkout con build.py; no copiarlo sobre PMM/PMM.exe.
-2. Preparar comparacion reproducible del original y candidato: PE/buildinfo,
-   contratos CLI, rutas, variables de sesion, codigos de salida, errores,
-   monitor de estado, cierre y handoff. Distinguir strings de funciones de
-   codigo real, y evidencia de build de evidencia de ejecucion.
-3. Revisar especialmente origen del HWND, carreras ready/close, estados parciales,
-   fallo de UI/splash y cierre temprano. Si hay una correccion imprescindible,
-   hacerla solo en la candidata, explicar el delta y regenerar sus hashes.
-   No convertir esta tanda en la migracion de PowerShell/dependencias.
-4. Guardar un informe de comparacion y una lista concreta de pruebas Windows:
-   arranque/cierre, splash, foco, tarea visible, errores, diagnosticos y retorno.
-   Las pruebas reales de escritorio pertenecen a 05 o a una tanda autorizada;
-   no fingirlas ni instalar el candidato sin aceptacion.
-5. Comprobar PMM/ intacto, actualizar STATUS/NEXT_SESSION y evidencia. Un commit
-   silencioso [skip ci], sin Actions, PR, tags, release ni cambios en idiomas.
+S02B corrige framing de estados, prioridad cierre/fallo y orden de chequeo de
+foreground. No recupera la fuente original ni acredita paridad Windows.
+Bloqueos antes de promocion: origen HWND H02B-04, sondeo PS H02B-05, pipes/logs
+H02B-06. Resolver en 02C tras 03A/03B. WINDOWS_HOST_ACCEPTANCE.md queda NOT_RUN.
+No instalar la candidata ni interpretar la ausencia de cambios en PMM como
+una validacion funcional del codigo nuevo.
 
-Salida: comparacion y gate Windows explicitados, no un certificado de equivalencia.
-Despues corresponde 03 (Runtime), conservando el Host original hasta su aceptacion.
-La fuente candidata es RECONSTRUCTION, nunca ORIGINAL_RECOVERED sin evidencia nueva.
+## Prompt siguiente
 
-## Comandos
-
-Desde la raiz del repositorio:
-
-```text
-python -B Development/Reliability/NativeCandidates/Host/build.py --out ../PMM-Host-S02B
-python Development/Reliability/verify_identity.py --expected-build PMM-v1.5.0.1-reliability-s01b
-```
-
-La primera ruta de salida debe ser nueva. La segunda orden necesita checkout Git;
-para una distribucion extraida usar --package PMM y el mismo expected-build.
-
-## Prompt de continuacion
-
-"Completa solo 02B en v1.5.0.1-PMM-reliability. Lee AGENTS.md y NEXT_SESSION.md.
-Parte del Host S02A guardado, prepara comparacion reproducible y gate Windows.
-No sustituyas binarios, no modifiques Runtime/idiomas y no repitas 01B.
-Guarda codigo e informes de cualquier correccion, registra limites y la entrada
-exacta de 03. Un commit [skip ci], sin Actions, PR, tags ni release."
+"Completa solo 03A en v1.5.0.1-PMM-reliability. Lee AGENTS.md y NEXT_SESSION.md.
+Prepara y guarda el Runtime candidato, receta/evidencia offline y mapa del
+contrato con la UI. No sustituyas binarios, no modifiques Host ni traducciones.
+Registra alcance, pruebas reales, limites y entrada de 03B. Un commit silencioso
+[skip ci], sin Actions, PR, tags ni release."

@@ -1,33 +1,34 @@
-# Estado de la linea v1.5.0.1
+# Estado de v1.5.0.1 - cierre 02B
 
-**02A cerrada: fuente candidata del Host, build y evidencia guardados.**
-Fecha: 2026-09-18. Entrada: a0c74b8fe2210ba55b1c0eed47eb6c701e3de330.
-Retomar [NEXT_SESSION.md](NEXT_SESSION.md): 02B, solo comparacion del Host.
+**02B CERRADA para comparacion y gate; REL-01 NO cerrado.** 2026-09-18.
+Entrada: baa063933c8940a7654d3350f728a81ed967f92c.
+Retomar NEXT_SESSION.md: 03A, candidato Runtime aislado.
 
-01B sigue cerrada: version/build/inventario coherentes. En 02A los 629 archivos
-de PMM/ permanecen identicos, con build PMM-v1.5.0.1-reliability-s01b.
-La candidata vive fuera del paquete, bajo NativeCandidates/Host/.
-
-| ID | Estado real | Proxima accion |
+| Area | Estado | Siguiente accion |
 | --- | --- | --- |
-| REL-00 | Identidades binarias conocidas; relacion del hash VT con ZIP RC30 documentada | Tabla de motores y superficie funcional/red pendientes |
-| REL-01 / Host | Candidata reconstruida, compilada y conservada; NO equivalencia certificada | 02B comparacion; 05 aceptacion Windows antes de reemplazar |
-| REL-01 / Runtime y FixLab | Pendientes, sin cambios | 03 y 04 |
-| REL-02 | CERRADO desde 01B; preservado en 02A | Mantener version/hashes coherentes |
-| REL-03 a REL-07 | Pendientes | SESSION_PLAN.md |
-| LOC-MERGE | No realizado; traducciones intactas | Integracion posterior autorizada |
+| Identidad REL-02 / 01B | Conservada: 1.5.0.1 / s01b, 629 archivos y 628 hashes correctos | No repetir; mantener |
+| Host 02A/02B | S02A reproducido; S02B con correcciones y comparacion persistidas | 02C: bloqueos origen HWND/sondeo/drenaje; 05: Windows |
+| Runtime | Fuente/paridad pendiente | 03A fuente/build; 03B comparacion |
+| FixLab | Fuente/paridad pendiente | 04 |
+| Hardening/distribucion | No terminado | Tandas de dependencias/procesos/recursos/firma despues de base verificable |
+| Traducciones | No modificadas ni fusionadas | Integracion autorizada posterior |
 
-El candidato tiene SHA-256 62fc4b234ea145c6e3dadcc51366c0ebbca109f7b5a11dcb17deda32e927257f.
-Dos builds en rutas distintas fueron byte-identicos en el entorno usado.
-Cinco tests Go de estados (incluidos 16 subcasos HWND) y nueve tests Python
-pasaron. No prueban Win32: no se ejecutaron PMM, candidato, WPF, Runtime,
-FixLab ni antivirus. El helper de icono ejecutado es una herramienta de build.
+S02B: SHA-256 a5f50c5677608c9875eefb65fe75fd7efb3460808be2f53df7ea3ec6db195d97.
+Dos builds en salidas distintas fueron byte-identicos en el entorno registrado.
+Nueve tests Go del modelo (16 subcasos HWND previos) y trece tests Python pasaron.
+El original y candidato NO son identicos; .text difiere. La tabla Go pclntab
+mapea funciones reales, no prueba semantica ni recupera fuente original.
 
-El original y candidato difieren; la fuente es RECONSTRUCTION, no recuperacion
-del original. No se ha reemplazado, firmado o publicado ningun ejecutable.
-La advertencia SOURCE_STATUS.md se conserva. Los campos de verificacion
-historicos no se reescriben como si hubiese habido paridad Windows.
+Corregido solo en candidata: framing LF/CRLF, rechazo de registros parciales,
+prioridad cierre/fallo sobre ready y chequeo de foco antes de ShowWindowAsync.
+Siguen bloqueando promocion H02B-04/05/06 (origen del HWND, timeout/seleccion PS,
+lectura de pipes/logs). Las carreras y apariencia reales esperan Windows.
 
-SESSION02A_FINDINGS.md, SESSION02A_CHECKS.json y NativeCandidates/Host/evidence/
-conservan los hechos, hashes, comandos, diff y logs de esta tanda. Los fuentes
-estan en Git y pueden recompilarse; no dependen solo de temporales del chat.
+Los 629 archivos PMM/, el snapshot Development/Source/, Runtime/FixLab, idiomas
+y workflows permanecen identicos. No se ejecutaron PMM/candidata Windows/WPF,
+no hay escaneo AV, instalacion, firma, release/tag/PR ni CI remoto solicitado.
+Los tests son de herramientas/modelos, NO paridad del programa en Windows.
+
+SESSION02B_FINDINGS.md, SESSION02B_CHECKS.json, WINDOWS_HOST_ACCEPTANCE.md y
+NativeCandidates/Host/evidence/s02b/ guardan evidencia y limites. Los registros
+02A/01B se conservan historicos; no se atribuyen sus resultados a la nueva candidata.
