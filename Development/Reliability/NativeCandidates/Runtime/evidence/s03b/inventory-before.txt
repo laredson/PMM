@@ -1,0 +1,9 @@
+=== RUN   TestInventoryRejectsIncompleteScan
+    inventory_contract_test.go:41: accepted valid prefix after Scanner stopped with an oversized record
+--- FAIL: TestInventoryRejectsIncompleteScan (0.00s)
+=== RUN   TestInventoryRejectsDuplicateRecords
+    inventory_contract_test.go:49: accepted duplicate inventory path
+--- FAIL: TestInventoryRejectsDuplicateRecords (0.00s)
+FAIL
+exit status 1
+FAIL	pmmruntime	0.007s

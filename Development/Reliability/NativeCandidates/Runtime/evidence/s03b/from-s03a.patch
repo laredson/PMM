@@ -1,0 +1,79 @@
+diff --git a/Development/Reliability/NativeCandidates/Runtime/build.py b/Development/Reliability/NativeCandidates/Runtime/build.py
+index 0803087..c028a4a 100644
+--- a/Development/Reliability/NativeCandidates/Runtime/build.py
++++ b/Development/Reliability/NativeCandidates/Runtime/build.py
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env python3
+-"""Build S03A outside the checkout, offline; never run/install PMMRuntime."""
++"""Build S03B outside the checkout, offline; never run/install PMMRuntime."""
+ from pathlib import Path
+ import argparse
+ import difflib
+@@ -121,7 +121,7 @@ def main():
+         # Preserve complete PE summaries in the downloadable evidence; root report stays compact.
+         for label, report in reports.items():
+             (out/(label+'-pe.json')).write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+-        report = {'schema':'PMM_RUNTIME_CANDIDATE_BUILD_V1', 'session':'03A',
++        report = {'schema':'PMM_RUNTIME_CANDIDATE_BUILD_V1', 'session':'03B',
+                   'classification':'RECONSTRUCTION_NOT_ORIGINAL_RECOVERED',
+                   'goVersion':GO_VERSION, 'buildHost':host_os+'/'+host_arch, 'target':'windows/amd64',
+                   'sourceSha256':input_hashes, 'iconSha256':ICON_SHA,'peIconHelperSha256':HELPER_SHA,
+@@ -138,7 +138,7 @@ def main():
+                 file.read_text().splitlines(keepends=True), fromfile='snapshot/'+file.name if old.exists() else '/dev/null',
+                 tofile='candidate/'+file.name))
+         (out/'from-snapshot.patch').write_text(''.join(patch),encoding='utf-8')
+-        (out/'COMPLETE.txt').write_text('S03A built, NOT executed or installed. Do not replace PMMRuntime.exe.\n',encoding='utf-8')
++        (out/'COMPLETE.txt').write_text('S03B built, NOT executed or installed. Do not replace PMMRuntime.exe.\n',encoding='utf-8')
+         print(json.dumps({'candidateSha256':reports['candidate']['sha256'],'output':str(out),
+                           'candidateExecuted':False,'packagedBinaryReplaced':False},indent=2))
+         return 0
+diff --git a/Development/Reliability/NativeCandidates/Runtime/deps.go b/Development/Reliability/NativeCandidates/Runtime/deps.go
+index 0c77f9b..da34c8f 100644
+--- a/Development/Reliability/NativeCandidates/Runtime/deps.go
++++ b/Development/Reliability/NativeCandidates/Runtime/deps.go
+@@ -290,26 +290,38 @@ func testRuntimeInventory(root string, m ReleaseManifest, runtimeDir string) boo
+ 		if e != nil {
+ 			return false
+ 		}
+-		expected[strings.ToLower(filepath.Clean(rel))] = strings.ToLower(mch[1])
++		key := strings.ToLower(filepath.Clean(rel))
++		if _, duplicate := expected[key]; duplicate {
++			return false
++		}
++		expected[key] = strings.ToLower(mch[1])
+ 		if !hashMatches(filepath.Join(runtimeDir, rel), mch[1]) {
+ 			return false
+ 		}
+ 	}
+-	if len(expected) < 20 {
++	// A valid prefix is not a complete inventory if Scanner stopped on an
++	// oversized record or read error. Do not silently certify partial input.
++	if scan.Err() != nil || len(expected) < 20 {
+ 		return false
+ 	}
+ 	actual := 0
+-	_ = filepath.Walk(runtimeDir, func(p string, info os.FileInfo, e error) error {
+-		if e == nil && info != nil && !info.IsDir() {
++	walkErr := filepath.Walk(runtimeDir, func(p string, info os.FileInfo, e error) error {
++		if e != nil {
++			return e
++		}
++		if !info.IsDir() {
+ 			actual++
+-			rel, _ := filepath.Rel(runtimeDir, p)
++			rel, err := filepath.Rel(runtimeDir, p)
++			if err != nil {
++				return err
++			}
+ 			if _, ok := expected[strings.ToLower(filepath.Clean(rel))]; !ok {
+-				actual = -999999
++				return fmt.Errorf("unexpected runtime inventory file: %s", rel)
+ 			}
+ 		}
+ 		return nil
+ 	})
+-	return actual == len(expected)
++	return walkErr == nil && actual == len(expected)
+ }
+ 
+ func saveDotnetSelection(root string, m ReleaseManifest, dotnet string) {

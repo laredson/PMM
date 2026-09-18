@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build S03A outside the checkout, offline; never run/install PMMRuntime."""
+"""Build S03B outside the checkout, offline; never run/install PMMRuntime."""
 from pathlib import Path
 import argparse
 import difflib
@@ -121,7 +121,7 @@ def main():
         # Preserve complete PE summaries in the downloadable evidence; root report stays compact.
         for label, report in reports.items():
             (out/(label+'-pe.json')).write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
-        report = {'schema':'PMM_RUNTIME_CANDIDATE_BUILD_V1', 'session':'03A',
+        report = {'schema':'PMM_RUNTIME_CANDIDATE_BUILD_V1', 'session':'03B',
                   'classification':'RECONSTRUCTION_NOT_ORIGINAL_RECOVERED',
                   'goVersion':GO_VERSION, 'buildHost':host_os+'/'+host_arch, 'target':'windows/amd64',
                   'sourceSha256':input_hashes, 'iconSha256':ICON_SHA,'peIconHelperSha256':HELPER_SHA,
@@ -138,7 +138,7 @@ def main():
                 file.read_text().splitlines(keepends=True), fromfile='snapshot/'+file.name if old.exists() else '/dev/null',
                 tofile='candidate/'+file.name))
         (out/'from-snapshot.patch').write_text(''.join(patch),encoding='utf-8')
-        (out/'COMPLETE.txt').write_text('S03A built, NOT executed or installed. Do not replace PMMRuntime.exe.\n',encoding='utf-8')
+        (out/'COMPLETE.txt').write_text('S03B built, NOT executed or installed. Do not replace PMMRuntime.exe.\n',encoding='utf-8')
         print(json.dumps({'candidateSha256':reports['candidate']['sha256'],'output':str(out),
                           'candidateExecuted':False,'packagedBinaryReplaced':False},indent=2))
         return 0

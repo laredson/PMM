@@ -1,34 +1,28 @@
-# PMM v1.5.0.1 - fiabilidad
+# PMM v1.5.0.1 - cierre 03B
 
-Rama: `v1.5.0.1-PMM-reliability`. Rama de idiomas independiente, no modificada.
+Rama: v1.5.0.1-PMM-reliability. Identidad distribuida: 1.5.0.1, build s01b.
+03B cierra comparacion del Runtime, correccion minima y gate; NO equivalencia
+Windows ni sustitucion de ejecutables. REL-01 sigue abierto.
 
-**Ultima tanda: 03A cerrada en su alcance.** Runtime candidato reconstruido,
-compilado y conservado con receta offline, evidencia y contrato con la UI.
-No se ha recuperado el original ni certificado equivalencia funcional.
+Empezar por [NEXT_SESSION.md](Development/Reliability/NEXT_SESSION.md), despues
+[STATUS.md](Development/Reliability/STATUS.md) y
+[SESSION03B_FINDINGS.md](Development/Reliability/SESSION03B_FINDINGS.md).
 
-El programa distribuido sigue intacto: 629 archivos, 628 hashes, version 1.5.0.1,
-build `PMM-v1.5.0.1-reliability-s01b`. Ninguna candidata reemplaza los ejecutables.
+Runtime candidato: Development/Reliability/NativeCandidates/Runtime/.
+S03B = 45e017190c379774afd24557084e7fa532bbef58b6ead6869294943bb72ed0be.
+Fuentes completos, build.py, compare_runtime.py, tests y evidence/s03b conservados.
+Original y candidata difieren; repetir build no demuestra equivalencia del programa.
 
-## Continuar
+Corregido SOLO en candidata: no aceptar inventario leido a medias, rutas duplicadas
+o recorrido con errores. No se redisenan descargas, permisos o UI en esta tanda.
+Los 629 archivos distribuidos siguen intactos. No instalar el candidato.
 
-[Development/Reliability/NEXT_SESSION.md](Development/Reliability/NEXT_SESSION.md)
-fija **03B: comparacion y gate de Runtime**, no repetir 01B/02A/02B/03A.
-[STATUS.md](Development/Reliability/STATUS.md) contiene el estado actual y
-[SESSION_PLAN.md](Development/Reliability/SESSION_PLAN.md) las tandas pendientes.
+18 tests Go y 15 Python pasaron; el inventario real de .NET fue leido/verificado,
+NO ejecutado. Windows/WPF/PowerShell/PMM/AV y los 18 casos del gate no se ejecutaron.
+[WINDOWS_RUNTIME_ACCEPTANCE.md](Development/Reliability/WINDOWS_RUNTIME_ACCEPTANCE.md)
+y [HOST_RUNTIME_HANDSHAKE.md](Development/Reliability/NativeCandidates/Runtime/HOST_RUNTIME_HANDSHAKE.md)
+separan pruebas pendientes y propuesta de IPC de lo realmente implementado.
 
-## Evidencia nueva
-
-[SESSION03A_FINDINGS.md](Development/Reliability/SESSION03A_FINDINGS.md) y
-[SESSION03A_CHECKS.json](Development/Reliability/SESSION03A_CHECKS.json).
-Fuente completa en `Development/Reliability/NativeCandidates/Runtime/`, con
-README, build.py, tests, UI_PROCESS_CONTRACT.md y evidence/.
-
-S03A conserva dependencias y seleccion de PowerShell; distingue presentacion WPF
-de utilidades CLI. Su hash repetible en el entorno registrado es
-`10effcaf7a5d02836104a5bb2bd90eeb52c755ac78fc4670b5eea11b235b938f`.
-13 tests Go y 9 Python pasaron; no prueban Win32 ni equivalencia con el original.
-No se ejecuto el candidato ni se hicieron reparaciones/escaneos o instalaciones.
-
-Host S02B permanece sin cambios. Sus bloqueos y los nuevos riesgos Runtime quedan
-para 03B/02C y aceptacion Windows. SOURCE_STATUS.md sigue vigente; REL-01 abierto.
-No se ha creado release/tag/PR. Los commits de desarrollo no activan workflows.
+Siguiente: 02C-1 (plazos/sondeos/supervision); despues 02C-2 (instancia UI/handoff).
+No repetir 01B/02A/02B/03A/03B ni recuperar progreso de mensajes sin evidencia.
+Rama de traducciones independiente; no hay merge, PR, tag o release automaticos.

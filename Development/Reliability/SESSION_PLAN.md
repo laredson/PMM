@@ -42,3 +42,12 @@ contrato UI y riesgos R03A-01..06. Dos builds finales identicos, 13 tests Go y 9
 Python. PMM/ y Host no cambian; paridad Windows no verificada. Siguiente 03B:
 comparacion detallada/gate Runtime, despues 02C para el acuerdo Host/UI. No
 confundir candidata compilable con componente autorizado para reemplazo.
+
+## Cierre 03B y subdivision 02C
+
+03B completada para comparacion/gate y parser de inventario. Los 18 casos Windows
+siguen NOT_RUN. R03B-01 corregido en candidata, no en el paquete distribuido.
+02C-1: plazos/seleccion de PS/supervision con stubs en candidatas Host y Runtime,
+sin reforma de descargas ni IPC nuevo. 02C-2: identidad de UI/canal/handoff segun
+HOST_RUNTIME_HANDSHAKE.md. Mantener limites Windows explicitos; no declarar
+resuelta gestion de familias/procesos por un test de modelo.

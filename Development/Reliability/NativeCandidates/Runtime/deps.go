@@ -290,26 +290,38 @@ func testRuntimeInventory(root string, m ReleaseManifest, runtimeDir string) boo
 		if e != nil {
 			return false
 		}
-		expected[strings.ToLower(filepath.Clean(rel))] = strings.ToLower(mch[1])
+		key := strings.ToLower(filepath.Clean(rel))
+		if _, duplicate := expected[key]; duplicate {
+			return false
+		}
+		expected[key] = strings.ToLower(mch[1])
 		if !hashMatches(filepath.Join(runtimeDir, rel), mch[1]) {
 			return false
 		}
 	}
-	if len(expected) < 20 {
+	// A valid prefix is not a complete inventory if Scanner stopped on an
+	// oversized record or read error. Do not silently certify partial input.
+	if scan.Err() != nil || len(expected) < 20 {
 		return false
 	}
 	actual := 0
-	_ = filepath.Walk(runtimeDir, func(p string, info os.FileInfo, e error) error {
-		if e == nil && info != nil && !info.IsDir() {
+	walkErr := filepath.Walk(runtimeDir, func(p string, info os.FileInfo, e error) error {
+		if e != nil {
+			return e
+		}
+		if !info.IsDir() {
 			actual++
-			rel, _ := filepath.Rel(runtimeDir, p)
+			rel, err := filepath.Rel(runtimeDir, p)
+			if err != nil {
+				return err
+			}
 			if _, ok := expected[strings.ToLower(filepath.Clean(rel))]; !ok {
-				actual = -999999
+				return fmt.Errorf("unexpected runtime inventory file: %s", rel)
 			}
 		}
 		return nil
 	})
-	return actual == len(expected)
+	return walkErr == nil && actual == len(expected)
 }
 
 func saveDotnetSelection(root string, m ReleaseManifest, dotnet string) {

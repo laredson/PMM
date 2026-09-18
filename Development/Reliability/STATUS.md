@@ -1,35 +1,33 @@
-# Estado de v1.5.0.1 - cierre 03A
+# Estado de v1.5.0.1 - cierre 03B
 
-**03A CERRADA: candidata Runtime, receta, evidencia basica y contrato UI.**
-Fecha: 2026-09-18. Entrada: f52101800b92b696b0600bb3382f89292a926cc8.
-Retomar NEXT_SESSION.md: 03B, solo comparacion/gate Runtime.
+03B CERRADA: comparacion Runtime, correccion minima de inventario y gate.
+Fecha: 2026-09-18. Entrada: 4182b4937bf446e41d9a6a937ac122a499d20b90.
+Retomar NEXT_SESSION.md: 02C-1, plazos/sondeos/supervision en candidatas.
+REL-01 sigue ABIERTO: fuente original/equivalencia Windows no certificadas.
 
 | Area | Estado | Siguiente accion |
 | --- | --- | --- |
-| Identidad REL-02 / 01B | Conservada: 1.5.0.1 / s01b; 629 archivos y 628 hashes correctos | Mantener, no repetir |
-| Host 02A/02B | Fuente candidata S02B conservada, sin cambios en 03A | 02C bloqueos H02B-04/05/06; 05 Windows |
-| Runtime 03A | Fuente candidata RECONSTRUCTION compilada y guardada; no original recuperado | 03B contratos/gate; sin sustitucion |
-| FixLab | Fuente/paridad pendientes | 04 |
-| Hardening/distribucion | No terminado | 06..12 despues de base verificable |
-| Traducciones | Intactas y sin fusion | Integracion autorizada posterior |
+| Identidad 01B/REL-02 | Conservada 1.5.0.1/s01b, 629 archivos y 628 hashes | Mantener, no repetir |
+| Host S02B | Intacto durante 03B | 02C-1 supervision; 02C-2 origen HWND; 05 Windows |
+| Runtime S03B | Build/comparacion y tests conservados, no instalado | 02C-1/2; gate de 18 casos NOT_RUN |
+| Dependencias | Parser de inventario corregido en candidata; politica/repair sin cambios | R03B-02/04 y 06/07 antes de promocion |
+| FixLab | Fuentes/paridad pendientes | 04 |
+| Hardening/distribucion | No terminado | Base verificable y gates antes de release |
+| Traducciones | Intactas, sin fusion | Integracion autorizada posterior |
 
-Runtime S03A: SHA-256 10effcaf7a5d02836104a5bb2bd90eeb52c755ac78fc4670b5eea11b235b938f.
-Dos builds en rutas distintas son identicos en Linux/amd64 Go1.23.2. Pasaron 13
-funciones de test Go (9 subcasos de ruta) y 9 tests Python de herramientas.
-No se ejecutaron EXE Windows, WPF, PowerShell, PMM ni antivirus. La comparacion
-PE/pclntab es estatica: original y candidata son diferentes, incluida .text.
+Candidata: 45e017190c379774afd24557084e7fa532bbef58b6ead6869294943bb72ed0be.
+S03A regenerado coincide con su hash; dos builds S03B identicos en Linux/amd64
+Go1.23.2. Original y candidata NO identicos, .text difiere. No es paridad funcional.
+18 tests Go (incluida lectura del inventario real), 9 subcasos UI y 15 tests Python
+pasaron. Dos fixtures fallaron antes de corregir R03B-01 y pasan despues.
+Se rechazan lectura de inventario incompleta, duplicados y errores de recorrido.
 
-Cambio funcional candidato limitado: WPF ya no recibe HideWindow/SW_HIDE;
-conserva CREATE_NO_WINDOW. Modelo de ruta/argv/entorno/streams comprobado con
-fixtures. Seleccion/sondeo PowerShell, dependencias, root y lifecycle se conservan
-con riesgos documentados R03A-01..06; no estan resueltos por extraer el modelo.
-El acuerdo de autenticacion del HWND con Host queda propuesto, no implementado.
+PMM/, Host, snapshot, idiomas, FixLab y workflows intactos. No se ejecutaron
+Windows/PMM/candidata/PS/.NET/WPF/AV ni reparaciones, no instalacion/firma/release.
+El modelo/propuesta de named pipe no esta implementado. Los riesgos R03A-01..06,
+H02B-04..06 y R03B-02..04 siguen abiertos segun SESSION03B_FINDINGS.md.
 
-Todos los archivos del paquete, Host candidato y snapshot historico permanecen
-intactos. REL-01 NO cerrado; SOURCE_STATUS.md sigue vigente. No hay instalacion,
-firma, PR, tag, release o CI remoto solicitado. Cada informe anterior permanece
-historico; no atribuir a S03A resultados de otras candidatas.
-
-SESSION03A_FINDINGS.md, SESSION03A_CHECKS.json y NativeCandidates/Runtime/evidence/
-conservan el cierre. NativeCandidates/Runtime/UI_PROCESS_CONTRACT.md detalla el
-contrato real de fuente, riesgos y requisitos para 03B/02C.
+SESSION03B_CHECKS.json, SESSION03B_FINDINGS.md, WINDOWS_RUNTIME_ACCEPTANCE.md y
+NativeCandidates/Runtime/evidence/s03b/ guardan resultados. NEXT_SESSION y
+HOST_RUNTIME_HANDSHAKE fijan entradas/requisitos para siguientes tandas cortas.
+Los registros anteriores permanecen historicos y SOURCE_STATUS.md sigue vigente.
