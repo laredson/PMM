@@ -1,0 +1,100 @@
+{
+  "schema": "PMM_REL_SESSION02C1_CHECKS_V1",
+  "date": "2026-09-18",
+  "inputCommit": "54a2a8224822431e24fb740d6b6bc1d2fa42a177",
+  "inputTree": "25748d0c3bb86fd9bdd19beee433630b5ed22ece",
+  "inputZipSha256": "5f5d033f4b674cf98ba7f93b9d883172d5144a11301e43bae8a81c4c437ee7c0",
+  "inputTreeMatchedRemote": true,
+  "scopeStatus": "COMPLETE_CANDIDATE_IMPLEMENTATION_AND_LOCAL_STUBS_ONLY",
+  "candidates": {
+    "Host": {
+      "sha256": "96e6e6b024207257e7777d7ad72711bf8f8c0966c86929d6f5528ec177ddb059",
+      "sizeBytes": 2614784,
+      "repeatSha256": "96e6e6b024207257e7777d7ad72711bf8f8c0966c86929d6f5528ec177ddb059",
+      "byteIdentical": true,
+      "differentOutputDirectories": true
+    },
+    "Runtime": {
+      "sha256": "db39fb942ebf9ba2c8d78c71abf4df43ec918a4040fe09dfaad65cba9a97ac77",
+      "sizeBytes": 6394880,
+      "repeatSha256": "db39fb942ebf9ba2c8d78c71abf4df43ec918a4040fe09dfaad65cba9a97ac77",
+      "byteIdentical": true,
+      "differentOutputDirectories": true
+    }
+  },
+  "goVersion": "go1.23.2",
+  "buildHost": "linux/amd64",
+  "target": "windows/amd64",
+  "tests": {
+    "Supervision": {
+      "testFunctionsPassed": 16,
+      "fixtureDispatcherExcluded": 1,
+      "skipped": 0
+    },
+    "Runtime": {
+      "testFunctionsPassed": 23,
+      "fixtureDispatcherExcluded": 1,
+      "skipped": 0
+    },
+    "Host": {
+      "testFunctionsPassed": 9,
+      "fixtureDispatcherExcluded": 0,
+      "skipped": 0
+    }
+  },
+  "pythonTests": {
+    "Host": 13,
+    "Runtime": 16
+  },
+  "raceDetector": {
+    "platform": "linux/amd64",
+    "module": "Supervision",
+    "passed": true
+  },
+  "windowsSupervisionTestsCompiledNotRun": true,
+  "packageIdentity": {
+    "scope": "static identity and checksum consistency only",
+    "version": "1.5.0.1",
+    "buildId": "PMM-v1.5.0.1-reliability-s01b",
+    "packageFiles": 629,
+    "checksumRows": 628,
+    "checksumMismatches": 0,
+    "pmmExecuted": false,
+    "antivirusScanned": false,
+    "sourceParityVerified": false,
+    "inputMode": "all package files"
+  },
+  "packageFilesUnchanged": 629,
+  "packageTreeUnchanged": "09df5c45aee3390c6b8ea235c8afa4e149a9f1fa",
+  "sourceSnapshotUnchanged": true,
+  "fixLabUnchanged": true,
+  "translationsUnchanged": true,
+  "workflowsUnchanged": true,
+  "functionalParityVerified": false,
+  "originalSourceRecovered": false,
+  "windowsExecuted": false,
+  "powerShellExecuted": false,
+  "networkRepairExecuted": false,
+  "antivirusScanned": false,
+  "packagedBinaryReplaced": false,
+  "processFamilyTerminationImplemented": false,
+  "uiIdentityChannelImplemented": false,
+  "githubWorkflowDispatched": false,
+  "releaseCreated": false,
+  "nextSession": "02C-2: UI instance channel/ownership in candidates; preserve C1 supervision",
+  "evidenceSha256": {
+    "SupervisionEvidence/s02c1/Host-build.json": "eb311a18e088a1b37970eb77e18a745abf6f792e142574fea3195deae7904009",
+    "SupervisionEvidence/s02c1/Host-comparison.json": "18da58d3f687fbc131df1c2e348724ae565040eb9a7591b6b2c803f5cdd4fea0",
+    "SupervisionEvidence/s02c1/Host-python-tests.txt": "046d39e201b1b4fa087bc95f57dd59a087a986442097296e41d1d13ad3a8eb5c",
+    "SupervisionEvidence/s02c1/Host-tests.txt": "3cfaaebb9142a783b9e1e3ea38db46925473789f0a13195a273bfd077667eb06",
+    "SupervisionEvidence/s02c1/Runtime-build.json": "8cad435a7d41c899a9d4bf7cf2426d1f491285ecf93c75548b6978a5b83a3934",
+    "SupervisionEvidence/s02c1/Runtime-comparison.json": "720a1696560eddfe7e8ee0cc35ed9de031ad4e3dc10a791f26a13e2c1c70cdc5",
+    "SupervisionEvidence/s02c1/Runtime-python-tests.txt": "685a63c1fc9e97b8f4f1f1f0e115c81d11e890cff4fecd589347a7f967c1c286",
+    "SupervisionEvidence/s02c1/Runtime-tests.txt": "a3f6dd50873b93dfe460cdce7be238e2a023ecb7e8f7a292f2d7e083cd69b3fb",
+    "SupervisionEvidence/s02c1/Supervision-race-tests.txt": "e251c673bec748aa4ba8c9e8e7c51ed4dcaf9785f79b9e9b754ec6c3dc135abe",
+    "SupervisionEvidence/s02c1/Supervision-tests.txt": "471fdd43d63bc049dc4a763cdb9bf8ebf843829cfec6a9311e95aef86613ceb6",
+    "SupervisionEvidence/s02c1/package-identity.json": "8f47c6ff6a7f31e45239141e1a7ca5079a430471d23671f07e0e9e50484034ac"
+  },
+  "fullCandidateDiffSha256": "ab0e8002168606ae8cae547e3bad320923079d1eee09dc1816a93a5f67910ebb",
+  "fullCandidateDiffLocation": "candidate evidence ZIP; equivalent Git diff from inputCommit"
+}

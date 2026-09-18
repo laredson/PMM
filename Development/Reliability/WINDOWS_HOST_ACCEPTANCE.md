@@ -53,3 +53,14 @@ No hay aprobacion hasta resolver H02B-04/05/06, revisar H02B-07, completar los
 casos aplicables y recibir aceptacion del propietario. Si cambia el candidato,
 registrar el nuevo hash y repetir los casos afectados. Ni el hash del original,
 ni una compilacion repetible, ni cero detecciones AV sustituyen esta decision.
+
+## Anexo C1 - todos NOT_RUN en Windows
+
+Verificar PS5.1 Desktop por ruta del sistema con PATH/pwsh/WINDIR manipulados;
+CLM, error de sondeo y plazo conservan reserva nativa. Medir presupuesto agregado,
+no anunciar 5s como tiempo maximo de toda la aplicacion. Probar linea >4MiB,
+limite de salida, disco lleno/permiso denegado/Close fallido y EOF retenido por
+nieto incluso con exit 7 del hijo. ExitCode 125 debe bloquear el uso de datos
+incompletos. Verificar eco de consola vs raw logs y consumidores CLI. Confirmar
+que cerrar splash NO se presenta como cancelacion de familia. Job Objects/canal
+no implementados ni validados en C1. Host sin plazo global durante sesion normal.

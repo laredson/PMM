@@ -3,13 +3,15 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
+	"pmm.local/supervision"
 	"regexp"
 	"runtime"
 	"sort"
 	"strings"
+	"time"
 )
 
 type GameDetection struct {
@@ -102,12 +104,14 @@ func steamRoots() []string {
 		add(filepath.Join(x, "Steam"))
 	}
 	if runtime.GOOS == "windows" {
-		if reg := findExecutable("reg.exe"); reg != "" {
+		if reg, err := supervision.SystemExecutable("reg.exe"); err == nil {
 			for _, key := range []string{`HKCU\Software\Valve\Steam`, `HKLM\SOFTWARE\WOW6432Node\Valve\Steam`, `HKLM\SOFTWARE\Valve\Steam`} {
-				cmd := exec.Command(reg, "query", key, "/v", "SteamPath")
-				configureProcess(cmd)
-				if b, e := cmd.Output(); e == nil {
-					for _, line := range strings.Split(string(b), "\n") {
+				r := runProcess(ProcessRequest{Executable: reg, Arguments: []string{"query", key, "/v", "SteamPath"}, Timeout: 3 * time.Second, OutputLimit: 4096})
+				if r.TimedOut || (r.StartError == "" && !r.OutputComplete) {
+					fmt.Fprintln(os.Stderr, "Steam registry probe incomplete: "+r.RunError)
+				}
+				if r.ExitCode == 0 {
+					for _, line := range strings.Split(r.Stdout, "\n") {
 						upper := strings.ToUpper(line)
 						if i := strings.Index(upper, "REG_SZ"); i >= 0 {
 							add(strings.TrimSpace(line[i+len("REG_SZ"):]))

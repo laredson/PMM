@@ -2,7 +2,7 @@ package main
 
 import "strings"
 
-// Pure launch decisions. The inherited PowerShell selection/probe is unchanged.
+// Pure launch decisions. System PowerShell version/mode is verified by supervision.Probe.
 const (
 	uiRouteNative         = "native"
 	uiRouteWPF            = "powershell-wpf"

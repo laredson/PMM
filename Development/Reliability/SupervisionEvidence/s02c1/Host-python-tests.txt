@@ -1,0 +1,18 @@
+test_added_removed_sections_and_functions (test_compare_host.ComparisonTests.test_added_removed_sections_and_functions) ... ok
+test_changed_text_is_reported (test_compare_host.ComparisonTests.test_changed_text_is_reported) ... ok
+test_identical_input_is_not_semantic_approval (test_compare_host.ComparisonTests.test_identical_input_is_not_semantic_approval) ... ok
+test_toolchain_or_settings_difference_is_visible (test_compare_host.ComparisonTests.test_toolchain_or_settings_difference_is_visible) ... ok
+test_adjacent_function_name_strings (test_tools.ToolsTest.test_adjacent_function_name_strings) ... ok
+test_existing_output_is_not_modified (test_tools.ToolsTest.test_existing_output_is_not_modified) ... ok
+test_minimal_pe_hash_and_section (test_tools.ToolsTest.test_minimal_pe_hash_and_section) ... ok
+test_output_inside_checkout_is_rejected (test_tools.ToolsTest.test_output_inside_checkout_is_rejected) ... ok
+test_rejects_non_pe (test_tools.ToolsTest.test_rejects_non_pe) ... ok
+test_rejects_out_of_bounds_header (test_tools.ToolsTest.test_rejects_out_of_bounds_header) ... ok
+test_rejects_raw_section_past_eof (test_tools.ToolsTest.test_rejects_raw_section_past_eof) ... ok
+test_rejects_truncated_sections (test_tools.ToolsTest.test_rejects_truncated_sections) ... ok
+test_rejects_wrong_architecture (test_tools.ToolsTest.test_rejects_wrong_architecture) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 1.512s
+
+OK

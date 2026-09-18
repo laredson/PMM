@@ -3,11 +3,9 @@ package main
 import (
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
+	"pmm.local/supervision"
 	"runtime"
-	"strings"
-	"time"
 )
 
 type SecurityStatus struct {
@@ -21,6 +19,9 @@ type SecurityStatus struct {
 	PowerShellAvailable         bool   `json:"powershell_available"`
 	PowerShellLanguageMode      string `json:"powershell_language_mode,omitempty"`
 	PowerShellProbeError        string `json:"powershell_probe_error,omitempty"`
+	PowerShellProbeStatus       string `json:"powershell_probe_status"`
+	PowerShellVersion           string `json:"powershell_version,omitempty"`
+	DetectedPowerShell          string `json:"detected_powershell,omitempty"`
 	RuntimeRequiresPowerShell   bool   `json:"runtime_requires_powershell"`
 	RuntimeRequiresFullLanguage bool   `json:"runtime_requires_full_language"`
 	Note                        string `json:"note"`
@@ -41,23 +42,17 @@ type RuntimeDoctor struct {
 func runtimeSecurity(root string) SecurityStatus {
 	exe, _ := os.Executable()
 	s := SecurityStatus{Protocol: "PMM_RUNTIME_SECURITY_V1", RuntimeVersion: runtimeVersion, RuntimeExecutable: exe, Root: root, OS: runtime.GOOS, Architecture: runtime.GOARCH, RuntimeRequiresPowerShell: false, RuntimeRequiresFullLanguage: false, Note: "PMMRuntime native capabilities do not request or force PowerShell FullLanguage. PowerShell is probed only to report the environment while the legacy UI remains available during migration."}
-	shell := findPowerShell()
-	s.PowerShell = shell
-	s.PowerShellAvailable = shell != ""
-	if shell != "" {
-		cmd := exec.Command(shell, "-NoProfile", "-NonInteractive", "-Command", "$ExecutionContext.SessionState.LanguageMode")
-		configureProcess(cmd)
-		cmd.Dir = root
-		b, e := cmd.CombinedOutput()
-		if e != nil {
-			s.PowerShellProbeError = strings.TrimSpace(string(b))
-			if s.PowerShellProbeError == "" {
-				s.PowerShellProbeError = e.Error()
-			}
-		} else {
-			s.PowerShellLanguageMode = strings.TrimSpace(string(b))
-		}
+	p := supervision.Probe(root)
+	s.DetectedPowerShell = p.Path
+	s.PowerShellAvailable = p.Path != ""
+	if p.Compatible {
+		s.PowerShell = p.Path
 	}
+	s.PowerShellLanguageMode = p.LanguageMode
+	s.PowerShellProbeError = p.Error
+	s.PowerShellProbeStatus = p.Status
+	s.PowerShellVersion = p.Version
+	s.Note = "Windows PowerShell 5.1 Desktop only; bounded probe without PATH/pwsh fallback or changes to security policy."
 	return s
 }
 
@@ -73,19 +68,4 @@ func runtimeDoctor(root string) RuntimeDoctor {
 	return RuntimeDoctor{Protocol: "PMM_RUNTIME_DOCTOR_V1", RuntimeVersion: runtimeVersion, BuildID: readTrim(filepath.Join(root, "Resources", "Metadata", "BUILD_ID.txt")), Root: root, Security: runtimeSecurity(root), Dependencies: deps, Knowledge: validateKnowledge(root), Game: detectPalworld(root), RequiredFiles: files}
 }
 
-func findPowerShell() string {
-	if p := findExecutable("pwsh.exe"); p != "" {
-		return p
-	}
-	if w := os.Getenv("WINDIR"); w != "" {
-		p := filepath.Join(w, "System32", "WindowsPowerShell", "v1.0", "powershell.exe")
-		if existsFile(p) {
-			return p
-		}
-	}
-	return findExecutable("powershell.exe")
-}
-
 func printJSON(v any) { b, _ := json.MarshalIndent(v, "", "  "); os.Stdout.Write(append(b, '\n')) }
-
-var _ = time.Second

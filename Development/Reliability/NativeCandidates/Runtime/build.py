@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build S03B outside the checkout, offline; never run/install PMMRuntime."""
+"""Build S02C1 outside the checkout, offline; never run/install PMMRuntime."""
 from pathlib import Path
 import argparse
 import difflib
@@ -61,6 +61,11 @@ def main():
         for file, expected in ((original, ORIGINAL_SHA), (icon, ICON_SHA), (helper, HELPER_SHA)):
             if sha(file) != expected:
                 raise ValueError('Input pin mismatch: '+str(file.relative_to(repo)))
+        support = src.parent/'Supervision'
+        support_inputs = sorted([*support.glob('*.go'), support/'go.mod'])
+        if any(p.is_symlink() or not p.is_file() for p in support_inputs):
+            raise ValueError('Invalid shared supervision source')
+        support_hashes = {p.name: sha(p) for p in support_inputs}
         inputs = sorted([*src.glob('*.go'), src/'go.mod', src/'build.py',
                          src/'inspect_pe.py', src/'test_tools.py', src/'tools/runtime_meta.go'])
         if any(p.is_symlink() for p in inputs):
@@ -73,6 +78,10 @@ def main():
             dest = stage/file.relative_to(src)
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(file, dest)
+        support_stage = out/'Supervision'
+        support_stage.mkdir()
+        for file in support_inputs:
+            shutil.copyfile(file, support_stage/file.name)
         native_env = dict(env, GOOS=host_os, GOARCH=host_arch)
         win_env = dict(env, GOOS='windows', GOARCH='amd64', GOAMD64='v1')
         candidate = out/'PMMRuntime-candidate.exe'
@@ -121,7 +130,9 @@ def main():
         # Preserve complete PE summaries in the downloadable evidence; root report stays compact.
         for label, report in reports.items():
             (out/(label+'-pe.json')).write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
-        report = {'schema':'PMM_RUNTIME_CANDIDATE_BUILD_V1', 'session':'03B',
+        if any(sha(p) != support_hashes[p.name] for p in support_inputs):
+            raise ValueError('Shared supervision source changed during build')
+        report = {'schema':'PMM_RUNTIME_CANDIDATE_BUILD_V1', 'session':'02C-1',
                   'classification':'RECONSTRUCTION_NOT_ORIGINAL_RECOVERED',
                   'goVersion':GO_VERSION, 'buildHost':host_os+'/'+host_arch, 'target':'windows/amd64',
                   'sourceSha256':input_hashes, 'iconSha256':ICON_SHA,'peIconHelperSha256':HELPER_SHA,
@@ -130,6 +141,7 @@ def main():
                   'commands':log, 'evidenceSha256':{f.name:sha(f) for f in sorted(out.glob('*.json'))},
                   'candidateExecuted':False,'packagedBinaryReplaced':False,'functionalParityVerified':False,
                   'antivirusScanned':False,'warning':'Candidate only. Not a release or Windows acceptance.'}
+        report['sharedSupervisionSha256'] = support_hashes
         (out/'build-report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
         patch=[]
         for file in sorted(src.glob('*.go')):
@@ -138,7 +150,7 @@ def main():
                 file.read_text().splitlines(keepends=True), fromfile='snapshot/'+file.name if old.exists() else '/dev/null',
                 tofile='candidate/'+file.name))
         (out/'from-snapshot.patch').write_text(''.join(patch),encoding='utf-8')
-        (out/'COMPLETE.txt').write_text('S03B built, NOT executed or installed. Do not replace PMMRuntime.exe.\n',encoding='utf-8')
+        (out/'COMPLETE.txt').write_text('S02C1 built, NOT executed or installed. Do not replace PMMRuntime.exe.\n',encoding='utf-8')
         print(json.dumps({'candidateSha256':reports['candidate']['sha256'],'output':str(out),
                           'candidateExecuted':False,'packagedBinaryReplaced':False},indent=2))
         return 0

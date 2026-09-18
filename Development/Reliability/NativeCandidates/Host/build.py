@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build S02B OUTSIDE the checkout, offline. Never execute/install the Host candidate."""
+"""Build S02C1 OUTSIDE the checkout, offline. Never execute/install the Host candidate."""
 from pathlib import Path
 import argparse
 import difflib
@@ -63,6 +63,11 @@ def main():
         for file, expected in ((original, ORIGINAL_SHA), (icon, ICON_SHA), (helper, HELPER_SHA)):
             if sha(file) != expected:
                 raise ValueError('Input pin mismatch: ' + str(file.relative_to(repo)))
+        support = src.parent/'Supervision'
+        support_inputs = sorted([*support.glob('*.go'), support/'go.mod'])
+        if any(p.is_symlink() or not p.is_file() for p in support_inputs):
+            raise ValueError('Invalid shared supervision source')
+        support_hashes = {p.name: sha(p) for p in support_inputs}
         inputs = sorted([*src.glob('*.go'), src/'go.mod', src/'build.py', src/'inspect_pe.py'])
         input_hashes = {p.name: sha(p) for p in inputs}
         original_before = inspect(original)
@@ -72,6 +77,10 @@ def main():
         stage.mkdir()
         for file in inputs:
             shutil.copyfile(file, stage/file.name)
+        support_stage = out/'Supervision'
+        support_stage.mkdir()
+        for file in support_inputs:
+            shutil.copyfile(file, support_stage/file.name)
         native_env = dict(env, GOOS=host_os, GOARCH=host_arch)
         win_env = dict(env, GOOS='windows', GOARCH='amd64', GOAMD64='v1')
         candidate = out/'PMMHost-candidate.exe'
@@ -92,8 +101,10 @@ def main():
             raise ValueError('Expected Windows GUI subsystem')
         if not any(s['name'] == '.rsrc' for s in candidate_report['sections']):
             raise ValueError('Candidate icon resources are missing')
+        if any(sha(p) != support_hashes[p.name] for p in support_inputs):
+            raise ValueError('Shared supervision source changed during build')
         report = {
-            'schema': 'PMM_HOST_CANDIDATE_BUILD_V1', 'session': '02B',
+            'schema': 'PMM_HOST_CANDIDATE_BUILD_V1', 'session': '02C-1',
             'classification': 'RECONSTRUCTION_NOT_ORIGINAL_RECOVERED',
             'goVersion': GO_VERSION, 'buildHost': host_os+'/'+host_arch,
             'target': 'windows/amd64', 'sourceSha256': input_hashes,
@@ -104,6 +115,7 @@ def main():
             'functionalParityVerified': False, 'antivirusScanned': False,
             'warning': 'Static build evidence only. No equivalence or release approval.',
         }
+        report['sharedSupervisionSha256'] = support_hashes
         (out/'build-report.json').write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')
         old = (repo/'Development/Source/Host/main.go').read_text().splitlines(keepends=True)
         new = (src/'main.go').read_text().splitlines(keepends=True)

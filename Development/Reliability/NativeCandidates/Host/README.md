@@ -1,3 +1,14 @@
+# Estado actual: S02C-1
+
+Esta candidata ahora depende del modulo local ../Supervision; build.py lo copia
+fuera del checkout y verifica sus hashes. Ver ../../SESSION02C1_FINDINGS.md y
+../Supervision/README.md para limites, comandos, cambios de consola/CLI y bloqueos.
+Los apartados S02B/S03B que siguen son contexto historico, NO resultados C1.
+Comparador actualizado a hashes C1; los informes historicos permanecen intactos.
+No copiar el EXE sobre el programa distribuido. Windows/familias/HWND pendientes.
+
+---
+
 # Host S02B - candidate, NOT installed
 
 Current candidate SHA-256:

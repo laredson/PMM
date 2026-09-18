@@ -1,12 +1,12 @@
 //go:build windows
 
-// RECONSTRUCTION candidate S02B. Not approved to replace PMM/PMM.exe.
+// RECONSTRUCTION candidate S02C-1. Not approved to replace PMM/PMM.exe.
 package main
 
 import (
 	"archive/zip"
-	"bufio"
 	"bytes"
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -19,6 +19,9 @@ import (
 	"runtime"
 	"sort"
 	"strings"
+	"sync"
+
+	"pmm.local/supervision"
 	"syscall"
 	"time"
 	"unsafe"
@@ -52,6 +55,9 @@ type SecurityStatus struct {
 	PowerShellAvailable bool   `json:"powershell_available"`
 	LanguageMode        string `json:"language_mode"`
 	ProbeError          string `json:"probe_error,omitempty"`
+	ProbeStatus         string `json:"probe_status"`
+	PowerShellVersion   string `json:"powershell_version,omitempty"`
+	DetectedPowerShell  string `json:"detected_powershell,omitempty"`
 	CoreUnaffected      bool   `json:"core_unaffected_by_clm"`
 	Note                string `json:"note"`
 }
@@ -198,43 +204,36 @@ func (h *Host) run(operation string, args []string) int {
 		"PMM_HOST_ROOT="+h.Root,
 		"PMM_HOST_POWERSHELL="+sec.PowerShell,
 	)
-	stdout, _ := cmd.StdoutPipe()
-	stderr, _ := cmd.StderrPipe()
-	if err := cmd.Start(); err != nil {
-		msg := "Could not start PMM child process: " + err.Error()
-		h.log("ERROR", msg)
-		p, _ := h.createHandoff("CHILD_START_FAILURE", 22, msg)
-		splash.Close()
-		notify("Palworld Manager Merger", msg+"\n\n"+p)
-		return 22
-	}
-	h.log("HOST", fmt.Sprintf("CHILD START kind=%s name=%s pid=%d", plan.Kind, plan.Name, cmd.Process.Pid))
+	// Child bytes go to exclusive bounded raw logs. Do not synchronously tee
+	// them to a potentially blocked console pipe; doctor/security still print JSON.
 	monitorDone := make(chan struct{})
-	if splash != nil {
-		go h.monitorStartupSplash(splash, monitorDone)
+	var stopOnce sync.Once
+	stopMonitor := func() { stopOnce.Do(func() { close(monitorDone) }) }
+	result := supervision.Run(context.Background(), cmd, supervision.Options{
+		Stdout: supervision.Output{Path: h.OutLog, Limit: supervision.HostLogLimit},
+		Stderr: supervision.Output{Path: h.ErrLog, Limit: supervision.HostLogLimit},
+		Started: func(pid int) {
+			h.log("HOST", fmt.Sprintf("CHILD START kind=%s name=%s pid=%d", plan.Kind, plan.Name, pid))
+			if splash != nil {
+				go h.monitorStartupSplash(splash, monitorDone)
+			}
+		},
+		Exited: stopMonitor,
+	})
+	stopMonitor()
+	code := result.ExitCode
+	if !result.Started {
+		code = 22
 	}
-	done := make(chan struct{}, 2)
-	go h.pipe(stdout, h.OutLog, os.Stdout, done)
-	go h.pipe(stderr, h.ErrLog, os.Stderr, done)
-	err = cmd.Wait()
-	// Stop startup observation as soon as the supervised process has exited,
-	// before waiting for stream bookkeeping or presenting error dialogs.
-	close(monitorDone)
-	splash.Close()
-	<-done
-	<-done
-	code := 0
-	if err != nil {
-		var ee *exec.ExitError
-		if errors.As(err, &ee) {
-			code = ee.ExitCode()
-		} else {
-			code = 23
-		}
+	if result.Error != "" {
+		h.log("SUPERVISION", result.Error)
 	}
 	splash.Close()
 	h.log("HOST", fmt.Sprintf("CHILD END kind=%s exit=%d", plan.Kind, code))
-	h.writeSummary(operation, args, code)
+	if err := h.writeSummary(operation, args, code, result); err != nil {
+		code = 125
+		h.log("ERROR", "Session summary could not be saved: "+err.Error())
+	}
 	if code != 0 {
 		state := readSmall(h.StateFile, 64*1024)
 		reason := classifyFailure(state + "\n" + readTail(h.ErrLog, 256*1024) + "\n" + readTail(h.OutLog, 256*1024))
@@ -298,24 +297,6 @@ func configureChildProcess(cmd *exec.Cmd) {
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: 0x08000000} // CREATE_NO_WINDOW
 }
 
-func (h *Host) pipe(r io.Reader, path string, screen io.Writer, done chan<- struct{}) {
-	defer func() { done <- struct{}{} }()
-	f, _ := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-	if f != nil {
-		defer f.Close()
-	}
-	s := bufio.NewScanner(r)
-	buf := make([]byte, 64*1024)
-	s.Buffer(buf, 4*1024*1024)
-	for s.Scan() {
-		line := s.Text()
-		if f != nil {
-			fmt.Fprintln(f, line)
-		}
-		fmt.Fprintln(screen, line)
-	}
-}
-
 func (h *Host) log(area, msg string) {
 	line := time.Now().Format("2006-01-02 15:04:05.000") + " [" + area + "] " + msg
 	fmt.Println(line)
@@ -326,14 +307,18 @@ func (h *Host) log(area, msg string) {
 	}
 }
 
-func (h *Host) writeSummary(op string, args []string, code int) {
+func (h *Host) writeSummary(op string, args []string, code int, result supervision.Result) error {
 	status := "success"
 	if code != 0 {
 		status = "failed"
 	}
 	v := map[string]any{"protocol": "PMM_HOST_SESSION_V1", "session_id": h.SessionID, "operation": op, "arguments": args, "exit_code": code, "status": status, "ended_utc": time.Now().UTC().Format(time.RFC3339Nano)}
-	b, _ := json.MarshalIndent(v, "", "  ")
-	os.WriteFile(filepath.Join(h.SessionDir, "session.json"), b, 0644)
+	v["supervision"] = result
+	b, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filepath.Join(h.SessionDir, "session.json"), b, 0644)
 }
 
 func classifyFailure(text string) string {
@@ -444,41 +429,17 @@ func doctor(root string) Doctor {
 }
 func securityStatus(root string) SecurityStatus {
 	exe, _ := os.Executable()
-	shell := findPowerShell()
-	mode := "Unavailable"
-	perr := ""
-	if shell != "" {
-		cmd := exec.Command(shell, "-NoProfile", "-NonInteractive", "-Command", "$ExecutionContext.SessionState.LanguageMode")
-		configureChildProcess(cmd)
-		cmd.Dir = root
-		out, e := cmd.CombinedOutput()
-		if e != nil {
-			perr = strings.TrimSpace(string(out))
-			if perr == "" {
-				perr = e.Error()
-			}
-		} else {
-			mode = strings.TrimSpace(string(out))
-		}
+	p := supervision.Probe(root)
+	shell := ""
+	if p.Compatible {
+		shell = p.Path
 	}
-	note := "PMM.exe does not change or bypass Windows application-control policy. v1.2.1 dispatches the normal start route directly to PMMRuntime.exe without starting PowerShell. Script routes remain external and optional."
-	return SecurityStatus{Protocol: "PMM_SECURITY_STATUS_V1", HostVersion: hostVersion, Executable: exe, Root: root, OS: runtime.GOOS, Architecture: runtime.GOARCH, PowerShell: shell, PowerShellAvailable: shell != "", LanguageMode: mode, ProbeError: perr, CoreUnaffected: false, Note: note}
-}
-func findPowerShell() string {
-	if p, e := exec.LookPath("pwsh.exe"); e == nil {
-		return p
-	}
-	sys := os.Getenv("WINDIR")
-	if sys != "" {
-		p := filepath.Join(sys, "System32", "WindowsPowerShell", "v1.0", "powershell.exe")
-		if _, e := os.Stat(p); e == nil {
-			return p
-		}
-	}
-	if p, e := exec.LookPath("powershell.exe"); e == nil {
-		return p
-	}
-	return ""
+	return SecurityStatus{Protocol: "PMM_SECURITY_STATUS_V1", HostVersion: hostVersion,
+		Executable: exe, Root: root, OS: runtime.GOOS, Architecture: runtime.GOARCH,
+		PowerShell: shell, PowerShellAvailable: p.Path != "", DetectedPowerShell: p.Path,
+		LanguageMode: p.LanguageMode, ProbeError: p.Error, ProbeStatus: p.Status,
+		PowerShellVersion: p.Version, CoreUnaffected: false,
+		Note: "Bounded Windows PowerShell 5.1 Desktop probe; no PATH/pwsh fallback or policy change. Native routes remain available after probe failure."}
 }
 func fileSHA(path string) string {
 	f, e := os.Open(path)

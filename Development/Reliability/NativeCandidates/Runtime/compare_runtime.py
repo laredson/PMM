@@ -13,8 +13,8 @@ sys.dont_write_bytecode = True
 from inspect_pe import inspect
 
 ORIGINAL = 'e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a'
-PREVIOUS = '10effcaf7a5d02836104a5bb2bd90eeb52c755ac78fc4670b5eea11b235b938f'
-CURRENT = '45e017190c379774afd24557084e7fa532bbef58b6ead6869294943bb72ed0be'
+PREVIOUS = '45e017190c379774afd24557084e7fa532bbef58b6ead6869294943bb72ed0be'
+CURRENT = 'db39fb942ebf9ba2c8d78c71abf4df43ec918a4040fe09dfaad65cba9a97ac77'
 
 
 def sha(path):
@@ -57,6 +57,14 @@ def bind_build_report(src, report):
         path = src/name
         if path.is_symlink() or sha(path) != digest:
             raise ValueError('Build source mismatch: ' + name)
+
+    shared = src.parent/'Supervision'
+    expected_shared = {p.name for p in shared.glob('*.go')} | {'go.mod'}
+    if set(report.get('sharedSupervisionSha256', {})) != expected_shared:
+        raise ValueError('Shared supervision source coverage mismatch')
+    for name, digest in report['sharedSupervisionSha256'].items():
+        if (shared/name).is_symlink() or sha(shared/name) != digest:
+            raise ValueError('Shared supervision source mismatch: '+name)
 
 
 def run(argv, env, cwd):
@@ -115,7 +123,7 @@ def main():
             'Development/Source/Runtime/main.go', 'Development/Source/Runtime/deps.go',
             'Development/Reliability/NativeCandidates/Host/main.go']
         report = {
-            'schema': 'PMM_RUNTIME_COMPARISON_S03B_V1',
+            'schema': 'PMM_RUNTIME_COMPARISON_S02C1_V1',
             'method': 'PE + debug/buildinfo + Go pclntab; source-contract review is separate',
             'artifacts': {k: {'sha256': r['pe']['sha256'], 'sizeBytes': r['pe']['sizeBytes'],
                 'subsystem': r['pe']['subsystem'], 'goVersion': r['go']['goVersion'],

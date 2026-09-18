@@ -1,0 +1,52 @@
+=== RUN   TestProbeResponseContracts
+--- PASS: TestProbeResponseContracts (0.00s)
+=== RUN   TestProbeUsesBoundedRunner
+=== RUN   TestProbeUsesBoundedRunner/probe
+=== RUN   TestProbeUsesBoundedRunner/bad-probe
+=== RUN   TestProbeUsesBoundedRunner/long
+=== RUN   TestProbeUsesBoundedRunner/sleep
+--- PASS: TestProbeUsesBoundedRunner (0.11s)
+    --- PASS: TestProbeUsesBoundedRunner/probe (0.00s)
+    --- PASS: TestProbeUsesBoundedRunner/bad-probe (0.00s)
+    --- PASS: TestProbeUsesBoundedRunner/long (0.01s)
+    --- PASS: TestProbeUsesBoundedRunner/sleep (0.10s)
+=== RUN   TestProbeDoesNotRequestPolicyOverride
+--- PASS: TestProbeDoesNotRequestPolicyOverride (0.00s)
+=== RUN   TestFixtureProcess
+--- PASS: TestFixtureProcess (0.00s)
+=== RUN   TestLongLineAndNoFinalNewline
+--- PASS: TestLongLineAndNoFinalNewline (0.10s)
+=== RUN   TestExactDiskOutputAndExclusiveCreation
+--- PASS: TestExactDiskOutputAndExclusiveCreation (0.00s)
+=== RUN   TestOutputLimitFailsExplicitly
+--- PASS: TestOutputLimitFailsExplicitly (0.04s)
+=== RUN   TestDeadlineKillsOnlyDirectChild
+--- PASS: TestDeadlineKillsOnlyDirectChild (0.06s)
+=== RUN   TestCancellation
+--- PASS: TestCancellation (0.00s)
+=== RUN   TestCancelledBeforeStart
+--- PASS: TestCancelledBeforeStart (0.00s)
+=== RUN   TestInheritedPipesDeadlineIndependentOfChildExit
+=== RUN   TestInheritedPipesDeadlineIndependentOfChildExit/hold0
+=== RUN   TestInheritedPipesDeadlineIndependentOfChildExit/hold7
+--- PASS: TestInheritedPipesDeadlineIndependentOfChildExit (0.08s)
+    --- PASS: TestInheritedPipesDeadlineIndependentOfChildExit/hold0 (0.04s)
+    --- PASS: TestInheritedPipesDeadlineIndependentOfChildExit/hold7 (0.04s)
+=== RUN   TestFailedStorageAndShortWrite
+=== RUN   TestFailedStorageAndShortWrite/false
+=== RUN   TestFailedStorageAndShortWrite/true
+--- PASS: TestFailedStorageAndShortWrite (0.03s)
+    --- PASS: TestFailedStorageAndShortWrite/false (0.01s)
+    --- PASS: TestFailedStorageAndShortWrite/true (0.02s)
+=== RUN   TestStorageCloseError
+--- PASS: TestStorageCloseError (0.00s)
+=== RUN   TestNonzeroExitKeepsOutput
+--- PASS: TestNonzeroExitKeepsOutput (0.00s)
+=== RUN   TestStartFailure
+--- PASS: TestStartFailure (0.00s)
+=== RUN   TestNonUTF8NotSilent
+--- PASS: TestNonUTF8NotSilent (0.00s)
+=== RUN   TestInvalidOptions
+--- PASS: TestInvalidOptions (0.00s)
+PASS
+ok  	pmm.local/supervision	0.435s

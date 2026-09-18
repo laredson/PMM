@@ -13,8 +13,8 @@ sys.dont_write_bytecode = True
 from inspect_pe import inspect
 
 ORIGINAL = '010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d'
-PREVIOUS = '62fc4b234ea145c6e3dadcc51366c0ebbca109f7b5a11dcb17deda32e927257f'
-CURRENT = 'a5f50c5677608c9875eefb65fe75fd7efb3460808be2f53df7ea3ec6db195d97'
+PREVIOUS = 'a5f50c5677608c9875eefb65fe75fd7efb3460808be2f53df7ea3ec6db195d97'
+CURRENT = '96e6e6b024207257e7777d7ad72711bf8f8c0966c86929d6f5528ec177ddb059'
 
 
 def sha(p):
@@ -53,7 +53,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--candidate', type=Path, required=True)
     parser.add_argument('--build-report', type=Path, required=True)
-    parser.add_argument('--previous', type=Path, help='Optional S02A artifact, hash-pinned')
+    parser.add_argument('--previous', type=Path, help='Optional S02B artifact, hash-pinned')
     parser.add_argument('--out', type=Path, required=True, help='NEW directory outside checkout')
     args = parser.parse_args()
     src = Path(__file__).resolve().parent
@@ -78,6 +78,13 @@ def main():
         for name, digest in br['sourceSha256'].items():
             if Path(name).name != name or sha(src/name) != digest:
                 raise ValueError('Current source differs from build report: ' + name)
+        shared = src.parent/'Supervision'
+        expected_shared = {p.name for p in shared.glob('*.go')} | {'go.mod'}
+        if set(br.get('sharedSupervisionSha256', {})) != expected_shared:
+            raise ValueError('Shared supervision source coverage mismatch')
+        for name, digest in br['sharedSupervisionSha256'].items():
+            if (shared/name).is_symlink() or sha(shared/name) != digest:
+                raise ValueError('Shared supervision source mismatch: '+name)
         env = dict(os.environ, GOTOOLCHAIN='local', GOPROXY='off', GOSUMDB='off',
                    GOWORK='off', GOFLAGS='', GOENV='off', CGO_ENABLED='0', GOEXPERIMENT='')
         go = shutil.which('go')
@@ -93,7 +100,7 @@ def main():
             data[key] = {'pe': inspect(p), 'go': json.loads(run([helper,p],env,src))}
             (out/(key+'.json')).write_text(json.dumps(data[key],indent=2)+'\n',encoding='utf-8')
         report = {
-            'schema':'PMM_HOST_COMPARISON_S02B_V1',
+            'schema':'PMM_HOST_COMPARISON_S02C1_V1',
             'method':'Static PE sections + debug/buildinfo + bounded Go pclntab function spans',
             'inputs':{key:{'sha256':v['pe']['sha256'],'sizeBytes':v['pe']['sizeBytes'],
                            'subsystem':v['pe']['subsystem'], 'certificateTableBytes':v['pe']['certificateTableBytes'],

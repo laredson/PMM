@@ -44,12 +44,15 @@ class ComparisonTests(unittest.TestCase):
 
     def test_source_report_coverage_and_hash_binding(self):
         with tempfile.TemporaryDirectory() as d:
-            src=Path(d)
+            src=Path(d)/'Runtime'; src.mkdir()
             names=['main.go','go.mod','build.py','inspect_pe.py','test_tools.py','tools/runtime_meta.go']
             for n in names:
                 p=src/n; p.parent.mkdir(parents=True, exist_ok=True); p.write_bytes(n.encode())
             report={'originalSha256':subject.ORIGINAL,'candidateSha256':subject.CURRENT,
                     'sourceSha256':{n:subject.sha(src/n) for n in names}}
+            shared=src.parent/'Supervision';shared.mkdir()
+            for n in ['go.mod','process.go']:(shared/n).write_bytes(n.encode())
+            report['sharedSupervisionSha256']={n:subject.sha(shared/n) for n in ['go.mod','process.go']}
             subject.bind_build_report(src,report)
             bad=copy.deepcopy(report); bad['sourceSha256']['../anything']='0'*64
             with self.assertRaisesRegex(ValueError,'coverage'):
@@ -58,5 +61,19 @@ class ComparisonTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'source mismatch'):
                 subject.bind_build_report(src,report)
 
+
+
+
+# Missing shared input evidence is rejected, even when candidate-local files match.
+class SharedEvidenceTests(unittest.TestCase):
+    def test_shared_input_required(self):
+        with tempfile.TemporaryDirectory() as d:
+            src=Path(d)/'Runtime';src.mkdir()
+            names=['go.mod','build.py','inspect_pe.py','test_tools.py','tools/runtime_meta.go']
+            for n in names:
+                p=src/n;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(n.encode())
+            report={'candidateSha256':subject.CURRENT,'originalSha256':subject.ORIGINAL,'sourceSha256':{n:subject.sha(src/n) for n in names}}
+            with self.assertRaisesRegex(ValueError,'supervision source coverage'):
+                subject.bind_build_report(src,report)
 
 if __name__ == '__main__': unittest.main()

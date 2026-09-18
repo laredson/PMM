@@ -45,3 +45,14 @@ PASS/FAIL/BLOCKED/NOT_RUN y limitaciones. No publicar datos de usuario, rutas
 personales, saves, logs crudos o secretos en Git. Comparar baseline/candidata solo
 cuando sea seguro; una diferencia intencional de fiabilidad se documenta, no se
 convierte en supuesto fallo probado del original. Todos siguen NOT_RUN en S03B.
+
+## Anexo C1 - todos NOT_RUN en Windows
+
+Verificar PS5.1 Desktop por ruta del sistema con PATH/pwsh/WINDIR manipulados;
+CLM, error de sondeo y plazo conservan reserva nativa. Medir presupuesto agregado,
+no anunciar 5s como tiempo maximo de toda la aplicacion. Probar linea >4MiB,
+limite de salida, disco lleno/permiso denegado/Close fallido y EOF retenido por
+nieto incluso con exit 7 del hijo. ExitCode 125 debe bloquear el uso de datos
+incompletos. Verificar eco de consola vs raw logs y consumidores CLI. Confirmar
+que cerrar splash NO se presenta como cancelacion de familia. Job Objects/canal
+no implementados ni validados en C1. Host sin plazo global durante sesion normal.

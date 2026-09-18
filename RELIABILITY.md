@@ -1,28 +1,24 @@
-# PMM v1.5.0.1 - cierre 03B
+# PMM v1.5.0.1 - fiabilidad independiente
 
-Rama: v1.5.0.1-PMM-reliability. Identidad distribuida: 1.5.0.1, build s01b.
-03B cierra comparacion del Runtime, correccion minima y gate; NO equivalencia
-Windows ni sustitucion de ejecutables. REL-01 sigue abierto.
+Rama: v1.5.0.1-PMM-reliability. **Ultima entrega 02C-1; siguiente 02C-2.**
+Los IDs 02/03 agrupan Host/Runtime; SESSION_PLAN explica el orden de dependencias.
 
-Empezar por [NEXT_SESSION.md](Development/Reliability/NEXT_SESSION.md), despues
-[STATUS.md](Development/Reliability/STATUS.md) y
-[SESSION03B_FINDINGS.md](Development/Reliability/SESSION03B_FINDINGS.md).
+01B conserva identidad 1.5.0.1 y build PMM-v1.5.0.1-reliability-s01b. Las siguientes
+tandas construyen candidatas EXTERNAS: los 629 archivos PMM permanecen intactos.
+No son versiones instaladas ni fuente original recuperada; no promocionar sin gates.
 
-Runtime candidato: Development/Reliability/NativeCandidates/Runtime/.
-S03B = 45e017190c379774afd24557084e7fa532bbef58b6ead6869294943bb72ed0be.
-Fuentes completos, build.py, compare_runtime.py, tests y evidence/s03b conservados.
-Original y candidata difieren; repetir build no demuestra equivalencia del programa.
+C1 implementa sondeo PS5.1 del sistema con plazo, captura/EOF acotados, logs raw,
+fallos explicitos y timeout CLI validado. Un modulo local Supervision comparte esa
+logica entre candidatos sin descargas. 48 tests Go de modelos/stubs y 29 Python,
+mas race Linux; dos builds iguales de cada candidata en el entorno registrado.
+No Windows/WPF/PowerShell/PMM/antivirus ejecutados, no gestion de familias probada.
 
-Corregido SOLO en candidata: no aceptar inventario leido a medias, rutas duplicadas
-o recorrido con errores. No se redisenan descargas, permisos o UI en esta tanda.
-Los 629 archivos distribuidos siguen intactos. No instalar el candidato.
+Leer [NEXT_SESSION](Development/Reliability/NEXT_SESSION.md),
+[STATUS](Development/Reliability/STATUS.md),
+[hallazgos](Development/Reliability/SESSION02C1_FINDINGS.md) y
+[checks](Development/Reliability/SESSION02C1_CHECKS.json).
+[Supervision](Development/Reliability/NativeCandidates/Supervision/README.md)
+contiene limites/codigos y cambios visibles. Fuentes y recetas en NativeCandidates.
 
-18 tests Go y 15 Python pasaron; el inventario real de .NET fue leido/verificado,
-NO ejecutado. Windows/WPF/PowerShell/PMM/AV y los 18 casos del gate no se ejecutaron.
-[WINDOWS_RUNTIME_ACCEPTANCE.md](Development/Reliability/WINDOWS_RUNTIME_ACCEPTANCE.md)
-y [HOST_RUNTIME_HANDSHAKE.md](Development/Reliability/NativeCandidates/Runtime/HOST_RUNTIME_HANDSHAKE.md)
-separan pruebas pendientes y propuesta de IPC de lo realmente implementado.
-
-Siguiente: 02C-1 (plazos/sondeos/supervision); despues 02C-2 (instancia UI/handoff).
-No repetir 01B/02A/02B/03A/03B ni recuperar progreso de mensajes sin evidencia.
-Rama de traducciones independiente; no hay merge, PR, tag o release automaticos.
+REL-01 sigue abierto: HWND/canal, familias, Windows, manifiesto/pins, rutas y
+repair son requisitos pendientes. No tocar rama de traducciones, main o releases.

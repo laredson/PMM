@@ -2,6 +2,18 @@
 
 No reservar duraciones ni prometer trabajo en segundo plano. Cada intervencion ejecuta una sola entrega verificable y se detiene antes del siguiente bloque. El usuario autoriza las escrituras de cada intervencion; no hay permiso remoto permanente.
 
+## Orden de ejecucion (no confundir con IDs por componente)
+
+Los IDs 02 son Host/supervision y 03 son Runtime. 03A/B fue dependencia de 02C,
+no un retroceso. Cola al cierre actual:
+
+01B -> 02A -> 02B -> 03A -> 03B -> **02C-1 CERRADA** -> **02C-2 SIGUIENTE**
+-> 04 FixLab -> 05 Windows -> 06/07 dependencias -> 08 procesos/politicas
+-> 09 build -> 10 firma -> 11 idiomas -> 12 candidata/publicacion autorizada.
+Los bloqueos de 06/07 impiden promocion aunque haya pruebas preliminares en 05.
+No renumerar evidencia historica. Cada cierre mueve NEXT_SESSION, no vuelve a
+una etapa anterior solo por tener un numero menor.
+
 ## Regla de cierre
 
 Leer HEAD y NEXT_SESSION al entrar. Fijar entrada/alcance. Trabajar sin Actions. Al cerrar, registrar archivos modificados, verificaciones reales, lo no ejecutado, resultado y proxima accion. Un bloqueo se registra como BLOCKED/PARTIAL, nunca como DONE. Un commit coherente con `[skip ci]`; comprobar diff y ausencia de workflows sin ejecutar tests remotos. No introducir una reestructuracion masiva en una tanda de diagnostico.

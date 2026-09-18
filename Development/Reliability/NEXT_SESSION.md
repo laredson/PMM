@@ -1,70 +1,57 @@
-# Retomar despues de 03B
+# Retomar despues de 02C-1
 
-Rama exclusiva: v1.5.0.1-PMM-reliability.
-01B/02A/02B/03A/03B cerradas EN SUS ALCANCES. REL-01 sigue abierto.
-Paquete: 1.5.0.1 / PMM-v1.5.0.1-reliability-s01b, 629 archivos intactos.
-Leer AGENTS.md -> este archivo -> STATUS.md -> SESSION03B_FINDINGS.md ->
+Rama v1.5.0.1-PMM-reliability. Leer AGENTS -> este archivo -> STATUS ->
+SESSION02C1_FINDINGS -> NativeCandidates/Supervision/README.md ->
 NativeCandidates/Runtime/HOST_RUNTIME_HANDSHAKE.md.
-No repetir sesiones cerradas ni pedir de nuevo el ZIP.
+No repetir sesiones cerradas, no pedir otra vez el ZIP. IDs 02/03 agrupan
+componentes; el orden real esta en SESSION_PLAN.md.
 
-## Entradas conservadas
+## Siguiente: 02C-2 - instancia UI / canal / entrega de foco
 
-Runtime original: e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a.
-Runtime S03B: 45e017190c379774afd24557084e7fa532bbef58b6ead6869294943bb72ed0be.
-Runtime S03A historico: 10effcaf7a5d02836104a5bb2bd90eeb52c755ac78fc4670b5eea11b235b938f.
-Host S02B: a5f50c5677608c9875eefb65fe75fd7efb3460808be2f53df7ea3ec6db195d97.
-Fuentes/recetas en NativeCandidates/Host y NativeCandidates/Runtime; evidence/s03b
-conserva comparacion, build, diff y tests. Las tablas PE/Go completas estan en el
-ZIP de evidencia y se regeneran con build.py/compare_runtime.py desde los fuentes.
-No hay fuente original recuperada ni aceptacion Windows por coincidencia de hashes.
+Entrada: HEAD de nuestra rama y candidatas S02C1 conservadas:
+Host 96e6e6b024207257e7777d7ad72711bf8f8c0966c86929d6f5528ec177ddb059.
+Runtime db39fb942ebf9ba2c8d78c71abf4df43ec918a4040fe09dfaad65cba9a97ac77.
+Modulo comun nuevo: NativeCandidates/Supervision/ (go.mod replace local obligatorio).
+Fuentes/recetas/modelos y evidencia: NativeCandidates/Host, Runtime y
+SupervisionEvidence/s02c1. No reconstruir desde un resumen del chat.
 
-## Siguiente tanda 02C-1 - plazos y supervision, NO IPC todavia
+1. Fijar HEAD, verificar fuentes/hashes y conservar PMM/ intacto (629 archivos,
+   628 hashes; 1.5.0.1/s01b). No sustituir EXE, ni tocar idiomas/snapshot/FixLab.
+2. Revisar handshake propuesto y elaborar implementacion candidata con canal local
+   y comprobacion de identidad por SO; no confiar en titulo, PID declarado o secreto
+   guardado en disco. Host conoce al Runtime directo; WPF es otro proceso hijo.
+3. Registro de instancia/generation, ACK, ready previo al registro, salida prioritaria
+   y rechazo de PID/HWND reutilizados. Conservar handles/identidad temporal y revisar
+   quien puede crear/abrir el canal. Un error degrada la coordinacion del foco, no
+   autoriza debilitar politica ni ejecutar payloads.
+4. Mantener supervision de C1. No convertir salida/logs en canal de control ni
+   perder el marcado output_complete. Gestion de familia Windows no esta resuelta:
+   si se requiere para el canal, implementarla en un subpaso especifico verificable.
+5. Modelos y stubs primero; compilar adapters Windows sin afirmar haberlos ejecutado.
+   Si la tanda no cabe, dividir ANTES en 02C-2A transporte/modelo y 02C-2B integracion;
+   cerrar cada una con codigo y gate explicitos, no entregas solo prometidas.
+6. Actualizar STATUS, NEXT_SESSION, CHECKS y hallazgos; un commit [skip ci] autorizado,
+   sin workflows/PR/tag/release. Pruebas reales Windows requieren entorno y permiso.
 
-1. Fijar HEAD y preservar PMM/, snapshot e idiomas. Trabajar SOLO en candidatas
-   Host/Runtime y herramientas/evidencia de supervision.
-2. Resolver H02B-05/R03A-01: seleccionar y comprobar el Windows PowerShell
-   compatible con la UI actual (PS5.1), sin prioridad silenciosa a pwsh.
-   Sondeo con plazo, salida acotada y errores distinguibles; no bloqueo infinito
-   antes de la reserva nativa. No cambiar politicas ni Bypass mediante otro bypass.
-3. Resolver H02B-06/R03A-05 en sus mecanismos de espera/salida: drenar sin Scanner
-   que abandone una linea larga, comunicar errores, acotar memoria y espera por
-   EOF. No confundir matar hijo directo con terminar familia de procesos.
-   Preservar stdout/stderr completos en almacenamiento controlado o devolver
-   error/incompletitud explicitos; no truncar silenciosamente datos de un merge.
-4. Incluir validacion del timeout CLI (R03B-03) y documentar politica de salida
-   para helpers/sondeos. No redisenar descargas, reparar dependencias ni ejecutar
-   start/ensure como prueba. El manifesto incompleto/R03B-02 sigue un bloqueo
-   separado a resolver antes de promocion, no cambiando hashes esperados.
-5. Pruebas con stubs locales inocuos y fixtures: salida larga, plazo, hijo que
-   retiene pipes, error de escritura y cancelacion. No ejecutar PMM/PowerShell/
-   juego real en este entorno ni afirmar gestion de familias Windows probada.
-6. Guardar codigo, tests, receta, hashes y estado real. Build candidato separado;
-   no tocar binarios distribuidos. Commit [skip ci], sin Actions/PR/tag/release.
+## Reproduccion de C1
 
-Salida: supervision y plazos implementados/probados con limites honestos. Si un
-caso Windows necesita adapters, marcarlo BLOCKED hasta su implementacion/prueba;
-no considerar una prueba Linux como validacion de ese comportamiento Windows.
+Desde raiz, Go1.23.2 instalado, salida nueva EXTERNA:
+python -B Development/Reliability/NativeCandidates/Host/build.py --out ../PMM-Host-S02C1
+python -B Development/Reliability/NativeCandidates/Runtime/build.py --out ../PMM-Runtime-S02C1
+python -B Development/Reliability/verify_identity.py --package PMM --expected-build PMM-v1.5.0.1-reliability-s01b
+Los builds copian Supervision y fijan sus hashes; no hay descarga ni instalacion.
 
-Despues 02C-2: canal de instancia UI y handoff, segun HOST_RUNTIME_HANDSHAKE.md.
-No autenticar HWND con un JSON, titulo o nonce en disco. Vida/identidad de procesos
-conservadas por handles, generation, REGISTER/ACK y rechazo de owner ajeno.
-04: FixLab. 05: aceptacion Windows. 06/07: dependencias/reparacion consentida.
-Los gates WINDOWS_HOST_ACCEPTANCE.md y WINDOWS_RUNTIME_ACCEPTANCE.md siguen NOT_RUN.
+## Bloqueos antes de promocion
 
-## Comando para reproducir S03B
+HWND/canal, gestion de familias y aceptacion Windows NOT_RUN. Manifiesto/pins y
+rutas heredadas R03B-02/04; dependencias/reparacion 06/07; salida de diagnosticos
+ante disco bloqueado/error; compatibilidad del nuevo eco de consola/logs y nuevos
+textos de error con idiomas. La source parity original NO esta certificada.
 
-```text
-python -B Development/Reliability/NativeCandidates/Runtime/build.py --out ../PMM-Runtime-S03B
-python -B Development/Reliability/verify_identity.py --expected-build PMM-v1.5.0.1-reliability-s01b
-```
+## Prompt
 
-Salida nueva y externa. Para ZIP sin Git, verificador con --package PMM.
-No ejecutar la candidata para comprobar su hash.
-
-## Prompt siguiente
-
-"Completa solo 02C-1 en v1.5.0.1-PMM-reliability. Lee AGENTS/NEXT_SESSION.
-Parte de Host S02B y Runtime S03B, implementa plazos/seleccion PS y supervision
-con stubs, sin IPC/handoff nuevo ni reforma de descargas. No sustituyas binarios,
-no toques traducciones; documenta limites Windows, evidencia y entrada de 02C-2.
-Un commit silencioso [skip ci], sin Actions, PR, tags ni release."
+"Continua con 02C-2 en nuestra rama reliability. Lee NEXT_SESSION y la especificacion
+de handshake. Parte de C1, implementa canal/identidad solo en candidatas, con stubs
+limitados y evidencia; no instales binarios ni toques traducciones. Si necesitas
+subdividir, define primero el alcance cerrado. Registra pendientes Windows y la
+entrada exacta siguiente; un commit [skip ci], sin Actions/PR/tag/release."

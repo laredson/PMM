@@ -1,0 +1,113 @@
+{
+  "schema": "PMM_HOST_CANDIDATE_BUILD_V1",
+  "session": "02C-1",
+  "classification": "RECONSTRUCTION_NOT_ORIGINAL_RECOVERED",
+  "goVersion": "go1.23.2",
+  "buildHost": "linux/amd64",
+  "target": "windows/amd64",
+  "sourceSha256": {
+    "build.py": "08d5da7b8134cb817a38e9077300d42d31a3ed567f1e22801f4904b6738524ea",
+    "go.mod": "347d4e78cd2248271e67d55684f1e39cb6e655690d3b726cf37576ab7dc261ae",
+    "inspect_pe.py": "03e5b87fc5e5c161de7a5b6f0931488c4792db2cf2fadf224779cb110990c5c5",
+    "main.go": "c68a28ba4620a7e8fc9f5960200dfdb575ea8f33d7331309ec758d456d01f1bd",
+    "splash_state.go": "06a37e58475fed0a2f8ecaf339266c024b43f5ec4d51fa040d95d47fd2463cf0",
+    "splash_state_test.go": "be74efdda9fa84f26f0060626b3aae870499d20894803f66e25fb65049eee95c",
+    "splash_windows.go": "819a543a7be7842200b6a664a010b5d94c33f72b786737e382aee5f10f7d8509"
+  },
+  "iconSha256": "6037c135e7651ac9bc799c8ba0d43c0be53021cb88def6649171709fe80a00fe",
+  "peIconHelperSha256": "ca2d070517d943936aae58855ebb98d9ceac87a861dd1b390405890cde2efd5d",
+  "buildInfo": "/mnt/data/PMM-Host-S02C1-final1/PMMHost-candidate.exe: go1.23.2\n\tpath\tgithub.com/laredson/pmm-host\n\tmod\tgithub.com/laredson/pmm-host\t(devel)\t\n\tdep\tpmm.local/supervision\tv0.0.0\n\t=>\t../Supervision\t(devel)\t\n\t\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tCGO_ENABLED=0\n\tbuild\tGOARCH=amd64\n\tbuild\tGOOS=windows\n\tbuild\tGOAMD64=v1\n",
+  "candidateExecuted": false,
+  "packagedBinaryReplaced": false,
+  "functionalParityVerified": false,
+  "antivirusScanned": false,
+  "warning": "Static build evidence only. No equivalence or release approval.",
+  "sharedSupervisionSha256": {
+    "go.mod": "2f80ac45a508789c86ed88674c406b272369e4745fc62514a1051cba8030a2a9",
+    "platform_other.go": "4b7a6139c3b494fb91acc562797fd2cf92dbee11347b4825f9cf4fc29cd98552",
+    "platform_windows.go": "f7e870a7ae6c044536e3e0f5308feff34b0d8d67c649bbf0e4b41c7fc3b9a1a7",
+    "probe.go": "0f673198b40cca04ac272dcb8c69c14ef40946d7952497b97acb67a49e3ead8b",
+    "probe_test.go": "d919abd0b6f60493ca9010e4e3d0b8f7bdbf6d4347317595a1b8d43865f6183e",
+    "process.go": "db3148a590e19f1263ed009e9c1e746f44d178a772181342b4a6288abdf2f18b",
+    "process_test.go": "cb86851a0416a944ea4d717ae091938d0191faefdec03313f12c56944032e9df"
+  },
+  "buildReportSha256": "c130b4b1a626a2e8e08c057c110b2deb24fd92446bbbfbd839b258bfdb28ecb6",
+  "commands": [
+    {
+      "command": [
+        "go",
+        "version"
+      ],
+      "exitCode": 0,
+      "stdout": "go version go1.23.2 linux/amd64\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "env",
+        "GOHOSTOS",
+        "GOHOSTARCH"
+      ],
+      "exitCode": 0,
+      "stdout": "linux\namd64\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "build",
+        "-trimpath",
+        "-buildvcs=false",
+        "-ldflags=-s -w -H=windowsgui",
+        "-o",
+        "<OUT>/PMMHost-candidate.exe",
+        "."
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "build",
+        "-trimpath",
+        "-buildvcs=false",
+        "-o",
+        "<OUT>/peicon-helper",
+        "<REPO>/Development/Source/PEIcon/inject.go"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<OUT>/peicon-helper",
+        "-exe",
+        "<OUT>/PMMHost-candidate.exe",
+        "-ico",
+        "<REPO>/PMM/Resources/UI/PMM.ico"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "version",
+        "-m",
+        "<OUT>/PMMHost-candidate.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "<OUT>/PMMHost-candidate.exe: go1.23.2\n\tpath\tgithub.com/laredson/pmm-host\n\tmod\tgithub.com/laredson/pmm-host\t(devel)\t\n\tdep\tpmm.local/supervision\tv0.0.0\n\t=>\t../Supervision\t(devel)\t\n\t\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tCGO_ENABLED=0\n\tbuild\tGOARCH=amd64\n\tbuild\tGOOS=windows\n\tbuild\tGOAMD64=v1\n",
+      "stderr": ""
+    }
+  ],
+  "originalSha256": "010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d",
+  "candidateSha256": "96e6e6b024207257e7777d7ad72711bf8f8c0966c86929d6f5528ec177ddb059",
+  "candidateSizeBytes": 2614784,
+  "fullReport": "Included in candidate evidence ZIP; regenerate with build.py"
+}

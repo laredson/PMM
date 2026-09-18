@@ -103,8 +103,8 @@ func commandOutput(timeout time.Duration, cwd, exe string, args ...string) (int,
 		}
 		combined += strings.TrimSpace(result.Stderr)
 	}
-	if result.StartError != "" {
-		return result.ExitCode, combined, errors.New(result.StartError)
+	if result.RunError != "" {
+		return result.ExitCode, combined, errors.New(result.RunError)
 	}
 	return result.ExitCode, combined, nil
 }

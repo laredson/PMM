@@ -1,0 +1,150 @@
+{
+  "schema": "PMM_HOST_COMPARISON_S02C1_V1",
+  "method": "Static PE sections + debug/buildinfo + bounded Go pclntab function spans",
+  "inputs": {
+    "original": {
+      "sha256": "010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d",
+      "sizeBytes": 2567168,
+      "subsystem": 2,
+      "certificateTableBytes": 0,
+      "goVersion": "go1.23.2",
+      "modulePath": "github.com/laredson/pmm-host",
+      "settings": {
+        "-buildmode": "exe",
+        "-compiler": "gc",
+        "-trimpath": "true",
+        "CGO_ENABLED": "0",
+        "GOAMD64": "v1",
+        "GOARCH": "amd64",
+        "GOOS": "windows"
+      },
+      "functionCount": 42
+    },
+    "candidate": {
+      "sha256": "96e6e6b024207257e7777d7ad72711bf8f8c0966c86929d6f5528ec177ddb059",
+      "sizeBytes": 2614784,
+      "subsystem": 2,
+      "certificateTableBytes": 0,
+      "goVersion": "go1.23.2",
+      "modulePath": "github.com/laredson/pmm-host",
+      "settings": {
+        "-buildmode": "exe",
+        "-compiler": "gc",
+        "-trimpath": "true",
+        "CGO_ENABLED": "0",
+        "GOAMD64": "v1",
+        "GOARCH": "amd64",
+        "GOOS": "windows"
+      },
+      "functionCount": 53
+    }
+  },
+  "originalVsCandidate": {
+    "byteIdentical": false,
+    "sameGoVersion": true,
+    "sameBuildSettings": true,
+    "sections": [
+      {
+        "name": ".data",
+        "sameRawBytes": false,
+        "leftBytes": 77824,
+        "rightBytes": 77824
+      },
+      {
+        "name": ".idata",
+        "sameRawBytes": false,
+        "leftBytes": 1536,
+        "rightBytes": 1536
+      },
+      {
+        "name": ".pdata",
+        "sameRawBytes": false,
+        "leftBytes": 29184,
+        "rightBytes": 29696
+      },
+      {
+        "name": ".rdata",
+        "sameRawBytes": false,
+        "leftBytes": 1209856,
+        "rightBytes": 1236480
+      },
+      {
+        "name": ".reloc",
+        "sameRawBytes": false,
+        "leftBytes": 21504,
+        "rightBytes": 22016
+      },
+      {
+        "name": ".rsrc",
+        "sameRawBytes": false,
+        "leftBytes": 107520,
+        "rightBytes": 107520
+      },
+      {
+        "name": ".symtab",
+        "sameRawBytes": true,
+        "leftBytes": 512,
+        "rightBytes": 512
+      },
+      {
+        "name": ".text",
+        "sameRawBytes": false,
+        "leftBytes": 1117184,
+        "rightBytes": 1137152
+      },
+      {
+        "name": ".xdata",
+        "sameRawBytes": false,
+        "leftBytes": 512,
+        "rightBytes": 512
+      }
+    ],
+    "commonFunctionCount": 34,
+    "sameRawFunctionBytes": [],
+    "leftOnlyFunctions": [
+      "main.(*Host).pipe",
+      "main.(*Host).pipe.deferwrap1",
+      "main.(*Host).pipe.func1",
+      "main.(*Host).run.gowrap1",
+      "main.(*Host).run.gowrap2",
+      "main.(*Host).run.gowrap3",
+      "main.findPowerShell",
+      "main.startupSplashWndProc"
+    ],
+    "rightOnlyFunctions": [
+      "main.(*Host).monitorStartupSplash.deferwrap1",
+      "main.(*Host).run.deferwrap1",
+      "main.(*Host).run.func1",
+      "main.(*Host).run.func2",
+      "main.(*Host).run.func2.1",
+      "main.(*Host).run.func3",
+      "main.(*Host).run.func3.gowrap1",
+      "main.(*startupSplash).Close.func1",
+      "main.(*startupSplash).control",
+      "main.(*startupSplash).run.deferwrap2",
+      "main.(*startupSplash).run.func1",
+      "main.(*startupSplash).run.func1.1",
+      "main.(*startupSplash).run.func2",
+      "main.(*startupSplash).run.func3",
+      "main.(*startupSplash).windowProc",
+      "main.(*startupSplash).windowProc-fm",
+      "main.completeStartupRecord",
+      "main.nextStartupView",
+      "main.startupState"
+    ],
+    "semanticEquivalenceEstablished": false
+  },
+  "buildReportSha256": "c130b4b1a626a2e8e08c057c110b2deb24fd92446bbbfbd839b258bfdb28ecb6",
+  "inspectorSourceSha256": "be7b0339d6a01c468be915457853390381622b990c9ac46947b3ae62542d9108",
+  "comparisonScriptSha256": "352bc9d86867a94180eb28f19457e7c112c620fd817b77c6aab9b8259ef4be97",
+  "windowsArtifactsExecuted": false,
+  "functionalParityVerified": false,
+  "replacementApproved": false,
+  "limitations": [
+    "Compiled function ranges do not recover the original source or all call semantics.",
+    "Raw equality is a byte comparison, not a semantic equivalence proof.",
+    "Code relocation, layout, metadata and added functions can change section bytes.",
+    "The Windows desktop, CLI outcomes, focus and process supervision are NOT exercised.",
+    "No Authenticode chain validation or antivirus scan is performed."
+  ]
+}

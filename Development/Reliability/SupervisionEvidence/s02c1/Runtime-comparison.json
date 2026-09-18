@@ -1,0 +1,274 @@
+{
+  "schema": "PMM_RUNTIME_COMPARISON_S02C1_V1",
+  "method": "PE + debug/buildinfo + Go pclntab; source-contract review is separate",
+  "artifacts": {
+    "original": {
+      "sha256": "e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a",
+      "sizeBytes": 6365184,
+      "subsystem": 3,
+      "goVersion": "go1.23.2",
+      "applicationFunctionCount": 80
+    },
+    "s03a": {
+      "sha256": "45e017190c379774afd24557084e7fa532bbef58b6ead6869294943bb72ed0be",
+      "sizeBytes": 6366720,
+      "subsystem": 3,
+      "goVersion": "go1.23.2",
+      "applicationFunctionCount": 81
+    },
+    "s03b": {
+      "sha256": "db39fb942ebf9ba2c8d78c71abf4df43ec918a4040fe09dfaad65cba9a97ac77",
+      "sizeBytes": 6394880,
+      "subsystem": 3,
+      "goVersion": "go1.23.2",
+      "applicationFunctionCount": 81
+    }
+  },
+  "originalVsS03A": {
+    "byteIdentical": false,
+    "sameGoVersion": true,
+    "sameBuildSettings": true,
+    "sections": [
+      {
+        "name": ".data",
+        "sameRawBytes": false,
+        "leftBytes": 277504,
+        "rightBytes": 277504
+      },
+      {
+        "name": ".idata",
+        "sameRawBytes": true,
+        "leftBytes": 1536,
+        "rightBytes": 1536
+      },
+      {
+        "name": ".pdata",
+        "sameRawBytes": false,
+        "leftBytes": 65536,
+        "rightBytes": 65536
+      },
+      {
+        "name": ".rdata",
+        "sameRawBytes": false,
+        "leftBytes": 2927616,
+        "rightBytes": 2928640
+      },
+      {
+        "name": ".reloc",
+        "sameRawBytes": false,
+        "leftBytes": 53760,
+        "rightBytes": 53760
+      },
+      {
+        "name": ".rsrc",
+        "sameRawBytes": true,
+        "leftBytes": 107520,
+        "rightBytes": 107520
+      },
+      {
+        "name": ".symtab",
+        "sameRawBytes": true,
+        "leftBytes": 512,
+        "rightBytes": 512
+      },
+      {
+        "name": ".text",
+        "sameRawBytes": false,
+        "leftBytes": 2929152,
+        "rightBytes": 2929664
+      },
+      {
+        "name": ".xdata",
+        "sameRawBytes": true,
+        "leftBytes": 512,
+        "rightBytes": 512
+      }
+    ],
+    "commonFunctionCount": 80,
+    "sameRawFunctionBytes": [
+      "main.ensureDependencies.deferwrap1",
+      "main.ensureDependencies.deferwrap2",
+      "main.ensureDependencies.deferwrap3",
+      "main.ensureDependencies.deferwrap4",
+      "main.ensureDependencies.deferwrap5",
+      "main.extractZipSafe.deferwrap1",
+      "main.fileSize",
+      "main.init"
+    ],
+    "leftOnlyFunctions": [],
+    "rightOnlyFunctions": [
+      "main.legacyUICommand"
+    ],
+    "semanticEquivalenceEstablished": false
+  },
+  "originalVsS03B": {
+    "byteIdentical": false,
+    "sameGoVersion": true,
+    "sameBuildSettings": true,
+    "sections": [
+      {
+        "name": ".data",
+        "sameRawBytes": false,
+        "leftBytes": 277504,
+        "rightBytes": 277504
+      },
+      {
+        "name": ".idata",
+        "sameRawBytes": false,
+        "leftBytes": 1536,
+        "rightBytes": 1536
+      },
+      {
+        "name": ".pdata",
+        "sameRawBytes": false,
+        "leftBytes": 65536,
+        "rightBytes": 66048
+      },
+      {
+        "name": ".rdata",
+        "sameRawBytes": false,
+        "leftBytes": 2927616,
+        "rightBytes": 2941440
+      },
+      {
+        "name": ".reloc",
+        "sameRawBytes": false,
+        "leftBytes": 53760,
+        "rightBytes": 53760
+      },
+      {
+        "name": ".rsrc",
+        "sameRawBytes": false,
+        "leftBytes": 107520,
+        "rightBytes": 107520
+      },
+      {
+        "name": ".symtab",
+        "sameRawBytes": true,
+        "leftBytes": 512,
+        "rightBytes": 512
+      },
+      {
+        "name": ".text",
+        "sameRawBytes": false,
+        "leftBytes": 2929152,
+        "rightBytes": 2944512
+      },
+      {
+        "name": ".xdata",
+        "sameRawBytes": true,
+        "leftBytes": 512,
+        "rightBytes": 512
+      }
+    ],
+    "commonFunctionCount": 79,
+    "sameRawFunctionBytes": [],
+    "leftOnlyFunctions": [
+      "main.findPowerShell"
+    ],
+    "rightOnlyFunctions": [
+      "main.legacyUICommand",
+      "main.parseProcessRequest"
+    ],
+    "semanticEquivalenceEstablished": false
+  },
+  "S03AVsS03B": {
+    "byteIdentical": false,
+    "sameGoVersion": true,
+    "sameBuildSettings": true,
+    "sections": [
+      {
+        "name": ".data",
+        "sameRawBytes": false,
+        "leftBytes": 277504,
+        "rightBytes": 277504
+      },
+      {
+        "name": ".idata",
+        "sameRawBytes": false,
+        "leftBytes": 1536,
+        "rightBytes": 1536
+      },
+      {
+        "name": ".pdata",
+        "sameRawBytes": false,
+        "leftBytes": 65536,
+        "rightBytes": 66048
+      },
+      {
+        "name": ".rdata",
+        "sameRawBytes": false,
+        "leftBytes": 2928640,
+        "rightBytes": 2941440
+      },
+      {
+        "name": ".reloc",
+        "sameRawBytes": false,
+        "leftBytes": 53760,
+        "rightBytes": 53760
+      },
+      {
+        "name": ".rsrc",
+        "sameRawBytes": false,
+        "leftBytes": 107520,
+        "rightBytes": 107520
+      },
+      {
+        "name": ".symtab",
+        "sameRawBytes": true,
+        "leftBytes": 512,
+        "rightBytes": 512
+      },
+      {
+        "name": ".text",
+        "sameRawBytes": false,
+        "leftBytes": 2929664,
+        "rightBytes": 2944512
+      },
+      {
+        "name": ".xdata",
+        "sameRawBytes": true,
+        "leftBytes": 512,
+        "rightBytes": 512
+      }
+    ],
+    "commonFunctionCount": 80,
+    "sameRawFunctionBytes": [],
+    "leftOnlyFunctions": [
+      "main.findPowerShell"
+    ],
+    "rightOnlyFunctions": [
+      "main.parseProcessRequest"
+    ],
+    "semanticEquivalenceEstablished": false
+  },
+  "reviewInputSha256": {
+    "PMM/Resources/Metadata/runtime-contract.json": "4e2634ca4e3c84fccd63330dcf5fa588e4d0402dc76207de85462c62f711c60c",
+    "PMM/Resources/Metadata/RELEASE_MANIFEST.json": "82185c8c81ea241aff7335b2c506978dd014af28f881eb5e1d9a18c7f9acad56",
+    "PMM/Engine/Runner/routes.json": "24fb5515292e9e1c4541971151fbd5272e48f95d4ea8b5adda6852575037dcd9",
+    "PMM/Modules/Bootstrap/Start-PalModMerger.ps1": "4cccbc64ef6434582123550bd22cff255c0d6d711c94556dec46d1e17355dd19",
+    "Development/Source/Runtime/main.go": "11fb22503144a70e67356fa4ee6ae63cae6c9578e3986d4ae3f31b2308426e08",
+    "Development/Source/Runtime/deps.go": "6c5689230e5885271085a39ea0e442f774fd72121b24fa83e0611acff17ddcf3",
+    "Development/Reliability/NativeCandidates/Host/main.go": "c68a28ba4620a7e8fc9f5960200dfdb575ea8f33d7331309ec758d456d01f1bd"
+  },
+  "toolSha256": {
+    "compare_runtime.py": "f9ff05fc0eadb9bc00bbb468af2c0b301ef633d373290f7949d27f22cfd06513",
+    "inspect_pe.py": "e67e18a81280434be1b353515b9ea277c74c6e8b73410596558bdac697c98eed",
+    "tools/runtime_meta.go": "f71a5508a16dfc6c037234c9dfc05ab22522b885056d39be10f7e4bdab9a1f7c"
+  },
+  "artifactReportSha256": {
+    "original.json": "e0e7571d2f8d97d985767019599043bee216171cc490f3b94c878e9d0621b687",
+    "s03a.json": "e8ad74a5888aec6356e52dae5ac0b1e059f1deb88fc6a62439ea16630fc87a38",
+    "s03b.json": "4443da9b360f0383194c5a4f84d93ba279ea199612d89fffafab37ee587b87ba"
+  },
+  "windowsArtifactsExecuted": false,
+  "functionalParityVerified": false,
+  "originalSourceRecovered": false,
+  "antivirusScanned": false,
+  "limits": [
+    "Function names/ranges are not source recovery or behavior proof.",
+    "Raw function hashes include addresses and padding; differences may reflect relocation.",
+    "Equal sections do not prove whole-program equivalence.",
+    "Only the local reader is executed, never the inspected EXEs."
+  ]
+}

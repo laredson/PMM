@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 )
 
 const runtimeVersion = "1.2.1"
@@ -115,28 +114,11 @@ func main() {
 }
 
 func processCommand(args []string) int {
-	timeout := 300 * time.Second
-	cwd := ""
-	sep := -1
-	for i, a := range args {
-		if a == "--" {
-			sep = i
-			break
-		}
-		if a == "--timeout-sec" && i+1 < len(args) {
-			if n, e := strconv.Atoi(args[i+1]); e == nil && n > 0 {
-				timeout = time.Duration(n) * time.Second
-			}
-		}
-		if a == "--cwd" && i+1 < len(args) {
-			cwd = args[i+1]
-		}
-	}
-	if sep < 0 || sep+1 >= len(args) {
-		fmt.Fprintln(os.Stderr, "process run requires -- <executable> [args]")
+	req, err := parseProcessRequest(args)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
 		return 64
 	}
-	req := ProcessRequest{Executable: args[sep+1], Arguments: args[sep+2:], WorkingDirectory: cwd, Timeout: timeout}
 	r := runProcess(req)
 	printJSON(r)
 	return r.ExitCode
