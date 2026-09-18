@@ -5,6 +5,10 @@ Base: validated `main` commit `70d106e871099e4936dc5f81eef3e4ea15529d93`
 
 This file is the close translation-work ledger for PMM 1.5. Update it whenever a language template is created, started, completed, validated, activated, reordered, or otherwise changed.
 
+## Current checkpoint — 2026-09-18
+
+The user reports Portuguese works perfectly. Korean is now split into two parts at the user's request. **Part 1: 645/1,291 baseline entries saved** in canonical `ko.json`; locale remains disabled and `in-progress`. Part 2 starts at `Loading Fix Lab module...` and has 646 baseline entries left. Resume from `Development/Localization/KOREAN_HANDOFF.md` and machine-readable `Development/Localization/Progress/ko.json`; compare current keys instead of restarting the translation. The last completed source key is `Load draft`.
+
 ## Policy
 
 - English (`en`) is the canonical source catalog.
@@ -17,7 +21,7 @@ This file is the close translation-work ledger for PMM 1.5. Update it whenever a
 - `complete` is catalog readiness for development testing, not automatic release acceptance. Record which checks actually ran; matching line counts alone are not a machine-run key/placeholder audit.
 - `rtl` languages must be registered with right-to-left direction.
 - Language names in selectors always remain in their own native form.
-- Translation work is now scoped conservatively: one language stage per intervention. A fresh 1,291-string locale should normally be reviewed in chunks of roughly 300-400 strings, followed by a separate completion/activation pass. A locale that already has a complete draft may use one intervention for finalization and activation.
+- Scope is one bounded stage per intervention. For Korean the user-approved plan is two parts: 645 entries, then the remaining 646 plus completion checks. Keep a recoverable catalog, exact counts/cursor, glossary and validation status after each part. This is a work plan, not a guarantee of model capacity; never mark unfinished work complete to meet a prompt quota.
 - Language changes require restarting PMM. The experimental live-switch path was reverted because it increased startup cost and produced incorrect/slow in-session refreshes.
 - The branch development identity is `1.5.0.0`. `PMM/Resources/Metadata/VERSION.txt` is the runtime UI version source; changing Git branches alone does not rewrite this file or rebuild an executable.
 
@@ -71,7 +75,7 @@ Normal post-baseline market queue:
 
 `pt-BR -> ko -> ru -> fr -> de -> zh-TW -> ja -> tr -> pl -> it -> th -> id -> vi -> nl -> uk -> cs -> hi -> ar`
 
-Hindi and Modern Standard Arabic were intentionally moved ahead of their normal market position as early v1.5 quality targets. Both are enabled for user testing. Brazilian Portuguese is now also committed and enabled. Korean remains next in the existing commercial queue unless the user changes the order; Italian was proposed as an alternative but has not been translated or enabled in this recovery.
+Hindi and Modern Standard Arabic were intentionally moved ahead of their normal market position as early v1.5 quality targets. Both are enabled for user testing. Brazilian Portuguese is committed, enabled, and has now passed the user's reported runtime test. Korean part 1 is saved; part 2 is the active task. Italian was proposed as an alternative but has not been translated or enabled.
 
 The older worldwide-speaker backlog remains as reserve templates rather than being deleted: Bengali (`bn`), Urdu (`ur`), Nigerian Pidgin (`pcm`), Egyptian Arabic (`arz`), Marathi (`mr`), Telugu (`te`) and Hausa (`ha`).
 
@@ -82,8 +86,8 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 | baseline | `en` | English | English | ltr | enabled | complete + active |
 | baseline | `es` | Español | Spanish | ltr | enabled | complete + active |
 | baseline | `zh-CN` | 简体中文 | Chinese (Simplified) | ltr | enabled | complete + active |
-| 3 | `pt-BR` | Português (Brasil) | Portuguese (Brazil) | ltr | enabled | **catalog complete; development QA pending** |
-| 4 | `ko` | 한국어 | Korean | ltr | disabled | template pending |
+| 3 | `pt-BR` | Português (Brasil) | Portuguese (Brazil) | ltr | enabled | **catalog complete; user reports it works perfectly** |
+| 4 | `ko` | 한국어 | Korean | ltr | disabled | **in-progress; part 1 saved, 645/1,291 entries; 646 remain** |
 | 5 | `ru` | Русский | Russian | ltr | disabled | template pending |
 | 6 | `fr` | Français | French | ltr | disabled | template pending |
 | 7 | `de` | Deutsch | German | ltr | disabled | template pending |
@@ -131,6 +135,16 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 - Full machine-run catalog validation and Windows PowerShell/WPF validation were not executed in the 2026-09-17 recovery environment. The registry enables Portuguese for user testing, not as a release-accepted build.
 
 ## Work log
+
+### 2026-09-18 — Portuguese user QA accepted; Korean part 1 checkpoint
+
+- Recorded the user's report that Portuguese works perfectly. This is user-reported runtime QA, not a new machine-run audit.
+- Resumed from branch HEAD `ef68aeef85b5160948030a0eb358b932ed68a82f`; the Korean catalog at that point was an empty template. No saved Korean translation was overwritten.
+- Completed the first 645 baseline keys through `Load draft` in `PMM/Resources/Localization/ko.json`, with 11 intentional invariants and 62 parameterized strings. Source blob: `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`.
+- Executed local Python checks for strict JSON/duplicate keys, nonempty values, full placeholder multisets, numeric literals, selected technical tokens, trailing spaces and unexpected Unicode controls. No errors remained. Uploaded catalog blob `e239428f7eab5b6ff954dbebfb50e3b198308cc9` exactly matches the locally validated bytes.
+- Source range was read sequentially through GitHub; a full repository/source-parity machine audit and PowerShell/WPF tests were not run. Korean remains `in-progress` and disabled.
+- Added `KOREAN_HANDOFF.md` with glossary, source identity, procedures, validation limits and preserved product constraints; added `Progress/ko.json` with exact counts, hashes and the next key. The remaining 646 entries begin at `Loading Fix Lab module...`.
+- Updated both ledgers and the registry in the same checkpoint. No active language catalog, runtime code, main, release, tag, PR or workflow changed; no GitHub Actions were run.
 
 ### 2026-09-17 — recover Portuguese publication and bound RTL exceptions
 
@@ -182,7 +196,7 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 ### 2026-09-16 — Palworld-market priority refresh + first translation pair
 
 - Replaced the original pure total-speaker order with a Palworld-market-first priority model; worldwide speakers now break close ties.
-- Added pending market templates that were missing from the original speaker-based scaffold: Korean (`ko`), Traditional Chinese (`zh-TW`), Polish (`pl`), Italian (`it`), Thai (`th`), Ukrainian (`uk`), Dutch (`nl`) and Czech (`cs`).
+- Added pending market templates that were missing from the original speaker-based scaffold: Korean (`ko`), Traditional Chinese (`zh-TW`), Polish (`pl`), Italian (`it`), Thai (`th`), Ukrainian (`uk`) and Dutch (`nl`) and Czech (`cs`).
 - Preserved the previous high-speaker templates as a reserve backlog instead of deleting them.
 - Started Hindi (`hi`) + Modern Standard Arabic (`ar`) as early quality targets to validate Devanagari/non-Latin rendering and RTL behavior.
 - After Hindi and Arabic, the market queue resumes with Brazilian Portuguese (`pt-BR`) and Korean (`ko`), now handled one language/stage at a time rather than two complete locales in one prompt.

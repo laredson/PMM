@@ -6,7 +6,7 @@
     {"code":"es","nativeName":"Español","englishName":"Spanish","fallback":"en","direction":"ltr","xaml":"MainWindow.es.xaml","enabled":true,"status":"complete"},
     {"code":"zh-CN","nativeName":"简体中文","englishName":"Chinese (Simplified)","fallback":"en","direction":"ltr","xaml":"MainWindow.zh-CN.xaml","enabled":true,"status":"complete"},
     {"code":"pt-BR","nativeName":"Português (Brasil)","englishName":"Portuguese (Brazil)","fallback":"en","direction":"ltr","xaml":null,"enabled":true,"status":"complete"},
-    {"code":"ko","nativeName":"한국어","englishName":"Korean","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
+    {"code":"ko","nativeName":"한국어","englishName":"Korean","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"in-progress"},
     {"code":"ru","nativeName":"Русский","englishName":"Russian","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
     {"code":"fr","nativeName":"Français","englishName":"French","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},
     {"code":"de","nativeName":"Deutsch","englishName":"German","fallback":"en","direction":"ltr","xaml":null,"enabled":false,"status":"template"},

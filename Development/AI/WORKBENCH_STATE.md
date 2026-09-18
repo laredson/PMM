@@ -1,5 +1,17 @@
 # PMM shared implementation state
 
+## Active checkpoint — Korean part 1 of 2 — 2026-09-18
+
+Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. The user has confirmed that Portuguese works perfectly and asked to split the next language into two bounded prompts with enough context to resume in another chat.
+
+**Korean part 1 is saved: 645 of the baseline 1,291 entries**, from `(not detected)` through `Load draft`. Continue with `Loading Fix Lab module...`; 646 baseline entries remain. The catalog is `PMM/Resources/Localization/ko.json`, `translationStatus: in-progress`; registry `ko` is `status: in-progress` / `enabled: false`. The existing six active languages are unchanged.
+
+**Next chat: read `Development/Localization/KOREAN_HANDOFF.md` first.** It contains the exact source revision, glossary, continuation procedure, validation code, known defects and scope boundaries. Machine-readable progress is in `Development/Localization/Progress/ko.json`. Recompute missing keys against the current English catalog; do not replace the first half or use a stale line number if the source changed.
+
+The partial Korean catalog passed local Python JSON/duplicate/nonempty, full-placeholder, numeric, selected technical-token, trailing-space and Unicode-control checks. Its uploaded Git blob `e239428f7eab5b6ff954dbebfb50e3b198308cc9` matches the locally checked bytes. The English range was read sequentially; the full repository audit, PowerShell 5.1 and WPF runtime tests have NOT run for Korean. Do not enable or claim complete until the remaining block and completion checks are done.
+
+This intervention changes catalogs/progress/documentation only. Keep restart-based language changes, Arabic RTL/LTR code, main, releases, workflows, game files and the existing active catalogs unchanged. Push with `[skip ci]`; update both ledgers and the Korean handoff/progress file in each subsequent checkpoint.
+
 ## v1.5.0.0 translation branch — 2026-09-17
 
 Branch `v1.5.0.0-PMM-translated` starts from validated `main` commit `70d106e871099e4936dc5f81eef3e4ea15529d93`. This branch is the working line for the next PMM localization release; the discarded historical 1.4 line is not reused.
@@ -10,7 +22,7 @@ Branch `v1.5.0.0-PMM-translated` starts from validated `main` commit `70d106e871
 
 The active selector now contains six native labels, in this order: `English`, `Español`, `简体中文`, `Português (Brasil)`, `हिन्दी`, and `العربية`. The first three remain fixed. Registry `complete` means catalog ready for development/user testing, not release acceptance or proof that every runtime-generated string is localized.
 
-Brazilian Portuguese (`pt-BR`) is now committed and enabled for user testing. The interrupted write did succeed in commit `9bcc60ff96da11c39c05cdf5b97b7561f84ca879`; it must not be translated from scratch again. Recovery found unescaped embedded quotes in two catalog lines (Delete draft and Replace the installed user scheme). Commit `fcd966a8ce921574ab2eaff864295a29dd3aa6a8` corrects only those two lines. The corrected catalog blob is `8bb8888779c60fe4c22ab6d7c8ac3944077cf5e0`. The registry is enabled only after that correction. Italian has not been started or enabled.
+Brazilian Portuguese (`pt-BR`) is committed and enabled, and the user has since reported it works perfectly. This is user runtime feedback, not a new automated audit. The interrupted write did succeed in commit `9bcc60ff96da11c39c05cdf5b97b7561f84ca879`; it must not be translated from scratch again. Recovery found unescaped embedded quotes in two catalog lines (Delete draft and Replace the installed user scheme). Commit `fcd966a8ce921574ab2eaff864295a29dd3aa6a8` corrects only those two lines. The corrected catalog blob is `8bb8888779c60fe4c22ab6d7c8ac3944077cf5e0`. The registry is enabled only after that correction. Italian has not been started or enabled.
 
 Hindi (`hi`) is enabled. The user's first runtime screenshot shows Devanagari text and no obvious severe clipping in the visible Fix Lab screen. Generic dynamic English suffixes such as `0 candidate(s)`, `0 variant(s)` and `0 case backup(s)` remain open localization defects; catalog completion must not hide those runtime gaps.
 
@@ -29,9 +41,9 @@ Arabic QA is not fully closed. Mixed prose/path text in `TxtGamePathStatus` need
 
 The experimental live-language-switch implementation remains reverted because the user observed slow startup, slow in-session changes and incorrect refresh results. PMM uses the stable behavior: selecting a language saves it, and the complete interface adopts it after PMM is restarted.
 
-Translation workload remains conservatively scoped. Prefer one contained language/stage per intervention; a complete draft can be finalized without restarting its translation. Every intervention must leave a recoverable Git checkpoint and update `Development/Localization/TRANSLATION_PLAN.md` plus this file.
+Translation workload remains conservatively scoped. The current user-approved Korean plan is two parts with a durable checkpoint after each. A complete draft can be finalized without restarting its translation. Every intervention must leave a recoverable Git checkpoint and update `Development/Localization/TRANSLATION_PLAN.md` plus this file.
 
-The backlog is prioritized by estimated Palworld audience. The detailed model and ordered locale queue live in `Development/Localization/TRANSLATION_PLAN.md`. Portuguese is now available for testing; Korean is next in the existing commercial queue unless the user chooses otherwise.
+The backlog is prioritized by estimated Palworld audience. The detailed model and ordered locale queue live in `Development/Localization/TRANSLATION_PLAN.md`. Portuguese has passed the user's reported runtime test; Korean part 2 is now the active task. Finish it before moving to another language unless the user chooses otherwise.
 
 ### v1.5 runtime identity correction
 
