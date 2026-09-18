@@ -1,0 +1,7 @@
+fuzz: elapsed: 0s, gathering baseline coverage: 0/2 completed
+fuzz: elapsed: 0s, gathering baseline coverage: 2/2 completed, now fuzzing with 2 workers
+fuzz: elapsed: 3s, execs: 82327 (27442/sec), new interesting: 2 (total: 4)
+fuzz: elapsed: 6s, execs: 233063 (50243/sec), new interesting: 3 (total: 5)
+fuzz: elapsed: 6s, execs: 233063 (0/sec), new interesting: 3 (total: 5)
+PASS
+ok  	pmm.local/fixlab/pakv11	6.009s

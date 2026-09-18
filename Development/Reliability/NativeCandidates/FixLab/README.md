@@ -1,29 +1,21 @@
-# FixLab - reconstruccion por componentes
+# FixLab - reconstruccion parcial, cierre 04A-3
 
-**04A-2 completada solo para PMMDLT1. No hay motor FixLab completo compilable.**
-La fuente original sigue sin recuperarse; los ocho fragmentos del overlay historico
-continuan invalidados por la auditoria 04A. No repetir esa busqueda sin una pista
-nueva ni modificar su hash esperado. PMMFixLab.exe original permanece intacto.
+**Todavia no hay motor PMMFixLab completo ni fuente original recuperada.**
+El ejecutable distribuido permanece intacto. La fuente historica sigue ausente
+_y_ el overlay R2 invalido; 04A conserva esa evidencia, no reintentarlo sin pista nueva.
 
-## Componente nuevo
+Componentes aislados ya disponibles:
+- PMMDLT1/: lector/aplicador en memoria (04A-2), sin cambios en 04A-3.
+- PAKV11/: escritor, lector y comparacion por bytes; perfil v11 ASCII sin
+  compresion/cifrado, PHI/FDI completos y limites explicitos. Lector Python separado,
+  golden sintetico y 17 fixtures cruzados (04A-3). No extrae ni instala archivos.
 
-[PMMDLT1/README.md](PMMDLT1/README.md) contiene el lector/aplicador en memoria,
-API, limites y pruebas. [FORMAT.md](PMMDLT1/FORMAT.md) documenta el layout derivado
-de datos y evidencia estatica, no de una fuente original recuperada.
-22 tests Go, 10 Python y race Linux pasaron. Los metadatos de los 137 payloads
-coinciden con un parser independiente; no se transformaron assets reales.
-El EXE generado por su build.py es un harness de pruebas, NO PMMFixLab.
+Herramientas de procedencia anteriores: audit_source.py, inspect_binary.py y
+tools/fixlab_meta.go. El auditor sigue marcando BLOCKED por el overlay invalido;
+ese resultado no es un fallo de las nuevas bibliotecas. El lector metadata no
+es el motor FixLab. SOURCE_CONTRACT.md y evidence/ conservan el mapa historico.
 
-## Procedencia anterior conservada
-
-`audit_source.py` sigue comprobando el EXE, recetas y el overlay como datos. Su
-resultado BLOCKED/codigo 2 para el overlay NO invalida la reconstruccion aislada,
-ni equivale a un fallo funcional del programa. `inspect_binary.py` compila un
-lector de metadata en una salida externa; nunca ejecuta PMMFixLab.exe.
-`SOURCE_CONTRACT.md` y evidence/ conservan el mapa/contratos historicos de 04A.
-
-## Siguiente
-
-04A-3: PAK v11/readback; despues UAsset/core R1 y orquestacion V2/CLI. Solo una
-candidata completa permite iniciar comparacion 04B. Leer ../../NEXT_SESSION.md.
-No sustituir binarios, alterar CKL o anunciar aceptacion Windows/Palworld.
+Faltan UAsset, transformaciones core R1, orquestacion V2 y CLI. Solo un motor
+completo permitira comparacion 04B y gates de aceptacion. No conectar prematuramente
+estos componentes al paquete ni modificar recetas/hashes productivos.
+Continuar en ../../NEXT_SESSION.md (Development/Reliability/NEXT_SESSION.md).

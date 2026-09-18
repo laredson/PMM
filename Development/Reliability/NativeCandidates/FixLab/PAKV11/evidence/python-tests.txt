@@ -1,0 +1,18 @@
+test_all_truncations (test_reference.ReferenceTests.test_all_truncations) ... ok
+test_build_existing_output_rejected (test_reference.ReferenceTests.test_build_existing_output_rejected) ... ok
+test_build_internal_output_rejected (test_reference.ReferenceTests.test_build_internal_output_rejected) ... ok
+test_expected_bytes_are_independent_requirement (test_reference.ReferenceTests.test_expected_bytes_are_independent_requirement) ... ok
+test_extra_bytes_rejected (test_reference.ReferenceTests.test_extra_bytes_rejected) ... ok
+test_footer_flags_and_ranges (test_reference.ReferenceTests.test_footer_flags_and_ranges) ... ok
+test_golden_recipe_reproduces_frozen_fixture (test_reference.ReferenceTests.test_golden_recipe_reproduces_frozen_fixture) ... ok
+test_hash_vectors_and_case (test_reference.ReferenceTests.test_hash_vectors_and_case) ... ok
+test_independent_golden_readback (test_reference.ReferenceTests.test_independent_golden_readback) ... ok
+test_logical_faults_with_recomputed_index_hashes (test_reference.ReferenceTests.test_logical_faults_with_recomputed_index_hashes) ... ok
+test_name_or_file_set_mismatch (test_reference.ReferenceTests.test_name_or_file_set_mismatch) ... ok
+test_path_safety (test_reference.ReferenceTests.test_path_safety) ... ok
+test_payload_and_header_rejected (test_reference.ReferenceTests.test_payload_and_header_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 1.843s
+
+OK

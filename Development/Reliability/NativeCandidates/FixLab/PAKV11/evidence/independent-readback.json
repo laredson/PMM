@@ -1,0 +1,31 @@
+{
+  "schema": "PMM_PAKV11_INDEPENDENT_READBACK_V1",
+  "method": "independent Python parser + supplied synthetic bytes",
+  "fixtureCount": 17,
+  "fileCount": 240,
+  "fixtureArchiveSha256": {
+    "synthetic-00": "7ae68994f75a7b647ee07e83498772467ea5a79c8e45a21c58adb5d4f41ed1be",
+    "synthetic-01": "3c85a96056256275a03fe1745719029ff769c869009eafb7babe6e0dd3e7b219",
+    "synthetic-02": "951776c8a233ba0c0807cd03e9e7627bce17d555c90831600b3c7484c7d92fb2",
+    "synthetic-03": "ab476f4305fe844a0c53033287d7849654e70bfa5c57f904be2f42c9bf5ebbf1",
+    "synthetic-04": "8a4bc49c3b67bf5263f389d66a545fcad3633aa3700e37e245a5d5e44048e624",
+    "synthetic-05": "51f32024727985a7a5d130fee372dbb48249187929aa6522a8026cecce4c591b",
+    "synthetic-06": "dd353139caa277b5f645d10d940b35c15c1f6727a7795fab64e024e0658f92b5",
+    "synthetic-07": "407c14c5421c109c47ab379bdec8da1f51a1d7e1543904951ece016a45aa6506",
+    "synthetic-08": "de5fcb073e213c63c49cbdf75fe3ab55e18c8b32613ea9b58bf1df01f0b78405",
+    "synthetic-09": "056772eb4e9f6eb304d8820422f9c5e2c38ae6881b34c934fdc81e1063d1672d",
+    "synthetic-10": "66bf04ae8e22618f40fe8ade2092822a8ead9a961543581d6ca0c6e6719664f3",
+    "synthetic-11": "deb897f02b924a65e4e125365bc532ed82766aa6107f45297c41f6473b0d5e1c",
+    "synthetic-12": "36f9201980a1c5c8e107ebb979fe2287adf2f585fe582e0d43a25e239f4dfb89",
+    "synthetic-13": "c753f9fd9abea8f018fda0b5947108e92ab99c6fe3c084c1c8ed919692964517",
+    "synthetic-14": "145299e9485d775c2959f587c5affeaf04a118e5442e7a36479f0af07a3f3ec2",
+    "synthetic-15": "cc804ddc99d9393e10493218d5777d4a20fc879bd277880acb96006c1934ef75",
+    "synthetic-16": "426af127efbdaa4b42aea3504d318b71ef2d16d632a8cd54f4ec02d4114da721"
+  },
+  "goldenSha256": "3c85a96056256275a03fe1745719029ff769c869009eafb7babe6e0dd3e7b219",
+  "allComparedWithSuppliedSyntheticBytes": true,
+  "fullReportSha256": "6174522b55eae04775a17428404c2f4654830d95fe700b69787c38cb19bf0da3",
+  "repakExecuted": false,
+  "unrealPakExecuted": false,
+  "engineCompatibilityVerified": false
+}

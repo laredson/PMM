@@ -1,0 +1,49 @@
+Top-level actual Go output; subcase details are preserved in the full JSONL evidence.
+Full go-tests.jsonl SHA-256: 3f2bd07436b33f187db5fe683a839cd09a263e2d9beca5599f109a44440dfacc
+
+=== RUN   TestIndependentGoldenBytes
+--- PASS: TestIndependentGoldenBytes (0.00s)
+=== RUN   TestEmptyAndBinaryFiles
+--- PASS: TestEmptyAndBinaryFiles (0.00s)
+=== RUN   TestDeterministicInputOrdering
+--- PASS: TestDeterministicInputOrdering (0.00s)
+=== RUN   TestNoInputOrOutputAliasing
+--- PASS: TestNoInputOrOutputAliasing (0.00s)
+=== RUN   TestPathRejection
+--- PASS: TestPathRejection (0.00s)
+=== RUN   TestCaseAndDirectoryCollisions
+--- PASS: TestCaseAndDirectoryCollisions (0.00s)
+=== RUN   TestPathHashVectors
+--- PASS: TestPathHashVectors (0.00s)
+=== RUN   TestResourceLimits
+--- PASS: TestResourceLimits (0.00s)
+=== RUN   TestCancellationAndNilContext
+--- PASS: TestCancellationAndNilContext (0.00s)
+=== RUN   TestCancellationDuringWork
+--- PASS: TestCancellationDuringWork (0.01s)
+=== RUN   TestEveryGoldenTruncation
+--- PASS: TestEveryGoldenTruncation (0.00s)
+=== RUN   TestFooterAndSuffixRejection
+--- PASS: TestFooterAndSuffixRejection (0.00s)
+=== RUN   TestLogicalTamperAfterResealing
+--- PASS: TestLogicalTamperAfterResealing (0.00s)
+=== RUN   TestHugeOffsetAndSecondaryOverlap
+--- PASS: TestHugeOffsetAndSecondaryOverlap (0.00s)
+=== RUN   TestDataHashesAndHeaderChecks
+--- PASS: TestDataHashesAndHeaderChecks (0.00s)
+=== RUN   TestExpectedBytesNotArchiveChecksumAlone
+--- PASS: TestExpectedBytesNotArchiveChecksumAlone (0.00s)
+=== RUN   TestNonzeroSeedReadback
+--- PASS: TestNonzeroSeedReadback (0.00s)
+=== RUN   TestSyntheticRoundtrips
+--- PASS: TestSyntheticRoundtrips (0.02s)
+=== RUN   TestIndependentReadbackCorpusExport
+--- PASS: TestIndependentReadbackCorpusExport (0.11s)
+=== RUN   TestLimitsDoNotChangeCanonicalBytes
+--- PASS: TestLimitsDoNotChangeCanonicalBytes (0.00s)
+=== RUN   FuzzRead
+--- PASS: FuzzRead (0.00s)
+=== RUN   FuzzResealedIndexes
+--- PASS: FuzzResealedIndexes (0.00s)
+PASS
+ok  	pmm.local/fixlab/pakv11	0.149s

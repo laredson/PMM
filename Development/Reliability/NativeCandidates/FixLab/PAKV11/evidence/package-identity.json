@@ -1,0 +1,12 @@
+{
+  "scope": "static identity and checksum consistency only",
+  "version": "1.5.0.1",
+  "buildId": "PMM-v1.5.0.1-reliability-s01b",
+  "packageFiles": 629,
+  "checksumRows": 628,
+  "checksumMismatches": 0,
+  "pmmExecuted": false,
+  "antivirusScanned": false,
+  "sourceParityVerified": false,
+  "inputMode": "all package files"
+}

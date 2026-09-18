@@ -1,0 +1,121 @@
+{
+  "schema": "PMM_PAKV11_STATIC_ORIGIN_V1",
+  "originalFixLabSha256": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe",
+  "originalExecuted": false,
+  "sourceRecovered": false,
+  "inspectedFunctions": [
+    {
+      "name": "main.(*pakReader).fstr",
+      "entryVA": 5423488,
+      "endVA": 5424448,
+      "sizeBytes": 960,
+      "rawCodeSha256": "8bea99fc29a883425ef49b74bdd1f12e567f0a23f98cfd2933370356f0dc17da",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/pakv11.go",
+      "sourceLine": 268
+    },
+    {
+      "name": "main.encodedEntry",
+      "entryVA": 5416576,
+      "endVA": 5416928,
+      "sizeBytes": 352,
+      "rawCodeSha256": "096577219b764d3ed4e040ac89f9fd3a8747dc0691d563bcac4096be514962ff",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/pakv11.go",
+      "sourceLine": 88
+    },
+    {
+      "name": "main.entryDataHeader",
+      "entryVA": 5416128,
+      "endVA": 5416576,
+      "sizeBytes": 448,
+      "rawCodeSha256": "634b055da5efa2dad3dddca92a9b753d9bbf784f2d4580740823601d19d24a2c",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/pakv11.go",
+      "sourceLine": 76
+    },
+    {
+      "name": "main.fnv64Path",
+      "entryVA": 5415616,
+      "endVA": 5415840,
+      "sizeBytes": 224,
+      "rawCodeSha256": "0c6c706d6637741d8c27916bfb85696c9bf8b61505247e0de858703088f07a54",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/pakv11.go",
+      "sourceLine": 51
+    },
+    {
+      "name": "main.generateFDI",
+      "entryVA": 5417440,
+      "endVA": 5419552,
+      "sizeBytes": 2112,
+      "rawCodeSha256": "22b07acda6293a93241d943f6b7c5ce99e6937b0e955de8a88a0d41bc0014650",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/pakv11.go",
+      "sourceLine": 109
+    },
+    {
+      "name": "main.generatePHI",
+      "entryVA": 5416928,
+      "endVA": 5417440,
+      "sizeBytes": 512,
+      "rawCodeSha256": "54da8a4e19e81d661a4f6cec3d407f657ee43e5f8e392496c69173a58aed7a4b",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/pakv11.go",
+      "sourceLine": 99
+    },
+    {
+      "name": "main.pakFString",
+      "entryVA": 5414912,
+      "endVA": 5415616,
+      "sizeBytes": 704,
+      "rawCodeSha256": "ddcc144de5189ab132484cb0bf6d4164d0a809302d0871afdace4c4d425515f0",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/pakv11.go",
+      "sourceLine": 26
+    },
+    {
+      "name": "main.splitPathChild",
+      "entryVA": 5415840,
+      "endVA": 5416128,
+      "sizeBytes": 288,
+      "rawCodeSha256": "910dd697f19462dd7da1365529f1ef9d35d77f8350ca0085609ed8bb6e337e44",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/pakv11.go",
+      "sourceLine": 64
+    },
+    {
+      "name": "main.validatePakV11",
+      "entryVA": 5424448,
+      "endVA": 5435840,
+      "sizeBytes": 11392,
+      "rawCodeSha256": "9ed2d87180b3201470dc1456e1845cbc39d8fe636296c5a83945a77603f641d4",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/pakv11.go",
+      "sourceLine": 306
+    },
+    {
+      "name": "main.validatePakV11.func1",
+      "entryVA": 5435840,
+      "endVA": 5435968,
+      "sizeBytes": 128,
+      "rawCodeSha256": "23e5fa042493f4ed6d69413c0f4380846e7798b0c325128bb7d7b414ab7ed8d1",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/pakv11.go",
+      "sourceLine": 426
+    },
+    {
+      "name": "main.writePakV11",
+      "entryVA": 5419552,
+      "endVA": 5423488,
+      "sizeBytes": 3936,
+      "rawCodeSha256": "31195bfc7b8b6a2eaf4e6bbb9645d3c406b3f8ffcdce1656124c5a305882b2bf",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/pakv11.go",
+      "sourceLine": 165
+    }
+  ],
+  "observations": [
+    "encodedEntry writes flags 0xe0000000 and two uint32 fields; rejects offset/size above uint32.",
+    "entryDataHeader serializes zero local offset, repeated length, no compression, 20-byte hash and zero flags/block size.",
+    "fnv64Path contains 0xcbf29ce484222325 plus seed and per-byte xor/multiply by 0x100000001b3 over 16-bit units.",
+    "writePakV11 contains 0x5a6f12e1, version 11, and a 160-byte compression-name area."
+  ],
+  "referenceRepo": "trumank/repak",
+  "referenceCommit": "355b5f62f51959c7cc6dd5a51708646ef483065d",
+  "referenceBlobs": {
+    "repak/src/pak.rs": "1b8e3d95fda21496e0009b2452c15cb5049d9e31",
+    "repak/src/entry.rs": "57a5b4856af7335b5dc0c76f946e4062cf8bef44",
+    "repak/src/footer.rs": "7e3c1c442fe50f915ce95fcc348b0464549cee02"
+  },
+  "limit": "Static fields/routines + independent format implementation; no recovered source, binary equivalence, or engine acceptance."
+}

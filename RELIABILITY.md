@@ -1,22 +1,20 @@
 # PMM v1.5.0.1 - fiabilidad independiente
 
-Rama v1.5.0.1-PMM-reliability. **04A-2 cerrada: componente PMMDLT1 reconstruido.**
-No es la fuente original ni un motor FixLab completo. 04A/REL-01 siguen abiertos.
+Rama v1.5.0.1-PMM-reliability. Ultima tanda **04A-3: PAK v11/readback**.
+PMMDLT1 y PAKV11 son componentes reconstruidos separados, no un motor FixLab completo.
+No se ha sustituido ningun ejecutable del programa distribuido.
 
-PMMDLT1 lee/aplica parches en memoria con hashes obligatorios de entrada,
-referencias y salida; lectura completa, limites y cancelacion. Las pruebas
-sinteticas pasan y dos lectores independientes coinciden en la estructura
-de los 137 payloads distribuidos. No se transformaron assets reales.
+PAKV11 agrega escritor/lector/Verify, indices y hashes, rutas seguras y limites.
+20 tests Go, 13 Python, race Linux; 17 paquetes sinteticos/240 archivos contrastados
+con lector Python independiente y un golden manual. Dos builds del harness Windows
+identicos; Windows/Unreal/Palworld NO ejecutados. No hay escaneo antivirus.
 
-Los 629 archivos PMM/ conservan 628 hashes y build 1.5.0.1/s01b. Host/Runtime/
-UIBridge/Supervision y traducciones no cambiaron. No hay ejecutable nuevo instalado,
-release ni aceptacion Windows. Los nuevos EXE de prueba NO sustituyen PMMFixLab.
+Paquete conserva 1.5.0.1 / PMM-v1.5.0.1-reliability-s01b, 629 archivos y 628 hashes.
+Host/Runtime/UIBridge/Supervision C2B, PMMDLT1, traducciones y recetas intactos.
+REL-01, recuperacion source original, UAsset/core/V2/CLI y gates reales pendientes.
 
-Leer [NEXT_SESSION](Development/Reliability/NEXT_SESSION.md),
-[STATUS](Development/Reliability/STATUS.md),
-[hallazgos](Development/Reliability/SESSION04A2_FINDINGS.md) y
-[checks](Development/Reliability/SESSION04A2_CHECKS.json).
-[PMMDLT1](Development/Reliability/NativeCandidates/FixLab/PMMDLT1/README.md)
-guarda API, formato, limites, fuentes y recetas offline.
-Siguiente 04A-3: PAK v11/readback, despues UAsset/core y orquestacion.
-No repetir la busqueda fallida del overlay sin una pista nueva.
+Retomar [NEXT_SESSION](Development/Reliability/NEXT_SESSION.md): 04A-4 estructura
+UAsset aislada. [STATUS](Development/Reliability/STATUS.md),
+[hallazgos](Development/Reliability/SESSION04A3_FINDINGS.md) y
+[checks](Development/Reliability/SESSION04A3_CHECKS.json) conservan el cierre.
+No rehacer componentes desde el chat ni reinstalar viejos binarios de los ZIP.

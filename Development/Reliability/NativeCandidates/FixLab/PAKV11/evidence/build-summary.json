@@ -1,0 +1,17 @@
+{
+  "schema": "PMM_PAKV11_BUILD_SUMMARY_V1",
+  "artifact": "TEST harness only, not FixLab",
+  "goVersion": "go1.23.2",
+  "buildHost": "linux/amd64",
+  "target": "windows/amd64",
+  "sha256": "6563b0a5e888e6709025dff239464e7f7e00fa37764808db1a6fa724ca74f21f",
+  "bytes": 5658624,
+  "repeatSha256": "6563b0a5e888e6709025dff239464e7f7e00fa37764808db1a6fa724ca74f21f",
+  "byteIdentical": true,
+  "buildReportsSha256": [
+    "56d6657f0a39cde705dfd766207ab3f836d5115e6cfed1765497cb178f284812",
+    "56d6657f0a39cde705dfd766207ab3f836d5115e6cfed1765497cb178f284812"
+  ],
+  "windowsVetExitCode": 0,
+  "windowsExecuted": false
+}
