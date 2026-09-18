@@ -1,14 +1,26 @@
+## Active checkpoint — Russian complete; Korean user-accepted — 2026-09-18
+
+Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. The user reports Korean works perfectly, as do the previously added languages, and requested the next queued language in one prompt where feasible. Russian is now complete: **1,291/1,291 canonical keys**, `enabled: true` / `status: complete`, native label `Русский`, fallback `en`, direction `ltr`. The seven previously active catalogs are unchanged.
+
+Source checkpoint: `d9442cff26b8ac84a1f85fe0db023baf2d6c89f8`. English blob: `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`, reconstructed locally with byte-identical content. Russian uploaded blob: `ffa3bfb80ef2aa4ae3268b0c557e3a38bb4b1b18`, identical to the checked local UTF-8 file. Local structural validation passed JSON/duplicates, exact keys/order, metadata, nonempty values, full placeholders, numeric literals, whitespace, selected technical tokens, file-dialog patterns and Unicode controls. There are 109 parameterized strings and 18 intentional invariant values.
+
+Read `Development/Localization/RUSSIAN_HANDOFF.md` and `Development/Localization/Progress/ru.json` for glossary, exact hashes, scope and executed-check details. Russian still needs the user's Windows runtime/visual review; this was not a PowerShell 5.1, WPF, native-speaker or full source-code localization audit. Existing runtime QA issues are not closed by catalog completeness or by the user's general positive report on older languages.
+
+**Next translation: French (`fr`, Français).** Do not follow the historical Korean part-1 cursor below and do not retranslate Korean, Portuguese or Russian from scratch. Preserve restart-based language changes, native names, Arabic RTL/LTR code, runtime/native binaries, main, releases, tags, workflows and game files. Development commits use `[skip ci]`; no GitHub Actions were dispatched. Update both translation ledgers in every future checkpoint.
+
 ## Korean localization completed and published — 2026-09-18
 
-한국어 now covers all 1,291 canonical English keys on `v1.5.0.0-PMM-translated` and is enabled for user testing.
+한국어 now covers all 1,291 canonical English keys on `v1.5.0.0-PMM-translated` and is enabled. The user subsequently reported it works perfectly.
 Part 1 (645 entries) was preserved; part 2 added the remaining 646 entries.
-Validation was deliberately bounded to one structural pass: JSON/key parity, non-empty values and placeholder preservation. No GitHub Actions, full repository audit or WPF visual/runtime test was run for this checkpoint.
+Validation was deliberately bounded to one structural pass: JSON/key parity, non-empty values and placeholder preservation. No GitHub Actions, full repository audit or WPF visual/runtime test was run for that checkpoint.
 Language switching remains restart-based. Portuguese remains user-validated; Arabic RTL behavior and its separately tracked UI exceptions are unchanged.
-Next step: user runtime/visual QA of Korean. Do not retranslate Korean from scratch unless QA reports a specific issue.
+Korean user runtime feedback is accepted; do not retranslate Korean from scratch unless QA reports a specific issue.
 
 # PMM shared implementation state
 
-## Active checkpoint — Korean part 1 of 2 — 2026-09-18
+## Historical checkpoint — Korean part 1 of 2 — 2026-09-18
+
+> Superseded by Korean completion and the active Russian checkpoint above. The following cursor and disabled status describe that earlier snapshot only.
 
 Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. The user has confirmed that Portuguese works perfectly and asked to split the next language into two bounded prompts with enough context to resume in another chat.
 
@@ -28,7 +40,7 @@ Branch `v1.5.0.0-PMM-translated` starts from validated `main` commit `70d106e871
 
 `PMM/Resources/Localization/languages.json` is the complete locale inventory for v1.5. Pending/template/reserve languages remain traceable in Git but are filtered from normal runtime language resolution until enabled.
 
-The active selector now contains six native labels, in this order: `English`, `Español`, `简体中文`, `Português (Brasil)`, `हिन्दी`, and `العربية`. The first three remain fixed. Registry `complete` means catalog ready for development/user testing, not release acceptance or proof that every runtime-generated string is localized.
+The active selector now contains eight native labels, in this order: `English`, `Español`, `简体中文`, `Português (Brasil)`, `한국어`, `Русский`, `हिन्दी`, and `العربية`. The first three remain fixed. Registry `complete` means catalog ready for development/user testing, not release acceptance or proof that every runtime-generated string is localized.
 
 Brazilian Portuguese (`pt-BR`) is committed and enabled, and the user has since reported it works perfectly. This is user runtime feedback, not a new automated audit. The interrupted write did succeed in commit `9bcc60ff96da11c39c05cdf5b97b7561f84ca879`; it must not be translated from scratch again. Recovery found unescaped embedded quotes in two catalog lines (Delete draft and Replace the installed user scheme). Commit `fcd966a8ce921574ab2eaff864295a29dd3aa6a8` corrects only those two lines. The corrected catalog blob is `8bb8888779c60fe4c22ab6d7c8ac3944077cf5e0`. The registry is enabled only after that correction. Italian has not been started or enabled.
 
@@ -49,9 +61,9 @@ Arabic QA is not fully closed. Mixed prose/path text in `TxtGamePathStatus` need
 
 The experimental live-language-switch implementation remains reverted because the user observed slow startup, slow in-session changes and incorrect refresh results. PMM uses the stable behavior: selecting a language saves it, and the complete interface adopts it after PMM is restarted.
 
-Translation workload remains conservatively scoped. The current user-approved Korean plan is two parts with a durable checkpoint after each. A complete draft can be finalized without restarting its translation. Every intervention must leave a recoverable Git checkpoint and update `Development/Localization/TRANSLATION_PLAN.md` plus this file.
+Translation workload remains scoped to one language or recoverable stage per intervention. Korean was completed in two stages; the user subsequently requested one complete next language where feasible, and Russian is complete in this checkpoint. A complete draft can be finalized without restarting its translation. Every intervention must leave a recoverable Git checkpoint and update `Development/Localization/TRANSLATION_PLAN.md` plus this file.
 
-The backlog is prioritized by estimated Palworld audience. The detailed model and ordered locale queue live in `Development/Localization/TRANSLATION_PLAN.md`. Portuguese has passed the user's reported runtime test; Korean part 2 is now the active task. Finish it before moving to another language unless the user chooses otherwise.
+The backlog is prioritized by estimated Palworld audience. The detailed model and ordered locale queue live in `Development/Localization/TRANSLATION_PLAN.md`. Portuguese and Korean have passed the user's reported runtime test. Russian is ready for user QA; French is the next translation target.
 
 ### v1.5 runtime identity correction
 
