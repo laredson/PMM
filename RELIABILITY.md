@@ -1,22 +1,36 @@
 # PMM v1.5.0.1 - linea independiente de fiabilidad
 
-Rama: `v1.5.0.1-PMM-reliability`. Rama de idiomas: `v1.5.0.0-PMM-translated`, independiente.
-Base comun: `38bd5a934488ac11a6200d3142b889ca86a82f57`. Preparacion inicial: `df4b2417d3278096f9f66f115bd1237e8d908068`.
+Rama: `v1.5.0.1-PMM-reliability`. Idiomas: `v1.5.0.0-PMM-translated`, independiente.
+Ancestro comun: `38bd5a934488ac11a6200d3142b889ca86a82f57`.
 
-## Estado actual
-
-**Tanda 01 parcial.** Investigacion de procedencia y herramienta de preparacion entregadas; fuentes exactas y cambios efectivos de identidad todavia pendientes. El contenido funcional de PMM no se ha cambiado. VERSION.txt sigue 1.5.0.0 y el manifiesto sigue 1.3.4.1. 1.5.0.1 es el objetivo de esta linea, no una release publicada.
+**01B cerrada para identidad e inventario estatico.** El paquete declara 1.5.0.1
+coherentemente, con build PMM-v1.5.0.1-reliability-s01b. SHA256SUMS contiene
+628 entradas para 629 archivos y solo excluye su propio archivo. Los otros
+625 archivos, incluidos binarios e idiomas, se conservan byte por byte.
+Esto no es una release publica ni una declaracion de hardening terminado.
 
 ## Continuar
 
-Leer primero [NEXT_SESSION.md](Development/Reliability/NEXT_SESSION.md). Contiene el bloqueo, la entrada necesaria, el alcance de 01B y un prompt de continuacion.
+[Development/Reliability/NEXT_SESSION.md](Development/Reliability/NEXT_SESSION.md)
+es el punto de entrada: 02A, SOLO fuente candidata del Host. No repetir 01B.
+[STATUS.md](Development/Reliability/STATUS.md),
+[SESSION01B_FINDINGS.md](Development/Reliability/SESSION01B_FINDINGS.md) y
+[SESSION01B_CHECKS.json](Development/Reliability/SESSION01B_CHECKS.json) documentan
+esta entrega. [SESSION_PLAN.md](Development/Reliability/SESSION_PLAN.md) mantiene
+las siguientes tandas. Los nativos del paquete no han sido sustituidos.
 
-[STATUS.md](Development/Reliability/STATUS.md) registra el estado real; [SESSION01_FINDINGS.md](Development/Reliability/SESSION01_FINDINGS.md) contiene evidencia y limites; [SESSION_PLAN.md](Development/Reliability/SESSION_PLAN.md) divide el trabajo en entregas verificables para sesiones acotadas.
+## Verificacion local de solo lectura
 
-[BASELINE.json](Development/Reliability/BASELINE.json), [IMPLEMENTATION_PLAN.md](Development/Reliability/IMPLEMENTATION_PLAN.md) y [TRANSLATION_INTEGRATION.md](Development/Reliability/TRANSLATION_INTEGRATION.md) conservan la base y los contratos generales. [AGENTS.md](AGENTS.md) establece las instrucciones de trabajo.
+```text
+python Development/Reliability/verify_identity.py --expected-build PMM-v1.5.0.1-reliability-s01b
+```
 
-## Herramienta de la tanda 01
+Comprueba archivos versionados por Git; `--package <carpeta-PMM>` comprueba TODOS
+los archivos de una distribucion limpia. No ejecuta PMM, no repara y no hace red.
+Los 20 tests locales de herramientas y los hashes no sustituyen pruebas Windows
+ni escaneos antivirus.
 
-`Development/Reliability/session01_prepare.py` se ejecuta en una copia Git completa de esta rama. Sin cambiar el checkout ni hacer red, comprueba los pins nativos/dependencias y genera un paquete de evidencia y una propuesta conjunta de VERSION, BUILD_ID, RELEASE_MANIFEST y SHA256SUMS. Su funcionamiento puro tiene 12 tests sinteticos; no se ha ejecutado sobre el paquete real ni se han probado PMM/Windows/antivirus.
-
-No sobrescribir ejecutables con el snapshot de fuentes antiguo, no cambiar pins para aceptar archivos inesperados y no afirmar que se emulo Nexus. No hay sincronizacion automatica con idiomas ni permiso permanente para publicar cambios. Cada tanda registra sus propias verificaciones y pendientes.
+REL-01 sigue pendiente: los candidatos descritos en la charla anterior no quedaron
+conservados con codigo/informes. No se certifica su equivalencia. La advertencia
+Development/Source/SOURCE_STATUS.md sigue activa. No integrar idiomas, publicar
+ni cambiar protecciones por iniciativa propia.

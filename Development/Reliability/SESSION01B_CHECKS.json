@@ -1,0 +1,101 @@
+{
+  "schema": "PMM_REL_SESSION01B_CHECKS_V1",
+  "date": "2026-09-18",
+  "branch": "v1.5.0.1-PMM-reliability",
+  "inputCommit": "74a47df7072f651c91ec114ff235e69bc8d1042a",
+  "inputRepositoryTree": "759d170d648a2f98fd7dc809b1b92e9fa34e7559",
+  "uploadedZip": "PMMv1.5.0.1.zip",
+  "uploadedZipSizeBytes": 53370602,
+  "uploadedZipSha256": "6a1721508a17ccf3c269ea1e3976d9502a7b918c0c72415026de8be3e1e40193",
+  "uploadedTrackedTreeMatchesRemote": true,
+  "excludedIgnoredFiles": [
+    "PMM/Engine/oo2core_9_win64.dll"
+  ],
+  "identityScopeStatus": "PASS",
+  "identity": {
+    "scope": "static identity and checksum consistency only",
+    "version": "1.5.0.1",
+    "buildId": "PMM-v1.5.0.1-reliability-s01b",
+    "packageFiles": 629,
+    "checksumRows": 628,
+    "checksumMismatches": 0,
+    "pmmExecuted": false,
+    "antivirusScanned": false,
+    "sourceParityVerified": false,
+    "inputMode": "Git-tracked PMM files only"
+  },
+  "changedPackageFiles": [
+    "PMM/Resources/Metadata/BUILD_ID.txt",
+    "PMM/Resources/Metadata/RELEASE_MANIFEST.json",
+    "PMM/Resources/Metadata/SHA256SUMS.txt",
+    "PMM/Resources/Metadata/VERSION.txt"
+  ],
+  "unchangedPackageFileCount": 625,
+  "nativePinsMatched": 3,
+  "dependencyPinsMatched": 201,
+  "runtimeInventoryFileCount": 188,
+  "oldInventory": {
+    "rowCount": 603,
+    "missing": [
+      "Resources/Localization/ar.json",
+      "Resources/Localization/arz.json",
+      "Resources/Localization/bn.json",
+      "Resources/Localization/cs.json",
+      "Resources/Localization/de.json",
+      "Resources/Localization/fr.json",
+      "Resources/Localization/ha.json",
+      "Resources/Localization/hi.json",
+      "Resources/Localization/id.json",
+      "Resources/Localization/it.json",
+      "Resources/Localization/ja.json",
+      "Resources/Localization/ko.json",
+      "Resources/Localization/mr.json",
+      "Resources/Localization/nl.json",
+      "Resources/Localization/pcm.json",
+      "Resources/Localization/pl.json",
+      "Resources/Localization/pt-BR.json",
+      "Resources/Localization/ru.json",
+      "Resources/Localization/te.json",
+      "Resources/Localization/th.json",
+      "Resources/Localization/tr.json",
+      "Resources/Localization/uk.json",
+      "Resources/Localization/ur.json",
+      "Resources/Localization/vi.json",
+      "Resources/Localization/zh-TW.json"
+    ],
+    "mismatches": [
+      "Modules/Shared/Localization.ps1",
+      "Resources/Localization/README.md",
+      "Resources/Localization/languages.json",
+      "Resources/Metadata/BUILD_ID.txt",
+      "Resources/Metadata/VERSION.txt"
+    ],
+    "extra": []
+  },
+  "metadataSha256": {
+    "Resources/Metadata/VERSION.txt": "fe6fc2841b2fc6e7bd9987f5268e55f38b6853314cf20010ef40a488aa47d5fc",
+    "Resources/Metadata/BUILD_ID.txt": "0e51cc82229d6fa8389f09678f36b06ae6d46bd0047d1548fb9a879224e99a34",
+    "Resources/Metadata/RELEASE_MANIFEST.json": "82185c8c81ea241aff7335b2c506978dd014af28f881eb5e1d9a18c7f9acad56",
+    "Resources/Metadata/SHA256SUMS.txt": "b21945673cd4bc3faa364f1c46d700d7cff6ed6afe4cd87ab074f438fc415493"
+  },
+  "validation": {
+    "preparerSyntheticTestsPassed": 12,
+    "verifierSyntheticTestsPassed": 8,
+    "preparerIdempotentOnFinalBytes": true,
+    "nativeBinariesRebuilt": false,
+    "windowsRuntimeTested": false,
+    "pmmExecuted": false,
+    "antivirusScanned": false,
+    "githubWorkflowDispatched": false,
+    "releaseCreated": false
+  },
+  "preserved": {
+    "nativeBinaries": true,
+    "componentVersionsAndPins": true,
+    "managedPayload": true,
+    "localizationAndUI": true,
+    "donorBranchNotModified": true
+  },
+  "releaseDateDecision": "null for unpublished candidate; no active source consumer found; historical RC fixtures unchanged",
+  "nextSession": "02A: persist Host source candidate and reproducible evidence; do not replace packaged executables"
+}

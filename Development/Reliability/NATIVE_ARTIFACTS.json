@@ -1,36 +1,100 @@
 {
-  "schema": "PMM_NATIVE_PROVENANCE_CHECKPOINT_V1",
-  "inspectedCommit": "df4b2417d3278096f9f66f115bd1237e8d908068",
-  "status": "UNRESOLVED_SOURCE_PARITY",
-  "binaryBytesAvailableInThisSession": false,
-  "sha256Origin": "Inherited RELEASE_MANIFEST.json, not recomputed in this session",
+  "schema": "PMM_NATIVE_PROVENANCE_CHECKPOINT_V2",
+  "inspectedCommit": "74a47df7072f651c91ec114ff235e69bc8d1042a",
+  "date": "2026-09-18",
+  "status": "BINARY_IDENTITIES_VERIFIED_SOURCE_PARITY_PENDING",
+  "binaryBytesAvailableInThisSession": true,
+  "sha256Origin": "Recomputed from uploaded ZIP; native blobs and repository tree match GitHub",
+  "buildInfoCommon": {
+    "goVersion": "go1.23.2",
+    "GOOS": "windows",
+    "GOARCH": "amd64",
+    "CGO_ENABLED": "0",
+    "GOAMD64": "v1",
+    "trimpath": true,
+    "compiler": "gc"
+  },
   "artifacts": [
     {
       "path": "PMM/PMM.exe",
+      "sizeBytes": 2567168,
       "gitBlob": "a49a3edd4c6dca197f02a7a58b0249d351463d4b",
-      "declaredSha256": "010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d",
+      "sha256": "010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d",
+      "matchesManifestPin": true,
       "sourceReference": "Development/Source/Host/main.go",
       "sourceMatchVerified": false,
-      "recoveryTarget": "Guided Flow splash stages, HWND foreground handoff, supervision and diagnostics"
+      "peSubsystem": 2,
+      "certificateTableBytes": 0,
+      "peSections": {
+        ".text": "7025be9d2c6a4614af652e7d7fc4e5aff987e69854e837632db58825d79c1017",
+        ".rdata": "923f5627262f7875ec1179b0921025833df0e57ab79db0d265073d531f6e766f",
+        ".data": "f92b49add7a3df7f1bf9525b76fda5881af9ca77400de7d104ce1045252c26f9",
+        ".pdata": "f14d11a14ebed203ff06a5d22445a11d2226244dec7db57b79f56702d04c8ee6",
+        ".xdata": "fd2f037065c725bb4f9e0757d0db67e83e572c552208edb0214c1a92910975c9",
+        ".idata": "e6e4e3d9532a53890514232f8a74e0be68d5a8e299f4f69d7f954aa696ff3dfe",
+        ".reloc": "b8d1895ab06970433db74a36227c8c2799343bbe4244820a877ee800c7ab9fee",
+        ".symtab": "3e67f4a7d14b832ff2a2433e9cf0f6f5720821f67148a87c0ee2595a20c96c68",
+        ".rsrc": "dec55758a933a325551686d547ab87f8f98ea6742f018e424a68d8719edd8b36"
+      }
     },
     {
       "path": "PMM/Engine/PMMRuntime.exe",
+      "sizeBytes": 6365184,
       "gitBlob": "068cb479ef4746de7cf360f6ab50113529af07c0",
-      "declaredSha256": "e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a",
+      "sha256": "e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a",
+      "matchesManifestPin": true,
       "sourceReference": "Development/Source/Runtime/",
       "sourceMatchVerified": false,
-      "recoveryTarget": "Actual start/UI dispatch, dependency contracts, WPF process creation and cancellation"
+      "peSubsystem": 3,
+      "certificateTableBytes": 0,
+      "peSections": {
+        ".text": "287c8b49dd2f9314d500da434fc7a19eb3ac24b015b95bee2d86160cc2b54c7d",
+        ".rdata": "3596e50991c46f4d6b6d32e5d0bb12f7965b771daf9424b135bae5cb561a728b",
+        ".data": "b6b257e63a5cca65810fa4ccda299ae49dae0b033a5e35c3cb5bdd2ffea65cb8",
+        ".pdata": "51553461e172e26cdab6f2e9e452d4b9562e4786fff75a7124cf3731e8932ade",
+        ".xdata": "f6e98c1402a7ed9660dcdda13eede96d2a541f4e6307346290c8cbd37dd892be",
+        ".idata": "180f7247bdaf0893653ea9aab938de03ea23ef7a0aaad8059c3693487257ed96",
+        ".reloc": "7bb6287adab848f0a7a4eb2323d5508a19e247cd384d146dcd6a61963c5137a8",
+        ".symtab": "3e67f4a7d14b832ff2a2433e9cf0f6f5720821f67148a87c0ee2595a20c96c68",
+        ".rsrc": "a95832a05a5a139d84e442dbe6c9f3704e421440cd73f2534c88a5c9bb51def5"
+      }
     },
     {
       "path": "PMM/Engine/PMMFixLab.exe",
+      "sizeBytes": 2790912,
       "gitBlob": "e2a7c8269215f5f02db1408429ddee58fc445b52",
-      "declaredSha256": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe",
-      "sourceReference": "Development/Source/FixLabEngine/",
+      "sha256": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe",
+      "matchesManifestPin": true,
+      "sourceReference": "repository Development/Source/FixLabEngine/",
       "sourceMatchVerified": false,
-      "recoveryTarget": "Locate source reference absent from inspected source tree; verify 0.2.0 variant-recipes engine"
+      "peSubsystem": 3,
+      "certificateTableBytes": 0,
+      "peSections": {
+        ".text": "9f9985e309f8a7c9df7000421089166e6e2d77fae6274a1388a332404172e3ce",
+        ".rdata": "152a70dcea66ef58dafe4e1405383ffd94009f051fbb71d78ef8137730d52eab",
+        ".data": "06345020b7d65e714aa04325974dc778d46ebb555d89821fc6566194a8d9b6c2",
+        ".pdata": "78872407624f0149e7a629e57dea472d218268e0956bc44b912091d327834187",
+        ".xdata": "03f81c55d0422ea382a7a4a4354ed19ee054d024eae6f5efd9bb9332ffc3d022",
+        ".idata": "6b7d774d2ccea40217909a4df0f704c0c7612fdf334f5db482ea374d4bb3a727",
+        ".reloc": "cd5327eb706a744ad7d5bb51a834f970f46fde24a7cbcec3b672303963418f6d",
+        ".symtab": "3e67f4a7d14b832ff2a2433e9cf0f6f5720821f67148a87c0ee2595a20c96c68"
+      }
     }
   ],
-  "reportedVirusTotalSha256": "5be86567f597aefb64f1645a9b924c7de213da49206d7591b9e4f7f685fbcade",
-  "virusTotalArtifactMatchVerified": false,
-  "nativeReplacementAllowedByThisCheckpoint": false
+  "authenticodeChainVerified": false,
+  "pmmExecuted": false,
+  "nativeReplacementAllowedByThisCheckpoint": false,
+  "previousCandidateFilesAvailable": false,
+  "previousSectionParityClaimsReproduced": false,
+  "reportedVirusTotal": {
+    "sha256": "5be86567f597aefb64f1645a9b924c7de213da49206d7591b9e4f7f685fbcade",
+    "artifact": "PMM.1.3.0.RC30.stable.release.zip",
+    "tag": "v1.3.0-Stable",
+    "githubAssetId": 537457024,
+    "sizeBytes": 46827823,
+    "matchesGitHubAssetDigest": true,
+    "artifactDownloadedAndRehashedInThisSession": false,
+    "virusTotalEngineTableRead": false,
+    "evidenceUrl": "https://api.github.com/repos/laredson/PMM/releases/tags/v1.3.0-Stable"
+  }
 }

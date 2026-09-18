@@ -59,8 +59,8 @@
   },
   "product": "Palworld Manager Merger",
   "acronym": "PMM",
-  "version": "1.3.4.1",
-  "releaseDate": "2026-09-16",
+  "version": "1.5.0.1",
+  "releaseDate": null,
   "creator": "laredson",
   "license": "MIT",
   "pmmCoreVersion": "0.9.0",
@@ -115,8 +115,8 @@
   "dotnetRuntimeInventorySha256": "8b2f4fe11635f18fa419d5e4fedad456bc7c3d7395272ee91e89b62e3ac72ed0",
   "gameReferenceBackgroundWorker": "Modules/GameReference/GameReferenceWorker.ps1",
   "gameReferenceProgressUi": "Shared normal Settings + Fix Lab progress bars plus both Game Reference buttons as ColorFlow progress surfaces. AUTO invokes the canonical Settings Game Reference command before Fix Lab navigation; output choice may be highlighted concurrently while the worker runs.",
-  "releaseCandidate": "1.3.4.1-chinese-translation",
-  "buildId": "PMM-v1.3.4-desktop-auat-rc2",
+  "releaseCandidate": "1.5.0.1-reliability-s01b",
+  "buildId": "PMM-v1.5.0.1-reliability-s01b",
   "buildIdentityFile": "Resources/Metadata/BUILD_ID.txt",
   "uiContract": "Public tabs are Mods & Merge, FIX LAB, AI & Help, World Save and Settings. Fresh size is 1460x900 and the normal minimum is 900x600; startup clamps to the Windows work area in device-independent pixels. Branding and action areas occupy equal header halves. Header actions are ordered Detect/status, folder/Play controls, then SemiAUTO/AUTO. SemiAUTO arms continuation after a manually started workflow action; the wider AUTO button runs the remaining safe workflow once and uses an idle-only sparkle treatment. AI & Help contains five focused subtabs: AI assistance, AI reception, Feedback & Knowledge, color-scheme editor and AI settings. AI assistance exposes separate diagnostic-case and standalone-mod-project entry points. Normal Settings also owns Vanilla Game Reference. General Settings follows the Sound events architecture by separating official PMM schemes from a bordered user-scheme collection. ColorFlow ends by highlighting Play as optional readiness without an action-required popup.",
   "bundledThemeCount": 11,
@@ -206,7 +206,8 @@
       "ready"
     ],
     "taskbarAppUserModelID": "laredson.PalworldManagerMerger",
-    "startupForegroundHandoff": "WPF reports startup:UI-shell-ready:<HWND>; PMM.exe activates that HWND before destroying the splash."
+    "startupForegroundHandoff": "WPF reports startup:UI-shell-ready:<HWND>; PMM.exe activates that HWND before destroying the splash.",
+    "sourceStatus": "UNVERIFIED_REFERENCE_NOT_REPRODUCIBLE_BUILD_PROOF"
   },
   "fullLanguageCompatibility": {
     "status": "native-start-and-ui-shell-1.3.1",
@@ -253,7 +254,8 @@
     "nativeUiConfigSha256": "4c762649651e28d7d685b3a54031baf7e633b2d596a8dc968ab03ed0fb539e5c",
     "nativeUiSourceSha256": "51f0fa0080fe49d6b15c8b354f4a1086ebc2badb9d9b8e8664ddffde27664a30",
     "childConsoleWindowsHidden": true,
-    "editableUiProcessCreation": "CREATE_NO_WINDOW without SW_HIDE; console suppressed while WPF top-level window remains normally visible/activatable."
+    "editableUiProcessCreation": "CREATE_NO_WINDOW without SW_HIDE; console suppressed while WPF top-level window remains normally visible/activatable.",
+    "sourceStatus": "UNVERIFIED_REFERENCE_NOT_REPRODUCIBLE_BUILD_PROOF"
   },
   "aiioModule": "Modules/AIIO/AIIO.ps1",
   "aiioServices": [
@@ -412,7 +414,8 @@
     "historicalR1RegressionEntries": 221,
     "goldenOutputProviderRequired": false,
     "variantCount": 5,
-    "engineSha256": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe"
+    "engineSha256": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe",
+    "sourceStatus": "UNVERIFIED_REFERENCE_NOT_REPRODUCIBLE_BUILD_PROOF"
   },
   "gameReferenceOnDemandFamilies": true,
   "gameReferenceHistoricalRetention": true,
@@ -430,7 +433,7 @@
     "targetBroker": "native PMMRuntime/PMMEngine operation subcommands",
     "uiHeavyWorkAllowed": false
   },
-  "release": "PMM v1.3.4 Desktop and AUAT",
+  "release": "PMM v1.5.0.1 Reliability - development",
   "fixLabEngineVersion": "0.2.0-variant-recipes",
   "fixLabRecipeSchema": "PMM_FIXLAB_VARIANT_RECIPE_V2",
   "fixLabCase001VariantCount": 5,
@@ -509,9 +512,9 @@
     "format": "transparent RGBA PNG",
     "pixelSize": "512x512"
   },
-  "releaseName": "1.3.4",
+  "releaseName": "1.5.0.1",
   "releaseValidation": {
-    "programRegression": "PASS: PS5.1 deep analysis/evidence, persistent jobs, candidate preservation, model routing and staged control, WPF EN/ES, case/MCP regressions, recovery and 1.3.2 cooked-data regressions. Full record: Development/Docs/Validation/PMM_1_3_3_ANALYSIS_VALIDATION.md.",
+    "programRegression": "NOT_RUN for this development candidate",
     "gameRuntime": "NOT_VERIFIED",
     "freeAccount": "NOT_VERIFIED",
     "inventoryModIncluded": false
@@ -604,5 +607,23 @@
     "retry": "Reuse the same session for unchanged evidence without extending budgets or authorizations",
     "validation": "26 WPF assertions per EN/ES using production library scan/display rows; 10 additional session/worker/real metadata-connection checks; no inference or Palworld run for these checks",
     "restartRequired": true
+  },
+  "inheritedReleaseValidation": {
+    "manifestVersion": "1.3.4.1",
+    "releaseDate": "2026-09-16",
+    "evidence": {
+      "programRegression": "PASS: PS5.1 deep analysis/evidence, persistent jobs, candidate preservation, model routing and staged control, WPF EN/ES, case/MCP regressions, recovery and 1.3.2 cooked-data regressions. Full record: Development/Docs/Validation/PMM_1_3_3_ANALYSIS_VALIDATION.md.",
+      "gameRuntime": "NOT_VERIFIED",
+      "freeAccount": "NOT_VERIFIED",
+      "inventoryModIncluded": false
+    }
+  },
+  "reliabilityPreparation": {
+    "session": "01B",
+    "state": "identity-aligned-native-source-unresolved",
+    "nativeSourceParityVerified": false,
+    "nativeBinariesRebuilt": false,
+    "antivirusScanned": false,
+    "publicReleaseCreated": false
   }
 }

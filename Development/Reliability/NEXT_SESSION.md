@@ -1,41 +1,65 @@
 # Retomar exactamente aqui
 
-Rama unica: `v1.5.0.1-PMM-reliability`. Version objetivo: **1.5.0.1**.
-Ultima tanda: **01, investigacion parcial y herramienta de preparacion**.
-Estado del programa: sin cambios funcionales; VERSION sigue 1.5.0.0 y el manifiesto sigue 1.3.4.1.
-**No estan resueltos todavia el desfase de fuentes ni la identidad efectiva del paquete.**
+Rama unica: `v1.5.0.1-PMM-reliability`.
+**01B terminada: no repetir identidad/inventario ni pedir de nuevo el ZIP.**
+Version: 1.5.0.1. Build: PMM-v1.5.0.1-reliability-s01b.
+Leer AGENTS.md -> este archivo -> STATUS.md -> SESSION01B_FINDINGS.md ->
+NATIVE_ARTIFACTS.json -> Development/Source/SOURCE_STATUS.md.
 
-## Leer
+## Siguiente tanda 02A: SOLO fuente candidata del Host
 
-AGENTS.md -> este archivo -> SESSION01_FINDINGS.md -> NATIVE_ARTIFACTS.json -> SESSION_PLAN.md.
-BASELINE.json conserva el punto de bifurcacion historico; no reescribirlo como si se hubiera creado hoy.
+Objetivo: recuperar o reconstruir una fuente candidata verificable de PMM.exe.
+No modificar Runtime, FixLab, UI, idiomas ni dependencias en esta tanda.
+No sustituir PMM.exe ni cambiar sus pins para aceptar un candidato no probado.
 
-## Proxima tanda: 01B - cerrar identidad, sin modificar ejecutables
+Entrada comprobada:
 
-Entrada necesaria: bytes completos de una copia de esta rama, o la salida real de la herramienta de preparacion junto con evidencia suficiente para contrastarla con la base. El acceso de lectura textual utilizado en la tanda 01 no proporciono los binarios ni un checkout completo.
+- Host original PMM/PMM.exe: SHA-256
+  010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d.
+- Go 1.23.2, windows/amd64, CGO_ENABLED=0, trimpath=true; hashes PE en NATIVE_ARTIFACTS.json.
+- Snapshot Development/Source/Host/; la advertencia de desfase sigue vigente.
+- Importacion Guided Flow: 683a46df474c5f576e0bf5543d070da0dab7478a;
+  padre bc04d18d677e8f6bf754518e342184761d6527a3.
+- Contrato splash/handoff HWND: RELEASE_MANIFEST.host y documentacion RC21.
+- Referencia historica de fuente splash, todavia no ligada a un archivo recuperado:
+  91e7531d9018ba1cbf7a3cbe20ed4736df3210c1ebad467cc80536959404ded9.
 
-Con una copia local completa, el comando de preparacion es:
+La busqueda anterior ya consulto 1.3.0-fix-lab, 1.3.0-stable, 1.3.0final,
+1.2.1-stable, 1.4.0-ReUI y 1.3.1-mod-creation: el main.go era el mismo snapshot.
+archive-main-before-1.2.1 y release/1.2 tenian el Host anterior. No repetir estas
+consultas sin una pista nueva. No se afirma haber agotado todos los backups.
 
-```text
-python Development/Reliability/session01_prepare.py --out ../PMM-session01
-```
+La charla menciono candidatos casi equivalentes, pero solo persistieron README,
+no sus .go/binarios/informes. No dar por recuperadas esas fuentes ni por probada
+su paridad. Conservar en esta tanda los resultados antes de prometer continuidad.
 
-Requiere Python 3.9+ y Git disponibles, la rama reliability seleccionada y el paquete sin cambios pendientes. No requiere ejecutar PMM ni instalar Go. El directorio de salida no debe existir. El checkout no se modifica. El archivo `PMM-session01/session01-packet.zip` contiene evidencia y la propuesta de los cuatro metadatos; no es un paquete para Nexus ni una release.
+## Trabajo y cierre
 
-1. Verificar el commit de entrada, los tres blobs nativos y sus hashes. Si hay discrepancia, parar y registrar su causa: no cambiar pins a los bytes encontrados por comodidad.
-2. Revisar que la propuesta preserve dependencias, versiones de componentes, campos de protocolos y evidencia historica. Revisar consumidores de releaseDate antes de adoptar un valor nulo para una candidata no publicada.
-3. Aplicar los cuatro metadatos juntos SOLO en reliability. Regenerar SHA256SUMS sobre los bytes finales de todo PMM, sin Workspace ni autorreferencia. No resolver el problema cambiando solo la etiqueta visible.
-4. Comprobar estaticamente version/build concordantes, cobertura/hash de todos los archivos, metadatos de componentes y ausencia de cambios fuera del alcance. No ejecutar PMM ni CI remoto.
-5. Actualizar STATUS.md, este archivo y el registro de la tanda. Subir un commit silencioso con la autorizacion de la intervencion. No publicar release/tag/PR.
+1. Leer snapshot/contrato y buscar una fuente exacta solo con pistas nuevas.
+2. Si no aparece, reconstruir cambios acotados desde contratos y evidencia
+   estatica. Etiquetar RECONSTRUCTION, no ORIGINAL_RECOVERED.
+3. Guardar los .go, diff, receta de build y hashes bajo
+   Development/Reliability/NativeCandidates/Host/. Explicar diferencias y limites.
+4. Compilar candidatos fuera del paquete. No ejecutar PMM ni hacer pruebas
+   funcionales Windows sin el alcance/autorizacion correspondientes.
+5. Cerrar con fuente candidata/evidencia guardadas o con bloqueo concreto.
+   Actualizar STATUS, este archivo y el registro antes del commit [skip ci].
+   No declarar equivalencia solo porque una seccion .text coincida.
 
-Salida verificable: identidad 1.5.0.1 coherente y SHA256SUMS completo. Nativos y traducciones byte-identicos a la entrada. El desfase de fuentes sigue separado y no impide corregir esta identidad cuando se tienen los bytes.
+La siguiente tanda 02B tratara SOLO comparacion reproducible/paridad del Host.
+Runtime queda para 03. Ningun resultado depende exclusivamente de directorios
+temporales o de la memoria de una conversacion. Binarios originales intactos
+hasta la aceptacion Windows pertinente. Sin Actions, PR, tags ni release.
 
-## Despues: 02 - recuperar/reconciliar SOLO Host
+## Comprobacion disponible
 
-El commit de importacion es `683a46df474c5f576e0bf5543d070da0dab7478a`, con padre `bc04d18d677e8f6bf754518e342184761d6527a3`. El Host anterior es otro source/blob y no se acepta como equivalente automaticamente.
-
-Buscar la fuente del splash identificada por el SHA-256 de referencia `91e7531d9018ba1cbf7a3cbe20ed4736df3210c1ebad467cc80536959404ded9` en backups/entregas/ramas disponibles. Con los bytes del binario, leer informacion de compilacion y contrastar contratos. Documentar si se recupera un original o si se reconstruye una implementacion; no equiparar ambas cosas. No sustituir PMM.exe sin paridad y aceptacion Windows.
+`python Development/Reliability/verify_identity.py --expected-build PMM-v1.5.0.1-reliability-s01b`
+comprueba identidad y hashes versionados, sin ejecutar PMM ni hacer red.
 
 ## Prompt para continuar
 
-"Continua en v1.5.0.1-PMM-reliability. Lee AGENTS.md y Development/Reliability/NEXT_SESSION.md. Completa solo la tanda 01B con los archivos reales disponibles: identidad 1.5.0.1 e inventario completo, sin tocar traducciones ni binarios. No afirmes recuperar fuentes: eso corresponde a las tandas siguientes. Documenta evidencia, pendientes y el siguiente paso; commit silencioso, sin Actions, PR, tags ni release. Si siguen faltando bytes, registra el bloqueo y no cambies pins ni declares completada la tanda."
+"Completa solo 02A en v1.5.0.1-PMM-reliability. Lee AGENTS.md y NEXT_SESSION.md.
+Recupera/reconstruye la fuente candidata del Host y guarda codigo, receta, hashes
+y diferencias. No cambies binarios, Runtime, idiomas ni pins. Documenta limites
+y la entrada exacta de 02B; un commit [skip ci], sin Actions, PR, tags ni release.
+No certifiques comparaciones anteriores sin disponer de sus archivos."

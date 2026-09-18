@@ -14,7 +14,7 @@ import zipfile
 
 BRANCH = 'v1.5.0.1-PMM-reliability'
 VERSION = '1.5.0.1'
-BUILD = 'PMM-v1.5.0.1-reliability-s01'
+BUILD = 'PMM-v1.5.0.1-reliability-s01b'
 META = 'Resources/Metadata/'
 MANIFEST = META + 'RELEASE_MANIFEST.json'
 SUMS = META + 'SHA256SUMS.txt'
@@ -107,7 +107,7 @@ def make_plan(files: dict[str, bytes]) -> tuple[dict[str, bytes], dict]:
     result['buildId'] = BUILD
     result['releaseName'] = VERSION
     result['release'] = 'PMM v1.5.0.1 Reliability - development'
-    result['releaseCandidate'] = '1.5.0.1-reliability-s01'
+    result['releaseCandidate'] = '1.5.0.1-reliability-s01b'
     result['stableCandidate'] = False
     # Do not relabel historical test results as validation of this candidate.
     if 'inheritedReleaseValidation' not in result:
@@ -123,7 +123,7 @@ def make_plan(files: dict[str, bytes]) -> tuple[dict[str, bytes], dict]:
     }
     result['releaseDate'] = None
     result['reliabilityPreparation'] = {
-        'session': '01', 'state': 'identity-prepared-native-source-unresolved',
+        'session': '01B', 'state': 'identity-aligned-native-source-unresolved',
         'nativeSourceParityVerified': False, 'nativeBinariesRebuilt': False,
         'antivirusScanned': False, 'publicReleaseCreated': False,
     }

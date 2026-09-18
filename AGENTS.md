@@ -5,7 +5,7 @@ Esta rama es `v1.5.0.1-PMM-reliability`, derivada de `v1.5.0.0-PMM-translated` e
 ## Leer primero
 
 1. `RELIABILITY.md`.
-2. `Development/Reliability/BASELINE.json` y `STATUS.md`.
+2. `Development/Reliability/NEXT_SESSION.md`, `STATUS.md` y el ultimo registro; BASELINE.json es historico.
 3. `Development/Reliability/IMPLEMENTATION_PLAN.md`.
 4. `Development/Reliability/TRANSLATION_INTEGRATION.md`.
 5. `Development/Source/SOURCE_STATUS.md` antes de cualquier compilacion nativa; despues, los handoffs historicos de `Development/AI/` como contexto, no como estado de esta nueva linea.
@@ -14,8 +14,8 @@ Esta rama es `v1.5.0.1-PMM-reliability`, derivada de `v1.5.0.0-PMM-translated` e
 
 - La rama de traducciones sigue su desarrollo independiente. No escribir alli, no cambiar su version y no fusionar de vuelta cambios de fiabilidad por iniciativa propia.
 - Mantener ancestro comun. La integracion futura es traducciones -> fiabilidad, revisada por diferencias; nunca copiar una carpeta antigua sobre el programa nuevo.
-- La inicializacion conserva TODOS los archivos de `PMM/` sin cambios. La version objetivo es 1.5.0.1; el paquete heredado todavia declara 1.5.0.0 en VERSION.txt. No afirmar que se ha publicado o implementado una nueva version funcional.
-- El manifiesto heredado declara 1.3.4.1. Resolver la coherencia de version, build y hashes como un cambio atomico posterior, no mediante sustitucion global de numeros.
+- La tanda 01B alinea la identidad a 1.5.0.1 y regenera el inventario; los otros 625 archivos de PMM quedan intactos. No afirmar que esto significa hardening terminado o release publicada.
+- Mantener version, build y hashes coherentes en cada tanda. No renumerar componentes ni hacer sustituciones globales. No repetir 01B, ya cerrada.
 - Los fuentes Host/Runtime tienen una advertencia de desfase respecto a los binarios empaquetados. No sobreescribir ejecutables actuales compilando ese snapshot sin reconciliacion y pruebas locales de paridad. Verificar tambien la procedencia de PMMFixLab y dependencias.
 - Preservar contratos de Workspace, casos, CKL, merge y recuperacion; cualquier migracion debe ser explicita, reversible y probada.
 - No renombrar masivamente rutas compartidas mientras se traducen. Mantener claves de catalogos, placeholders, nativeName, fallback, activacion y RTL/LTR. El contrato heredado de localizacion requiere Windows PowerShell 5.1 hasta que exista una migracion real verificada.
