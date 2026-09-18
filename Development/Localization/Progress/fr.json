@@ -12,8 +12,11 @@
   "completedEntries": 1291,
   "remainingEntries": 0,
   "nextKey": null,
-  "nextLanguage": "de",
-  "userRuntimeVisualQA": "pending",
+  "nextLanguage": "zh-TW",
+  "userRuntimeVisualQA": "confirmed-by-user",
+  "userConfirmationDate": "2026-09-18",
+  "userConfirmationText": "Frances confirmado. Seguimos con alemán",
+  "userConfirmationScope": "User runtime feedback, not a new exhaustive automated or native-speaker audit. German is now published; Traditional Chinese is next.",
   "sourceByteIdentityVerified": true,
   "uploadedBlobMatchesLocal": true,
   "validation": {

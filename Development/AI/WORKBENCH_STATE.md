@@ -1,4 +1,18 @@
-## Active checkpoint — French complete; Russian feedback positive — 2026-09-18
+## Active checkpoint — German published; French user-confirmed — 2026-09-18
+
+Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. The user confirmed French and then explicitly requested publishing the prepared German package to GitHub. German is now complete and enabled: **1,291/1,291 canonical keys**, `enabled: true` / `status: complete`, native label `Deutsch`, fallback `en`, direction `ltr`, no separate XAML. The nine previously active language catalogs are unchanged.
+
+German was first delivered as a local ZIP/patch without a remote commit. This publication reuses its exact catalog; do not retranslate it. The branch remained at the package base `d5e293b690e863501684adc2f77ef7d603222386`. The canonical English blob was reconfirmed as `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`. Uploaded German blob: `98bc5289926786476201a8bcbc82846c87576305`, matching the local payload byte for byte. SHA-256: `6fdc63265fbf90cfd7575baef474c29837f8442075b45ff6aa4b73b3fdf053a1`; size 146,725 bytes.
+
+The package's local structural validation was rerun before publication: exact keys/order, strict JSON/duplicates, metadata, nonempty values, placeholders/formats, numeric literals, whitespace, literal escapes, selected technical tokens, file extensions/filters and Unicode checks passed. There are 109 parameterized entries, 31 intentional invariants and zero structural errors. The registry change is restricted to the two German enable/status fields; reversing them reproduces the exact old registry blob.
+
+Read `Development/Localization/GERMAN_HANDOFF.md` and `Development/Localization/Progress/de.json` for the publication checkpoint, glossary and limits. The publication SHA is the Git commit containing this checkpoint, not the French base SHA. Pull the branch with GitHub Desktop; the separate manual patch installer is no longer needed. German user runtime/visual QA remains pending. No PMM/WPF runtime, Windows PowerShell 5.1, native-speaker acceptance or full source-code localization audit was run. Existing dynamic-runtime/Arabic issues remain open separately.
+
+**Next translation: Traditional Chinese (`zh-TW`, 繁體中文).** French confirmation is recorded in both ledgers and the French handoff/progress. Preserve all completed catalogs, restart-based language changes, native names, runtime code, binaries, Arabic bidi behavior, main, tags, releases and workflows. Publication uses one authorized development commit with `[skip ci]`; no Actions were dispatched.
+
+## Historical checkpoint — French complete; Russian feedback positive — 2026-09-18
+
+> German publication above supersedes this checkpoint's next-language pointer and French QA status.
 
 Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. The user reported Russian "funciona bien aparentemente" and requested the next language. Record this as positive preliminary feedback, not exhaustive acceptance. French is complete: **1,291/1,291 canonical keys**, `enabled: true` / `status: complete`, native label `Français`, fallback `en`, direction `ltr`, no separate XAML. The eight previously active language catalogs are unchanged.
 
@@ -34,7 +48,7 @@ Korean user runtime feedback is accepted; do not retranslate Korean from scratch
 
 ## Historical checkpoint — Korean part 1 of 2 — 2026-09-18
 
-> Superseded by Korean completion and the active French checkpoint above. The following cursor and disabled status describe that earlier snapshot only.
+> Superseded by Korean completion and the active German checkpoint above. The following cursor and disabled status describe that earlier snapshot only.
 
 Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. The user has confirmed that Portuguese works perfectly and asked to split the next language into two bounded prompts with enough context to resume in another chat.
 
@@ -54,7 +68,7 @@ Branch `v1.5.0.0-PMM-translated` starts from validated `main` commit `70d106e871
 
 `PMM/Resources/Localization/languages.json` is the complete locale inventory for v1.5. Pending/template/reserve languages remain traceable in Git but are filtered from normal runtime language resolution until enabled.
 
-The active selector now contains nine native labels, in this order: `English`, `Español`, `简体中文`, `Português (Brasil)`, `한국어`, `Русский`, `Français`, `हिन्दी`, and `العربية`. The first three remain fixed. Registry `complete` means catalog ready for development/user testing, not release acceptance or proof that every runtime-generated string is localized.
+The active selector now contains ten native labels, in this order: `English`, `Español`, `简体中文`, `Português (Brasil)`, `한국어`, `Русский`, `Français`, `Deutsch`, `हिन्दी`, and `العربية`. The first three remain fixed. Registry `complete` means catalog ready for development/user testing, not release acceptance or proof that every runtime-generated string is localized.
 
 Brazilian Portuguese (`pt-BR`) is committed and enabled, and the user has since reported it works perfectly. This is user runtime feedback, not a new automated audit. The interrupted write did succeed in commit `9bcc60ff96da11c39c05cdf5b97b7561f84ca879`; it must not be translated from scratch again. Recovery found unescaped embedded quotes in two catalog lines (Delete draft and Replace the installed user scheme). Commit `fcd966a8ce921574ab2eaff864295a29dd3aa6a8` corrects only those two lines. The corrected catalog blob is `8bb8888779c60fe4c22ab6d7c8ac3944077cf5e0`. The registry is enabled only after that correction. Italian has not been started or enabled.
 
@@ -75,9 +89,9 @@ Arabic QA is not fully closed. Mixed prose/path text in `TxtGamePathStatus` need
 
 The experimental live-language-switch implementation remains reverted because the user observed slow startup, slow in-session changes and incorrect refresh results. PMM uses the stable behavior: selecting a language saves it, and the complete interface adopts it after PMM is restarted.
 
-Translation workload remains scoped to one language or recoverable stage per intervention. Korean was completed in two stages; the user subsequently requested one complete next language where feasible. Russian and French are complete. A complete draft can be finalized without restarting its translation. Every intervention must leave a recoverable Git checkpoint and update `Development/Localization/TRANSLATION_PLAN.md` plus this file.
+Translation workload remains scoped to one language or recoverable stage per intervention. Korean was completed in two stages; the user subsequently requested one complete next language where feasible. Russian, French and German are complete. A complete draft can be finalized without restarting its translation. Every intervention must leave a recoverable Git checkpoint and update `Development/Localization/TRANSLATION_PLAN.md` plus this file.
 
-The backlog is prioritized by estimated Palworld audience. The detailed model and ordered locale queue live in `Development/Localization/TRANSLATION_PLAN.md`. Portuguese and Korean have passed the user's reported runtime test; Russian has positive preliminary user feedback. French is ready for user QA; German is the next translation target.
+The backlog is prioritized by estimated Palworld audience. The detailed model and ordered locale queue live in `Development/Localization/TRANSLATION_PLAN.md`. Portuguese, Korean and French have passed the user's reported runtime test; Russian has positive preliminary user feedback. German is published and ready for user QA; Traditional Chinese is the next translation target.
 
 ### v1.5 runtime identity correction
 

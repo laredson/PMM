@@ -1,8 +1,12 @@
-# PMM French localization - complete catalog, user QA pending
+# PMM French localization - complete catalog, user confirmed
 
 Date: 2026-09-18
 Branch: `v1.5.0.0-PMM-translated`
-Next translation target: **German (`de`, Deutsch)**
+Next translation target: **Traditional Chinese (`zh-TW`, 繁體中文)**; German is now published for user QA.
+
+## User QA update - 2026-09-18
+
+The user confirmed French: "Frances confirmado. Seguimos con alemán". This is recorded as user runtime confirmation, not a new automated, exhaustive or native-speaker audit. The French catalog is unchanged. German has since been completed and published; see `GERMAN_HANDOFF.md` for the current checkpoint.
 
 ## Checkpoint
 
@@ -54,4 +58,4 @@ Pull this branch, launch PMM from that checkout, select `Français`, apply/save 
 
 Previously tracked dynamic English counters, the old Library.UI selector assignment, Arabic mixed prose/path bidi scopes and virtualized technical cells remain separate runtime QA items. This catalog-only change neither fixes nor closes them.
 
-Address French feedback by exact key rather than retranslating the file. Otherwise continue with **German (`de`)**, using the current English catalog and checking whether any German work already exists. Keep existing catalogs, runtime code, native binaries, main, tags, releases and workflows unchanged. Update both ledgers in the same authorized development checkpoint and use `[skip ci]`.
+Address French feedback by exact key rather than retranslating the file. German is now published; otherwise continue with **Traditional Chinese (`zh-TW`)**, using the current English catalog and checking whether any work already exists. Keep existing catalogs, runtime code, native binaries, main, tags, releases and workflows unchanged. Update both ledgers in the same authorized development checkpoint and use `[skip ci]`.

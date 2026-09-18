@@ -1,10 +1,10 @@
-## French localization completed; Russian preliminary user feedback positive — 2026-09-18
+## German localization published; French user confirmation recorded — 2026-09-18
 
-Français now covers all 1,291 canonical English keys on `v1.5.0.0-PMM-translated` and is enabled for user testing. The user reports Russian apparently works well; this is preliminary feedback, not exhaustive acceptance. The eight previously active catalogs are unchanged.
-The French catalog passed local structural checks against a byte-identical copy of canonical `en.json`, including full keys/order, nonempty values, placeholders, numbers, whitespace, selected technical tokens, file-dialog patterns and Unicode controls. There are 109 parameterized entries, 31 intentional invariant values (including valid French homographs) and zero remaining entries.
-The uploaded French Git blob `09b29bddef3fe13d7bc0f0fdd4d7d476f1050deb` matches the validated local bytes. Detailed evidence, glossary and limits are in `FRENCH_HANDOFF.md` and `Progress/fr.json`.
+Deutsch covers all 1,291 canonical English keys on `v1.5.0.0-PMM-translated` and is enabled for user testing. The user confirmed French and explicitly authorized publishing the previously prepared German package. The nine previously active catalogs are unchanged.
+The German catalog was reused byte for byte from the local delivery, not retranslated. Its structural validation was rerun before publication: exact keys/order, nonempty values, placeholders, numbers, whitespace, selected technical tokens, file-dialog patterns and Unicode controls passed. There are 109 parameterized entries, 31 intentional invariants and zero remaining entries.
+The uploaded German Git blob `98bc5289926786476201a8bcbc82846c87576305` matches the validated local bytes. Detailed evidence, glossary and limits are in `GERMAN_HANDOFF.md` and `Progress/de.json`.
 No GitHub Actions, full repository audit, Windows PowerShell 5.1 or WPF visual/runtime test was run for this checkpoint. Language switching remains restart-based; existing runtime QA issues remain separately tracked.
-Next step: user runtime/visual QA of French. Next translation: **German (`de`, Deutsch)**. Do not restart completed languages from scratch.
+Next step: user runtime/visual QA of German. Next translation: **Traditional Chinese (`zh-TW`, 繁體中文)**. Do not restart completed languages from scratch.
 
 # PMM v1.5.0.0 translation plan
 
@@ -15,7 +15,7 @@ This file is the close translation-work ledger for PMM 1.5. Update it whenever a
 
 ## Current checkpoint — 2026-09-18
 
-French is complete at the catalog level: **1,291/1,291 entries**, enabled with native label `Français`, fallback `en`, direction `ltr`, no separate XAML. The source commit is `7da32ce5fb043105690219d90f86ad0cf514d1bb`; canonical English blob is `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`. This checkpoint completes one whole language without changing runtime code. `Progress/fr.json` records the executed structural checks; French user runtime/visual QA is pending. Russian has positive preliminary user feedback; Korean and Portuguese remain user-accepted. German is next in the unchanged market queue.
+German is complete at the catalog level: **1,291/1,291 entries**, enabled with native label `Deutsch`, fallback `en`, direction `ltr`, no separate XAML. The source commit is `d5e293b690e863501684adc2f77ef7d603222386`; canonical English blob is `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`. German was first delivered locally; the user then requested direct GitHub publication. This commit publishes the unchanged catalog and its activation, without runtime changes. `Progress/de.json` records the reexecuted structural checks and publication status; German user runtime/visual QA is pending. French is user-confirmed. Russian has positive preliminary user feedback; Korean and Portuguese remain user-accepted. Traditional Chinese is next in the unchanged market queue.
 
 ## Policy
 
@@ -83,7 +83,7 @@ Normal post-baseline market queue:
 
 `pt-BR -> ko -> ru -> fr -> de -> zh-TW -> ja -> tr -> pl -> it -> th -> id -> vi -> nl -> uk -> cs -> hi -> ar`
 
-Hindi and Modern Standard Arabic were intentionally moved ahead of their normal market position as early v1.5 quality targets. Both are enabled for user testing. Brazilian Portuguese and Korean are committed, enabled, and have passed the user's reported runtime test. Russian has positive preliminary user feedback. French is complete and enabled for user QA; German is the next translation target. Italian was proposed as an alternative but has not been translated or enabled. The user's positive reports do not by themselves close the specific runtime issues listed below.
+Hindi and Modern Standard Arabic were intentionally moved ahead of their normal market position as early v1.5 quality targets. Both are enabled for user testing. Brazilian Portuguese, Korean and French have passed the user's reported runtime test. Russian has positive preliminary user feedback. German is complete and published for user QA; Traditional Chinese is the next translation target. Italian was proposed as an alternative but has not been translated or enabled. The user's positive reports do not by themselves close the specific runtime issues listed below.
 
 The older worldwide-speaker backlog remains as reserve templates rather than being deleted: Bengali (`bn`), Urdu (`ur`), Nigerian Pidgin (`pcm`), Egyptian Arabic (`arz`), Marathi (`mr`), Telugu (`te`) and Hausa (`ha`).
 
@@ -97,9 +97,9 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 | 3 | `pt-BR` | Português (Brasil) | Portuguese (Brazil) | ltr | enabled | **catalog complete; user reports it works perfectly** |
 | 4 | `ko` | 한국어 | Korean | ltr | enabled | **catalog complete, 1,291/1,291; user reports it works perfectly** |
 | 5 | `ru` | Русский | Russian | ltr | enabled | **catalog complete, 1,291/1,291; user reports it apparently works well** |
-| 6 | `fr` | Français | French | ltr | enabled | **catalog complete, 1,291/1,291; structural checks passed; user QA pending** |
-| 7 | `de` | Deutsch | German | ltr | disabled | **next translation target; template pending** |
-| 9 | `zh-TW` | 繁體中文 | Chinese (Traditional) | ltr | disabled | template pending |
+| 6 | `fr` | Français | French | ltr | enabled | **catalog complete, 1,291/1,291; user confirmed French** |
+| 7 | `de` | Deutsch | German | ltr | enabled | **catalog complete, 1,291/1,291; published; structural recheck passed; user QA pending** |
+| 9 | `zh-TW` | 繁體中文 | Chinese (Traditional) | ltr | disabled | **next translation target; template pending** |
 | 10 | `ja` | 日本語 | Japanese | ltr | disabled | template pending |
 | 11 | `tr` | Türkçe | Turkish | ltr | disabled | template pending |
 | 12 | `pl` | Polski | Polish | ltr | disabled | template pending |
@@ -143,6 +143,17 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 - Full machine-run catalog validation and Windows PowerShell/WPF validation were not executed in the 2026-09-17 recovery environment. The registry enables Portuguese for user testing, not as a release-accepted build.
 
 ## Work log
+
+### 2026-09-18 — French confirmed; prepared German package published
+
+- Recorded the user's French confirmation: "Frances confirmado. Seguimos con alemán". French catalog contents remain unchanged; confirmation is user feedback, not a new exhaustive automated audit.
+- The German catalog was already complete in the local package. The user explicitly requested publication to the same branch after restoring GitHub write access. No translation was restarted.
+- Rechecked the branch at `d5e293b690e863501684adc2f77ef7d603222386` and the canonical English blob `2fa3c4712619cc5f811ce2251cef3daf5b0e2024` before publication.
+- Reran the package's bounded local Python validation: 1,291/1,291 exact keys, 109 parameterized entries, 31 intentional invariants, no structural errors. The reproduced file is byte-identical to the prepared payload.
+- GitHub returned German blob `98bc5289926786476201a8bcbc82846c87576305`, exactly matching the local file; SHA-256 `6fdc63265fbf90cfd7575baef474c29837f8442075b45ff6aa4b73b3fdf053a1`, 146,725 bytes.
+- Enabled only `de`; reversing those two registry fields exactly reproduces the current registry blob. Added the German handoff/progress records, updated both ledgers and recorded French confirmation in its handoff/progress.
+- Publication is one authorized development commit with `[skip ci]`. No runtime code, binaries, other language catalogs, main, tags, releases or workflows changed. No Actions were dispatched; no Windows PowerShell 5.1, PMM/WPF or full source-code localization audit ran.
+- German user QA is pending. Traditional Chinese (`zh-TW`) is next. The manual patch installer is no longer needed after pulling this commit.
 
 ### 2026-09-18 — Russian preliminary user feedback positive; French completed
 
@@ -211,7 +222,7 @@ The older worldwide-speaker backlog remains as reserve templates rather than bei
 - Updated `Resources/Metadata/VERSION.txt` to `1.5.0.0` and `Resources/Metadata/BUILD_ID.txt` to `PMM-v1.5.0.0-localization-dev` on this branch only.
 - No release/tag/main merge was created. The existing 1.3.4.1 release manifest/hash inventory remains release provenance and will be regenerated when 1.5 is actually packaged.
 - The language selector still intentionally exposes only completed languages; unfinished locales remain registered but disabled until their translations reach user-test quality.
-- GitHub Desktop branch switching changes the checked-out source files. It does not by itself rebuild/replace a binary; the current editable UI nevertheless reads `VERSION.txt` at startup, so after fetching/pulling this commit and restarting PMM from the repository checkout the title should report `v1.5.0.0`.
+- GitHub Desktop branch switching changes the checked-out source files. It does not by itself rebuild/replace a binary; the current editable UI nevertheless reads `VERSION.txt` at startup, so after fetching/pulling this commit and restarting PMM from this checkout the title should report `v1.5.0.0`.
 
 ### 2026-09-16 — registry/progress synchronization correction
 
