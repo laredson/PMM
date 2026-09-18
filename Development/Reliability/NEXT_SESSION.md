@@ -1,57 +1,55 @@
-# Retomar despues de 04A-4C - postProcess acotado
+# Retomar despues de 04A-5A - planificador R1
 
 Rama exclusiva v1.5.0.1-PMM-reliability. Leer AGENTS -> este archivo -> STATUS ->
-SESSION04A4C_FINDINGS/CHECKS -> UAsset/POSTPROCESS_CONTRACT.md.
-04A-4C cerrada como componente, NO core R1/motor completo. REL-01 sigue abierta.
+SESSION04A5A_FINDINGS/CHECKS -> CoreR1/README y CONTRACT.
+04A-5A cerrada como planificador, NO executor ni motor completo. REL-01 abierta.
 
-## Conservado y no repetir
+## Ya conservado
 
-PMMDLT1/PAKV11 y Read/RewriteNames UAsset intactos. PatchPostProcess agrega DOS
-operaciones: precarga stale->safe y propiedad serializada stale->null. No escribir
-safe dentro de la propiedad ni hacer reemplazos globales del int32 antiguo.
+CoreR1/PlanCore es biblioteca pura, no toca disco/juego. Recipe + donor/current
+inventories JSON fijados por hash. Valida donante alternativo, build exacto,
+familias, minimos, soporte/exclusiones, nombres, colisiones y outputs.
+PLAN_VALID significa metadata coherente. No se comprobaron bytes de assets.
+TransformReady/BuildReady/Validated/Installed/InputBytesVerified siguen false.
+Los claims schema solo se vinculan y quedan DECLARED_UNVERIFIED; hashes de layout
+/review no significan que se hayan leido o autenticado. No hay override de seguridad.
 
-El offset 120 de la receta es relativo a .uexp, no al export. Se exige derivarlo
-con un schema externo de propiedades unversioned antes de escribir. Inputs y outputs
-estan fijados por hashes. Imports se identifican por paquete/Outer/clase, no solo
-por nombre. La precarga pertenece a un unico export/grupo y debe tener un solo stale.
+30 tests Go, 10 Python con opt-ins, race Linux, vet Windows, fuzz acotado y dos
+builds TEST identicos. La prueba de receta real usa inventarios totalmente
+SIMULADOS (93 destinos), no PAK/meshes reales. No convertirla en evidencia de juego.
+CoreR1-tests.exe no es FixLab ni debe instalarse. PMM/ sigue 629 archivos/628 hashes,
+1.5.0.1/s01b, arbol 09df5c45aee3390c6b8ea235c8afa4e149a9f1fa. Otros componentes intactos.
 
-El schema admitido es SOLO escalar y explicito; no parser .usmap ni arrays/structs.
-Schemas sinteticos disponibles, schema SkeletalMesh real NO disponible/validado.
-El caller debe establecer autenticidad/completitud del schema. No crearlo a partir
-de la posicion esperada o bytes deseados ni falsear las identidades de salida.
-No ampliar RewriteNames para mover payload opaco sin conocer offsets internos.
+## Siguiente 04A-5B - verificacion de entradas y expediente de schema
 
-56 tests Go/31 Python, 7 fixtures nuevas con segunda verificacion byte a byte,
-6 lecturas y 12 reescrituras previas, race Linux y fuzz. Harness TEST Windows
-compilado, NO ejecutado. Leer CHECKS para hashes finales. No es PMMFixLab.exe.
-PMM tree 09df5c45aee3390c6b8ea235c8afa4e149a9f1fa, 629 archivos/628 hashes,
-1.5.0.1 / PMM-v1.5.0.1-reliability-s01b. Candidatas C2B no se tocaron.
+1. Fijar HEAD y mantener intactos paquete, recetas/pins, otras candidatas y codecs.
+   No repetir el planificador ni la busqueda del mismo overlay roto.
+2. Crear SOLO la capa offline acotada que adquiere/verifica snapshots de entradas
+   y emite evidencia para los inventarios. Disenar procedencia del provider-set,
+   pinning externo, enlaces/symlinks, limites, errores y cambios durante lectura.
+   Debe decir exactamente cuales bytes se comprobaron; no declarar extraccion
+   autenticada sin probar su relacion con el PAK donante fijado.
+3. Implementar comprobacion del expediente schema (bytes layout/review y bindings)
+   solo hasta donde exista evidencia; identidad no es autenticidad ni correccion.
+   Antes de depender de un schema real, fijar un formato/revision verificable y
+   conocer sus serializers. Los schemas reales no escalares siguen pendientes.
+4. Fixtures sinteticas para IO y sustituciones concurrentes; no ejecutar PMM,
+   original, juego o reparaciones, no publicar assets de terceros ni inventar
+   expected outputs. Si la captura de un equipo Windows necesita datos reales,
+   dejar comando local y reporte de metadata, sin pedir subir el juego completo.
+5. No cambiar el planner para emitir TRANSFORM_READY solo porque haya hashes.
+   La relocalizacion opaca y executor completo siguen gates distintos. No conectar
+   CLI de build con placeholders. Separar alcance si la adquisicion y schema no
+   caben en una entrega, documentando cual queda pendiente antes de implementarlo.
+6. Guardar codigo/tests/evidencia y proxima entrada; un commit [skip ci] autorizado,
+   sin Actions, PR, tags, release ni cambios en rama de traducciones.
 
-## Siguiente 04A-5A - planificador y requisitos del core R1
+## Reproduccion
 
-1. Fijar HEAD. Leer receta core R1, SOURCE_CONTRACT y todos los contratos de
-   primitivas. No repetir la busqueda del overlay roto ni pedir el mismo ZIP.
-2. Implementar un planificador sin escrituras sobre archivos de juego: comprobar
-   donante permitido, rutas/grupos de destinos, minimos, soporte y exclusiones,
-   familias actuales e identidades de referencia; entradas/fixtures sinteticas.
-3. Distinguir PLAN_VALID de TRANSFORM_READY. La receta sola no aporta un schema
-   de props ni pins por familia antes/despues: debe informar requisitos faltantes,
-   nunca declarar una reparacion utilizable ni usar 120 como layout automatico.
-4. La procedencia de schemas y las transformaciones no escalares/relocalizacion
-   real deben resolverse antes de ejecutar core R1 completo. Si aparece una fuente
-   original NUEVA, verificarla en lugar de seguir reconstruyendo innecesariamente.
-5. No conectar una CLI que anuncie build completo con placeholders. No modificar
-   CKL/pins/traducciones/Host/Runtime ni el paquete distribuido. No ejecutar mods,
-   motor original, juego, bootstrap o reparaciones. 04B requiere motor completo.
-6. Documentar salida autoconclusiva y el siguiente requisito concreto; commit
-   [skip ci] autorizado, sin Actions, PR, tags, releases ni sustitucion de binarios.
-
-## Pruebas
-
-UAsset: go test -count=1 ./... ; python -B -m unittest -v test_reference
- test_rewrite_reference test_postprocess_reference (una sola linea).
-PMM_POSTPROCESS_FIXTURE_OUTPUT=<nuevo directorio> exporta las siete fixtures;
-verify_postprocess.py compara cada byte. Sin variables de export se saltan tres
-tests de entrega; no contarlos como PASS. build.py solo genera harness TEST.
-Los gates Windows/Unreal/Palworld, familias/Job Objects, manifests/pins/rutas
-R03B-02/04 y repair 06/07 siguen pendientes. No afirmar cero falsos positivos.
+En CoreR1: go test -count=1 ./... ; python -B -m unittest -v test_tools.
+PMM_R1_PLAN_OUTPUT=<nuevo dir externo> activa export sintetico.
+PMM_R1_PACKAGE=<ruta absoluta PMM> activa SOLO lectura de receta + inputs simulados.
+PMM_R1_TOOL_FIXTURES=<export anterior> activa oracle Python y negativos.
+Sin opt-ins son 28 Go y 5 Python PASS; los restantes SKIP, no contarlos como PASS.
+Todos los gates Windows/Unreal/Palworld, familia/Job Objects, manifests/pins/rutas
+y repair 06/07 siguen abiertos. El arranque original del usuario no los acepta.

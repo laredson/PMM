@@ -1,25 +1,24 @@
-# Estado v1.5.0.1 - cierre acotado 04A-4C
+# Estado v1.5.0.1 - cierre 04A-5A
 
-04A-4C CERRADA solo en componente postProcess con schema escalar externo.
-Entrada 7b0a030ec3f5dd38249a6c47582d8f8c72cd1900; 2026-09-18.
-04A completa/REL-01 ABIERTAS. No motor FixLab completo ni promocion autorizada.
+04A-5A CERRADA: planificador de requisitos core R1 aislado, NO executor.
+Entrada 4d8b0ca142dc55fbf066b1a18fac1658dfd6b87b; fecha 2026-09-18.
+Siguiente 04A-5B: entradas/snapshots y expediente schema, ver NEXT_SESSION.
 
-| Area | Estado real |
-| --- | --- |
-| Paquete PMM | 1.5.0.1/s01b, 629 archivos/628 hashes intactos |
-| PMMDLT1/PAKV11 | Componentes previos conservados |
-| UAsset Read/RewriteNames | Sin cambios; no relocalizacion de payload opaco |
-| PostProcess | Prefijo unversioned escalar, schema externo, pins antes/despues, dos cambios int32 |
-| Schema real/core R1/V2/CLI | Pendientes; receta actual sola no habilita esta API |
-| Host/Runtime/UIBridge/Supervision | Candidatas C2B intactas; gates Windows pendientes |
-| Traducciones/recetas | Intactas, sin fusion ni cambios de pins |
+| Area | Estado | Pendiente |
+| --- | --- | --- |
+| Identidad | 1.5.0.1/s01b; 629 archivos y 628 hashes correctos | Mantener |
+| Host/Runtime/UIBridge/Supervision | C2B intacto | Gates Windows y bloqueos previos |
+| PMMDLT1/PAKV11/UAsset | Primitivas previas intactas | Integracion y paridad reales |
+| CoreR1 planner | PLAN_VALID sobre metadata, grupos/minimos/soporte y requisitos | Verificacion de assets/executor |
+| Schema provenance | Claim ligado a hashes, DECLARED_UNVERIFIED | Leer/revisar layout real y su procedencia |
+| Core completo/V2/CLI | No implementado | No iniciar comparacion 04B aun |
+| Traducciones/recetas | Intactas, sin merge | Integracion posterior autorizada |
 
-56 tests Go (39+17) / 31 Python (20+11), siete packets de transformacion y las
-6 lecturas/12 reescrituras previas contrastados independientemente; race Linux PASS.
-Fuzz y dos builds TEST Windows registrados en SESSION04A4C_CHECKS. Windows NO
-ejecutado; schemas sinteticos, no reparaciones de juego. No analisis antivirus.
+30 tests Go y 10 Python con opt-ins pasados, race Linux, vet Windows, fuzz 173539.
+Dos builds TEST Windows byte-identicos; NO ejecutados. Cuatro planes artificiales
+contrastados con oracle Python manual. Receta productiva: 93 destinos SIMULADOS,
+no reparacion real. Assets/inputBytesVerified y TRANSFORM_READY siguen false.
 
-El original escribe null en el payload; safe solo sustituye la precarga.
-Nuestra candidata deriva el campo mediante schema: no usa 120 como permiso de
-escritura y no cambia coincidencias ajenas. No declara paridad con el original.
-Siguiente 04A-5A: plan/requisitos core R1 y procedencia de schema; leer NEXT_SESSION.
+No PMM/FixLab original/Windows/juego/AV ni reparaciones ejecutados. Sin sustitucion
+de binarios, firma, release/tag/PR. REL-01/gates anteriores permanecen abiertos.
+SESSION04A5A_FINDINGS/CHECKS y CoreR1/evidence conservan resultados reales y limites.
