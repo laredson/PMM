@@ -1,0 +1,35 @@
+Python maintenance-tool fixtures (not FixLab):
+test_bounded_read (test_audit_source.SourceAuditTests.test_bounded_read) ... ok
+test_canonical_padding_bits_required (test_audit_source.SourceAuditTests.test_canonical_padding_bits_required) ... ok
+test_extra_or_missing_part_rejected (test_audit_source.SourceAuditTests.test_extra_or_missing_part_rejected) ... ok
+test_json_duplicates_rejected (test_audit_source.SourceAuditTests.test_json_duplicates_rejected) ... ok
+test_line_wrapping_only_ignored (test_audit_source.SourceAuditTests.test_line_wrapping_only_ignored) ... ok
+test_non_alphabet_rejected (test_audit_source.SourceAuditTests.test_non_alphabet_rejected) ... ok
+test_original_mismatch_rejected (test_audit_source.SourceAuditTests.test_original_mismatch_rejected) ... ok
+test_padding_not_repaired (test_audit_source.SourceAuditTests.test_padding_not_repaired) ... ok
+test_payload_mismatch_rejected (test_audit_source.SourceAuditTests.test_payload_mismatch_rejected) ... ok
+test_size_limit (test_audit_source.SourceAuditTests.test_size_limit) ... ok
+test_symlink_rejected (test_audit_source.SourceAuditTests.test_symlink_rejected) ... ok
+test_unsafe_paths_rejected (test_audit_source.SourceAuditTests.test_unsafe_paths_rejected) ... ok
+test_valid_base64_wrong_pin_rejected (test_audit_source.SourceAuditTests.test_valid_base64_wrong_pin_rejected) ... ok
+test_valid_overlay_pin (test_audit_source.SourceAuditTests.test_valid_overlay_pin) ... ok
+test_wrong_part_count (test_audit_source.SourceAuditTests.test_wrong_part_count) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.008s
+
+OK
+
+Go metadata-reader fixtures (not FixLab):
+=== RUN   TestDigestKnownBytes
+--- PASS: TestDigestKnownBytes (0.00s)
+=== RUN   TestMissingInput
+--- PASS: TestMissingInput (0.00s)
+=== RUN   TestNonPEInputs
+--- PASS: TestNonPEInputs (0.00s)
+=== RUN   TestDirectoryRejected
+--- PASS: TestDirectoryRejected (0.00s)
+=== RUN   TestOversizedInputRejected
+--- PASS: TestOversizedInputRejected (0.00s)
+PASS
+ok  	command-line-arguments	0.003s

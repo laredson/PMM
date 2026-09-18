@@ -1,0 +1,153 @@
+{
+  "schema": "PMM_FIXLAB_PROVENANCE_AUDIT_V1",
+  "contracts": {
+    "originalSha256": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe",
+    "originalGitBlob": "e2a7c8269215f5f02db1408429ddee58fc445b52",
+    "originalBytes": 2790912,
+    "manifestPinsMatched": true,
+    "engineVersionFromManifest": "0.2.0-variant-recipes",
+    "sourceReference": "repository Development/Source/FixLabEngine/",
+    "sourceDirectoryPresent": false,
+    "recipes": [
+      {
+        "path": "PMM/CKL/FixLab/Cases/FIXLAB-CASE-001-GAWR-GURA/recipe-original_fullreplacement-v2.json",
+        "sha256": "6a82559b7f2a9fc151437a6caa266e77351ce1138976b9ef3ff72d106bfb295e",
+        "variant": "original_fullreplacement",
+        "coreRecipe": "recipe-core-r1.json",
+        "coreSha256": "3f08c8da1dbc799b0c47a8a00d88819280e14ad7e21dce9f0622c7974a0c4f9c",
+        "outputName": "GawrGura_fullreplacement-3skins_P.pak",
+        "operations": {
+          "remove": 1,
+          "patch": 65,
+          "copy": 14
+        }
+      },
+      {
+        "path": "PMM/CKL/FixLab/Cases/FIXLAB-CASE-001-GAWR-GURA/recipe-normal_locked-v2.json",
+        "sha256": "24f6325b6e44adc8371014bfac4b524e61b22f591b0417bf403b8d1cfab20131",
+        "variant": "normal_locked",
+        "coreRecipe": "recipe-core-r1.json",
+        "coreSha256": "3f08c8da1dbc799b0c47a8a00d88819280e14ad7e21dce9f0622c7974a0c4f9c",
+        "outputName": "GawrGura_gura_P.pak",
+        "operations": {
+          "remove": 1,
+          "patch": 60,
+          "copy": 9
+        }
+      },
+      {
+        "path": "PMM/CKL/FixLab/Cases/FIXLAB-CASE-001-GAWR-GURA/recipe-red_locked-v2.json",
+        "sha256": "d8fba8b7998686531af7ee23c47a7980cea04658ee3205a68000c6e7d2c9160c",
+        "variant": "red_locked",
+        "coreRecipe": "recipe-core-r1.json",
+        "coreSha256": "3f08c8da1dbc799b0c47a8a00d88819280e14ad7e21dce9f0622c7974a0c4f9c",
+        "outputName": "GawrGura_red-gura_P.pak",
+        "operations": {
+          "remove": 1,
+          "patch": 65,
+          "copy": 14
+        }
+      },
+      {
+        "path": "PMM/CKL/FixLab/Cases/FIXLAB-CASE-001-GAWR-GURA/recipe-hooded_locked-v2.json",
+        "sha256": "9897d452bc3a104f5dd168d3a30526065b3091aa2d79d6c856108d77834c14b6",
+        "variant": "hooded_locked",
+        "coreRecipe": "recipe-core-r1.json",
+        "coreSha256": "3f08c8da1dbc799b0c47a8a00d88819280e14ad7e21dce9f0622c7974a0c4f9c",
+        "outputName": "GawrGura_hooded-gura_P.pak",
+        "operations": {
+          "remove": 1,
+          "patch": 60,
+          "copy": 9
+        }
+      },
+      {
+        "path": "PMM/CKL/FixLab/Cases/FIXLAB-CASE-001-GAWR-GURA/recipe-hair2_panties-v2.json",
+        "sha256": "e5986a26a6b9501b9c4870748e5219c3f988055e1f5f128f77f915aac3e72c86",
+        "variant": "hair2_panties",
+        "coreRecipe": "recipe-core-r1.json",
+        "coreSha256": "3f08c8da1dbc799b0c47a8a00d88819280e14ad7e21dce9f0622c7974a0c4f9c",
+        "outputName": "GawrGura_hair2-panties-3skins_P.pak",
+        "operations": {
+          "copy": 17,
+          "patch": 8
+        }
+      }
+    ],
+    "payloadReferenceCount": 260,
+    "uniquePayloadCount": 137,
+    "repairsExecuted": false,
+    "gameDataRead": false,
+    "originalExecuted": false,
+    "limit": "Pinned packaged recipes/payloads only; no transformations, provider verification, or game acceptance.",
+    "fullAuditSha256": "78793e54108ed2873b9d3d074341848a3700064ef3c75ea1c9669f5d9ff4d2b1"
+  },
+  "overlay": {
+    "parts": [
+      {
+        "path": ".github/bootstrap/fixlab-r2-overlay.patch.xz.b64.part00",
+        "bytes": 19998,
+        "gitBlob": "03512b5c306f5e678e665fd311d0c03d058618c4",
+        "sha256": "a86d3a52d23314cc3e4341cbeb837d64a750e8005225c9e948d97fd092d92009"
+      },
+      {
+        "path": ".github/bootstrap/fixlab-r2-overlay.patch.xz.b64.part01",
+        "bytes": 20000,
+        "gitBlob": "c835c1beb888e7228b5d53de7296ec80791f30b2",
+        "sha256": "4080d8eab9b38940f2669489e2251250fd365e620e8508a2c23527cdbab1c17b"
+      },
+      {
+        "path": ".github/bootstrap/fixlab-r2-overlay.patch.xz.b64.part02",
+        "bytes": 19999,
+        "gitBlob": "9e0f61d0ff3e70cf369eef4dbfa1d614b8f57235",
+        "sha256": "fe98b5c92cb9b78f20b3317f8247333134b7c79ee6edfbf984dbba15434a2cdd"
+      },
+      {
+        "path": ".github/bootstrap/fixlab-r2-overlay.patch.xz.b64.part03",
+        "bytes": 20000,
+        "gitBlob": "14bd6a5073edd9428a2490d753405ce1be37dd84",
+        "sha256": "ef85b5c64b5eac60b14324e1d4dbff61b92a97237d3ebc137d6756dde80825ec"
+      },
+      {
+        "path": ".github/bootstrap/fixlab-r2-overlay.patch.xz.b64.part04",
+        "bytes": 19999,
+        "gitBlob": "3fed8182aae40559691daef2befe7818890a0d6d",
+        "sha256": "94341797d0a6bec2e00066ccf5b768673ab414e6b8583a4b68820d306ebe7a95"
+      },
+      {
+        "path": ".github/bootstrap/fixlab-r2-overlay.patch.xz.b64.part05",
+        "bytes": 20000,
+        "gitBlob": "5367c5e5898771f3b36855003efb12150e299240",
+        "sha256": "78dd377658d5dd706d4cec04745d75e6c4ba480976d1c38c135bfa4c4c50f722"
+      },
+      {
+        "path": ".github/bootstrap/fixlab-r2-overlay.patch.xz.b64.part06",
+        "bytes": 19999,
+        "gitBlob": "4a2237909cf2ff84ea6bc24afa496661f80823db",
+        "sha256": "776174f7cbf9ae9baee3cf7b98a3ac2ca0de39298ea679ca384cdf5fa21655d1"
+      },
+      {
+        "path": ".github/bootstrap/fixlab-r2-overlay.patch.xz.b64.part07",
+        "bytes": 15488,
+        "gitBlob": "4c253a96f41476fbe6062d4301aeac5507832db3",
+        "sha256": "feb8433b630f5b41f886ec112fced8a01689ae0228d4ea37f4529ff403b53c68"
+      }
+    ],
+    "encodedBytes": 155483,
+    "lengthModulo4": 3,
+    "expectedArchiveSha256": "39622b989a4b4a1056f3efc6b527828c3325359c90e5f7ffe399776c6536fcbb",
+    "archivePinVerified": false,
+    "sourceRecovered": false,
+    "overlayApplied": false,
+    "bootstrapExecuted": false,
+    "status": "BLOCKED",
+    "reason": "INVALID_BASE64: Incorrect padding"
+  },
+  "filesWritten": false,
+  "sourceParityVerified": false,
+  "inputCommit": "7d8b5265c881746aefd8ffae9ba592bb0e6ce589",
+  "historicalOverlayHasSameEightBlobs": true,
+  "historicalOverlayCommit": "f04a17643f0e12525c4865ebb273083a4fc1859a",
+  "decoderExitCode": 2,
+  "notAnExecutableOrSourceBuild": true
+}

@@ -1,55 +1,63 @@
-# Retomar despues de 02C-2B
+# Retomar despues de la investigacion 04A
 
-Rama exclusiva v1.5.0.1-PMM-reliability. 02C-2B cerrada para integracion candidata;
-Windows/IPC/GUI siguen NOT_RUN. Leer AGENTS -> este archivo -> STATUS ->
-SESSION02C2B_FINDINGS/CHECKS. No repetir tandas ni pedir el ZIP de nuevo.
+Rama exclusiva v1.5.0.1-PMM-reliability. **04A sigue PARCIAL, no pasar a 04B.**
+Leer AGENTS -> este archivo -> STATUS -> SESSION04A_FINDINGS/CHECKS ->
+NativeCandidates/FixLab/README.md y SOURCE_CONTRACT.md.
 
-## Estado conservado
+## Base conservada
 
-Paquete original intacto: 1.5.0.1, build PMM-v1.5.0.1-reliability-s01b,
-629 archivos, 628 hashes, arbol PMM 09df5c45aee3390c6b8ea235c8afa4e149a9f1fa.
-Host C2B a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c.
-Runtime C2B b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f.
-Fuentes/recetas y dependencias LOCALES Supervision/UIBridge estan en NativeCandidates.
-No copiar estos EXE sobre PMM.exe/Engine/PMMRuntime.exe. No se recupero fuente original.
+Paquete 1.5.0.1 / PMM-v1.5.0.1-reliability-s01b, 629 archivos, 628 hashes.
+Subarbol PMM: 09df5c45aee3390c6b8ea235c8afa4e149a9f1fa.
+Host/Runtime/UIBridge C2B estan integrados en candidatas y quedan intactos.
+Host: a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c.
+Runtime: b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f.
+No reimplementar canal ni restaurar candidatas antiguas de los ZIP.
 
-02C-2A fue biblioteca; 02C-2B ya la conecta. No reimplementar el canal. Host captura
-Runtime antes de Wait; Runtime conecta antes de tareas largas, acks serializados
-+ heartbeat, una WPF por coordinador, directorios nuevos, READY posterior a ACK,
-retirada terminal y handoff por Gate desde el hilo del splash. state.txt del Host
-es solo progreso. Leer UIBridge/INTEGRATION.md antes de modificar esa cadena.
+## Bloqueo FixLab comprobado
 
-## Siguiente tanda 04A - SOLO procedencia/fuente FixLab
+Original: PMM/Engine/PMMFixLab.exe, 2790912 bytes, SHA-256
+8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe.
+Version 0.2.0-variant-recipes segun manifiesto. Go1.23.2, modulo
+`github.com/laredson/pmm/fixlabengine`. La carpeta source referida no existe.
+Los nombres/lineas de seis .go estan identificados, sus cuerpos NO recuperados.
 
-1. Verificar HEAD y leer NATIVE_ARTIFACTS, SOURCE_STATUS y documentos FixLab.
-   No tocar Host/Runtime/UIBridge ni el paquete. Original PMM/Engine/PMMFixLab.exe:
-   8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe.
-2. Localizar fuente verificable de 0.2.0-variant-recipes. Revisar como DATOS el
-   historial/entregas y el overlay .github/bootstrap/fixlab-r2-overlay.patch.xz.b64.part*
-   si resulta pertinente; NO ejecutar workflows/bootstrap ni aplicar un overlay
-   completo sobre la rama. Una referencia de manifiesto no demuestra existencia.
-3. Si se recupera una fuente, registrar origen y hash exactos. Si se reconstruye,
-   etiquetar RECONSTRUCTION. Guardar SOLO candidata aislada en NativeCandidates/FixLab;
-   contratos/recetas/output hashes originales no se sustituyen para hacerla pasar.
-4. Receta offline y evidencia si puede compilarse; no ejecutar reparaciones reales,
-   herramientas del juego ni distribuir datos propietarios. Fixtures sinteticos
-   y lectura de metadatos no se presentan como aceptacion en Palworld/Windows.
-5. Registrar hallazgos y alcance terminado o bloqueo concreto, con entrada precisa
-   de 04B (comparacion) o la recuperacion pendiente. Un commit [skip ci] autorizado,
-   sin Actions/PR/tag/release. Conservar identidad y los archivos de PMM.
+Overlay .github/bootstrap: los ocho blobs coinciden con la rama historica,
+pero Base64 es invalido. Agregar padding no alcanza el pin y XZ falla. No hay
+codigo fuente validado que extraer. No lanzar workflows ni aplicar ese overlay,
+no modificar su hash esperado y no reutilizar texto parcialmente decodificado.
+No repetir esta misma busqueda ni solicitar otra copia del ZIP del paquete.
 
-## Gates antes de cualquier promocion
+## Proximo bloque 04A-2 - completar fuente, no comparacion todavia
 
-WINDOWS_HOST_ACCEPTANCE, WINDOWS_RUNTIME_ACCEPTANCE y WINDOWS_UIBRIDGE_ACCEPTANCE
-siguen NOT_RUN. El ultimo incluye casos integrados de C2B. No confundir abrir el
-PMM original con probar los candidatos. Falta gestion de familia/Job Objects,
-validacion manifiesto/pins/rutas R03B-02/04 y politica/reparacion 06/07. Activacion
-propia de WPF y carreras de HWND mismo proceso necesitan observacion Windows.
+Primero comprobar HEAD y si existe una pista NUEVA de fuente. Una copia de
+main.go, delta.go, pakv11.go, recipe.go, uasset.go, variant.go y go.mod puede
+permitir recuperacion. Verificar origen, version, dependencias y hashes antes
+de compilar. Los nombres de pclntab no prueban la lista completa ni equivalencia.
 
-## Prompt
+Sin una fuente nueva, la ruta es reconstruccion declarada y acotada:
+- Empezar SOLO por codec PMMDLT1 y sus limites, lectura de datos y fixtures
+  sinteticos; no tocar CKL productivo ni ejecutar el motor original/juego.
+- Inferir el formato de especificaciones/datos y evidencia estatica documentada,
+  no suponer que COPY/LITERAL y unos nombres equivalen a una implementacion.
+- Persistir codigo/tests como componente parcial fuera de PMM; no anunciar
+  una candidata completa ni inventar source original. Parar al cerrar ese codec.
+- Dejar PAK/readback, UAsset/core y orquestacion CLI para subtandas siguientes;
+  solo despues hay una candidata completa que comparar en 04B.
 
-"Completa solo 04A en reliability: lee NEXT_SESSION y recupera/reconcilia la fuente
-candidata de FixLab con procedencia y receta conservadas. No sustituyas binarios ni
-toques Host/Runtime/UIBridge, traducciones o recetas productivas. No ejecutes bootstrap,
-reparaciones o juego. Registra evidencia, limites y 04B; commit [skip ci], sin Actions,
-PR, tags ni release."
+Un commit [skip ci] con la autorizacion de esa intervencion. No cambios en Host,
+Runtime, UIBridge, Supervision, snapshot, binarios, recetas productivas o idiomas.
+No subir datos de juego/donantes ni ejecutar bootstrap o reparaciones.
+
+## Herramientas ya listas
+
+Desde raiz:
+python -B Development/Reliability/NativeCandidates/FixLab/audit_source.py
+Devuelve 2 con informe BLOCKED para el overlay actual; no confundirlo con un test fallido del programa.
+
+python -B Development/Reliability/NativeCandidates/FixLab/inspect_binary.py --out ../PMM-FixLab-inspection
+Salida nueva/exterior; solo lector de metadatos, no motor FixLab. No se ha
+construido un PMMFixLab candidato ni cambiado el original.
+
+Gates Host/Runtime/UIBridge Windows siguen NOT_RUN. R03B-02/04, familias y
+06/07 continuan abiertos. El arranque informal del usuario solo corresponde
+al paquete original. Source parity no se declara por coincidencias de metadata.

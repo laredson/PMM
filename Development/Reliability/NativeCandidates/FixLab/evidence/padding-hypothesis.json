@@ -1,0 +1,9 @@
+{
+  "scope": "diagnostic padding-only hypothesis, bytes never adopted",
+  "addedPaddingBytes": 1,
+  "decodedSha256": "26909847792d8c4e0112bfcdec16f428fd10a9b2cc77a6b965e3e328648ba763",
+  "matchesExpectedArchiveSha256": false,
+  "decodedAsSource": false,
+  "applied": false,
+  "xzResult": "Corrupt input data"
+}

@@ -1,0 +1,98 @@
+{
+  "schema": "PMM_REL_SESSION04A_CHECKS_V1",
+  "date": "2026-09-18",
+  "branch": "v1.5.0.1-PMM-reliability",
+  "inputCommit": "7d8b5265c881746aefd8ffae9ba592bb0e6ce589",
+  "inputTree": "a4fdedd955fb73e19ed8b8cad00ee19fa35a1ce6",
+  "scopeStatus": "PARTIAL_SOURCE_RECOVERY_BLOCKED",
+  "blockers": [
+    "R04A-01: declared source directory absent",
+    "R04A-02: historical overlay Base64 invalid; padding-only hypothesis fails SHA-256 and XZ"
+  ],
+  "sourceRecovered": false,
+  "sourceReconstructed": false,
+  "engineCandidateBuilt": false,
+  "originalExecuted": false,
+  "binaryProvenance": {
+    "sha256": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe",
+    "bytes": 2790912,
+    "goVersion": "go1.23.2",
+    "modulePath": "github.com/laredson/pmm/fixlabengine",
+    "applicationFunctionCountIncludingWrappers": 63,
+    "sourceFilenames": [
+      "main.go",
+      "delta.go",
+      "pakv11.go",
+      "recipe.go",
+      "uasset.go",
+      "variant.go"
+    ],
+    "metadataNotSourceCode": true
+  },
+  "overlay": {
+    "partCount": 8,
+    "encodedBytes": 155483,
+    "strictDecode": "INVALID_BASE64: Incorrect padding",
+    "archivePinVerified": false,
+    "bootstrapExecuted": false,
+    "applied": false
+  },
+  "readOnlyContracts": {
+    "variantRecipeCount": 5,
+    "payloadReferenceCount": 260,
+    "uniquePayloadCount": 137,
+    "payloadHashesMatched": true,
+    "repairsExecuted": false
+  },
+  "validation": {
+    "pythonToolTestsPassed": 15,
+    "goReaderTestsPassed": 5,
+    "metadataInspections": 2,
+    "metadataReportsIdentical": true,
+    "fixLabTestsPassed": null,
+    "windowsExecuted": false,
+    "gameExecuted": false,
+    "antivirusScanned": false
+  },
+  "packageIdentity": {
+    "scope": "static identity and checksum consistency only",
+    "version": "1.5.0.1",
+    "buildId": "PMM-v1.5.0.1-reliability-s01b",
+    "packageFiles": 629,
+    "checksumRows": 628,
+    "checksumMismatches": 0,
+    "pmmExecuted": false,
+    "antivirusScanned": false,
+    "sourceParityVerified": false,
+    "inputMode": "all package files"
+  },
+  "preservedTrees": {
+    "PMM": "09df5c45aee3390c6b8ea235c8afa4e149a9f1fa",
+    ".github": "cb881ba48502f8dcea8cead16f47f275069d5945",
+    "Development/Source": "0cfad865e6fd63663b29f5ec92b76618bc6e4a02"
+  },
+  "hostRuntimeUIBridgeSupervisionModified": false,
+  "translationsModified": false,
+  "recipePinsModified": false,
+  "packagedBinaryReplaced": false,
+  "githubWorkflowDispatched": false,
+  "releaseCreated": false,
+  "nextSession": "04A-2: verified new source or bounded PMMDLT1 reconstruction component; not 04B yet",
+  "sourceSha256": {
+    "README.md": "a8bac8ae66ff51f4646afd736c5dbc5d4914beff43c7283a2a56952daeba48af",
+    "SOURCE_CONTRACT.md": "f6894a874740dc45c8e3dde6888a640dd3d36ce19ecd0004f254d0d3ad1b3aca",
+    "audit_source.py": "0bc0652bf6c15b9e61400c2348fc73c668b56c5fe47d8fbe0c35bd5f439532cd",
+    "inspect_binary.py": "cc2e6d2d4c7df6372a4649074f110620fde04db2c7467fe39a0f7f9d7f7b95d5",
+    "test_audit_source.py": "5d905cd4760f18aa58d9851955557e65ad242bf4e10e556499c8166fea208cb1",
+    "tools/fixlab_meta.go": "3f10e6f2df6c37e12baa4ee6f1650ee302c2ccc15fac5bf520b1f180533da484",
+    "tools/fixlab_meta_test.go": "0a7bac6b93542c54b65ac070ed56e36f97d5f87e68664d0bbb60e84684393e8a"
+  },
+  "evidenceSha256": {
+    "binary-map.json": "af6373a3f679b3fef0fbcae164c4d19865fb54acfb5a54faf56d0fb68c02ee36",
+    "inspection-recipe.json": "d3864ef742ea1da43845f410a468f32c15169e9e7e63860de65b7c278ee0a6e1",
+    "package-identity.json": "8f47c6ff6a7f31e45239141e1a7ca5079a430471d23671f07e0e9e50484034ac",
+    "padding-hypothesis.json": "2667372c5dcf6628236dd239bdfe428fd714bc8ba5315e7bd35e2a2d96c46a0b",
+    "source-audit.json": "6425ab8e604f63d1d8317f3130d0e961a50b5508399e544ebfaefae687d81ab4",
+    "tests.txt": "b9c385190c9fcee7ef21156bb9c87d50cfbb5500be0e853d58fd936d6db54689"
+  }
+}

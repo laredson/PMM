@@ -1,0 +1,52 @@
+{
+  "schema": "PMM_FIXLAB_INSPECTION_RECIPE_V1",
+  "goVersion": "go1.23.2",
+  "readerSourceSha256": "3f10e6f2df6c37e12baa4ee6f1650ee302c2ccc15fac5bf520b1f180533da484",
+  "readerSha256": "d526ca1a9def0b5c72501411c85b89aa1bbf5095d554575c2fc04174da31b45e",
+  "originalSha256": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe",
+  "commands": [
+    {
+      "command": [
+        "go",
+        "version"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "env",
+        "GOHOSTOS",
+        "GOHOSTARCH"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "go",
+        "build",
+        "-trimpath",
+        "-buildvcs=false",
+        "-o",
+        "<OUT>/fixlab-meta",
+        "<OUT>/fixlab_meta.go"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<OUT>/fixlab-meta",
+        "<REPO>/PMM/Engine/PMMFixLab.exe"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    }
+  ],
+  "originalExecuted": false,
+  "engineBuilt": false,
+  "sourceRecovered": false,
+  "note": "Only our metadata reader was compiled/executed. No FixLab candidate exists yet."
+}

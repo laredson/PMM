@@ -1,0 +1,289 @@
+{
+  "schema": "PMM_FIXLAB_SOURCE_MAP_V1",
+  "originalSha256": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe",
+  "goVersion": "go1.23.2",
+  "modulePath": "github.com/laredson/pmm/fixlabengine",
+  "settings": {
+    "-buildmode": "exe",
+    "-compiler": "gc",
+    "-trimpath": "true",
+    "CGO_ENABLED": "0",
+    "GOAMD64": "v1",
+    "GOARCH": "amd64",
+    "GOOS": "windows"
+  },
+  "externalModuleDependencies": null,
+  "applicationFunctionCount": 63,
+  "sourceFiles": {
+    "delta.go": [
+      {
+        "name": "main.applyDeltaPatch",
+        "line": 37
+      },
+      {
+        "name": "main.applyDeltaPatch.deferwrap1",
+        "line": 42
+      },
+      {
+        "name": "main.applyDeltaPatch.deferwrap2",
+        "line": 55
+      },
+      {
+        "name": "main.sha256Bytes",
+        "line": 132
+      }
+    ],
+    "main.go": [
+      {
+        "name": "main.failf",
+        "line": 10
+      },
+      {
+        "name": "main.main",
+        "line": 15
+      }
+    ],
+    "pakv11.go": [
+      {
+        "name": "main.(*pakReader).fstr",
+        "line": 268
+      },
+      {
+        "name": "main.encodedEntry",
+        "line": 88
+      },
+      {
+        "name": "main.entryDataHeader",
+        "line": 76
+      },
+      {
+        "name": "main.fnv64Path",
+        "line": 51
+      },
+      {
+        "name": "main.generateFDI",
+        "line": 109
+      },
+      {
+        "name": "main.generatePHI",
+        "line": 99
+      },
+      {
+        "name": "main.pakFString",
+        "line": 26
+      },
+      {
+        "name": "main.splitPathChild",
+        "line": 64
+      },
+      {
+        "name": "main.validatePakV11",
+        "line": 306
+      },
+      {
+        "name": "main.validatePakV11.func1",
+        "line": 426
+      },
+      {
+        "name": "main.writePakV11",
+        "line": 165
+      }
+    ],
+    "recipe.go": [
+      {
+        "name": "main.buildCoreRecipeFiles",
+        "line": 262
+      },
+      {
+        "name": "main.buildRecipe",
+        "line": 348
+      },
+      {
+        "name": "main.collectSupportFiles",
+        "line": 163
+      },
+      {
+        "name": "main.collectSupportFiles.func1",
+        "line": 174
+      },
+      {
+        "name": "main.collectSupportFiles.func2",
+        "line": 182
+      },
+      {
+        "name": "main.collectSupportFiles.func3",
+        "line": 197
+      },
+      {
+        "name": "main.harvestCurrentNameHashes",
+        "line": 147
+      },
+      {
+        "name": "main.loadRecipe",
+        "line": 87
+      },
+      {
+        "name": "main.objectFromPakPath",
+        "line": 129
+      },
+      {
+        "name": "main.packageFromPakPath",
+        "line": 123
+      },
+      {
+        "name": "main.readLines",
+        "line": 108
+      },
+      {
+        "name": "main.resolveCurrentFName",
+        "line": 132
+      },
+      {
+        "name": "main.sha256File",
+        "line": 236
+      },
+      {
+        "name": "main.sha256File.deferwrap1",
+        "line": 241
+      },
+      {
+        "name": "main.slash",
+        "line": 107
+      },
+      {
+        "name": "main.verifyForbidden",
+        "line": 222
+      }
+    ],
+    "uasset.go": [
+      {
+        "name": "main.(*UAsset).fName",
+        "line": 522
+      },
+      {
+        "name": "main.(*UAsset).readExports",
+        "line": 465
+      },
+      {
+        "name": "main.(*UAsset).readHeader",
+        "line": 207
+      },
+      {
+        "name": "main.(*UAsset).readHeader.func1",
+        "line": 319
+      },
+      {
+        "name": "main.(*UAsset).readImports",
+        "line": 437
+      },
+      {
+        "name": "main.(*UAsset).readNames",
+        "line": 399
+      },
+      {
+        "name": "main.(*binReader).fname",
+        "line": 97
+      },
+      {
+        "name": "main.(*binReader).fstring",
+        "line": 66
+      },
+      {
+        "name": "main.bytesCount",
+        "line": 659
+      },
+      {
+        "name": "main.encodeNameEntry",
+        "line": 638
+      },
+      {
+        "name": "main.findImportByObject",
+        "line": 677
+      },
+      {
+        "name": "main.loadUAsset",
+        "line": 183
+      },
+      {
+        "name": "main.nextSectionAfterNames",
+        "line": 644
+      },
+      {
+        "name": "main.parseUAssetBytes",
+        "line": 191
+      },
+      {
+        "name": "main.patchPostProcess",
+        "line": 694
+      },
+      {
+        "name": "main.relocatePackage",
+        "line": 759
+      },
+      {
+        "name": "main.serializeSummary",
+        "line": 570
+      },
+      {
+        "name": "main.writeEngine",
+        "line": 563
+      },
+      {
+        "name": "main.writeFString",
+        "line": 537
+      }
+    ],
+    "variant.go": [
+      {
+        "name": "main.applyVariantOperations",
+        "line": 221
+      },
+      {
+        "name": "main.buildVariantRecipe",
+        "line": 344
+      },
+      {
+        "name": "main.compileRegexes",
+        "line": 133
+      },
+      {
+        "name": "main.loadVariantRecipe",
+        "line": 95
+      },
+      {
+        "name": "main.matchesAny",
+        "line": 145
+      },
+      {
+        "name": "main.readScopedFile",
+        "line": 183
+      },
+      {
+        "name": "main.recipeSchema",
+        "line": 119
+      },
+      {
+        "name": "main.selectVariantBase",
+        "line": 154
+      },
+      {
+        "name": "main.validateVariantFiles",
+        "line": 329
+      },
+      {
+        "name": "main.variantRequirements",
+        "line": 418
+      },
+      {
+        "name": "main.variantRequirements.func1",
+        "line": 430
+      }
+    ]
+  },
+  "fullMetadataSha256": "da79e87a02bb5133d63b41258e4ced7bb17b249f8b059a55540c2c07848da5ca",
+  "metadataReaderReproducedSameReport": true,
+  "sourceRecovered": false,
+  "functionalParityVerified": false,
+  "originalExecuted": false,
+  "limit": "PCToLine metadata identifies compiled file names/line references, not the contents or completeness of source. Function count includes compiler wrappers."
+}
