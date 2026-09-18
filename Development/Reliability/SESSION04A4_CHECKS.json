@@ -1,0 +1,172 @@
+{
+  "schema": "PMM_REL_SESSION04A4_CHECKS_V1",
+  "date": "2026-09-18",
+  "branch": "v1.5.0.1-PMM-reliability",
+  "inputCommit": "a66cea06e673a169623b3c12821739b0fa6d0b9f",
+  "inputTree": "1c703ca1a05ca306bce6882035a7e6c1b9137e49",
+  "scopeStatus": "COMPLETE_UASSET_READER_COMPONENT_ONLY",
+  "classification": "RECONSTRUCTION_NOT_ORIGINAL_SOURCE",
+  "profile": "Explicit cooked UE4 522 / UE5 1008; separate .uasset, optional opaque .uexp",
+  "goAssertionTestsPassed": 23,
+  "goAssertionTests": [
+    "TestIndependentVectors",
+    "TestHeaderOnlyDoesNotClaimExportData",
+    "TestExplicitVersionPolicy",
+    "TestAllHeaderTruncationsAndSuffix",
+    "TestMagicAndCookedFlags",
+    "TestCountsAndOffsets",
+    "TestOptionalSectionsFailClosed",
+    "TestNarrowStringAndTerminators",
+    "TestUTF16Validation",
+    "TestFNameBoundsAndSuffix",
+    "TestBooleans",
+    "TestObjectReferencesAndOuterCycles",
+    "TestDependencyRanges",
+    "TestSerialBoundsAndOverlap",
+    "TestOpaqueAndNonCanonicalGapsRemainExplicit",
+    "TestLimitsCannotBeRaised",
+    "TestNilAndCancelledContext",
+    "TestCancellationAtEveryReadBoundary",
+    "TestNoInputAliasing",
+    "TestDeterminism",
+    "TestHeaderHashIsNotAuthenticity",
+    "TestExportMetadataJSON",
+    "TestDisabledPreloadAndZeroSizeExport"
+  ],
+  "pythonToolTestsPassed": 12,
+  "linuxRacePassed": true,
+  "fuzzReadInputs": 1464,
+  "fuzzTablesInputs": 21117,
+  "independentRead": {
+    "schema": "PMM_UASSET_INDEPENDENT_READ_V1",
+    "method": "Python cursor/struct parser of synthetic fixtures vs Go output",
+    "fixtureCount": 6,
+    "fixtures": [
+      {
+        "fixture": "basic",
+        "headerSha256": "73fa003f11012d791d0209f5a03cee246ddd10ca05f28bb0262b7196c30a1445",
+        "names": 6,
+        "imports": 2,
+        "exports": 2
+      },
+      {
+        "fixture": "unicode",
+        "headerSha256": "cb770be3b87b7b6b36ea9863b686ad2fb93b0889c6dc4a1708fe7d9c60d9254a",
+        "names": 6,
+        "imports": 2,
+        "exports": 2
+      },
+      {
+        "fixture": "unversioned",
+        "headerSha256": "05184cee18ce94a685bd6f5034cbaf4e2f163279b728c27db3ed0978ac3df18e",
+        "names": 6,
+        "imports": 2,
+        "exports": 2
+      },
+      {
+        "fixture": "empty",
+        "headerSha256": "78aaee7c51b1fdea13e3bbc28e84f97a7f8ead04c67b78535909c1bf00745ec5",
+        "names": 0,
+        "imports": 0,
+        "exports": 0
+      },
+      {
+        "fixture": "opaque",
+        "headerSha256": "150809b934d6db39d03d00c76a50ca5a9f6ee77c41e977c543fb13b911f6c7d1",
+        "names": 6,
+        "imports": 2,
+        "exports": 2
+      },
+      {
+        "fixture": "multi",
+        "headerSha256": "6d74cd7575ce164200c394b6073f4f8fb52a467962c946d14b75f3ab7af4366f",
+        "names": 6,
+        "imports": 2,
+        "exports": 3
+      }
+    ],
+    "allCompared": true,
+    "gameAssetsRead": false,
+    "originalExecuted": false,
+    "compatibilityWithUnrealVerified": false,
+    "limit": "Shared format assumptions; not an independent Unreal writer or actual game sample."
+  },
+  "build": {
+    "schema": "PMM_UASSET_TEST_BUILD_V1",
+    "artifact": "UAsset TEST harness, not FixLab",
+    "goVersion": "go1.23.2",
+    "buildHost": "linux/amd64",
+    "target": "windows/amd64",
+    "sha256": "12a8a4e96d739061389cb61d934f78b2da749d0cd6ed963c03c88c8c69a98feb",
+    "bytes": 5596672,
+    "windowsExecuted": false,
+    "engineBuilt": false,
+    "repeatSha256": "12a8a4e96d739061389cb61d934f78b2da749d0cd6ed963c03c88c8c69a98feb",
+    "byteIdentical": true,
+    "buildReportsSha256": [
+      "3acb7064e3d44f9a309a3cddf1f0703a066a1de584bbcc016ac5e518b1b85333",
+      "3acb7064e3d44f9a309a3cddf1f0703a066a1de584bbcc016ac5e518b1b85333"
+    ],
+    "windowsVetExitCode": 0
+  },
+  "packageIdentity": {
+    "scope": "static identity and checksum consistency only",
+    "version": "1.5.0.1",
+    "buildId": "PMM-v1.5.0.1-reliability-s01b",
+    "packageFiles": 629,
+    "checksumRows": 628,
+    "checksumMismatches": 0,
+    "pmmExecuted": false,
+    "antivirusScanned": false,
+    "sourceParityVerified": false,
+    "inputMode": "all package files"
+  },
+  "preservedTrees": {
+    "PMM": "09df5c45aee3390c6b8ea235c8afa4e149a9f1fa",
+    ".github": "cb881ba48502f8dcea8cead16f47f275069d5945",
+    "Development/Source": "0cfad865e6fd63663b29f5ec92b76618bc6e4a02"
+  },
+  "sourceRecoveryBlocked": true,
+  "fixLabEngineComplete": false,
+  "engineCandidateBuilt": false,
+  "originalExecuted": false,
+  "gameExecuted": false,
+  "gameAssetsRead": false,
+  "windowsExecuted": false,
+  "functionalParityVerified": false,
+  "antivirusScanned": false,
+  "otherNativeCandidatesModified": false,
+  "pmmdlt1OrPakv11Modified": false,
+  "recipePinsModified": false,
+  "packagedBinaryReplaced": false,
+  "githubWorkflowDispatched": false,
+  "releaseCreated": false,
+  "inputMode": "Selective recent FixLab documents plus hash-verified PMM/.github/snapshot from older ZIP; not a full current checkout.",
+  "nextSession": "04A-4B: bounded serialization/relocation with opaque-region protection; not complete engine comparison",
+  "sourceSha256": {
+    "FORMAT.md": "a046d1989e2406761444f11765ad6d04563ecc8c02aefb0d12b30ddbd7a54e2a",
+    "README.md": "b3cab835875b55a91d95b4325de064ff1abf36a39f22b67a7325b78f34d28c15",
+    "binary.go": "04715fab5d89c6959a4739750362dc0886d1e1bbd63ac29ee19a6803f315bf1b",
+    "build.py": "ce8fd0bf688281f900a0fb35a11ee39ba69df9607ff62a3e8f29ec8c163f98b5",
+    "go.mod": "d548f7e9c6883d603f56928f72822bb1a10fcb2778a83ae95bd0f9fd512d4ec9",
+    "reader.go": "caa097674f0fd7605a7f570c01f592e761dd0df21d9a81c724fc766921b44c35",
+    "reader_test.go": "294a05cd6e39f7d72e3773927085494ea2082088e573097eeb68ce05ebc05184",
+    "summary.go": "03da3d998cd285f52d45cdf2183ac91a1c09f9b965134918f426ad31c8fa8f23",
+    "test_reference.py": "a65ca43c9da0442755d0549f3b31eae63f769921c28d79f4d4084f6e4d371b8a",
+    "testdata/make_fixtures.py": "1861ca3c688bfbcab34a91dca172f7013891365d1c0e9262d6138d6c0341707a",
+    "testdata/vectors.json": "ba6983aea6a08cad7fe110ddac60463a3af573ed06c05780c72e8682e160c2d0",
+    "types.go": "f58ee7ebf212fdc12ce17d9010a42a1645dda8f8afc96440e66cfe269e6e1483",
+    "verify_reference.py": "a308418c15d9c9c6dd17513d27b561464bf0dbb00c012b80aca3ee529d50257c"
+  },
+  "evidenceSha256": {
+    "build-summary.json": "a4167f060c7fe35770fb5ab5c530436d62a0c37c775ac6768cfbb475c470d53e",
+    "fuzz-envelope.txt": "cc7628089d8cad982f9b9772965b6c99ec82c4e650a94014ce7f82187b33dbbe",
+    "fuzz-tables.txt": "20812aca6c9988c437a0f50043443a73a24e3c68a462e8dbd8ca0d56c499b987",
+    "go-tests.txt": "0c75230ec3b59b53286dec3ed121086f3321bda1a46b79ccfd6a88e14dfc4fe3",
+    "independent-read.json": "1151406afd2ae1e23f3876e3336b05db21966761de9eaa0a5dfc9bf2dabeed49",
+    "package-identity.json": "8f47c6ff6a7f31e45239141e1a7ca5079a430471d23671f07e0e9e50484034ac",
+    "python-tests.txt": "6dcc447bdf5a9e4f54da5ea1862c527ed35c32af3bf473c20c10341f93521866",
+    "race-tests.txt": "5f530e800acacba58ac7540593fcb3a3c461203afb6c99554c62c62c4e6f14b1",
+    "static-origin.json": "bcc6edba1ab9a722f6673a1c3c314bb72c2f315c9cbf04f1cebc8c66e68f18ac"
+  }
+}

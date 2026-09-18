@@ -1,0 +1,18 @@
+{
+  "schema": "PMM_UASSET_TEST_BUILD_V1",
+  "artifact": "UAsset TEST harness, not FixLab",
+  "goVersion": "go1.23.2",
+  "buildHost": "linux/amd64",
+  "target": "windows/amd64",
+  "sha256": "12a8a4e96d739061389cb61d934f78b2da749d0cd6ed963c03c88c8c69a98feb",
+  "bytes": 5596672,
+  "windowsExecuted": false,
+  "engineBuilt": false,
+  "repeatSha256": "12a8a4e96d739061389cb61d934f78b2da749d0cd6ed963c03c88c8c69a98feb",
+  "byteIdentical": true,
+  "buildReportsSha256": [
+    "3acb7064e3d44f9a309a3cddf1f0703a066a1de584bbcc016ac5e518b1b85333",
+    "3acb7064e3d44f9a309a3cddf1f0703a066a1de584bbcc016ac5e518b1b85333"
+  ],
+  "windowsVetExitCode": 0
+}

@@ -1,0 +1,129 @@
+{
+  "schema": "PMM_UASSET_STATIC_ORIGIN_V1",
+  "originalSha256": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe",
+  "functions": [
+    {
+      "name": "main.(*UAsset).readExports",
+      "entryVA": 5468896,
+      "endVA": 5471936,
+      "sizeBytes": 3040,
+      "rawCodeSha256": "82d76131f20cb730a2ae7c16f4697f33be9f83947e9eab7ae5d8080fb1ad3233",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/uasset.go",
+      "sourceLine": 465
+    },
+    {
+      "name": "main.(*UAsset).readHeader",
+      "entryVA": 5454080,
+      "endVA": 5464672,
+      "sizeBytes": 10592,
+      "rawCodeSha256": "6e55ba7f24da1a81b3348f3a31e4a5b820ed188e49912039883398c4d9a8f904",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/uasset.go",
+      "sourceLine": 207
+    },
+    {
+      "name": "main.(*UAsset).readImports",
+      "entryVA": 5467776,
+      "endVA": 5468896,
+      "sizeBytes": 1120,
+      "rawCodeSha256": "6041eeefa13202d9d822c024679052de6aef7b37dcf95dd79a2112e819f50f2d",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/uasset.go",
+      "sourceLine": 437
+    },
+    {
+      "name": "main.(*UAsset).readNames",
+      "entryVA": 5465824,
+      "endVA": 5467776,
+      "sizeBytes": 1952,
+      "rawCodeSha256": "325b0b4159106871be9240739db2c1a3e3323a05cbc90cc05f9c6ab606e99ce2",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/uasset.go",
+      "sourceLine": 399
+    },
+    {
+      "name": "main.(*binReader).fstring",
+      "entryVA": 5451712,
+      "endVA": 5452736,
+      "sizeBytes": 1024,
+      "rawCodeSha256": "f7d736d34fb6ef45ecef039cf0a27e9b539e5fa9dfde63943b033a6db66ff2fc",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/uasset.go",
+      "sourceLine": 66
+    },
+    {
+      "name": "main.parseUAssetBytes",
+      "entryVA": 5453536,
+      "endVA": 5454080,
+      "sizeBytes": 544,
+      "rawCodeSha256": "1b86cb67a007c9f8da4344f860101b422a705f472d494e8268e3015090e5c1a5",
+      "sourceFile": "github.com/laredson/pmm/fixlabengine/uasset.go",
+      "sourceLine": 191
+    }
+  ],
+  "originalExecuted": false,
+  "sourceRecovered": false,
+  "profileInference": "Fixed zero-custom cooked layout with soft-object summary slots, PayloadToc tail, 32-byte imports, 96-byte exports; no proof of actual donor asset compatibility.",
+  "upstream": {
+    "repository": "atenfyr/UAssetAPI",
+    "commit": "3228c1e86261aa08131f7ec0ff1a395f5d0b2a84",
+    "blobs": {
+      "UAssetAPI/UAsset.cs": "e45390d28b2db8e4cc583d6b7c2cc09b9b5a426c",
+      "UAssetAPI/Import.cs": "ea381bec860b085197cd5cc4bddd902c299afd5a",
+      "UAssetAPI/ExportTypes/Export.cs": "14a05038bca8d3e955ab073cec523ecb7f36a640",
+      "UAssetAPI/UnrealTypes/ObjectVersion.cs": "0a4be18d5bbd741de33431754264a568058380e5"
+    }
+  },
+  "disassemblyCommands": [
+    [
+      "objdump",
+      "-d",
+      "-M",
+      "intel",
+      "--start-address=0x5372e0",
+      "--stop-address=0x537ec0",
+      "<PINNED PMMFixLab.exe>"
+    ],
+    [
+      "objdump",
+      "-d",
+      "-M",
+      "intel",
+      "--start-address=0x533900",
+      "--stop-address=0x536260",
+      "<PINNED PMMFixLab.exe>"
+    ],
+    [
+      "objdump",
+      "-d",
+      "-M",
+      "intel",
+      "--start-address=0x536e80",
+      "--stop-address=0x5372e0",
+      "<PINNED PMMFixLab.exe>"
+    ],
+    [
+      "objdump",
+      "-d",
+      "-M",
+      "intel",
+      "--start-address=0x5366e0",
+      "--stop-address=0x536e80",
+      "<PINNED PMMFixLab.exe>"
+    ],
+    [
+      "objdump",
+      "-d",
+      "-M",
+      "intel",
+      "--start-address=0x532fc0",
+      "--stop-address=0x5333c0",
+      "<PINNED PMMFixLab.exe>"
+    ],
+    [
+      "objdump",
+      "-d",
+      "-M",
+      "intel",
+      "--start-address=0x5336e0",
+      "--stop-address=0x533900",
+      "<PINNED PMMFixLab.exe>"
+    ]
+  ]
+}

@@ -1,27 +1,30 @@
-# Estado v1.5.0.1 - cierre 04A-3
+# Estado v1.5.0.1 - cierre 04A-4
 
-**04A-3 CERRADA: componente reconstruido PAK v11 y readback independiente.**
-Fecha 2026-09-18. Entrada f7c8359a8e0f089311cc01a6133bdfd9790e702a.
-04A completa y REL-01 siguen ABIERTAS. No hay motor FixLab completo ni instalacion.
-Siguiente: 04A-4 lectura/estructura UAsset; ver NEXT_SESSION.md.
+**04A-4 CERRADA: lectura/estructura UAsset como componente aislado.**
+Fecha 2026-09-18. Entrada a66cea06e673a169623b3c12821739b0fa6d0b9f.
+04A completa/REL-01 siguen abiertas. No hay motor FixLab candidato completo.
+Siguiente: 04A-4B serializacion/relocalizacion; leer NEXT_SESSION.md.
 
-| Area | Estado | Pendiente |
+| Area | Estado real | Pendiente |
 | --- | --- | --- |
-| Identidad 01B | 1.5.0.1/s01b; 629 archivos y 628 hashes intactos | Mantener |
-| Host/Runtime/UIBridge/Supervision | C2B conservado sin cambios | Gates Windows y bloqueos previos |
-| FixLab original | Fuentes ausentes; overlay no valido | Solo investigar pistas nuevas |
-| PMMDLT1 | Componente 04A-2 conservado | Integracion posterior |
-| PAKV11 | Build/Read/Verify y lector Python; perfil acotado | Compatibilidad engine real y publicacion transaccional |
-| UAsset/core/V2/CLI | No implementados como motor completo | 04A-4 y siguientes |
-| Manifiesto/rutas/repair/familias | Bloqueos previos abiertos | Antes de promocion |
-| Traducciones | Intactas, sin fusion | Integracion autorizada posterior |
+| Identidad 01B | 1.5.0.1/s01b; 629 archivos/628 hashes intactos | Mantener |
+| Host/Runtime/UIBridge/Supervision | C2B conservado | Windows/bloqueos previos |
+| FixLab source original | Ausente; overlay no valido | Solo pistas nuevas |
+| PMMDLT1 y PAKV11 | Componentes previos conservados | Integracion y gates engine |
+| UAsset | Read perfil 522/1008 explicito, mapas/referencias/rangos | Serializacion/core; datos opacos y compatibilidad real |
+| Core/V2/CLI | No es motor completo | Tandas siguientes antes de 04B |
+| Familias/manifest/rutas/repair | Bloqueos anteriores abiertos | Antes de promocion |
+| Traducciones | Intactas | Fusion posterior autorizada |
 
-20 tests Go, 13 Python, race Linux. Golden manual de 649 bytes y 17 paquetes
-sinteticos/240 archivos verificados independientemente contra sus bytes esperados.
-Fuzz: 233063 entradas de archivo + 236260 de indices re-sellados sinteticos.
-Dos builds del harness TEST Windows identicos; vet correcto, Windows NO ejecutado.
-No motor FixLab completo construido, reparacion productiva, PMM, juego o antivirus.
+23 Test Go con aserciones y 12 Python pasaron. Seis fixtures artificiales con
+lectura independiente; race Linux sin incidencias. FuzzRead 1464 entradas,
+FuzzTables 21117. Dos builds TEST Windows identicos, vet correcto. Windows NO
+executado. No datos reales de juego/donantes, reparaciones ni analisis AV.
 
-SESSION04A3_FINDINGS/CHECKS y NativeCandidates/FixLab/PAKV11/evidence guardan fuentes,
-formato, hashes y resultados. Evidencia anterior historica; no equivalencia original
-ni actualizacion instalada. No modificar/repinnear recetas para simular validacion.
+UAsset header-only NO afirma presencia de .uexp. ExportRangesChecked con .uexp
+solo valida extents, no propiedades; hashes calculados no prueban autenticidad.
+Secciones opacas quedan etiquetadas, no descartadas. Versiones no soportadas se
+rechazan; 0/0 requiere perfil externo explicitamente autorizado por el caller.
+
+SESSION04A4_FINDINGS/CHECKS y UAsset/evidence conservan codigo y resultados.
+Registros anteriores historicos, sin reescritura de supuestos PASS.

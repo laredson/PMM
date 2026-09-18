@@ -1,0 +1,622 @@
+[
+  {
+    "id": "basic",
+    "header": "wYMqnvj///9gAwAACgIAAPADAAAAAAAAAAAAAJgCAAAQAAAAL0dhbWUvU3ludGhldGljAAAiAIAGAAAAFAEAAAAAAAAAAAAAAAAAAAAAAAACAAAAwAEAAAIAAACAAQAAgAIAAAAAAAAAAAAAAAAAAAAAAAAAAQIDBAUGBwgJCgsMDQ4PAQAAAAIAAAAGAAAABQABAAEAAAAAABYAAABzeW50aGV0aWMtbGF5b3V0LW9ubHkABQABAAEAAAAAABYAAABzeW50aGV0aWMtbGF5b3V0LW9ubHkAAAAAAAAAAAB4VjQSAAAAAAAAAACnAgAAAAAAAAAAAAABAAAAAwAAAAIAAACQAgAABgAAAP//////////BQAAAE5vbmUAAAAAABQAAAAvU2NyaXB0L0NvcmVVT2JqZWN0AAsADQAGAAAAQ2xhc3MAFgAaABAAAABTeW50aGV0aWNPYmplY3QAIQAnAAYAAABGaXJzdAAsADQABwAAAFNlY29uZAA3AEEAAQAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAABAAAAAAAAAAIAAAAAAAAA/////wQAAAAAAAAAAQAAAP7///8AAAAAAAAAAAAAAAAEAAAAAAAAAAEAAAAPAAAAAAAAAJgCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAP7///8AAAAAAAAAAAAAAAAFAAAAAQAAAAEAAAAAAAAAAAAAAKcCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAD+////AQAAAP7////+/////v///w==",
+    "data": "Tk9ULUdBTUUtREFUQS0w",
+    "fields": {
+      "legacy": 4,
+      "ue3": 8,
+      "ue4": 12,
+      "ue5": 16,
+      "licensee": 20,
+      "customCount": 24,
+      "headerSize": 28,
+      "flags": 52,
+      "nameCount": 56,
+      "nameOffset": 60,
+      "softObjectCount": 64,
+      "softObjectOffset": 68,
+      "gatherCount": 72,
+      "gatherOffset": 76,
+      "exportCount": 80,
+      "exportOffset": 84,
+      "importCount": 88,
+      "importOffset": 92,
+      "dependsOffset": 96,
+      "softPackageCount": 100,
+      "softPackageOffset": 104,
+      "searchableOffset": 108,
+      "thumbnailOffset": 112,
+      "compressionFlags": 216,
+      "compressedChunks": 220,
+      "additionalPackages": 228,
+      "assetRegistryOffset": 232,
+      "bulkDataStart": 236,
+      "worldTileOffset": 244,
+      "preloadCount": 256,
+      "preloadOffset": 260,
+      "namesReferenced": 264,
+      "payloadToc": 268
+    },
+    "expected": {
+      "headerSize": 664,
+      "summaryEnd": 276,
+      "names": [
+        "None",
+        "/Script/CoreUObject",
+        "Class",
+        "SyntheticObject",
+        "First",
+        "Second"
+      ],
+      "nameSpans": [
+        [
+          276,
+          13
+        ],
+        [
+          289,
+          28
+        ],
+        [
+          317,
+          14
+        ],
+        [
+          331,
+          24
+        ],
+        [
+          355,
+          14
+        ],
+        [
+          369,
+          15
+        ]
+      ],
+      "imports": [
+        {
+          "offset": 384,
+          "outer": 0,
+          "name": 3
+        },
+        {
+          "offset": 416,
+          "outer": -1,
+          "name": 4
+        }
+      ],
+      "exports": [
+        {
+          "offset": 448,
+          "payloadOffset": 0,
+          "size": 15,
+          "name": 4,
+          "number": 0,
+          "firstDep": 0
+        },
+        {
+          "offset": 544,
+          "payloadOffset": 15,
+          "size": 0,
+          "name": 5,
+          "number": 1,
+          "firstDep": 1
+        }
+      ],
+      "unversioned": false,
+      "opaque": false,
+      "headerSha256": "73fa003f11012d791d0209f5a03cee246ddd10ca05f28bb0262b7196c30a1445",
+      "dataSha256": "ace33513ead91c58e72a2f865ba9405f93bbb13aeea153d829da8ec19e6e9053"
+    }
+  },
+  {
+    "id": "unicode",
+    "header": "wYMqnvj///9gAwAACgIAAPADAAAAAAAAAAAAAK0CAAAQAAAAL0dhbWUvU3ludGhldGljAAAiAIAGAAAAFAEAAAAAAAAAAAAAAAAAAAAAAAACAAAA1QEAAAIAAACVAQAAlQIAAAAAAAAAAAAAAAAAAAAAAAAAAQIDBAUGBwgJCgsMDQ4PAQAAAAIAAAAGAAAABQABAAEAAAAAABYAAABzeW50aGV0aWMtbGF5b3V0LW9ubHkABQABAAEAAAAAABYAAABzeW50aGV0aWMtbGF5b3V0LW9ubHkAAAAAAAAAAAB4VjQSAAAAAAAAAAC8AgAAAAAAAAAAAAABAAAAAwAAAAIAAAClAgAABgAAAP//////////BQAAAE5vbmUAAAAAABQAAAAvU2NyaXB0L0NvcmVVT2JqZWN0AAsADQAGAAAAQ2xhc3MAFgAaABAAAABTeW50aGV0aWNPYmplY3QAIQAnAAYAAABGaXJzdAAsADQA8v///0UAcwBwAGEA8QBvAGwAXwAtTodlXwA82A3fAAA3AEEAAQAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAABAAAAAAAAAAIAAAAAAAAA/////wQAAAAAAAAAAQAAAP7///8AAAAAAAAAAAAAAAAEAAAAAAAAAAEAAAAPAAAAAAAAAK0CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAP7///8AAAAAAAAAAAAAAAAFAAAAAQAAAAEAAAAAAAAAAAAAALwCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAD+////AQAAAP7////+/////v///w==",
+    "data": "Tk9ULUdBTUUtREFUQS0w",
+    "fields": {
+      "legacy": 4,
+      "ue3": 8,
+      "ue4": 12,
+      "ue5": 16,
+      "licensee": 20,
+      "customCount": 24,
+      "headerSize": 28,
+      "flags": 52,
+      "nameCount": 56,
+      "nameOffset": 60,
+      "softObjectCount": 64,
+      "softObjectOffset": 68,
+      "gatherCount": 72,
+      "gatherOffset": 76,
+      "exportCount": 80,
+      "exportOffset": 84,
+      "importCount": 88,
+      "importOffset": 92,
+      "dependsOffset": 96,
+      "softPackageCount": 100,
+      "softPackageOffset": 104,
+      "searchableOffset": 108,
+      "thumbnailOffset": 112,
+      "compressionFlags": 216,
+      "compressedChunks": 220,
+      "additionalPackages": 228,
+      "assetRegistryOffset": 232,
+      "bulkDataStart": 236,
+      "worldTileOffset": 244,
+      "preloadCount": 256,
+      "preloadOffset": 260,
+      "namesReferenced": 264,
+      "payloadToc": 268
+    },
+    "expected": {
+      "headerSize": 685,
+      "summaryEnd": 276,
+      "names": [
+        "None",
+        "/Script/CoreUObject",
+        "Class",
+        "SyntheticObject",
+        "First",
+        "Espa\u00f1ol_\u4e2d\u6587_\ud83c\udf0d"
+      ],
+      "nameSpans": [
+        [
+          276,
+          13
+        ],
+        [
+          289,
+          28
+        ],
+        [
+          317,
+          14
+        ],
+        [
+          331,
+          24
+        ],
+        [
+          355,
+          14
+        ],
+        [
+          369,
+          36
+        ]
+      ],
+      "imports": [
+        {
+          "offset": 405,
+          "outer": 0,
+          "name": 3
+        },
+        {
+          "offset": 437,
+          "outer": -1,
+          "name": 4
+        }
+      ],
+      "exports": [
+        {
+          "offset": 469,
+          "payloadOffset": 0,
+          "size": 15,
+          "name": 4,
+          "number": 0,
+          "firstDep": 0
+        },
+        {
+          "offset": 565,
+          "payloadOffset": 15,
+          "size": 0,
+          "name": 5,
+          "number": 1,
+          "firstDep": 1
+        }
+      ],
+      "unversioned": false,
+      "opaque": false,
+      "headerSha256": "cb770be3b87b7b6b36ea9863b686ad2fb93b0889c6dc4a1708fe7d9c60d9254a",
+      "dataSha256": "ace33513ead91c58e72a2f865ba9405f93bbb13aeea153d829da8ec19e6e9053"
+    }
+  },
+  {
+    "id": "unversioned",
+    "header": "wYMqnvj///8AAAAAAAAAAAAAAAAAAAAAAAAAAJgCAAAQAAAAL0dhbWUvU3ludGhldGljAAAiAIAGAAAAFAEAAAAAAAAAAAAAAAAAAAAAAAACAAAAwAEAAAIAAACAAQAAgAIAAAAAAAAAAAAAAAAAAAAAAAAAAQIDBAUGBwgJCgsMDQ4PAQAAAAIAAAAGAAAABQABAAEAAAAAABYAAABzeW50aGV0aWMtbGF5b3V0LW9ubHkABQABAAEAAAAAABYAAABzeW50aGV0aWMtbGF5b3V0LW9ubHkAAAAAAAAAAAB4VjQSAAAAAAAAAACnAgAAAAAAAAAAAAABAAAAAwAAAAIAAACQAgAABgAAAP//////////BQAAAE5vbmUAAAAAABQAAAAvU2NyaXB0L0NvcmVVT2JqZWN0AAsADQAGAAAAQ2xhc3MAFgAaABAAAABTeW50aGV0aWNPYmplY3QAIQAnAAYAAABGaXJzdAAsADQABwAAAFNlY29uZAA3AEEAAQAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAABAAAAAAAAAAIAAAAAAAAA/////wQAAAAAAAAAAQAAAP7///8AAAAAAAAAAAAAAAAEAAAAAAAAAAEAAAAPAAAAAAAAAJgCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAP7///8AAAAAAAAAAAAAAAAFAAAAAQAAAAEAAAAAAAAAAAAAAKcCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAD+////AQAAAP7////+/////v///w==",
+    "data": "Tk9ULUdBTUUtREFUQS0w",
+    "fields": {
+      "legacy": 4,
+      "ue3": 8,
+      "ue4": 12,
+      "ue5": 16,
+      "licensee": 20,
+      "customCount": 24,
+      "headerSize": 28,
+      "flags": 52,
+      "nameCount": 56,
+      "nameOffset": 60,
+      "softObjectCount": 64,
+      "softObjectOffset": 68,
+      "gatherCount": 72,
+      "gatherOffset": 76,
+      "exportCount": 80,
+      "exportOffset": 84,
+      "importCount": 88,
+      "importOffset": 92,
+      "dependsOffset": 96,
+      "softPackageCount": 100,
+      "softPackageOffset": 104,
+      "searchableOffset": 108,
+      "thumbnailOffset": 112,
+      "compressionFlags": 216,
+      "compressedChunks": 220,
+      "additionalPackages": 228,
+      "assetRegistryOffset": 232,
+      "bulkDataStart": 236,
+      "worldTileOffset": 244,
+      "preloadCount": 256,
+      "preloadOffset": 260,
+      "namesReferenced": 264,
+      "payloadToc": 268
+    },
+    "expected": {
+      "headerSize": 664,
+      "summaryEnd": 276,
+      "names": [
+        "None",
+        "/Script/CoreUObject",
+        "Class",
+        "SyntheticObject",
+        "First",
+        "Second"
+      ],
+      "nameSpans": [
+        [
+          276,
+          13
+        ],
+        [
+          289,
+          28
+        ],
+        [
+          317,
+          14
+        ],
+        [
+          331,
+          24
+        ],
+        [
+          355,
+          14
+        ],
+        [
+          369,
+          15
+        ]
+      ],
+      "imports": [
+        {
+          "offset": 384,
+          "outer": 0,
+          "name": 3
+        },
+        {
+          "offset": 416,
+          "outer": -1,
+          "name": 4
+        }
+      ],
+      "exports": [
+        {
+          "offset": 448,
+          "payloadOffset": 0,
+          "size": 15,
+          "name": 4,
+          "number": 0,
+          "firstDep": 0
+        },
+        {
+          "offset": 544,
+          "payloadOffset": 15,
+          "size": 0,
+          "name": 5,
+          "number": 1,
+          "firstDep": 1
+        }
+      ],
+      "unversioned": true,
+      "opaque": false,
+      "headerSha256": "05184cee18ce94a685bd6f5034cbaf4e2f163279b728c27db3ed0978ac3df18e",
+      "dataSha256": "ace33513ead91c58e72a2f865ba9405f93bbb13aeea153d829da8ec19e6e9053"
+    }
+  },
+  {
+    "id": "empty",
+    "header": "wYMqnvj///9gAwAACgIAAPADAAAAAAAAAAAAABQBAAAQAAAAL0dhbWUvU3ludGhldGljAAAiAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQIDBAUGBwgJCgsMDQ4PAQAAAAAAAAAAAAAABQABAAEAAAAAABYAAABzeW50aGV0aWMtbGF5b3V0LW9ubHkABQABAAEAAAAAABYAAABzeW50aGV0aWMtbGF5b3V0LW9ubHkAAAAAAAAAAAB4VjQSAAAAAAAAAAAUAQAAAAAAAAAAAAABAAAAAwAAAAAAAAAAAAAAAAAAAP//////////",
+    "data": "",
+    "fields": {
+      "legacy": 4,
+      "ue3": 8,
+      "ue4": 12,
+      "ue5": 16,
+      "licensee": 20,
+      "customCount": 24,
+      "headerSize": 28,
+      "flags": 52,
+      "nameCount": 56,
+      "nameOffset": 60,
+      "softObjectCount": 64,
+      "softObjectOffset": 68,
+      "gatherCount": 72,
+      "gatherOffset": 76,
+      "exportCount": 80,
+      "exportOffset": 84,
+      "importCount": 88,
+      "importOffset": 92,
+      "dependsOffset": 96,
+      "softPackageCount": 100,
+      "softPackageOffset": 104,
+      "searchableOffset": 108,
+      "thumbnailOffset": 112,
+      "compressionFlags": 216,
+      "compressedChunks": 220,
+      "additionalPackages": 228,
+      "assetRegistryOffset": 232,
+      "bulkDataStart": 236,
+      "worldTileOffset": 244,
+      "preloadCount": 256,
+      "preloadOffset": 260,
+      "namesReferenced": 264,
+      "payloadToc": 268
+    },
+    "expected": {
+      "headerSize": 276,
+      "summaryEnd": 276,
+      "names": [],
+      "nameSpans": [],
+      "imports": [],
+      "exports": [],
+      "unversioned": false,
+      "opaque": false,
+      "headerSha256": "78aaee7c51b1fdea13e3bbc28e84f97a7f8ead04c67b78535909c1bf00745ec5",
+      "dataSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "id": "opaque",
+    "header": "wYMqnvj///9gAwAACgIAAPADAAAAAAAAAAAAALECAAAQAAAAL0dhbWUvU3ludGhldGljAAAiAIAGAAAAFAEAAAAAAAAAAAAAAAAAAAAAAAACAAAAwAEAAAIAAACAAQAAgAIAAAAAAAAAAAAAAAAAAAAAAAAAAQIDBAUGBwgJCgsMDQ4PAQAAAAIAAAAGAAAABQABAAEAAAAAABYAAABzeW50aGV0aWMtbGF5b3V0LW9ubHkABQABAAEAAAAAABYAAABzeW50aGV0aWMtbGF5b3V0LW9ubHkAAAAAAAAAAAB4VjQSAAAAAJgCAADAAgAAAAAAAAAAAAABAAAAAwAAAAIAAACQAgAABgAAAP//////////BQAAAE5vbmUAAAAAABQAAAAvU2NyaXB0L0NvcmVVT2JqZWN0AAsADQAGAAAAQ2xhc3MAFgAaABAAAABTeW50aGV0aWNPYmplY3QAIQAnAAYAAABGaXJzdAAsADQABwAAAFNlY29uZAA3AEEAAQAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAABAAAAAAAAAAIAAAAAAAAA/////wQAAAAAAAAAAQAAAP7///8AAAAAAAAAAAAAAAAEAAAAAAAAAAEAAAAPAAAAAAAAALECAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAP7///8AAAAAAAAAAAAAAAAFAAAAAQAAAAEAAAAAAAAAAAAAAMACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAD+////AQAAAP7////+/////v///09QQVFVRS1TWU5USEVUSUMtUkVHSVNUUlk=",
+    "data": "Tk9ULUdBTUUtREFUQS0w",
+    "fields": {
+      "legacy": 4,
+      "ue3": 8,
+      "ue4": 12,
+      "ue5": 16,
+      "licensee": 20,
+      "customCount": 24,
+      "headerSize": 28,
+      "flags": 52,
+      "nameCount": 56,
+      "nameOffset": 60,
+      "softObjectCount": 64,
+      "softObjectOffset": 68,
+      "gatherCount": 72,
+      "gatherOffset": 76,
+      "exportCount": 80,
+      "exportOffset": 84,
+      "importCount": 88,
+      "importOffset": 92,
+      "dependsOffset": 96,
+      "softPackageCount": 100,
+      "softPackageOffset": 104,
+      "searchableOffset": 108,
+      "thumbnailOffset": 112,
+      "compressionFlags": 216,
+      "compressedChunks": 220,
+      "additionalPackages": 228,
+      "assetRegistryOffset": 232,
+      "bulkDataStart": 236,
+      "worldTileOffset": 244,
+      "preloadCount": 256,
+      "preloadOffset": 260,
+      "namesReferenced": 264,
+      "payloadToc": 268
+    },
+    "expected": {
+      "headerSize": 689,
+      "summaryEnd": 276,
+      "names": [
+        "None",
+        "/Script/CoreUObject",
+        "Class",
+        "SyntheticObject",
+        "First",
+        "Second"
+      ],
+      "nameSpans": [
+        [
+          276,
+          13
+        ],
+        [
+          289,
+          28
+        ],
+        [
+          317,
+          14
+        ],
+        [
+          331,
+          24
+        ],
+        [
+          355,
+          14
+        ],
+        [
+          369,
+          15
+        ]
+      ],
+      "imports": [
+        {
+          "offset": 384,
+          "outer": 0,
+          "name": 3
+        },
+        {
+          "offset": 416,
+          "outer": -1,
+          "name": 4
+        }
+      ],
+      "exports": [
+        {
+          "offset": 448,
+          "payloadOffset": 0,
+          "size": 15,
+          "name": 4,
+          "number": 0,
+          "firstDep": 0
+        },
+        {
+          "offset": 544,
+          "payloadOffset": 15,
+          "size": 0,
+          "name": 5,
+          "number": 1,
+          "firstDep": 1
+        }
+      ],
+      "unversioned": false,
+      "opaque": true,
+      "headerSha256": "150809b934d6db39d03d00c76a50ca5a9f6ee77c41e977c543fb13b911f6c7d1",
+      "dataSha256": "ace33513ead91c58e72a2f865ba9405f93bbb13aeea153d829da8ec19e6e9053"
+    }
+  },
+  {
+    "id": "multi",
+    "header": "wYMqnvj///9gAwAACgIAAPADAAAAAAAAAAAAAAQDAAAQAAAAL0dhbWUvU3ludGhldGljAAAiAIAGAAAAFAEAAAAAAAAAAAAAAAAAAAAAAAADAAAAwAEAAAIAAACAAQAA4AIAAAAAAAAAAAAAAAAAAAAAAAAAAQIDBAUGBwgJCgsMDQ4PAQAAAAMAAAAGAAAABQABAAEAAAAAABYAAABzeW50aGV0aWMtbGF5b3V0LW9ubHkABQABAAEAAAAAABYAAABzeW50aGV0aWMtbGF5b3V0LW9ubHkAAAAAAAAAAAB4VjQSAAAAAAAAAAAiAwAAAAAAAAAAAAABAAAAAwAAAAMAAAD4AgAABgAAAP//////////BQAAAE5vbmUAAAAAABQAAAAvU2NyaXB0L0NvcmVVT2JqZWN0AAsADQAGAAAAQ2xhc3MAFgAaABAAAABTeW50aGV0aWNPYmplY3QAIQAnAAYAAABGaXJzdAAsADQABwAAAFNlY29uZAA3AEEAAQAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAABAAAAAAAAAAIAAAAAAAAA/////wQAAAAAAAAAAQAAAP7///8AAAAAAAAAAAAAAAAEAAAAAAAAAAEAAAAPAAAAAAAAAAQDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAP7///8AAAAAAAAAAAAAAAAFAAAAAQAAAAEAAAAAAAAAAAAAABMDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAAAAAP7///8AAAAAAAAAAAAAAAAEAAAAAgAAAAEAAAAPAAAAAAAAABMDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAACAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAD+////AQAAAP7///8BAAAA/v////7////+/////v///w==",
+    "data": "Tk9ULUdBTUUtREFUQS0wTk9ULUdBTUUtREFUQS0y",
+    "fields": {
+      "legacy": 4,
+      "ue3": 8,
+      "ue4": 12,
+      "ue5": 16,
+      "licensee": 20,
+      "customCount": 24,
+      "headerSize": 28,
+      "flags": 52,
+      "nameCount": 56,
+      "nameOffset": 60,
+      "softObjectCount": 64,
+      "softObjectOffset": 68,
+      "gatherCount": 72,
+      "gatherOffset": 76,
+      "exportCount": 80,
+      "exportOffset": 84,
+      "importCount": 88,
+      "importOffset": 92,
+      "dependsOffset": 96,
+      "softPackageCount": 100,
+      "softPackageOffset": 104,
+      "searchableOffset": 108,
+      "thumbnailOffset": 112,
+      "compressionFlags": 216,
+      "compressedChunks": 220,
+      "additionalPackages": 228,
+      "assetRegistryOffset": 232,
+      "bulkDataStart": 236,
+      "worldTileOffset": 244,
+      "preloadCount": 256,
+      "preloadOffset": 260,
+      "namesReferenced": 264,
+      "payloadToc": 268
+    },
+    "expected": {
+      "headerSize": 772,
+      "summaryEnd": 276,
+      "names": [
+        "None",
+        "/Script/CoreUObject",
+        "Class",
+        "SyntheticObject",
+        "First",
+        "Second"
+      ],
+      "nameSpans": [
+        [
+          276,
+          13
+        ],
+        [
+          289,
+          28
+        ],
+        [
+          317,
+          14
+        ],
+        [
+          331,
+          24
+        ],
+        [
+          355,
+          14
+        ],
+        [
+          369,
+          15
+        ]
+      ],
+      "imports": [
+        {
+          "offset": 384,
+          "outer": 0,
+          "name": 3
+        },
+        {
+          "offset": 416,
+          "outer": -1,
+          "name": 4
+        }
+      ],
+      "exports": [
+        {
+          "offset": 448,
+          "payloadOffset": 0,
+          "size": 15,
+          "name": 4,
+          "number": 0,
+          "firstDep": 0
+        },
+        {
+          "offset": 544,
+          "payloadOffset": 15,
+          "size": 0,
+          "name": 5,
+          "number": 1,
+          "firstDep": 1
+        },
+        {
+          "offset": 640,
+          "payloadOffset": 15,
+          "size": 15,
+          "name": 4,
+          "number": 2,
+          "firstDep": 2
+        }
+      ],
+      "unversioned": false,
+      "opaque": false,
+      "headerSha256": "6d74cd7575ce164200c394b6073f4f8fb52a467962c946d14b75f3ab7af4366f",
+      "dataSha256": "04bc2c78ca785141dc790529f8395674188da61bc4dbd81e18dda167c67b0ab0"
+    }
+  }
+]

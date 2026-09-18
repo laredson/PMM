@@ -1,47 +1,56 @@
-# Retomar despues de 04A-3 (PAK v11)
+# Retomar despues de 04A-4 - lectura UAsset
 
-Rama exclusiva v1.5.0.1-PMM-reliability. **04A-3 cerrada como componente aislado.**
-04A completa y REL-01 siguen abiertas. No pasar todavia a comparacion 04B.
-Leer AGENTS -> este archivo -> STATUS -> SESSION04A3_FINDINGS/CHECKS ->
-NativeCandidates/FixLab/PAKV11/README.md y FORMAT.md.
+Rama exclusiva v1.5.0.1-PMM-reliability. 04A-4 cerrada en componente de lectura;
+04A completa/REL-01 siguen abiertas. No pasar todavia a comparacion 04B.
+Leer AGENTS -> este archivo -> STATUS -> SESSION04A4_FINDINGS/CHECKS ->
+NativeCandidates/FixLab/UAsset/README.md y FORMAT.md.
 
-## Conservado, no repetir
+## Conservado
 
-PMMDLT1 ya esta reconstruido, testeado y separado. PAKV11 tiene Build/Read/Verify,
-lector Python independiente y golden manual. No volver a programarlos desde el chat.
-No repetir la busqueda del overlay invalido ni pedir el ZIP del programa otra vez.
-No se ha recuperado el source original. No existen aun core UAsset/V2/CLI completos.
+PMMDLT1, PAKV11 y UAsset son bibliotecas separadas con codigo/fixtures/recetas,
+NO un motor FixLab completo. No repetirlos ni reabrir la busqueda del overlay
+invalido sin una pista nueva. No usar ZIP viejos como autoridad de Host/Runtime.
+Paquete 1.5.0.1 / PMM-v1.5.0.1-reliability-s01b, 629 archivos/628 hashes.
+PMM tree 09df5c45aee3390c6b8ea235c8afa4e149a9f1fa. Candidatas C2B intactas.
 
-PAK perfil: v11, mount ../../../, ASCII, registros compactos 32-bit, PHI y FDI
-completos, sin compresion/cifrado. 20 tests Go/13 Python, 17 fixtures/240 archivos
-releidos en Python, race Linux y dos fuzz acotados. Windows harness compilado,
-NO ejecutado: 6563b0a5e888e6709025dff239464e7f7e00fa37764808db1a6fa724ca74f21f.
-No es PMMFixLab.exe; no copiarlo sobre binarios distribuidos.
+UAsset admite el perfil explicito cooked-ue4-522-ue5-1008. 0/0 solo por afirmacion
+externa AllowUnversioned; nunca adivinar. Imports 32/exports 96 bytes, names,
+summary/offsets, depends/preload, comprobacion de rangos .uexp cuando se suministra.
+AssetRegistry y gaps/tail son OPACOS. Propiedades/bulkdata no decodificados.
+Metadata read no equivale a transformacion o carga valida por Unreal.
 
-Paquete intacto: 629 archivos, 628 checksums, 1.5.0.1 / PMM-v1.5.0.1-reliability-s01b.
-PMM tree: 09df5c45aee3390c6b8ea235c8afa4e149a9f1fa.
-Host/Runtime/UIBridge/Supervision C2B siguen como estaban. No usar viejos ZIP como
-autoridad de esas candidatas; aplicar solo rutas de la intervencion al HEAD remoto.
+23 tests Go con aserciones (export fixture opt-in incluido), 12 Python, seis
+fixtures comparadas con lector independiente y race Linux. Dos builds TEST
+Windows iguales: 12a8a4e96d739061389cb61d934f78b2da749d0cd6ed963c03c88c8c69a98feb.
+NO es PMMFixLab.exe; no reemplazar binarios. Go1.23.2 local/offline.
 
-## Siguiente tanda 04A-4 - SOLO UAsset: lectura y estructura
+## Siguiente 04A-4B - serializacion y relocalizacion acotadas
 
-1. Verificar HEAD y leer FixLab/SOURCE_CONTRACT y evidence/binary-map.json de 04A.
-   Original PMMFixLab.exe: 8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe.
-2. Determinar el subconjunto UAsset que requieren las recetas core R1 mediante
-   contratos de CKL, documentacion primaria y metadata/disassembly estatica.
-   No deducir un layout solo por los nombres de readHeader/readNames/readExports.
-3. Implementar una lectura acotada y explicitamente limitada con offsets/rangos/
-   nombres/imports/exports y fixtures sinteticos. Version no soportada = error,
-   nunca adivinar offsets ni saltar validacion para aceptar un asset.
-4. No aplicar recetas reales, ejecutar juego/original, importar datos propietarios,
-   integrar PMMDLT1/PAK con un main ficticio ni alterar CKL productivo.
-5. Conservar source, tests, receta/hashes y limites como componente parcial.
-   Las transformaciones/serializacion/core R1 pueden requerir subtanda 04A-4B;
-   si hace falta dividir, fijar alcance antes de implementar, sin llamar terminado
-   al motor completo. Despues orquestacion V2/CLI; solo entonces 04B.
-6. Guardar estado y siguiente accion exacta; commit [skip ci] autorizado para esta
-   intervencion, sin Actions/PR/tag/release ni sustitucion de ejecutables.
+1. Fijar HEAD y leer SOURCE_CONTRACT, la receta core R1 original y mapa estatico
+   de serializeSummary/encodeNameEntry/relocatePackage/patchPostProcess. Original
+   FixLab pin 8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe.
+2. Definir ANTES un alcance terminado: reconstruir header/names y ajustar offsets
+   en fixtures sinteticos, con las invariantes de lector 04A-4. Si las operaciones
+   postProcess/core no caben, registrarlas como proximo bloque, no fingir motor.
+3. Conservar todos los bytes opacos o rechazar el asset si no se conoce como
+   relocalizarlos. Un span reportado como opaco NO significa que no contenga
+   offsets internos. No sustituir CRC/name hashes actuales por valores inventados.
+4. Verificar identidad inmutable de entradas, expected deltas/offsets, no cambios
+   fuera del alcance, roundtrip sin cambios y lectura independiente del resultado.
+   Ajustar SerialOffset con respecto a TotalHeaderSize, no a posiciones deducidas.
+5. Solo fixtures propios. No leer/redistribuir assets donantes/juego ni ejecutar
+   original, reparaciones, Unreal o repak. No tocar CKL, pins, traducciones,
+   PMMDLT1/PAKV11 o Host/Runtime/UIBridge/Supervision en esa tanda.
+6. Guardar codigo, evidencia y siguiente paso. Commit [skip ci] autorizado,
+   sin Actions/PR/tag/release ni sustitucion. 04B requiere motor completo V2/CLI.
 
-Los gates reales Windows/Unreal/Palworld siguen NOT_RUN. Siguen pendientes familias/
-Job Objects, manifiestos/pins/rutas R03B-02/04 y reparacion 06/07. La prueba informal
-de abrir PMM original no valida estos componentes nuevos ni elimina falsos positivos.
+## Reproduccion actual
+
+En UAsset: go test -count=1 ./... ; python -B -m unittest -v test_reference.
+PMM_UASSET_FIXTURE_OUTPUT=<directorio nuevo> activa la exportacion sintetica;
+python -B verify_reference.py <directorio> realiza la segunda lectura.
+python -B build.py --out <directorio nuevo EXTERNO> compila harness sin ejecutarlo.
+
+Gates Windows/Unreal/Palworld NOT_RUN; source original NO recuperado. Siguen
+familias/Job Objects, manifests/pins/rutas R03B-02/04 y repair 06/07. No confundir
+arranque del PMM original o fixtures correctas con aceptacion de las candidatas.

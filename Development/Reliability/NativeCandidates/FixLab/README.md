@@ -1,21 +1,24 @@
-# FixLab - reconstruccion parcial, cierre 04A-3
+# FixLab - reconstruccion por componentes
 
-**Todavia no hay motor PMMFixLab completo ni fuente original recuperada.**
-El ejecutable distribuido permanece intacto. La fuente historica sigue ausente
-_y_ el overlay R2 invalido; 04A conserva esa evidencia, no reintentarlo sin pista nueva.
+Fuente original no recuperada. El motor completo todavia no esta construido ni
+instalado. Las herramientas de 04A documentan la fuente ausente y overlay invalido.
+No reintentar ese bootstrap ni presentar sus datos parciales como fuente valida.
 
-Componentes aislados ya disponibles:
-- PMMDLT1/: lector/aplicador en memoria (04A-2), sin cambios en 04A-3.
-- PAKV11/: escritor, lector y comparacion por bytes; perfil v11 ASCII sin
-  compresion/cifrado, PHI/FDI completos y limites explicitos. Lector Python separado,
-  golden sintetico y 17 fixtures cruzados (04A-3). No extrae ni instala archivos.
+## Componentes conservados
 
-Herramientas de procedencia anteriores: audit_source.py, inspect_binary.py y
-tools/fixlab_meta.go. El auditor sigue marcando BLOCKED por el overlay invalido;
-ese resultado no es un fallo de las nuevas bibliotecas. El lector metadata no
-es el motor FixLab. SOURCE_CONTRACT.md y evidence/ conservan el mapa historico.
+- PMMDLT1/ (04A-2): lectura/aplicacion en memoria con hashes/limites y fixtures.
+- PAKV11/ (04A-3): Build/Read/Verify, perfil sin cifrar/comprimir y lectura independiente.
+- UAsset/ (04A-4): lectura de perfil cooked 522/1008, nombres/mapas/dependencias;
+  header-only y export ranges diferenciados, secciones desconocidas opacas.
 
-Faltan UAsset, transformaciones core R1, orquestacion V2 y CLI. Solo un motor
-completo permitira comparacion 04B y gates de aceptacion. No conectar prematuramente
-estos componentes al paquete ni modificar recetas/hashes productivos.
-Continuar en ../../NEXT_SESSION.md (Development/Reliability/NEXT_SESSION.md).
+Son codigo funcional de bibliotecas, no un main que simula PMMFixLab completo.
+Cada carpeta conserva contrato, pruebas, receta offline y evidencia de su alcance.
+Los harnesses TEST no son actualizaciones de PMMFixLab.exe.
+
+Auditor/lector de 04A siguen disponibles: audit_source.py e inspect_binary.py.
+SOURCE_CONTRACT.md es evidencia historica del contrato esperado, no source recuperado.
+Original conservado: 8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe.
+
+Siguiente 04A-4B: serializacion/relocalizacion con proteccion de regiones opacas.
+Despues core R1/V2/CLI y solo entonces comparacion 04B/gates reales. No modificar
+recetas o pins para aceptar resultados; no afirmar compatibilidad Unreal sin pruebas.
