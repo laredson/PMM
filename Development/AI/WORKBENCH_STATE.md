@@ -1,3 +1,11 @@
+## Korean localization completed and published — 2026-09-18
+
+한국어 now covers all 1,291 canonical English keys on `v1.5.0.0-PMM-translated` and is enabled for user testing.
+Part 1 (645 entries) was preserved; part 2 added the remaining 646 entries.
+Validation was deliberately bounded to one structural pass: JSON/key parity, non-empty values and placeholder preservation. No GitHub Actions, full repository audit or WPF visual/runtime test was run for this checkpoint.
+Language switching remains restart-based. Portuguese remains user-validated; Arabic RTL behavior and its separately tracked UI exceptions are unchanged.
+Next step: user runtime/visual QA of Korean. Do not retranslate Korean from scratch unless QA reports a specific issue.
+
 # PMM shared implementation state
 
 ## Active checkpoint — Korean part 1 of 2 — 2026-09-18
