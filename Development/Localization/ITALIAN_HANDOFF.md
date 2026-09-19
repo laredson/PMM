@@ -1,4 +1,6 @@
-# PMM Italian localization - complete catalog; user QA pending
+# PMM Italian localization - complete catalog; user-confirmed
+
+> User update, 2026-09-18: "italiano probado. ok." Italian has passed the user's reported runtime test. This supersedes the earlier pending user-QA wording below. It is not exhaustive native-speaker or automated acceptance, and does not close generic runtime localization issues. The Italian catalog is unchanged.
 
 Date: 2026-09-18
 Branch: `v1.5.0.0-PMM-translated`

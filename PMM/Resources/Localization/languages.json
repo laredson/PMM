@@ -69,8 +69,8 @@
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
-      "enabled": false,
-      "status": "template"
+      "enabled": true,
+      "status": "complete"
     },
     {
       "code": "nl",
@@ -249,8 +249,8 @@
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
-      "enabled": false,
-      "status": "template"
+      "enabled": true,
+      "status": "complete"
     },
     {
       "code": "ar",

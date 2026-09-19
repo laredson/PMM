@@ -13,7 +13,13 @@
   "remainingEntries": 0,
   "nextKey": null,
   "nextLanguage": "tr",
-  "userRuntimeVisualQA": "pending",
+  "userRuntimeVisualQA": "user-confirmed",
+  "userRuntimeFeedback": {
+    "date": "2026-09-18",
+    "userText": "italiano probado. ok.\ncontinua por favor",
+    "result": "User reports Italian has been tested and is OK.",
+    "scope": "User runtime feedback; not an exhaustive linguistic, automated or native-speaker audit."
+  },
   "nativeSpeakerQA": "pending",
   "sourceByteIdentityVerified": true,
   "uploadedBlobMatchesLocal": true,

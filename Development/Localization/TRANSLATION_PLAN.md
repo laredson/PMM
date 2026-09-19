@@ -1,3 +1,26 @@
+## Turkish and Polish published; Italian user-confirmed; Dutch next — 2026-09-18
+
+This checkpoint publishes the previously prepared Turkish and Polish catalogs together on `v1.5.0.0-PMM-translated`, without retranslating either language. The publication parent is `7b0209836ddcf8027c604bad9ea5c9e9ee0da9d2`. Both `tr` (Türkçe) and `pl` (Polski) are now enabled with `status: complete`, fallback `en`, direction `ltr`, and no separate XAML.
+
+| Locale | Canonical entries | Parameterized entries | Intentional invariant values | User runtime/visual QA |
+|---|---:|---:|---:|---|
+| Türkçe (`tr`) | 1,291 / 1,291 | 109 | 21 | Pending |
+| Polski (`pl`) | 1,291 / 1,291 | 109 | 23 | Pending |
+
+Exact catalog identities: Turkish `a91f23d0efc9b1fd53570b2f94f1078c6fec0487` (142,665 bytes; SHA-256 `06d9235a5f6b59c9e2901c76d8ea438f317c34cd4ee72898584ef9de87a5142e`), Polish `0485e18aa3ac5b10a83b408f7b140b3d17f7c564` (143,271 bytes; SHA-256 `b00efd82dbbcacb3b36e32c310b1879d958f8775eda5ee907703be93cc3b9164`). The prepared package checksums and both local structural validators were rerun before publication and passed with zero errors. The exact catalog objects were also retrieved through the GitHub connector before attaching them to the publication tree. Canonical English remains `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`.
+
+The user's earlier feedback, "italiano probado. ok.", is recorded in Italian progress and its handoff as user-confirmed runtime feedback. It does not imply native-speaker review, Turkish/Polish acceptance, or resolution of generic runtime defects.
+
+The registry is `5045c649730ae8cd50864285ecc6da5948008c46`: **29 registered locales, 15 enabled**. Only the enabled/status fields of `tr` and `pl` differ from the Italian checkpoint. English remains first/default; all native labels, fallbacks, directions, XAML fields and the quasi-continental visual order are preserved. Polish follows German, Dutch retains the following reserved position, the Chinese variants remain adjacent, and Turkish precedes Arabic. No Romanian locale is added.
+
+**Next translation execution queue: Nederlands (`nl`) -> Gaeilge (`ga`).** Do not translate Turkish or Polish again from scratch. Read `TURKISH_HANDOFF.md`, `POLISH_HANDOFF.md` and the corresponding `Progress` files. After pulling this publication, do not also apply the earlier local patches.
+
+Publication is one normal fast-forward development commit with `[skip ci]`. No force-push, temporary transfer commits, PR, release, tag, main update, workflow dispatch, runtime-code change or binary change is part of this task. The other thirteen enabled catalogs are unchanged. No PMM/WPF, Windows PowerShell 5.1, full source-code localization audit or native-speaker review was run. Existing dynamic counters, the old Library.UI selector path, Arabic mixed prose/path handling and virtualized technical-cell QA remain separate.
+
+## Historical checkpoints
+
+Everything below preserves the earlier ledger. Its older statements labelled current, pending publication, next language, or enabled counts describe those earlier snapshots and do not override the publication checkpoint above.
+
 ## Italian localization complete; Japanese user-confirmed; visual grouping clarified — 2026-09-18
 
 Italiano covers **1,291/1,291 canonical English keys** and is enabled for user testing. The user confirmed "comprobado el japones funciona." Japanese is now user-confirmed; its catalog and the other eleven previously enabled catalogs are unchanged. Italian user runtime/visual QA remains pending.
@@ -18,7 +41,7 @@ There are **29 registered locales, 13 enabled**. This checkpoint changes only th
 
 > The Italian checkpoint above supersedes this snapshot's Japanese QA status, next-language pointer and selector ordering. Japanese completion evidence remains historical evidence.
 
-日本語 now covers **1,291/1,291 canonical English keys** and is enabled for user testing. Japanese blob: `0523fa7a906e7b7a13e24217c1b5142efb8feff5`; SHA-256 `2444aedd657e925cfde04436b5d02671b67651f490456627ca6f6ec0b4fa252c`; 159,854 bytes. Structural checks passed with 109 parameterized entries, 26 intentional invariants and zero recorded structural errors. Runtime/visual and native-speaker QA remain pending.
+日本語 now covers **1,291/1,291 canonical English keys** on `v1.5.0.0-PMM-translated` and is enabled for user testing. Japanese blob: `0523fa7a906e7b7a13e24217c1b5142efb8feff5`; SHA-256 `2444aedd657e925cfde04436b5d02671b67651f490456627ca6f6ec0b4fa252c`; 159,854 bytes. Structural checks passed with 109 parameterized entries, 26 intentional invariants and zero recorded structural errors. Runtime/visual and native-speaker QA remain pending.
 
 The user-defined translation execution queue is now:
 `ja -> it -> tr -> pl -> nl -> ga`
@@ -284,7 +307,7 @@ The first column preserves historical market labels; actual selector order is in
 - Updated `Resources/Metadata/VERSION.txt` to `1.5.0.0` and `Resources/Metadata/BUILD_ID.txt` to `PMM-v1.5.0.0-localization-dev` on this branch only.
 - No release/tag/main merge was created. The existing 1.3.4.1 release manifest/hash inventory remains release provenance and will be regenerated when 1.5 is actually packaged.
 - The language selector still intentionally exposes only completed languages; unfinished locales remain registered but disabled until their translations reach user-test quality.
-- GitHub Desktop branch switching changes the checked-out repository files. It does not by itself rebuild/replace a binary; the current editable UI nevertheless reads `VERSION.txt` at startup, so after fetching/pulling this commit and restarting PMM from this checkout the title should report `v1.5.0.0`.
+- GitHub Desktop branch switching changes the checked-out source files. It does not by itself rebuild/replace a binary; the current editable UI nevertheless reads `VERSION.txt` at startup, so after fetching/pulling this commit and restarting PMM from this checkout the title should report `v1.5.0.0`.
 
 ### 2026-09-16 — registry/progress synchronization correction
 

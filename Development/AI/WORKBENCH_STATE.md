@@ -1,3 +1,23 @@
+## Active checkpoint — Turkish and Polish published; Dutch next — 2026-09-18
+
+Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. This publication attaches the previously prepared Turkish and Polish catalogs, unchanged, to one normal fast-forward development commit based on `7b0209836ddcf8027c604bad9ea5c9e9ee0da9d2`. Do not retranslate either catalog.
+
+Turkish (`tr`, Türkçe): **1,291/1,291 entries**, 109 parameterized strings, 21 intentional invariant values; exact blob `a91f23d0efc9b1fd53570b2f94f1078c6fec0487`, SHA-256 `06d9235a5f6b59c9e2901c76d8ea438f317c34cd4ee72898584ef9de87a5142e`, 142,665 bytes. Polish (`pl`, Polski): **1,291/1,291 entries**, 109 parameterized strings, 23 intentional invariant values; exact blob `0485e18aa3ac5b10a83b408f7b140b3d17f7c564`, SHA-256 `b00efd82dbbcacb3b36e32c310b1879d958f8775eda5ee907703be93cc3b9164`, 143,271 bytes.
+
+Both prepared packages passed checksum verification and their bounded local structural validators were rerun successfully before publication: zero missing/extra/empty keys, placeholder/format, numeric, whitespace, Unicode or protected-token errors. The exact catalog objects were retrieved through the connector before publication. This is not PMM/WPF, PowerShell 5.1, native-speaker or full source-code audit acceptance. Turkish and Polish user runtime/visual QA remain pending.
+
+The user confirmed Italian with "italiano probado. ok." Italian progress and handoff record that user feedback without changing its catalog or claiming other languages or generic runtime defects were tested.
+
+The final registry blob is `5045c649730ae8cd50864285ecc6da5948008c46`: **29 registered locales and 15 enabled**. Relative to the Italian checkpoint only `tr` and `pl` enabled/status change. Preserve the quasi-continental order, native names, English first/default, `Deutsch -> Polski -> Nederlands`, adjacent Chinese variants, and Turkish immediately before Arabic. All other thirteen active catalogs, runtime code, binaries, Arabic bidi behavior, main, tags, releases, workflows and game files are unchanged.
+
+**Next execution queue: Nederlands (`nl`) -> Gaeilge (`ga`).** Read `Development/Localization/TURKISH_HANDOFF.md`, `POLISH_HANDOFF.md`, `Progress/tr.json` and `Progress/pl.json`. Pull this branch, select either new language and restart PMM; do not also apply the old local patches after pulling this publication.
+
+Use `[skip ci]`; no workflow is dispatched and no branch history is rewritten. Existing dynamic English counters, the old Library.UI selector path, Arabic mixed prose/path bidi scopes and virtualized technical-cell QA remain open separately.
+
+## Historical implementation checkpoints
+
+The following earlier state is retained. Its old active/current headings, enabled counts, pending statuses and next-language pointers describe historical snapshots, not the current publication above.
+
 ## Active checkpoint — Italian complete; Japanese user-confirmed; Turkish next — 2026-09-18
 
 Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. The user confirmed "comprobado el japones funciona." Japanese is user-confirmed; its catalog is unchanged. Italian (`it`, `Italiano`) is now complete and enabled: **1,291/1,291 canonical keys**, fallback `en`, direction `ltr`, no separate XAML. The twelve previously active catalogs remain unchanged.
