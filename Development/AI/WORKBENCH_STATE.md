@@ -1,3 +1,17 @@
+## Active checkpoint — Dutch complete; Irish next — 2026-09-18
+
+Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. Dutch (`nl`, Nederlands) is complete and enabled for user testing: **1,291/1,291 canonical keys**, fallback `en`, direction `ltr`, no separate XAML. Publication parent: `f231136769289a9dc56a71bed68fac11cc78833a`. All fifteen previously enabled catalogs, including Turkish and Polish, remain unchanged.
+
+Canonical English blob: `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`. Dutch blob: `f5609d59648da08956cf40c0a083e5aa21ad08ab`; SHA-256 `42eb98c97506de551f30c57566cc0cd789b0fd8b09493b7b8ccf36f63dbe2bc5`; 142,275 bytes. The uploaded Dutch blob matches the locally validated file exactly. Local structural checks passed strict JSON/duplicates, metadata, exact case-sensitive keys/order, nonempty values, complete placeholders/formats, braces, numbers, whitespace, PowerShell escapes, selected technical tokens, extensions/dialog filters, units, color syntax, ~mods, Unicode controls and NFC. There are **109 parameterized entries**, **37 intentional invariant values**, and zero structural errors.
+
+Read `Development/Localization/DUTCH_HANDOFF.md` and `Development/Localization/Progress/nl.json` for glossary, contextual token rules and limits. No PMM/WPF, Windows PowerShell 5.1, full source-code localization audit or native-speaker test ran. Dutch runtime/visual QA is pending. No new Turkish/Polish confirmation was supplied by the user's request to continue; do not mark their pending QA accepted.
+
+Registry blob: `8cf947332960f320ca3f39628b38b1dc2f089f4e`; **29 registered locales, 16 enabled**. Only Dutch enabled/status changes from `5045c649730ae8cd50864285ecc6da5948008c46`. Preserve all names, metadata and the quasi-continental selector order, including **Deutsch -> Polski -> Nederlands**, English first/default and adjacent Chinese variants. Irish remains a disabled template in the European block; Romanian remains a possibility only.
+
+**Next requested translation: Irish (`ga`, Gaeilge).** Do not restart Dutch, Polish or Turkish. Keep restart-based language switching, runtime code, binaries, Arabic bidi behavior, main, releases, tags and workflows unchanged. Existing dynamic English counters, the old Library.UI selector path, mixed Arabic prose/path handling and virtualized technical-cell QA remain open separately.
+
+Publish as one normal fast-forward development commit with `[skip ci]`. No force-push, workflow dispatch, temporary transfer commits, PR or release is part of this checkpoint. The earlier ledgers below are historical snapshots; this top checkpoint supersedes their older active headings, counts and next-language pointers.
+
 ## Active checkpoint — Turkish and Polish published; Dutch next — 2026-09-18
 
 Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. This publication attaches the previously prepared Turkish and Polish catalogs, unchanged, to one normal fast-forward development commit based on `7b0209836ddcf8027c604bad9ea5c9e9ee0da9d2`. Do not retranslate either catalog.
@@ -62,7 +76,7 @@ Traditional Chinese user runtime/visual QA and native-speaker review are pending
 
 ## Historical checkpoint — German published; French user-confirmed — 2026-09-18
 
-Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. The user confirmed French and then explicitly requested publishing the prepared German package to GitHub. German is now complete and enabled: **1,291/1,291 canonical keys**, `enabled: true` / `status: complete`, native label `Deutsch`, fallback `en`, direction `ltr`, no separate XAML. The nine previously active language catalogs are unchanged.
+Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. The user confirmed French and then explicitly requested publishing the prepared German package to GitHub. German is now complete and enabled: **1,291/1,291 canonical keys**, `enabled: true` / `status: complete`, native label `Deutsch`, fallback `en`, direction `ltr`, no separate XAML. The nine previously active catalogs are unchanged.
 
 German was first delivered as a local ZIP/patch without a remote commit. This publication reuses its exact catalog; do not retranslate it. The branch remained at the package base `d5e293b690e863501684adc2f77ef7d603222386`. The canonical English blob was reconfirmed as `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`. Uploaded German blob: `98bc5289926786476201a8bcbc82846c87576305`, matching the local payload byte for byte. SHA-256: `6fdc63265fbf90cfd7575baef474c29837f8442075b45ff6aa4b73b3fdf053a1`; size 146,725 bytes.
 
@@ -80,7 +94,7 @@ Work ONLY in `laredson/PMM`, branch `v1.5.0.0-PMM-translated`. The user reported
 
 Source checkpoint: `7da32ce5fb043105690219d90f86ad0cf514d1bb`. English blob: `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`, reconstructed locally with byte-identical content. Uploaded French blob: `09b29bddef3fe13d7bc0f0fdd4d7d476f1050deb`, identical to the checked local UTF-8/LF file. SHA-256: `de54d8d56b2bf6d488215ebcc6f401662b17af0cff475c5b04ca085330b1ad8e`; size 149,134 bytes.
 
-Local structural checks passed strict JSON/duplicate rejection, metadata, exact keys/order, nonempty strings, full placeholder/format multisets, remaining braces, numeric literals, edge whitespace, literal escapes, selected technical identifiers, ~mods references, extensions and file-dialog patterns, Unicode controls and NFC. There are 109 parameterized entries and 31 intentional invariant values, including French homographs.
+Local structural checks passed strict JSON/duplicate rejection, metadata, exact keys/order, nonempty strings, full placeholder/format multisets, remaining brace counts, numeric literals, edge whitespace, literal escapes, selected technical identifiers, ~mods references, extensions and file-dialog patterns, Unicode controls and NFC. There are 109 parameterized entries and 31 intentional invariant values, including French homographs.
 
 Read `Development/Localization/FRENCH_HANDOFF.md` and `Development/Localization/Progress/fr.json` for evidence, glossary and limits. French user runtime/visual QA is pending. No PMM/WPF runtime, PowerShell 5.1, native-speaker acceptance or full repository localization audit was performed. No GitHub Actions were dispatched. Existing dynamic-runtime/Arabic QA issues remain open separately.
 
@@ -163,7 +177,7 @@ A user screenshot on the correct `v1.5.0.0-PMM-translated` checkout still showed
 
 The branch runtime identity is now explicitly `1.5.0.0`: `Resources/Metadata/VERSION.txt` is `1.5.0.0` and `Resources/Metadata/BUILD_ID.txt` is `PMM-v1.5.0.0-localization-dev`. This is development metadata only. No v1.5 release/tag/main merge was created, and the old 1.3.4.1 release manifest/hash inventory remains release provenance until the eventual 1.5 package is generated.
 
-GitHub Desktop switching/fetching a branch changes the checked-out repository files; it does not itself rebuild or replace `PMM.exe`. The editable PMM UI does read the checked-out `VERSION.txt` at startup, however, so after pulling this intervention and restarting PMM from the repository checkout the window title should show `v1.5.0.0`. If it still shows 1.3.4.1 after that, the executable was launched from a different PMM folder/copy and that path must be identified before further code changes.
+GitHub Desktop switching/fetching a branch changes the checked-out repository files; it does not itself rebuild or replace `PMM.exe`. The editable PMM UI does read the checked-out `VERSION.txt` at startup, however, so after pulling this intervention and restarting PMM from the repository checkout the title should show `v1.5.0.0`. If it still shows 1.3.4.1 after that, the executable was launched from a different PMM folder/copy and that path must be identified before further code changes.
 
 Every future translation intervention must update both `Development/Localization/TRANSLATION_PLAN.md` and this state record in the same branch. No v1.5 release, tag, main merge or native executable change has been made yet.
 

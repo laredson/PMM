@@ -1,3 +1,17 @@
+## Dutch localization complete; Irish next — 2026-09-18
+
+Nederlands (`nl`) now covers **1,291/1,291 canonical English entries** and is enabled for user testing on `v1.5.0.0-PMM-translated`. Publication parent: `f231136769289a9dc56a71bed68fac11cc78833a`. All fifteen previously enabled catalogs, including Turkish and Polish, are unchanged.
+
+Dutch blob: `f5609d59648da08956cf40c0a083e5aa21ad08ab`; SHA-256 `42eb98c97506de551f30c57566cc0cd789b0fd8b09493b7b8ccf36f63dbe2bc5`; 142,275 bytes, UTF-8/LF. Canonical English remains blob `2fa3c4712619cc5f811ce2251cef3daf5b0e2024`. The uploaded Dutch blob exactly matches the locally validated catalog. Local structural checks passed strict JSON/duplicates, metadata, exact case-sensitive keys/order, nonempty values, complete placeholders/formats, braces, numbers, edge whitespace, literal PowerShell escapes, selected technical tokens, extensions/dialog filters, units, color syntax, ~mods, Unicode controls and NFC. There are **109 parameterized entries**, **37 intentional whole-value invariants**, and zero remaining structural errors. See `DUTCH_HANDOFF.md` and `Progress/nl.json` for the glossary, invariant list and documented token rules.
+
+The registry is now `8cf947332960f320ca3f39628b38b1dc2f089f4e`: **29 registered locales, 16 enabled**. Only Dutch enabled/status differs from the Turkish/Polish checkpoint. The quasi-continental selector order, all native labels, locale metadata, English first/default, Polish immediately after German, Dutch immediately after Polish and adjacent Chinese variants are preserved. Romanian is not added. Irish remains a disabled template in its European position.
+
+**Next requested translation: Gaeilge (`ga`, Irish).** Dutch user runtime/visual QA and native-speaker review are pending. The request to continue did not include a new Turkish or Polish runtime confirmation, so their pending QA remains pending. Do not restart completed catalogs or follow older next-language pointers below.
+
+No PMM/WPF execution, Windows PowerShell 5.1 test, full source-code localization audit or native-speaker acceptance was performed here. Existing dynamic English counters, the old Library.UI selector path, Arabic mixed prose/path handling and virtualized technical-cell checks remain separate. Catalog completeness is not release acceptance.
+
+Publication is one ordinary fast-forward development commit with `[skip ci]`; no history rewriting, temporary transfer commits, PR, main update, release, tag, workflow dispatch, runtime-code change or binary change. Both shared ledgers are updated, with the complete earlier history retained below. This top checkpoint supersedes all earlier active/current headings, counts, QA states and next-language pointers only where explicitly stated.
+
 ## Turkish and Polish published; Italian user-confirmed; Dutch next — 2026-09-18
 
 This checkpoint publishes the previously prepared Turkish and Polish catalogs together on `v1.5.0.0-PMM-translated`, without retranslating either language. The publication parent is `7b0209836ddcf8027c604bad9ea5c9e9ee0da9d2`. Both `tr` (Türkçe) and `pl` (Polski) are now enabled with `status: complete`, fallback `en`, direction `ltr`, and no separate XAML.
@@ -255,7 +269,7 @@ The first column preserves historical market labels; actual selector order is in
 - Recorded the user's report that Korean works perfectly and the previously added languages also work. This is user feedback, not an automated or exhaustive runtime audit.
 - Resumed from branch HEAD `d9442cff26b8ac84a1f85fe0db023baf2d6c89f8`. Russian was an empty disabled template and followed Korean in the approved queue.
 - Translated all 1,291 canonical entries; no source key was changed. Source blob `2fa3c4712619cc5f811ce2251cef3daf5b0e2024` was reconstructed locally with byte-identical content, not just matching line counts.
-- Ran bounded local Python checks for strict JSON/duplicates, metadata, exact keys/order, nonempty values, full placeholder multisets, numeric literals, whitespace, literal escapes, selected technical identifiers, extensions, file-dialog filters and Unicode controls. Zero errors remained; 109 entries contain parameters, 18 whole-value invariants are intentional and 1,273 values contain Cyrillic.
+- Ran bounded local Python checks for strict JSON/duplicates, metadata, exact keys/order, nonempty values, full placeholder multisets, numeric literals, whitespace, literal escapes, selected technical identifiers, extensions/dialog filters and Unicode controls. Zero errors remained; 109 entries contain parameters, 18 whole-value invariants are intentional and 1,273 values contain Cyrillic.
 - Uploaded Russian blob `ffa3bfb80ef2aa4ae3268b0c557e3a38bb4b1b18` exactly matches the checked local bytes. SHA-256: `21250ee7671b8b4875527b799072043d80b27e2883820249b96af3f477bf1173`.
 - Enabled only `ru` in the registry, preserving all names, ordering, existing locale settings and other catalogs. Added `RUSSIAN_HANDOFF.md` and `Progress/ru.json` with glossary, evidence, intentional invariants and validation limits.
 - No localization runtime, Arabic RTL/LTR behavior, native binary, main, release, tag or workflow changed. No GitHub Actions were dispatched; no PowerShell 5.1/WPF or full source-code localization audit was run. Existing runtime QA issues remain open separately.
