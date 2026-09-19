@@ -1,21 +1,30 @@
-# Estado v1.5.0.1 - cierre 04A-5C
+# Estado v1.5.0.1 - 04A-6A publicada
 
-04A-5C CERRADA: relacion byte a byte entre snapshot y entradas de PAK del perfil
-acotado. REL-01 y motor FixLab completo siguen ABIERTOS. Entrada remota:
-d5af1bff255b94e0e47bf9b2ed6f3277712ae346. Retomar NEXT_SESSION.md.
+**Implementacion 6A conservada en esta rama mediante un unico commit sobre 587b4ed.**
+SESSION04A6A_PUBLICATION.json identifica la entrega importada; el hash del commit
+portador figura en el historial Git. No hay que volver a aplicar el ZIP local.
+Retomar NEXT_SESSION.md: siguiente 04A-6B, sin repetir 6A.
 
-| Area | Estado real | Pendiente |
-| --- | --- | --- |
-| PMM distribuido | 1.5.0.1/s01b; 629 archivos/628 hashes intactos | No reemplazar aun |
-| Host/Runtime/UIBridge/Supervision | Candidatas anteriores intactas | Aceptacion Windows y bloqueos previos |
-| PMMDLT1/PAKV11/UAsset | Bibliotecas previas conservadas | Compatibilidad real/generalizacion no demostrada |
-| CoreR1 Plan/Capture | Declaraciones y snapshots separados; sin cambios de logica | No certifican schemas o builds |
-| VerifyMembership 5C | Revalida PAK y bytes; unico propietario por ruta declarada | Solo perfil estrecho; no precedencias/compresion ni universo completo |
-| Executor R1/V2/CLI | No implementado completo | 04A-6A acotada y bloqueos de integracion |
+FINDINGS/CHECKS mantienen la evidencia del cierre local anterior y su estado
+PENDING historico. PUBLICATION actualiza exclusivamente el estado de entrega.
+No se repiten ni se atribuyen pruebas funcionales nuevas en esta publicacion.
 
-Pruebas Linux sobre PAK y archivos sinteticos, lector Python independiente y
-compilaciones TEST Windows: recuentos/hashes en SESSION04A5C_CHECKS.json.
-No Windows/FixLab/repak/juego/antivirus ejecutados. Membership no convierte
-TransformReady, BuildReady, Validated o Installed en true. Plan/report 5B intactos.
-Codecs, CKL, idiomas, snapshot historico y workflows no cambian. Commit [skip ci]
-sin PR/tag/release ni ejecutables nuevos dentro del paquete de usuario.
+ExecuteBounded une captura/membership, plan/review explicitos, nombres del mismo
+ancho, postProcess escalar, soporte y Build/Verify PAK en memoria. No toca disco
+ni modifica los reportes anteriores. Requisitos no soportados fallan sin output.
+Los schemas/revisiones siguen necesitando evidencia semantica externa; hash no
+es autenticidad. No es core R1 general, V2/CLI, motor completo o fuente recuperada.
+
+104 Test Go con aserciones (80+24), 44 Python (32+12), race Linux completo PASS;
+tres escenarios/30 outputs y sus PAK comprobados con oracle Python. Windows vet
+y dos builds TEST identicos. Dos tests OS exclusivos siguen compilados, NOT_RUN.
+Los outputs son artificiales. No originales/juego/reparaciones/antivirus ejecutados.
+
+PMM/ conserva 629 archivos/628 hashes, s01b, arbol
+09df5c45aee3390c6b8ea235c8afa4e149a9f1fa. PAKV11/UAsset/PMMDLT1 y otras candidatas
+no modificadas. No cambios en recetas, traducciones ni workflows.
+
+REL-01 sigue ABIERTO. Gates Windows, schemas reales/no escalares, relocalizacion,
+familias/Job Objects, manifiestos/pins/rutas y reparacion 06/07 siguen pendientes.
+El proximo bloque es 6B: guardado transaccional en carpeta
+candidata aislada, no deploy al juego. SESSION04A6A_FINDINGS/CHECKS guardan evidencias.

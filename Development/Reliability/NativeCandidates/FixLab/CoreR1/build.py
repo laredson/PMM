@@ -25,18 +25,22 @@ def valid_output(root, out):
 def collect_sources(here):
     """Stage the real sibling module, not a second implementation or download."""
     files = {}
-    for module in (here, here.parent / 'PAKV11'):
+    for module in (here, here.parent / 'PAKV11', here.parent / 'UAsset'):
         if module.is_symlink() or not module.is_dir():
             raise ValueError('Missing module or module symlink')
         paths = sorted(module.glob('*.go')) + [module / 'go.mod']
         for p in paths:
-            if module.name == 'PAKV11' and p.name.endswith('_test.go'):
+            if module.name != 'CoreR1' and p.name.endswith('_test.go'):
                 continue
             if p.is_symlink() or not p.is_file() or p.stat().st_size > (1 << 20):
                 raise ValueError('Missing, symlink or oversized source')
             files[module.name + '/' + p.name] = p.read_bytes()
     if not any(n.startswith('PAKV11/') and n.endswith('.go') for n in files):
         raise ValueError('PAKV11 source absent')
+    fixture = here / 'testdata' / 'execution-vectors.json'
+    if fixture.parent.is_symlink() or fixture.is_symlink() or not fixture.is_file() or fixture.stat().st_size > (1 << 20):
+        raise ValueError('Missing, symlink or oversized embedded fixture')
+    files['CoreR1/testdata/execution-vectors.json'] = fixture.read_bytes()
     return files
 
 
@@ -62,9 +66,9 @@ def build(out):
     if p.returncode:
         raise ValueError('Compilation failed: ' + p.stderr)
     if collect_sources(here) != files:
-        raise ValueError('Source or local PAKV11 dependency changed during build')
+        raise ValueError('Source or local dependency changed during build')
     artifact = (out / 'CoreR1-tests.exe').read_bytes()
-    report = {'schema': 'PMM_CORE_R1_MEMBERSHIP_TEST_BUILD_V1', 'artifact': 'TEST harness only; not FixLab',
+    report = {'schema': 'PMM_CORE_R1_BOUNDED_EXECUTION_TEST_BUILD_V1', 'artifact': 'TEST harness only; not FixLab',
               'goVersion': version, 'target': 'windows/amd64', 'sha256': sha(artifact), 'bytes': len(artifact),
               'command': [x.replace(str(out), '<OUT>') for x in command],
               'sourceSHA256': {n: sha(b) for n, b in files.items()},

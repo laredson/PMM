@@ -1,0 +1,36 @@
+{
+  "schema": "PMM_R1_SYNTHETIC_PLAN_CHECK_V1",
+  "fixtures": [
+    {
+      "case": "alternative",
+      "tasks": 3,
+      "outputs": 10,
+      "transformReady": false,
+      "planSHA256": "256cd3d2df22718965f604ea8f3e66fe030fce5453f2587fdd5b776306334c92"
+    },
+    {
+      "case": "basic",
+      "tasks": 3,
+      "outputs": 10,
+      "transformReady": false,
+      "planSHA256": "74cb024f8ec8cd4009fb44a985bfe7a768e30a52900de73c1a0b0c725925a233"
+    },
+    {
+      "case": "bulk",
+      "tasks": 3,
+      "outputs": 12,
+      "transformReady": false,
+      "planSHA256": "96f1fa92a2038af92fee629c5f956aa8c112cc4228ac356329a251bb3248e428"
+    },
+    {
+      "case": "provenance",
+      "tasks": 3,
+      "outputs": 10,
+      "transformReady": false,
+      "planSHA256": "f3d8d6385933f9dd0db4a0af4b03305cb9d24b7fe7d231d117d82414b5ed2b3f"
+    }
+  ],
+  "method": "Independent handwritten path/count oracle; not a second general recipe planner",
+  "gameInputsVerified": false,
+  "repairsExecuted": false
+}

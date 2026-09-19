@@ -1,16 +1,15 @@
-# FixLab - componentes de reconstruccion, cierre 04A-5C
+# FixLab candidato - reconstruccion por componentes
 
-Fuente original no recuperada; overlay historico invalido documentado en 04A.
-No hay todavia motor completo PMMFixLab compilable o instalado. No repetir la
-busqueda sin pista nueva ni sustituir el ejecutable original.
+04A-6A publicada en la rama de fiabilidad; ver SESSION04A6A_PUBLICATION.json.
+Base remota 587b4ed (5C). Leer ../../NEXT_SESSION.md antes de continuar.
 
-PMMDLT1: codec acotado. PAKV11: escritor/lector de perfil limitado. UAsset:
-lectura, reescritura de nombres con proteccion de opacos y postProcess escalar.
-CoreR1: planificacion declarativa, captura por handles, expediente schema y ahora
-VerifyMembership para vincular snapshots con entradas reales de PAK pinneados.
+PMMDLT1, PAKV11 y UAsset (lectura/nombres/postProcess) permanecen conservados.
+CoreR1 tiene PlanCore, CaptureCore, VerifyMembership y ahora ExecuteBounded:
+plan explicito, transformaciones de ancho fijo, soporte y PAK en memoria.
+No es receta general Gura ni motor FixLab completo; schemas reales no demostrados.
+No source original recuperado. No cambiar pins o aceptar regiones opacas como
+relocalizables para ocultar una limitacion. No repetir el overlay corrupto.
 
-Los archivos de prueba son artificiales y los binarios generados son harnesses,
-no actualizaciones de FixLab. Membership no resuelve schema real, relocalizacion
-opaca, core R1 completo, V2/CLI, ni acepta los componentes en Windows/Palworld.
-Leer CoreR1/MEMBERSHIP_CONTRACT.md y ../../NEXT_SESSION.md. Siguiente 04A-6A:
-ejecutor acotado con primitivas existentes; no empezar 04B sin motor completo.
+Los tests son artificiales, los harness Windows no se ejecutaron ni instalaron.
+PMM/ y PMMFixLab.exe permanecen intactos. Siguiente 6B, que tratara
+el guardado transaccional a carpeta candidata aislada; no despliegue al juego.

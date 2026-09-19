@@ -1,0 +1,32 @@
+{
+  "schema": "PMM_R1_MEMBERSHIP_INDEPENDENT_V1",
+  "fixtures": {
+    "single": {
+      "assets": 19,
+      "archives": 2,
+      "allArchiveEntries": 19,
+      "reportSHA256": "08884d75c97a3b9da7b38cfaa9fb9b6409a6c0941963a58d4f19026abef1b07c",
+      "membershipCheckedAgainstIndependentPythonParser": true,
+      "engineCompatibilityVerified": false
+    },
+    "split": {
+      "assets": 19,
+      "archives": 3,
+      "allArchiveEntries": 19,
+      "reportSHA256": "8bdced47d8df74d752dd6612e696971bfcec19c381ac433c247c500eb6e7f8b7",
+      "membershipCheckedAgainstIndependentPythonParser": true,
+      "engineCompatibilityVerified": false
+    },
+    "extras": {
+      "assets": 19,
+      "archives": 3,
+      "allArchiveEntries": 21,
+      "reportSHA256": "fd957301e87d83e68b0d58935257608f9811801a33128c767f77286153f9c721",
+      "membershipCheckedAgainstIndependentPythonParser": true,
+      "engineCompatibilityVerified": false
+    }
+  },
+  "realAssetsRead": false,
+  "repakExecuted": false,
+  "scope": "Synthetic byte membership, not original-engine acceptance"
+}

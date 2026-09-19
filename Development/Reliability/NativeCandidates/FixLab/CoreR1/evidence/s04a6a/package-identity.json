@@ -1,0 +1,22 @@
+{
+  "schema": "PMM_S04A6A_INPUT_V1",
+  "inputCommit": "587b4ed0c026ff97bb043fad84bd16d09803b02c",
+  "inputTree": "08ebd39c157a00846eed001baff6194dedc24788",
+  "verifiedSubtrees": {
+    "PMM": "09df5c45aee3390c6b8ea235c8afa4e149a9f1fa",
+    ".github": "cb881ba48502f8dcea8cead16f47f275069d5945",
+    "Development/Source": "0cfad865e6fd63663b29f5ec92b76618bc6e4a02"
+  },
+  "currentComponentTrees": {
+    "CoreR1": "597e22cfb85abd112ac74c3e43a43dc5334e992a",
+    "PAKV11": "c2ce8ddd83583817611ca21798061c97ef2f8c82",
+    "UAsset": "5c718b7ef23cd84a1844608dae13438dc4752530"
+  },
+  "packageFiles": 629,
+  "checksumRows": 628,
+  "checksumMismatches": 0,
+  "version": "1.5.0.1",
+  "buildId": "PMM-v1.5.0.1-reliability-s01b",
+  "fullCurrentCheckout": false,
+  "originalsExecuted": false
+}

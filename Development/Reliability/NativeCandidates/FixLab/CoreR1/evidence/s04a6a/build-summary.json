@@ -1,0 +1,16 @@
+{
+  "schema": "PMM_R1_EXECUTION_TEST_BUILD_SUMMARY_V1",
+  "artifact": "TEST harness only; not PMMFixLab",
+  "toolchain": "go version go1.23.2 linux/amd64",
+  "target": "windows/amd64",
+  "sha256": "fa92349e026e36cd85804c87f9dde045e5c4f217429dd1be5aae2dd510642b9f",
+  "bytes": 6511616,
+  "byteIdenticalFinalBuilds": true,
+  "buildReportSHA256": "d9f569e3afe9e3548651935b2b03eac558f40a6dafaf96cb6bd78111091e4fe6",
+  "localDependencies": [
+    "../PAKV11",
+    "../UAsset"
+  ],
+  "windowsExecuted": false,
+  "engineBuilt": false
+}

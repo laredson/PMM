@@ -1,17 +1,21 @@
-# PMM v1.5.0.1 - fiabilidad
+# PMM v1.5.0.1 - fiabilidad independiente
 
-Rama exclusiva v1.5.0.1-PMM-reliability. Ultima tanda: **04A-5C cerrada en
-verificacion de pertenencia de archivos a PAK de perfil declarado**.
+Rama v1.5.0.1-PMM-reliability. **04A-6A publicada en esta rama.**
+El commit portador de Development/Reliability/SESSION04A6A_PUBLICATION.json
+incorpora la entrega conservada sobre 587b4ed, sin nuevos cambios funcionales.
+Los indicadores PENDING en FINDINGS/CHECKS corresponden al cierre local anterior;
+el registro de publicacion actualiza ese estado, no la evidencia de pruebas.
 
-VerifyMembership une snapshots capturados con sus entradas en PAK revalidados,
-reutilizando PAKV11 sin cambios. Rechaza rutas ambiguas entre proveedores aunque
-sus bytes coincidan. No implica build autentico, extraccion historica probada,
-schemas semanticamente correctos ni motor listo. El paquete funcional sigue
-intacto en 1.5.0.1 / PMM-v1.5.0.1-reliability-s01b, 629 archivos/628 hashes.
+CoreR1 agrega ExecuteBounded: plan/revision, snapshot/membership, transformaciones
+acotadas y PAK verificado en memoria. Sin escritura en juego/PMM ni instalacion.
+104 Test Go/44 Python, race Linux y tres PAK artificiales verificados por Python.
+No equivale a core general ni aceptacion Windows/Unreal/Palworld. REL-01 abierta.
 
-Leer [NEXT_SESSION](Development/Reliability/NEXT_SESSION.md),
-[STATUS](Development/Reliability/STATUS.md),
-[hallazgos](Development/Reliability/SESSION04A5C_FINDINGS.md) y
-[comprobaciones](Development/Reliability/SESSION04A5C_CHECKS.json).
-Siguiente: 04A-6A, ejecutor acotado con primitivas existentes, sin promocion a
-FixLab completo ni debilitamiento de sus restricciones. Gates Windows pendientes.
+[Continuar](Development/Reliability/NEXT_SESSION.md),
+[estado](Development/Reliability/STATUS.md),
+[hallazgos](Development/Reliability/SESSION04A6A_FINDINGS.md) y
+[comprobaciones](Development/Reliability/SESSION04A6A_CHECKS.json).
+Siguiente: guardado transaccional aislado 04A-6B. No repetir la publicacion de 6A.
+
+Paquete intacto: 1.5.0.1/s01b, 629 archivos/628 hashes. Otras candidatas y codecs
+conservados. No copiar CoreR1-tests.exe sobre PMMFixLab.exe. Sin release, PR o tag.
