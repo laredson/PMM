@@ -1,0 +1,14 @@
+{
+  "schema": "PMM_R1_MEMBERSHIP_BUILD_SUMMARY_V1",
+  "artifact": "CoreR1 TEST harness only, not FixLab",
+  "goVersion": "go1.23.2",
+  "target": "windows/amd64",
+  "sha256": "6c574085486190cd0afb1053e0a6ab1ab7d62dd75f3635d8e8dc11a75980e1d2",
+  "bytes": 6147072,
+  "byteIdenticalFinalBuilds": true,
+  "windowsExecuted": false,
+  "engineBuilt": false,
+  "windowsOnlyTestsCompiledNotRun": 2,
+  "localDependency": "../PAKV11 (unchanged)",
+  "buildReportSHA256": "9fda3c21429ce2ac97ca10dfac18a2c81ff65c0c07f53836cf20b0bbccc6fcd8"
+}

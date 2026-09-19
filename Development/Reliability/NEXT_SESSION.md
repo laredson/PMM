@@ -1,56 +1,63 @@
-# Retomar despues de 04A-5B - captura y dossier
+# Retomar despues de 04A-5C - pertenencia PAK
 
 Rama exclusiva v1.5.0.1-PMM-reliability. Leer AGENTS -> este archivo -> STATUS ->
-SESSION04A5B_FINDINGS/CHECKS -> CoreR1/CAPTURE_CONTRACT.md.
-04A-5B cerrada como capa de captura, NO executor ni motor completo. REL-01 abierta.
+SESSION04A5C_FINDINGS/CHECKS -> CoreR1/MEMBERSHIP_CONTRACT.md.
+04A-5C cerrada en perfil PAK limitado. REL-01 y motor completo siguen abiertos.
 
 ## Conservado
 
-PlanCore sigue declarativo. CaptureCore recalcula el plan y captura todas las
-entradas enumeradas desde roots locales por handles, con hash/size/EOF/metadata.
-Buffers privados y accessors copian; archives solo streaming. ProviderSet JSON
-versionado vincula inventario current a lista de archives. Dossiers cargan bytes
-layout/review y comprueban bindings, pero no autentican autor ni semantica.
-No volver a programar la captura ni cambiar los flags del planner a ready.
+PlanCore, CaptureCore y VerifyMembership son APIs distintas. La ultima reabre
+archives con pins del snapshot, usa PAKV11.Read intacto y compara todos los bytes
+de cada archivo declarado. Exige Profile=MembershipProfile y
+CurrentOwnership=UniqueCurrentOwner. Orden registrado no significa prioridad.
+Dos propietarios bloquean incluso con bytes iguales; no fallback por hash.
+No se vuelve a abrir donor/current. No se promocionan report/plan previos.
 
-Snapshot verificado NO es extraccion verificada ni snapshot atomico del FS.
-No se enumeran ficheros no declarados. Todo input esperado sigue necesitando pins
-externos confiables. No se habilito relocalizacion opaca ni se genero schema real.
-Las pruebas usan archivos realmente leidos, pero TODOS artificiales, no assets.
+Solo perfil v11 ASCII compacto sin compresion/cifrado, PHI/FDI completos, mount
+../../../, maximo 256 MiB/archive y 1 GiB agregado. PAKV11 no es un lector universal.
+Un proveedor fuera de perfil bloquea, aunque sus bytes tengan el SHA esperado.
+Membership verificado no autentica build, schemas ni proceso de extraccion.
+No demuestra que existan todos los proveedores del juego ni que no haya otras
+entradas/carpetas. TransformReady/BuildReady/Validated/Installed siguen false.
 
-55 tests Go Linux/20 Python, race y dos escenarios comprobados en Python. Dos
-builds TEST Windows iguales, no ejecutados. Ver CHECKS para hashes. Dos tests
-Windows especificos estan compilados, no PASS. Diez casos Windows NOT_RUN.
-No copiar CoreR1-tests.exe sobre PMMFixLab.exe. No hace falta aportar el juego.
-PMM tree 09df5c45aee3390c6b8ea235c8afa4e149a9f1fa, 629 archivos/628 hashes,
-1.5.0.1 / PMM-v1.5.0.1-reliability-s01b. Otras candidatas y recetas intactas.
+CoreR1/go.mod depende LOCALMENTE de ../PAKV11. build.py conserva ambos modulos en
+source/CoreR1 y source/PAKV11, con hashes. No copiar solo CoreR1 para compilar.
+No modificar esa biblioteca para acomodar archives no soportados sin otra tanda.
+Las fixtures son propias. Harness TEST Windows compilado, NO ejecutado; no es
+PMMFixLab.exe. PMM/ intacto: 629 archivos/628 hashes, version 1.5.0.1/s01b,
+arbol 09df5c45aee3390c6b8ea235c8afa4e149a9f1fa. Otras candidatas intactas.
 
-## Siguiente 04A-5C - pertenencia a proveedores y frontera de ejecucion
+## Siguiente 04A-6A - ejecutor acotado con primitivas existentes
 
-1. Fijar HEAD y leer contratos CoreR1/PAKV11 y expediente. No repetir tandas ni
-   busqueda del overlay sin pista nueva. No usar un ZIP viejo como autoridad remota.
-2. Disenar e implementar prueba de relacion entre bytes de un proveedor pinneado
-   y cada path/size/hash capturado, para un perfil PAK DECLARADO y soportado.
-   Reutilizar PAKV11 sin afirmar soporte de compresion/cifrado inexistente.
-3. Un .pak con SHA correcto pero sintaxis no validada no prueba pertenencia. No
-   reabrir paths sin recomprobar pins ni asumir que el archive no cambio desde 5B.
-   Un conjunto de proveedores requiere orden/ownership/resolucion explicitos;
-   rutas ambiguas deben bloquearse, no elegir silenciosamente un proveedor.
-4. Fixtures sinteticas de PAK con sus bytes esperados, archivos omitidos,
-   modificados y duplicados. Sin PAK/juego real ni datos propietarios subidos.
-5. Mantener separados MembershipChecked, schema semanticamente validado,
-   TransformReady y BuildReady. La pertenencia sola no habilita meshes opacos ni
-   un executor completo. No implementar una CLI de build con placeholders.
-6. Registrar codigo/evidencia/limites/siguiente paso. Un commit [skip ci] autorizado,
-   sin Actions/PR/tag/release, sin alterar PMM/, traducciones u otras candidatas.
+1. Fijar HEAD, leer contratos CoreR1, UAsset (RewriteNames/PatchPostProcess),
+   PMMDLT1 y PAKV11. No reprogramar los lectores ni recuperar el mismo overlay.
+2. Definir un plan de ejecucion explicito por familia unido a snapshot/membership,
+   receta, fuentes de nombres y esquema/revision. Reutilizar buffers privados o
+   copias verificadas, nunca reabrir rutas para aplicar cambios no revalidados.
+3. Implementar UNA ruta completa y acotada de ejecucion en memoria con fixtures
+   compatibles con las primitivas reales: cambios de nombres del mismo ancho y
+   postProcess escalar cuando todas las precondiciones se cumplen. Sin main o
+   CLI que anuncie funciones inexistentes. No claim TRANSFORM_READY por hashes
+   solos: el caller debe justificar el plan y su schema; no aprobacion magica.
+4. Preservar todos los rechazos existentes de regiones opacas y layouts no
+   soportados. Mesh real con relocacion variable o serializer complejo sigue
+   UNSUPPORTED. No inventar schema desde offset 120 o fabricar expected outputs.
+5. Verificar inputs/outputs, pasos y bytes no afectados; errores/cancelacion sin
+   salida parcial. Preparar evidencia externa con fixtures sinteticas propias.
+   Guardado transaccional/UI/CLI/V2 quedan separados hasta definir sus contratos.
+6. Registrar implementacion y bloqueo real de integracion productiva; commit
+   [skip ci] autorizado para esa tanda. Sin cambios PMM/CKL/idiomas/otros nativos,
+   originales ejecutados, Actions, PR, release o tags. 04B exige motor completo.
 
-## Reproducir 5B
+## Reproduccion
 
-En CoreR1: go test -count=1 ./... y go test -race -count=1 ./...
-PMM_R1_PLAN_OUTPUT, PMM_R1_CAPTURE_OUTPUT -> directorios NUEVOS de fixtures.
-PMM_R1_PACKAGE -> solo receta empaquetada con metadata simulada. Sin opt-ins tres
-Test de entrega se omiten; no sumar SKIP como PASS. verify_capture.py compara los
-dos exports artificiales. Ver README para variables de los 20 tests Python.
-build.py compila harness TEST offline Go1.23.2; no ejecuta Windows ni motor.
-Los gates previos Windows/Unreal/Palworld, familias/Job Objects, manifests/pins/rutas
-y repair 06/07 siguen pendientes. Schemas reales no escalares siguen sin validar.
+En CoreR1: go test -count=1 ./... ; go test -race -count=1 ./...
+PMM_R1_PLAN_OUTPUT, PMM_R1_CAPTURE_OUTPUT, PMM_R1_MEMBERSHIP_OUTPUT activan exports
+a directorios NUEVOS. PMM_R1_PACKAGE activa solo receta con metadata simulada.
+Sin esos opt-ins los tests correspondientes se omiten, no contarlos como PASS.
+verify_membership.py <membership-output> hace la segunda lectura Python de PAK.
+PMM_R1_TOOL_FIXTURES, PMM_R1_CAPTURE_FIXTURES, PMM_R1_MEMBERSHIP_FIXTURES activan
+los oracles de unittest (test_tools test_capture_reference test_membership_reference).
+Ver CHECKS para recuentos y hashes finales, no reutilizar los historicos de 5B.
+Windows real, schemas reales, familias/Job Objects, manifest/pins/rutas y repair
+06/07 siguen pendientes. No pedir subir el juego completo para una prueba local.

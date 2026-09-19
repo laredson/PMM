@@ -1,15 +1,16 @@
-# FixLab - reconstruccion por componentes, cierre 04A-5B
+# FixLab - componentes de reconstruccion, cierre 04A-5C
 
-No hay source original recuperado ni motor FixLab completo. No sustituir EXE.
-PMMDLT1, PAKV11, UAsset y el planner PlanCore conservan sus contratos.
-CaptureCore adquiere snapshots de entradas y documentos por handles y hashes,
-con informes que distinguen bytes comprobados de procedencia/correccion pendientes.
+Fuente original no recuperada; overlay historico invalido documentado en 04A.
+No hay todavia motor completo PMMFixLab compilable o instalado. No repetir la
+busqueda sin pista nueva ni sustituir el ejecutable original.
 
-No acredita pertenencia a un PAK, autenticidad del build o semantica de schemas.
-No se habilitan transformaciones por tener un expediente con hashes correctos.
-El adaptador Windows esta compilado, NO ejecutado. Los tests solo usan bytes
-artificiales. El paquete real, recetas y traducciones siguen intactos.
+PMMDLT1: codec acotado. PAKV11: escritor/lector de perfil limitado. UAsset:
+lectura, reescritura de nombres con proteccion de opacos y postProcess escalar.
+CoreR1: planificacion declarativa, captura por handles, expediente schema y ahora
+VerifyMembership para vincular snapshots con entradas reales de PAK pinneados.
 
-Leer CoreR1/CAPTURE_CONTRACT.md y ../../NEXT_SESSION.md. 04A-5C debe vincular
-archivos con proveedores en el perfil soportado; la relocalizacion de meshes,
-schemas reales, executor completo y V2/CLI siguen pendientes. No saltar a 04B.
+Los archivos de prueba son artificiales y los binarios generados son harnesses,
+no actualizaciones de FixLab. Membership no resuelve schema real, relocalizacion
+opaca, core R1 completo, V2/CLI, ni acepta los componentes en Windows/Palworld.
+Leer CoreR1/MEMBERSHIP_CONTRACT.md y ../../NEXT_SESSION.md. Siguiente 04A-6A:
+ejecutor acotado con primitivas existentes; no empezar 04B sin motor completo.

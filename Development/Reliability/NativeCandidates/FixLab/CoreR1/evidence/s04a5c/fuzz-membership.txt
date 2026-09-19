@@ -1,0 +1,8 @@
+fuzz: elapsed: 0s, gathering baseline coverage: 0/3 completed
+fuzz: elapsed: 0s, gathering baseline coverage: 3/3 completed, now fuzzing with 2 workers
+fuzz: elapsed: 3s, execs: 39626 (13205/sec), new interesting: 75 (total: 78)
+fuzz: elapsed: 6s, execs: 51591 (3989/sec), new interesting: 77 (total: 80)
+fuzz: elapsed: 9s, execs: 51591 (0/sec), new interesting: 77 (total: 80)
+fuzz: elapsed: 9s, execs: 51591 (0/sec), new interesting: 77 (total: 80)
+PASS
+ok  	pmm/reliability/corer1	9.010s

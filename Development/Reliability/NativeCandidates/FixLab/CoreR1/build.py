@@ -22,6 +22,24 @@ def valid_output(root, out):
     return out
 
 
+def collect_sources(here):
+    """Stage the real sibling module, not a second implementation or download."""
+    files = {}
+    for module in (here, here.parent / 'PAKV11'):
+        if module.is_symlink() or not module.is_dir():
+            raise ValueError('Missing module or module symlink')
+        paths = sorted(module.glob('*.go')) + [module / 'go.mod']
+        for p in paths:
+            if module.name == 'PAKV11' and p.name.endswith('_test.go'):
+                continue
+            if p.is_symlink() or not p.is_file() or p.stat().st_size > (1 << 20):
+                raise ValueError('Missing, symlink or oversized source')
+            files[module.name + '/' + p.name] = p.read_bytes()
+    if not any(n.startswith('PAKV11/') and n.endswith('.go') for n in files):
+        raise ValueError('PAKV11 source absent')
+    return files
+
+
 def build(out):
     here = Path(__file__).resolve().parent
     root = here.parents[4]
@@ -32,23 +50,21 @@ def build(out):
     version = subprocess.run(['go', 'version'], check=True, capture_output=True, text=True, env=env, timeout=15).stdout.strip()
     if version.split()[2] != 'go1.23.2':
         raise ValueError('Install Go 1.23.2 separately; this script never downloads it')
-    files = {p.name: p.read_bytes() for p in sorted(here.glob('*.go')) if not p.is_symlink()}
-    files['go.mod'] = (here / 'go.mod').read_bytes()
-    if not files or any(p.is_symlink() for p in here.glob('*.go')) or (here / 'go.mod').is_symlink():
-        raise ValueError('Missing source or source symlink')
+    files = collect_sources(here)
     out.mkdir(parents=True, exist_ok=False)
-    source = out / 'source'; source.mkdir()
+    source = out / 'source'
     for name, data in files.items():
-        (source / name).write_bytes(data)
-    command = ['go', 'test', '-c', '-trimpath', '-buildvcs=false', '-o', str(out / 'CoreR1-tests.exe'), '.']
-    p = subprocess.run(command, cwd=source, env=env, capture_output=True, text=True, timeout=90)
+        dest = source / name
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(data)
+    command = ['go', 'test', '-c', '-trimpath', '-buildvcs=false', '-mod=readonly', '-o', str(out / 'CoreR1-tests.exe'), '.']
+    p = subprocess.run(command, cwd=source / 'CoreR1', env=env, capture_output=True, text=True, timeout=90)
     if p.returncode:
         raise ValueError('Compilation failed: ' + p.stderr)
-    for name, data in files.items():
-        if (here / name).read_bytes() != data:
-            raise ValueError('Source changed during build')
+    if collect_sources(here) != files:
+        raise ValueError('Source or local PAKV11 dependency changed during build')
     artifact = (out / 'CoreR1-tests.exe').read_bytes()
-    report = {'schema': 'PMM_CORE_R1_TEST_BUILD_V1', 'artifact': 'TEST harness only; not FixLab',
+    report = {'schema': 'PMM_CORE_R1_MEMBERSHIP_TEST_BUILD_V1', 'artifact': 'TEST harness only; not FixLab',
               'goVersion': version, 'target': 'windows/amd64', 'sha256': sha(artifact), 'bytes': len(artifact),
               'command': [x.replace(str(out), '<OUT>') for x in command],
               'sourceSHA256': {n: sha(b) for n, b in files.items()},
