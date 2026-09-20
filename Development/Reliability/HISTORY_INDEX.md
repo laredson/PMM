@@ -158,6 +158,16 @@ Se ensambla una aplicacion real de prueba usando Host/Runtime C2B y FixLab origi
 El conector del chat no pudo transferir los dos EXE grandes, asi que el commit documental conserva receta/evidencia, pero `PMM/` remoto sigue s01b. Commit:
 `552a4562b53a7142dfc8c2e5a67abacd6b79b61e`.
 
+### SESSION_I01B
+- `SESSION_I01B_FINDINGS.md`
+- `SESSION_I01B_CHECKS.json`
+
+Un entorno Windows con checkout local reconstruye Host/Runtime C2B con Go 1.23.2,
+reproduce los hashes fijados e integra en `PMM/` los cinco archivos I01. El arbol
+del paquete queda `12e01ba3a24a2c0ce5e74d681b4931307c845a56`, con 628 checksums y
+0 mismatches. La publicacion binaria pendiente de SESSION_I01 queda cerrada; la
+aceptacion funcional Windows del programa sigue pendiente del propietario.
+
 ## Documentos transversales
 
 - `IMPLEMENTATION_PLAN.md`: REL-00..REL-07.

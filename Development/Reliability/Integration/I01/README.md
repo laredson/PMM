@@ -18,21 +18,19 @@ Solo cinco archivos de PMM cambian: los dos EXE, BUILD_ID.txt,
 RELEASE_MANIFEST.json y SHA256SUMS.txt. VERSION.txt no necesita cambiar.
 Los internos nativos conservan la version 1.2.1; distinguir I01 por BUILD_ID y hashes.
 
-## Entrega remota y local: NO confundir
+## Entrega remota y local: estado actual
 
-Esta intervencion publica en GitHub la receta de ensamblado, pruebas y registros.
-NO se han transferido los EXE compilados a los blobs remotos: el conector disponible
-no tiene un parametro de archivo montado para esa carga, ni hay Git autenticado
-en el contenedor. No se ejecutan Actions para sortear esa limitacion.
-El arbol PMM/ REMOTO sigue siendo s01b hasta importar los cinco archivos binarios/
-metadatos por una via de transferencia adecuada, por ejemplo GitHub Desktop.
+La entrega inicial SESSION_I01 publico solo receta/evidencia porque su conector no
+podia transferir los EXE. SESSION_I01B resolvio ese bloqueo desde un checkout local:
+reconstruyo los hashes C2B e integro los cinco archivos juntos. El arbol PMM de la
+rama es ahora `12e01ba3a24a2c0ce5e74d681b4931307c845a56`.
 
 La entrega descargable PMM_v1.5.0.1_I01_TEST_APPLICATION.zip contiene la aplicacion
 REAL ensamblada, con dependencias, lista para abrir PMM/PMM.exe. El ZIP
 PMM_I01_APPLY_TO_CHECKOUT.zip contiene los cinco archivos para aplicarlos a una
 copia local limpia de esta rama, con PMM cerrado y backup anterior conservado.
-Hacer Pull por si solo NO instala I01. Nunca actualizar solo el manifiesto remoto
-sin sus dos EXE: eso romperia la integridad del paquete.
+Hacer Pull de SESSION_I01B SI instala I01. Verificar BUILD_ID y mantener los cinco
+archivos coordinados; actualizar solo el manifiesto sin sus EXE rompe la integridad.
 
 ## Reproducir sin red ni alterar el checkout
 

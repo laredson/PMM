@@ -23,22 +23,24 @@ La rama de traducciones `v1.5.0.0-PMM-translated` sigue independiente. Ancestro 
 
 ## 3. Estado remoto actual
 
-Antes de este handoff el HEAD era `552a4562b53a7142dfc8c2e5a67abacd6b79b61e`.
+SESSION_I01B parte de `e83b191e56c916b4de12c34a9d054f4bd6bbd485` y cierra la
+transferencia binaria pendiente del handoff anterior.
 
-El paquete `PMM/` REMOTO sigue siendo s01b:
+El paquete `PMM/` de la rama es I01:
 - producto 1.5.0.1;
-- BUILD_ID `PMM-v1.5.0.1-reliability-s01b`;
+- BUILD_ID `PMM-v1.5.0.1-reliability-i01`;
 - 629 archivos;
 - 628 filas en SHA256SUMS;
 - 0 mismatches;
-- Git tree `09df5c45aee3390c6b8ea235c8afa4e149a9f1fa`.
+- Git tree `12e01ba3a24a2c0ce5e74d681b4931307c845a56`.
 
-Ejecutables remotos aun conservados:
-- Host original `PMM/PMM.exe`: SHA-256 `010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d`.
-- Runtime original `PMM/Engine/PMMRuntime.exe`: SHA-256 `e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a`.
+Ejecutables de la rama:
+- Host C2B `PMM/PMM.exe`: SHA-256 `a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c`.
+- Runtime C2B `PMM/Engine/PMMRuntime.exe`: SHA-256 `b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f`.
 - FixLab original `PMM/Engine/PMMFixLab.exe`: SHA-256 `8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe`.
 
-Importante: probar actualmente el `PMM.exe` remoto s01b NO ejecuta las nuevas candidatas.
+Importante: I01 esta compilado e integrado, pero su ejecucion funcional Windows
+sigue pendiente; compilacion y hashes no equivalen a aceptacion.
 
 ## 4. Candidatas nativas ya construidas
 
@@ -98,15 +100,12 @@ Verificaciones ya realizadas durante I01:
 - NO medicion de velocidad;
 - NO escaneo antivirus.
 
-### Limitacion de transferencia anterior
+### Transferencia binaria resuelta en SESSION_I01B
 
-El chat que preparo I01 podia compilar los binarios localmente pero el conector GitHub no podia cargar archivos binarios grandes desde `/mnt/data` por ruta. Por eso SOLO las fuentes/receta/evidencia de I01 llegaron a GitHub. No es una limitacion del repositorio.
-
-Un nuevo entorno con checkout local + Git autenticado/Work/Codex debe resolverlo directamente sin pedir al usuario los ZIP anteriores:
-- reconstruir desde Git si hace falta;
-- verificar los hashes exactos;
-- actualizar los cinco archivos en el checkout;
-- commit/push.
+El chat que preparo I01 no pudo cargar los dos EXE. SESSION_I01B uso un checkout
+local Windows, Go 1.23.2 verificado y Git autenticado para reproducir ambos hashes,
+ensamblar el arbol esperado e integrar juntos los cinco archivos. Ya no se necesita
+un ZIP anterior para instalar I01 mediante Pull.
 
 ## 6. Como reconstruir I01 solo desde Git
 
@@ -128,7 +127,9 @@ El ensamblador exige:
 
 Produce el paquete I01 y regenera manifest/checksums. Nunca relajar pins para aceptar bytes distintos.
 
-Si el checkout actual ya avanzo documentalmente mas alla de la base pero `PMM/` sigue s01b, puede usarse como fuente del paquete; los builders pinnean el binario original. Si una receta exige commit exacto, usar un worktree/copia del commit pinneado en lugar de cambiar guards.
+Como el checkout actual ya contiene I01, una reconstruccion futura debe obtener la
+base s01b mediante un worktree o archivo limpio del commit pinneado. No cambiar los
+guards para compilar sobre los EXE I01 ni copiar una carpeta antigua sobre la nueva.
 
 ## 7. FixLab - investigacion completada hasta 04A-6B, NO integrada
 
@@ -194,7 +195,7 @@ Las nuevas cadenas de reliability deben registrarse para traducirlas antes de ca
 
 ## 10. Roadmap restante, nivel alto
 
-1. Publicar I01 realmente en `PMM/` remoto y obtener prueba Windows del usuario.
+1. Obtener la prueba Windows del usuario para I01 ya integrado.
 2. Corregir cualquier regresion de I01 y medir arranque.
 3. 04A-6C Windows del guardado FixLab.
 4. Completar las capacidades FixLab reales pendientes y V2/CLI.

@@ -1,4 +1,4 @@
-# Estado actual - handoff Git autosuficiente / I01 pendiente de EXE remotos
+# Estado actual - I01 integrado / aceptacion Windows pendiente
 
 El contexto necesario para continuar en un proyecto/chat nuevo esta ahora
 centralizado en:
@@ -10,18 +10,19 @@ centralizado en:
 
 No se necesita el historial de esta conversacion para entender el estado.
 
-## Paquete remoto
+## Paquete de la rama
 
-`PMM/` sigue s01b, no I01:
-- 1.5.0.1 / `PMM-v1.5.0.1-reliability-s01b`
-- tree `09df5c45aee3390c6b8ea235c8afa4e149a9f1fa`
+`PMM/` ya es I01:
+- 1.5.0.1 / `PMM-v1.5.0.1-reliability-i01`
+- tree `12e01ba3a24a2c0ce5e74d681b4931307c845a56`
 - 629 archivos / 628 checksums / 0 mismatches
-- Host, Runtime y FixLab ejecutables originales.
+- Host y Runtime C2B nuevos; FixLab ejecutable original conservado.
 
 ## I01
 
-Fuentes, builders, receta y evidencia SI estan en Git. Los dos EXE C2B que forman
-I01 no pudieron transferirse desde el sandbox del chat anterior.
+Fuentes, builders, receta, evidencia y los dos EXE C2B estan en Git. SESSION_I01B
+cerro la limitacion de transferencia del chat anterior mediante reconstruccion
+local verificable, sin cambiar pins.
 
 Esperados:
 - Host `a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c`
@@ -29,8 +30,9 @@ Esperados:
 - PMM tree I01 `12e01ba3a24a2c0ce5e74d681b4931307c845a56`
 - Build `PMM-v1.5.0.1-reliability-i01`.
 
-El nuevo entorno debe reconstruir/verificar y publicar directamente esos cinco
-cambios si tiene acceso local/Git, sin pedir ZIPs anteriores de entrada.
+Los cinco cambios del paquete ya estan integrados juntos. La siguiente accion es
+que el propietario haga Pull y pruebe el programa real en Windows: ventana visible,
+UI utilizable, cierre, segundo arranque, tiempos y logs ante fallo.
 
 ## Research conservado
 
@@ -38,7 +40,7 @@ cambios si tiene acceso local/Git, sin pedir ZIPs anteriores de entrada.
 original. Ultima evidencia: 130 Go PASS, 52 Python PASS, race enfocado 26 PASS;
 Windows-specific compilado, no ejecutado. Siguiente research: 04A-6C.
 
-Host/Runtime C2B estan preparados para I01 pero no aceptados aun en Windows real.
+Host/Runtime C2B estan integrados en I01 pero no aceptados aun en Windows real.
 Optimizar inicio queda planificado despues de medir I01.
 
 Traducciones continuan separadas y se integraran de forma controlada mas adelante.

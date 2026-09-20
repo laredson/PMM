@@ -8,11 +8,11 @@ recuperar el chat anterior ni pedir ZIPs antiguos para entender el proyecto.
 
 Estado actual:
 - rama `v1.5.0.1-PMM-reliability`;
-- PMM remoto sigue `PMM-v1.5.0.1-reliability-s01b`;
-- Host/Runtime C2B e integracion I01 son reproducibles desde Git;
-- los dos EXE I01 aun no estan en `PMM/` remoto por una limitacion del conector anterior;
+- `PMM/` contiene `PMM-v1.5.0.1-reliability-i01`;
+- Host/Runtime C2B se reprodujeron localmente desde Git con sus hashes fijados;
+- los dos EXE I01 y sus tres metadatos ya estan integrados en la rama;
 - FixLab research llega a 04A-6B pero el executable original sigue distribuido;
-- siguiente objetivo ejecutable: publicar I01 realmente en la rama y probarlo en Windows;
+- siguiente objetivo ejecutable: probar I01 en Windows y registrar arranque/cierre/tiempos;
 - siguiente research FixLab: 04A-6C.
 
 Leer:

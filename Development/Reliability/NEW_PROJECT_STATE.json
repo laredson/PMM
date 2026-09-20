@@ -2,8 +2,8 @@
   "schema": "PMM_NEW_PROJECT_HANDOFF_V1",
   "repository": "laredson/PMM",
   "branch": "v1.5.0.1-PMM-reliability",
-  "handoffBaseCommit": "552a4562b53a7142dfc8c2e5a67abacd6b79b61e",
-  "handoffBaseTree": "cf65d785aeb781a876bb527e5f522c6eb7573ffa",
+  "handoffBaseCommit": "e83b191e56c916b4de12c34a9d054f4bd6bbd485",
+  "handoffBaseTree": "34282d041c5930a0882a92209e7bf51f5ad4cf32",
   "sourceOfTruth": "GitHub branch; local ZIP/chat history is not required to understand the project",
   "readOrder": [
     "START_HERE_NEW_PROJECT.md",
@@ -21,19 +21,20 @@
   ],
   "remotePackage": {
     "version": "1.5.0.1",
-    "buildId": "PMM-v1.5.0.1-reliability-s01b",
-    "tree": "09df5c45aee3390c6b8ea235c8afa4e149a9f1fa",
+    "buildId": "PMM-v1.5.0.1-reliability-i01",
+    "tree": "12e01ba3a24a2c0ce5e74d681b4931307c845a56",
     "files": 629,
     "checksumRows": 628,
     "checksumMismatches": 0,
     "executableSha256": {
-      "PMM/PMM.exe": "010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d",
-      "PMM/Engine/PMMRuntime.exe": "e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a",
+      "PMM/PMM.exe": "a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c",
+      "PMM/Engine/PMMRuntime.exe": "b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f",
       "PMM/Engine/PMMFixLab.exe": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe"
     }
   },
   "i01": {
-    "status": "REPRODUCIBLE_BUT_TWO_NEW_EXES_NOT_IN_REMOTE_PMM",
+    "status": "INTEGRATED_IN_PMM_PENDING_USER_WINDOWS_ACCEPTANCE",
+    "integratedIntoPMM": true,
     "buildId": "PMM-v1.5.0.1-reliability-i01",
     "expectedPackageTree": "12e01ba3a24a2c0ce5e74d681b4931307c845a56",
     "changedPackageFiles": 5,
@@ -53,7 +54,14 @@
       ],
       "windowsExecuted": false,
       "antivirusScanned": false,
-      "startupSpeedMeasured": false
+      "startupSpeedMeasured": false,
+      "i01bWindowsRebuild": {
+        "hostHashMatched": true,
+        "runtimeHashMatched": true,
+        "assemblyTestsPassed": 11,
+        "assemblyTestsSkipped": 1,
+        "packageChecksumMismatches": 0
+      }
     }
   },
   "nativeCandidateTrees": {
@@ -87,10 +95,10 @@
     ]
   },
   "immediateNext": [
-    "Do not ask user for old ZIP before inspecting Git/local checkout.",
-    "If local Git access is available, reproduce or verify I01 binaries and commit the five I01 package changes directly to this branch.",
+    "Do not rebuild or republish I01 without a new reason; it is already integrated in PMM.",
     "Ask user to Pull via GitHub Desktop and run I01 on Windows.",
     "Record startup visible/usable time, close, second startup, UI/regressions and logs if failure.",
+    "Correct any I01 regression before another large integration.",
     "Then continue 04A-6C and remaining roadmap."
   ],
   "developmentPolicy": {

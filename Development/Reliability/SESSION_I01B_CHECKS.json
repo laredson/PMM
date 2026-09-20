@@ -1,0 +1,35 @@
+{
+  "schema": "PMM_I01B_PUBLICATION_CHECKS_V1",
+  "integrationBaseCommit": "e83b191e56c916b4de12c34a9d054f4bd6bbd485",
+  "branch": "v1.5.0.1-PMM-reliability",
+  "toolchain": {
+    "python": "3.10.6",
+    "go": "go1.23.2 windows/amd64",
+    "goArchiveSource": "https://go.dev/dl/go1.23.2.windows-amd64.zip",
+    "goArchiveSha256": "bc28fe3002cd65cec65d0e4f6000584dacb8c71bfaff8801dfb532855ca42513",
+    "installedGlobally": false
+  },
+  "hostSha256": "a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c",
+  "runtimeSha256": "b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f",
+  "fixLabPreservedSha256": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe",
+  "buildId": "PMM-v1.5.0.1-reliability-i01",
+  "packageTree": "12e01ba3a24a2c0ce5e74d681b4931307c845a56",
+  "packageFiles": 629,
+  "checksumRows": 628,
+  "checksumMismatches": 0,
+  "changedPackageFiles": 5,
+  "assemblyTests": {
+    "passed": 11,
+    "skipped": 1,
+    "failed": 0,
+    "skipReason": "Windows environment did not permit creation of the test symlink"
+  },
+  "dirtyCheckoutGuardRejectedUntrackedPmmCodex": true,
+  "cleanTrackedBaseCreatedWithGitArchive": true,
+  "windowsCompiled": true,
+  "windowsExecuted": false,
+  "functionalParityVerified": false,
+  "antivirusScanned": false,
+  "workflowsExecuted": false,
+  "releaseCreated": false
+}

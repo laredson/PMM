@@ -28,16 +28,16 @@ Lee, en orden:
 
 Si tienes acceso a una carpeta local del repo, usala como fuente de trabajo y comprueba `git status`, rama y HEAD antes de cambiar nada. Si solo tienes GitHub remoto, inspecciona la rama antes de pedir archivos al usuario.
 
-Contexto inmediato: todo el research/codigo esta en Git. La excepcion es que los dos EXE I01 compilados en la sesion anterior no pudieron transferirse al remoto por limitacion del conector. NO necesitamos esos ZIPs para reconstruirlos: las fuentes, hashes y recetas estan versionados. Si tu entorno puede compilar y hacer push binario, reproduce I01, verifica los hashes exactos y publica los cinco archivos del paquete I01 en esta misma rama. No cambies pins para forzar resultados.
+Contexto inmediato: todo el research/codigo esta en Git. La limitacion anterior de transferencia de los dos EXE I01 ya quedo cerrada en SESSION_I01B: `PMM/` contiene Host/Runtime C2B y los tres metadatos I01, con arbol `12e01ba3a24a2c0ce5e74d681b4931307c845a56`. No cambies pins ni reconstruyas I01 otra vez sin una razon nueva.
 
 Esta rama SI puede quedar temporalmente rota: es una rama experimental para que el propietario pruebe cambios reales mediante GitHub Desktop. Mantener `Development/Reliability/NativeCandidates/` como laboratorio/historial, pero integrar en `PMM/` los bloques suficientemente cerrados.
 
-Despues de publicar I01, pedirme que haga Pull y probar: arranque, ventana visible, UI utilizable, cierre, segundo arranque y tiempos. No sigas acumulando integraciones antes de revisar esa prueba.
+Pedirme que haga Pull y probar I01: arranque, ventana visible, UI utilizable, cierre, segundo arranque y tiempos. No sigas acumulando integraciones antes de revisar esa prueba.
 
 Luego retomar 04A-6C y el roadmap documentado. No crear PR/tag/release ni ejecutar Actions por iniciativa propia. Commits de desarrollo con `[skip ci]`. No desactivar antivirus ni pedir exclusiones.
 
 Antes de responderme que falta contexto, demuestra que has leido el handoff y resume:
-- que ejecutables remotos siguen siendo originales;
+- que Host/Runtime I01 estan integrados y FixLab sigue siendo el original;
 - hashes Host/Runtime I01;
 - que hace 04A-6B;
 - cual es la siguiente prueba Windows;
