@@ -12,6 +12,8 @@ $ambiguous=$false;try{Select-PMMDesktopPackage @($new,$new) 'CHATGPT'|Out-Null}c
 Assert ((Get-PMMCaseDesktopMode ([pscustomobject]@{})) -eq 'chat') 'New and legacy requests must default to Chat.'
 $link=New-PMMDesktopLink 'a & b'
 Assert ($link.Contains('mode=chat&') -and $link.Contains('a%20%26%20b')) 'Default mode or prompt escaping is wrong.'
+$project=[Uri]::EscapeDataString([IO.Path]::GetFullPath((Join-Path $Script:Root 'Workspace')))
+Assert ($link.Contains('path='+$project+'&')) 'New Desktop chat does not use Workspace as its project root.'
 foreach($mode in @('chat','work','codex')){Assert ((New-PMMDesktopLink 'test' '' $mode).Contains('mode='+$mode+'&')) 'Mode lost in Desktop URI.'}
 $id='01a09877-71f4-77e2-8261-930f91a85d6b'
 Assert ((New-PMMDesktopLink '' $id) -ceq ('codex://threads/'+$id)) 'Open conversation created a new chat.'

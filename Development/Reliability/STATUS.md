@@ -1,4 +1,4 @@
-# Estado actual - I01 en prueba / 04A-6C validado en Win10 NTFS
+# Estado actual - I02 en prueba / 04A-6C validado en Win10 NTFS
 
 El contexto necesario para continuar en un proyecto/chat nuevo esta ahora
 centralizado en:
@@ -12,11 +12,17 @@ No se necesita el historial de esta conversacion para entender el estado.
 
 ## Paquete de la rama
 
-`PMM/` ya es I01:
-- 1.5.0.1 / `PMM-v1.5.0.1-reliability-i01`
-- tree `12e01ba3a24a2c0ce5e74d681b4931307c845a56`
+`PMM/` ya es I02:
+- 1.5.0.1 / `PMM-v1.5.0.1-reliability-i02`
+- tree `9ef22d5815943ce50413dfa7e09b474b06a22860`
 - 629 archivos / 628 checksums / 0 mismatches
 - Host y Runtime C2B nuevos; FixLab ejecutable original conservado.
+
+I02 conserva byte-identicos los ejecutables I01 y corrige el alcance privado de
+Desktop: el proyecto local es `Workspace`, la configuracion generada queda en
+`Workspace/.codex/config.toml` y las opciones preexistentes se conservan. PMM ya
+no genera `PMM/.codex/config.toml`; no borra automaticamente un archivo legado.
+Las regresiones locales pasan con 14 aserciones de routing y 32 de binding.
 
 ## I01
 

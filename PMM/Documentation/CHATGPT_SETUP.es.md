@@ -6,8 +6,8 @@ ChatGPT Desktop es un cliente opcional. Cada caso puede elegir **ChatGPT Desktop
 
 1. En **Settings > Instalaciones**, detecta o instala ChatGPT. Al pulsar **Enviar a ChatGPT** sin la aplicación, PMM también ofrece instalarla mediante el servicio de instalaciones existente. Solicita modo silencioso a WinGet; los permisos, el inicio de sesión y cualquier paso del instalador oficial siguen bajo tu control. ChatGPT no va incluido en el ZIP de PMM.
 2. En **Settings > IA / MCP**, pulsa **Conectar ChatGPT**. Inicia sesión en el cliente. El diálogo muestra qué aplicación y versión detectó; una versión antigua que no registra `codex://` requiere actualizarse para abrir chats locales.
-3. Selecciona o crea en el cliente un proyecto local cuya carpeta sea la instalación que contiene `PMM.exe`. PMM utiliza su subcarpeta `Workspace` para casos y trabajo temporal. No crea otra ubicación fija en C:. Puedes elegir una carpeta adicional; debes conceder su acceso por separado en el cliente.
-4. Pulsa **Configuración MCP**. La configuración generada está en `Workspace/MCP/codex-mcp.toml` y `mcp-config.json`. Importa o añade la entrada PMM mediante los ajustes MCP del cliente, conservando las entradas de otros servidores, y reinícialo. PMM genera ejemplos; no sobrescribe tu configuración de cliente. Agregar la carpeta del proyecto no configura MCP por sí solo.
+3. Selecciona o crea en el cliente un proyecto local cuya carpeta sea `Workspace`, dentro de la instalación que contiene `PMM.exe`. Allí viven los casos, archivos temporales y configuración privada de este proyecto; no hace falta conceder acceso al resto de la instalación. Puedes elegir una carpeta adicional y conceder su acceso por separado.
+4. Pulsa **Configuración MCP**. PMM instala la entrada del proyecto en `Workspace/.codex/config.toml`, conservando cualquier otra entrada existente. También genera ejemplos portables en `Workspace/MCP/codex-mcp.toml` y `mcp-config.json`. Reinicia el servidor una vez. PMM no modifica la configuración global del usuario.
 5. Pulsa **Abrir chat de sincronización** y envía el texto preparado. Pide a la IA que ejecute `pmm_desktop_pair` con el código mostrado. El código es de un solo uso y caduca a los 30 minutos. Si caduca, usa **Volver a vincular**.
 6. Pulsa **Comprobar conexión**. Solo una llamada MCP correcta verifica la vinculación. Abrir la aplicación no demuestra que haya sesión iniciada o MCP conectado. La llamada tampoco certifica la marca del cliente, su plan ni sus permisos de archivos.
 
@@ -27,7 +27,7 @@ PMM distingue texto preparado, mensaje enviado pendiente de recepción, solicitu
 
 ## Alcance del acceso y pruebas
 
-Dar al cliente acceso a toda la carpeta PMM también puede darle acceso a su código. El texto solicita trabajar en `Workspace` y usar MCP. PMM valida las operaciones y rutas de su servidor, pero no restringe la consola, los archivos ni el control de Windows que concedas a otras herramientas del cliente. Inicio de sesión, confianza y permisos siguen siendo decisiones tuyas.
+Dar al cliente acceso al proyecto `Workspace` limita el acceso normal del proyecto al estado local del usuario. PMM valida las operaciones y rutas de su servidor, pero no restringe la consola, los archivos ni el control de Windows que concedas a otras herramientas del cliente. Inicio de sesión, confianza y permisos siguen siendo decisiones tuyas.
 
 Prueba los candidatos con guardados aislados y conserva el despliegue anterior. Separa siempre «construido» de «probado en Palworld». El control visual es opcional y depende de un escritorio disponible y de la accesibilidad del cliente. Se mantiene la alternativa de informar manualmente «funciona», «crashea» y aportar evidencias.
 

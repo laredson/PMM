@@ -26,13 +26,13 @@ La rama de traducciones `v1.5.0.0-PMM-translated` sigue independiente. Ancestro 
 SESSION_I01B parte de `e83b191e56c916b4de12c34a9d054f4bd6bbd485` y cierra la
 transferencia binaria pendiente del handoff anterior.
 
-El paquete `PMM/` de la rama es I01:
+El paquete `PMM/` de la rama es I02:
 - producto 1.5.0.1;
-- BUILD_ID `PMM-v1.5.0.1-reliability-i01`;
+- BUILD_ID `PMM-v1.5.0.1-reliability-i02`;
 - 629 archivos;
 - 628 filas en SHA256SUMS;
 - 0 mismatches;
-- Git tree `12e01ba3a24a2c0ce5e74d681b4931307c845a56`.
+- Git tree `9ef22d5815943ce50413dfa7e09b474b06a22860`.
 
 Ejecutables de la rama:
 - Host C2B `PMM/PMM.exe`: SHA-256 `a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c`.
@@ -41,6 +41,11 @@ Ejecutables de la rama:
 
 Importante: I01 esta compilado e integrado, pero su ejecucion funcional Windows
 sigue pendiente; compilacion y hashes no equivalen a aceptacion.
+
+I02 conserva exactamente los tres ejecutables de I01 y corrige la integracion
+Desktop: usa `Workspace` como raiz del proyecto, escribe la configuracion privada
+en `Workspace/.codex/config.toml`, conserva otras entradas y deja de generar
+`PMM/.codex/config.toml`. La ruta antigua no se borra automaticamente.
 
 ## 4. Candidatas nativas ya construidas
 

@@ -13,6 +13,8 @@
     "pairingTool": "pmm_desktop_pair",
     "caseLinkTool": "pmm_desktop_case_link",
     "newChatLink": "codex://threads/new?path=...&prompt=...",
+    "projectRoot": "Workspace",
+    "projectConfiguration": "Workspace/.codex/config.toml",
     "messageDelivery": "Desktop-owned conversation with MCP receipt; internal App Server requests are advanced opt-in",
     "automaticSubmissionValidation": "ASSISTED: send the prepared request in Desktop; no hidden inference or automatic model escalation",
     "nativeProjectCreation": "ASSISTED",
@@ -115,8 +117,8 @@
   "dotnetRuntimeInventorySha256": "8b2f4fe11635f18fa419d5e4fedad456bc7c3d7395272ee91e89b62e3ac72ed0",
   "gameReferenceBackgroundWorker": "Modules/GameReference/GameReferenceWorker.ps1",
   "gameReferenceProgressUi": "Shared normal Settings + Fix Lab progress bars plus both Game Reference buttons as ColorFlow progress surfaces. AUTO invokes the canonical Settings Game Reference command before Fix Lab navigation; output choice may be highlighted concurrently while the worker runs.",
-  "releaseCandidate": "1.5.0.1-reliability-i01",
-  "buildId": "PMM-v1.5.0.1-reliability-i01",
+  "releaseCandidate": "1.5.0.1-reliability-i02",
+  "buildId": "PMM-v1.5.0.1-reliability-i02",
   "buildIdentityFile": "Resources/Metadata/BUILD_ID.txt",
   "uiContract": "Public tabs are Mods & Merge, FIX LAB, AI & Help, World Save and Settings. Fresh size is 1460x900 and the normal minimum is 900x600; startup clamps to the Windows work area in device-independent pixels. Branding and action areas occupy equal header halves. Header actions are ordered Detect/status, folder/Play controls, then SemiAUTO/AUTO. SemiAUTO arms continuation after a manually started workflow action; the wider AUTO button runs the remaining safe workflow once and uses an idle-only sparkle treatment. AI & Help contains five focused subtabs: AI assistance, AI reception, Feedback & Knowledge, color-scheme editor and AI settings. AI assistance exposes separate diagnostic-case and standalone-mod-project entry points. Normal Settings also owns Vanilla Game Reference. General Settings follows the Sound events architecture by separating official PMM schemes from a bordered user-scheme collection. ColorFlow ends by highlighting Play as optional readiness without an action-required popup.",
   "bundledThemeCount": 11,
@@ -617,15 +619,15 @@
     }
   },
   "reliabilityPreparation": {
-    "session": "I01",
-    "state": "host-runtime-integrated-for-user-trial",
+    "session": "I02",
+    "state": "host-runtime-integrated-with-workspace-local-desktop-project",
     "nativeSourceParityVerified": false,
     "nativeBinariesRebuilt": true,
     "antivirusScanned": false,
     "publicReleaseCreated": false
   },
   "integrationTrial": {
-    "id": "I01",
+    "id": "I02",
     "sourceCommit": "96287f98f59b7387a00b29cec7c9316800bde098",
     "integrated": [
       "Host-C2B",
@@ -635,6 +637,7 @@
     ],
     "fixLabExecutableReplaced": false,
     "fixLabReconstructionIntegrated": false,
+    "workspaceProjectMigration": "Desktop project root and private project config moved to Workspace; legacy installation-root config is preserved but no longer generated",
     "componentVersionNote": "Native internal 1.2.1 constants and third-party component versions are retained.",
     "windowsAcceptance": "PENDING_USER_TEST",
     "startupSpeedupMeasured": false,

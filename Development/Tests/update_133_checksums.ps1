@@ -18,5 +18,5 @@ $lines=@(foreach($relative in $ordered){
   if(-not(Test-Path -LiteralPath $path -PathType Leaf)){throw ('Missing public file: '+$relative)}
   (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()+'  '+$relative
 })
-[IO.File]::WriteAllText($inventory,($lines -join [Environment]::NewLine)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText($inventory,($lines -join "`n")+"`n",[Text.UTF8Encoding]::new($false))
 'Updated public checksums: '+$lines.Count

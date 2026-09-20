@@ -21,8 +21,8 @@
   ],
   "remotePackage": {
     "version": "1.5.0.1",
-    "buildId": "PMM-v1.5.0.1-reliability-i01",
-    "tree": "12e01ba3a24a2c0ce5e74d681b4931307c845a56",
+    "buildId": "PMM-v1.5.0.1-reliability-i02",
+    "tree": "9ef22d5815943ce50413dfa7e09b474b06a22860",
     "files": 629,
     "checksumRows": 628,
     "checksumMismatches": 0,
@@ -62,6 +62,20 @@
         "assemblyTestsSkipped": 1,
         "packageChecksumMismatches": 0
       }
+    }
+  },
+  "i02": {
+    "status": "INTEGRATED_IN_PMM_PENDING_USER_WINDOWS_ACCEPTANCE",
+    "buildId": "PMM-v1.5.0.1-reliability-i02",
+    "expectedPackageTree": "9ef22d5815943ce50413dfa7e09b474b06a22860",
+    "inheritsI01Executables": true,
+    "desktopProjectRoot": "Workspace",
+    "desktopProjectConfig": "Workspace/.codex/config.toml",
+    "legacyRootConfigDeleted": false,
+    "tests": {
+      "desktopRoutingAssertionsPassed": 14,
+      "desktopBindingAssertionsPassed": 32,
+      "packageChecksumMismatches": 0
     }
   },
   "nativeCandidateTrees": {
@@ -108,11 +122,11 @@
     ]
   },
   "immediateNext": [
-    "Do not rebuild or republish I01 without a new reason; it is already integrated in PMM.",
-    "Collect results from the owner's ongoing I01 Windows test.",
+    "Do not rebuild I01 executables without a new reason; they are retained byte-identical in I02.",
+    "Collect results from the owner's ongoing I02 Windows test.",
     "Record startup visible/usable time, close, second startup, UI/regressions and logs if failure.",
-    "Correct any I01 regression before another large integration.",
-    "Owner authorized laboratory progress while testing I01; 6C implementation and Win10 NTFS validation are done without changing PMM.",
+    "Correct any I02 regression before another large integration.",
+    "Owner authorized laboratory progress while testing; 6C implementation and Win10 NTFS validation remain candidate-only.",
     "Complete remaining Windows acceptance where available; delimit V2/CLI candidate-only contract next."
   ],
   "developmentPolicy": {

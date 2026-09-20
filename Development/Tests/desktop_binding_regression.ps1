@@ -40,6 +40,8 @@ Assert ($null -eq (Get-PMMDesktopBinding)) 'Different installation is not implic
 $Script:Root=$savedRoot
 $link=New-PMMDesktopLink 'Plan +100 & preserve "items"'
 Assert ($link -match 'path=.*%20' -and $link -match '%2B100%20%26') 'Workspace and prompt URI-encoded'
+$project=[Uri]::EscapeDataString([IO.Path]::GetFullPath((Join-Path $Script:Root 'Workspace')))
+Assert ($link.Contains('path='+$project+'&')) 'Desktop project root is Workspace'
 Reject {New-PMMDesktopLink '' '../other'} 'Malformed thread link rejected'
 # Mock only desktop side effects. Real PMM publication and persistence stay active.
 function Save-PMMAIIOCaseEditor{return $false}
@@ -55,9 +57,18 @@ function Open-PMMDesktopLink($link){$Script:opened++;return $true}
 function Show-PMMDesktopDispatchHelp($Dispatch,$CanOpen){$Script:helpers++}
 function Show-PMMDesktopSetup{$Script:setup++}
 function Start-Process {param($FilePath,$ArgumentList,$WindowStyle);$Script:started++}
+$workspaceConfig=Join-Path $Script:Root 'Workspace\.codex\config.toml'
+[void][IO.Directory]::CreateDirectory((Split-Path $workspaceConfig -Parent))
+[IO.File]::WriteAllText($workspaceConfig,'model = "fixture"'+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
 Show-PMMChatGPTCase
 $d=Get-PMMDesktopDispatch $case.CaseId
 Assert ($Script:opened -eq 1 -and $Script:started -eq 0 -and $d.phase -eq 'PREPARED') 'First send prepares one Desktop chat without starting a worker'
+Assert ($d.projectPath -ceq [IO.Path]::GetFullPath((Join-Path $Script:Root 'Workspace'))) 'Dispatch records Workspace as project root'
+Assert ((Test-Path -LiteralPath $workspaceConfig) -and -not(Test-Path -LiteralPath (Join-Path $Script:Root '.codex\config.toml'))) 'Project MCP config exists only under Workspace'
+Assert ([IO.File]::ReadAllText($workspaceConfig).Contains('model = "fixture"')) 'Existing Workspace project configuration is preserved'
+$configBefore=(Get-FileHash -LiteralPath $workspaceConfig -Algorithm SHA256).Hash
+Initialize-PMMDesktopProject
+Assert ((Get-FileHash -LiteralPath $workspaceConfig -Algorithm SHA256).Hash -ceq $configBefore) 'Workspace project setup is idempotent'
 Show-PMMChatGPTCase
 Assert ($Script:opened -eq 1 -and $Script:helpers -eq 1) 'Repeated send does not duplicate a chat'
 $case=Get-PMMMCPCase $case.CaseId

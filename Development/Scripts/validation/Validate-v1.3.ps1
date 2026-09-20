@@ -15,7 +15,7 @@ function Parse-Json([string]$Path){
   try{
     $text=[IO.File]::ReadAllText($Path,[Text.Encoding]::UTF8)
     $doc=[System.Text.Json.JsonDocument]::Parse($text)
-    return $doc
+    return ,$doc
   }catch{Fail ('Invalid JSON: '+$Path+' | '+$_.Exception.Message);return $null}
 }
 

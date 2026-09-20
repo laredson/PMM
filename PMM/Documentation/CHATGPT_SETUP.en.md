@@ -6,8 +6,8 @@ ChatGPT Desktop is optional. Each case can target **ChatGPT Desktop**, **Other M
 
 1. Detect or install ChatGPT in **Settings > Installations**. **Send to ChatGPT** also offers installation when the app is missing, using the existing installation service. PMM requests silent WinGet installation; OS prompts, sign-in and official installer steps remain yours to accept. ChatGPT is not bundled in the PMM ZIP.
 2. Open **Settings > AI / MCP > Connect ChatGPT** and sign in to the client. The dialog identifies the detected app and version. An older app without the `codex://` protocol needs an update to open local chats.
-3. Select or create a local project in the client using the installation folder containing `PMM.exe`. PMM uses its `Workspace` subfolder for cases and temporary work, without creating another fixed location on C:. An optional additional folder can be selected; grant its access separately in the client.
-4. Click **MCP configuration**. Generated examples are `Workspace/MCP/codex-mcp.toml` and `mcp-config.json`. Import or add the PMM entry in your client's MCP settings, preserve other servers, then restart the server. PMM generates examples without overwriting client configuration. Adding the project folder alone does not configure MCP.
+3. Select or create a local project in the client using the installation's `Workspace` folder. Cases, temporary files and this project's private configuration live there, so access to the rest of the installation is unnecessary. An optional additional folder can be selected and granted separately.
+4. Click **MCP configuration**. PMM installs the project entry in `Workspace/.codex/config.toml` while preserving other existing entries. Portable examples are also generated as `Workspace/MCP/codex-mcp.toml` and `mcp-config.json`. Restart the server once. PMM does not modify the user's global configuration.
 5. Click **Open synchronization chat** and send the prepared text. It asks the AI to call `pmm_desktop_pair` with the displayed code. Codes are single-use and expire after 30 minutes; use **Reconnect** to generate another.
 6. Click **Check connection**. Only a successful MCP call verifies pairing. Opening the app does not prove sign-in or connectivity. Pairing does not certify the client brand, account plan, or filesystem permissions.
 
@@ -27,7 +27,7 @@ Prepared text, sent message awaiting receipt, MCP receipt, research, awaiting ap
 
 ## Access and validation
 
-Giving the client access to the entire PMM folder can also expose PMM source files. The prompt asks it to work in `Workspace` and use MCP. PMM validates operations and paths inside its server; it cannot restrict shell, filesystem or Windows control granted to other client tools. Sign-in, trust and permissions remain user decisions.
+Giving the client access to the `Workspace` project normally limits project access to user-local state. PMM validates operations and paths inside its server; it cannot restrict shell, filesystem or Windows control granted to other client tools. Sign-in, trust and permissions remain user decisions.
 
 Test candidates with isolated saves and retain the previous deployment. Keep “built” distinct from “tested in Palworld.” Visual automation is optional and depends on an available desktop and accessible client controls. Manual feedback such as “works” or “crashes,” with evidence, remains supported.
 

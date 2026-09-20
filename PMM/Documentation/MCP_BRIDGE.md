@@ -10,9 +10,11 @@ todavía no es el sistema completo de modding autónomo.
 1. Abrir **Settings → AI / MCP → Puente MCP local**.
 2. Pulsar **Habilitar y preparar conexión**. Comparte resúmenes de todos los casos
    de esta instalación, sus artefactos MCP y la referencia Vanilla preparada.
-3. Abrir **Conexión y archivos recibidos**. En Workspace/MCP, PMM genera
-   codex-mcp.toml para Codex y mcp-config.json para clientes STDIO compatibles.
-4. Incorporar esa entrada al cliente una vez y reiniciar su conexión MCP.
+3. Abrir **Conexión y archivos recibidos**. PMM instala la entrada local de Codex
+   en `Workspace/.codex/config.toml`, conservando otras entradas existentes.
+   En `Workspace/MCP` también genera codex-mcp.toml y mcp-config.json como
+   ejemplos portables para clientes STDIO compatibles.
+4. Usar `Workspace` como raíz del proyecto local y reiniciar su conexión MCP.
    Regenerar los archivos si se mueve la instalación portable.
 
 **Deshabilitar MCP** rechaza llamadas posteriores incluso en conexiones abiertas.
@@ -25,8 +27,9 @@ También se puede preparar la conexión con Windows PowerShell 5.1:
 & .\PMM\Modules\MCP\Export-PMMMCPConfig.ps1 -Enable
 ~~~
 
-No requiere Node ni Python. No modifica automáticamente ajustes personales de
-otros programas. Este HQ puede usar una entrada de proyecto en .codex/config.toml.
+No requiere Node ni Python. No modifica la configuración global del usuario.
+La entrada de proyecto vive bajo `Workspace/.codex/config.toml`; tanto ella como
+el resto de `Workspace` son estado privado/local y no forman parte del paquete.
 Una conversación ya iniciada puede necesitar reinicio/reconexión del cliente.
 
 La conexión desde una nube necesita un transporte remoto autenticado. Esta

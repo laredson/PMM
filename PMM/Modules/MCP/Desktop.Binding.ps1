@@ -1,5 +1,6 @@
 # Installation-local binding; no account credentials or client databases.
 function Get-PMMDesktopFile([string]$Name='binding.json') { return (Resolve-PMMMCPPath (Get-PMMMCPRoot) ('Desktop\'+$Name)) }
+function Get-PMMDesktopProjectPath { return [IO.Path]::GetFullPath((Join-Path $Script:Root 'Workspace')) }
 function Get-PMMDesktopBinding {
     $p=Get-PMMDesktopFile
     if(-not(Test-Path -LiteralPath $p)){return $null}
@@ -74,7 +75,7 @@ function New-PMMDesktopLink([string]$Prompt,[string]$ThreadId='',[string]$Mode='
         return 'codex://threads/'+$ThreadId
     }
     if($Mode -notmatch '^[a-z][a-z0-9_-]{0,40}$'){throw 'Invalid Desktop mode.'}
-    return 'codex://threads/new?mode='+[Uri]::EscapeDataString($Mode)+'&path='+[Uri]::EscapeDataString([IO.Path]::GetFullPath($Script:Root))+'&prompt='+[Uri]::EscapeDataString($Prompt)
+    return 'codex://threads/new?mode='+[Uri]::EscapeDataString($Mode)+'&path='+[Uri]::EscapeDataString((Get-PMMDesktopProjectPath))+'&prompt='+[Uri]::EscapeDataString($Prompt)
 }
 
 function Cancel-PMMDesktopDispatch([string]$CaseId) {

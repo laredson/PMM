@@ -34,12 +34,12 @@ Despues leer el contrato de la candidata concreta antes de modificarla.
 
 ## Estado ejecutivo en una frase
 
-La rama contiene research hasta 04A-6C: publicacion candidata corregida y ejecutada en Win10 NTFS, mas interfaz de integracion acotada. Host y Runtime C2B siguen integrados en `PMM/` como I01; FixLab candidato sigue aislado y NO sustituye al original. La prueba funcional I01 del propietario sigue pendiente; este autorizo avanzar el laboratorio mientras lo prueba.
+La rama contiene research hasta 04A-6C y el paquete I02. Host y Runtime C2B de I01 siguen integrados; I02 mueve el proyecto/configuracion privada de Codex a `Workspace`. FixLab candidato sigue aislado y NO sustituye al original. La prueba funcional del propietario sigue pendiente.
 
 ## Objetivo inmediato
 
 1. comprobar que la rama/checkout corresponden a este handoff;
-2. confirmar BUILD_ID I01, hashes y arbol PMM esperado;
+2. confirmar BUILD_ID I02, hashes y arbol PMM esperado;
 3. pedir al usuario que haga Pull con GitHub Desktop y pruebe el programa real;
 4. registrar arranque, cierre, segundo arranque, ventana visible, UI utilizable y tiempos;
 5. corregir cualquier regresion antes de otra integracion grande;
@@ -50,10 +50,11 @@ No modificar pins para conseguir que una compilacion distinta pase.
 
 ## Identidades importantes
 
-Paquete actual I01:
-- build: `PMM-v1.5.0.1-reliability-i01`
-- PMM tree esperado: `12e01ba3a24a2c0ce5e74d681b4931307c845a56`
+Paquete actual I02:
+- build: `PMM-v1.5.0.1-reliability-i02`
+- PMM tree esperado: `9ef22d5815943ce50413dfa7e09b474b06a22860`
 - 629 archivos / 628 filas de checksum / 0 mismatches.
+- proyecto Desktop y configuracion privada: `Workspace` y `Workspace/.codex/config.toml`.
 - Host SHA-256: `a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c`
 - Runtime SHA-256: `b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f`
 - FixLab original conservado SHA-256: `8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe`.

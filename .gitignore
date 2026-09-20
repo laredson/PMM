@@ -80,3 +80,5 @@ oo2core_9_win64.dll
 
 # Per-machine MCP client paths
 /.codex/config.toml
+/PMM/.codex/
+/PMM/.codex/
