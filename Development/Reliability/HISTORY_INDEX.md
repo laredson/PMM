@@ -172,6 +172,22 @@ COMPLETE con RootDirectory de acceso minimo, sin retry. 152 tests Go top-level,
 secuenciales y 500x4 concurrentes PASS. Dos builds de harness/CLI reproducibles.
 Win10 NTFS; Win11/SMB/AV/disco lleno/race siguen pendientes. PMM I02 intacto.
 
+### SESSION04A6E - arrays escalares V2 acotados
+
+- `SESSION04A6E_FINDINGS.md`
+- `SESSION04A6E_CHECKS.json`
+- `NativeCandidates/FixLab/UAsset/evidence/s04a6e/`
+- `NativeCandidates/FixLab/CoreR1/evidence/s04a6e/`
+
+Agrega `PMM_FIXED_UNVERSIONED_SCHEMA_V2` exclusivamente para recorrer
+`ArrayProperty` de elementos escalares de ancho fijo, sin mutarlos ni relocalizar.
+CaptureCore acepta la misma forma sin autenticar semantica y el escenario `array`
+la valida hasta job/CLI candidato-only. UAsset: 63 tests Go top-level, 32 Python y
+tres verificadores. CoreR1: 154 tests Go top-level, 54 Python PASS / 2 SKIP y seis
+verificadores. Harnesses Windows x3, builds repetidos byte-identicos, vet y
+cross-build Linux PASS sin ejecucion. Schema real, containers complejos,
+relocalizacion y aceptacion Unreal/Palworld siguen pendientes. PMM I02 intacto.
+
 ## Primera integracion ejecutable
 
 ### SESSION_I01

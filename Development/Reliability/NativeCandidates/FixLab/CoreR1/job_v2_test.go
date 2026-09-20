@@ -172,7 +172,16 @@ func TestCandidateJobV2FixtureExport(t *testing.T) {
 	if _, err := os.Stat(output); !os.IsNotExist(err) {
 		t.Fatal("output must not exist")
 	}
-	captureRequest, _, _, executionRequest, _ := executorFixture(t, 0)
+	arrayFixture := -1
+	for i, fixture := range executorVectors(t) {
+		if fixture.ID == "array" {
+			arrayFixture = i
+		}
+	}
+	if arrayFixture < 0 {
+		t.Fatal("array execution fixture missing")
+	}
+	captureRequest, _, _, executionRequest, _ := executorFixture(t, arrayFixture)
 	if err := os.Mkdir(output, 0700); err != nil {
 		t.Fatal(err)
 	}

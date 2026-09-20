@@ -1,4 +1,4 @@
-"""Artificial scalar-schema packages, NOT extracted from a game or a mod.
+"""Artificial bounded-schema packages, NOT extracted from a game or a mod.
 No Go imports. The two expected four-byte edits are authored separately here.
 """
 import base64
@@ -39,6 +39,9 @@ def make_case(kind='basic'):
     if kind=='mixed':
         props=[dict(name='Flag',type='BoolProperty'),dict(name='ByteValue',type='ByteProperty'),dict(name='FloatValue',type='FloatProperty'),dict(name='LongValue',type='Int64Property'),dict(name='NameValue',type='NameProperty'),dict(name='ObjectValue',type='ObjectProperty'),dict(name='PostProcessAnimBlueprint',type='ClassProperty')]
         slots=list(range(len(props)))
+    if kind=='array':
+        props=[dict(name='ScalarValues',type='ArrayProperty',innerType='IntProperty'),dict(name='PostProcessAnimBlueprint',type='ClassProperty')]
+        slots=list(range(len(props)))
     if kind=='masked':zeros={0,3,25}
     if kind=='skipped':slots=list(range(2,len(props)))
     mask=bytearray()
@@ -57,6 +60,7 @@ def make_case(kind='basic'):
         elif t=='NameProperty':prefix.extend(struct.pack('<ii',11,0))
         elif t=='ObjectProperty':prefix.extend(struct.pack('<i',-2))
         elif t=='FloatProperty':prefix.extend(struct.pack('<f',1.25))
+        elif t=='ArrayProperty':prefix.extend(struct.pack('<i',3)+struct.pack('<iii',101,202,303))
         else:prefix.extend(struct.pack('<i',j+100))
     prefix_end=6+len(prefix)
     tail=b'UNKNOWN-NATIVE-TAIL'
@@ -78,7 +82,7 @@ def make_case(kind='basic'):
     for j,e in enumerate(exports):struct.pack_into('<q',header,e+36,len(header)+(6 if j else 0))
     # Deliberately leave the original generation field values: these are test
     # packages, and the reader treats generations as historical data.
-    schema=jsonb(dict(schema='PMM_FIXED_UNVERSIONED_SCHEMA_V1',profile='cooked-ue4-522-ue5-1008',classPath='/Script/Engine.SkeletalMesh',fields=props))
+    schema=jsonb(dict(schema='PMM_FIXED_UNVERSIONED_SCHEMA_V2' if kind=='array' else 'PMM_FIXED_UNVERSIONED_SCHEMA_V1',profile='cooked-ue4-522-ue5-1008',classPath='/Script/Engine.SkeletalMesh',fields=props))
     result_header=bytearray(header);result_data=bytearray(data)
     dep=fields['preloadOffset'];dep=struct.unpack_from('<i',header,dep)[0]+4
     struct.pack_into('<i',result_header,dep,-6);struct.pack_into('<i',result_data,target,0)
@@ -86,7 +90,7 @@ def make_case(kind='basic'):
     return dict(id=kind,header=b64(header),data=b64(data),request=req,expectedHeader=b64(result_header),expectedData=b64(result_data),positions=dict(imports=imports,exports=exports,preload=dep,property=target,prefixEnd=prefix_end,fields=fields))
 
 
-def all_cases():return [make_case(k) for k in ('basic','masked','skipped','mixed','unicode','opaque','decoy')]
+def all_cases():return [make_case(k) for k in ('basic','masked','skipped','mixed','unicode','opaque','decoy','array')]
 def encoded_cases():
     raw=jsonb(all_cases())
     return dict(schema='PMM_SYNTHETIC_FIXTURE_ZLIB_V1',decodedBytes=len(raw),decodedSha256=sha(raw),content=b64(zlib.compress(raw,9)))

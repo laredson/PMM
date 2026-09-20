@@ -40,9 +40,10 @@ deploy, retry ni importacion de evidencia serializada.
 - Planificar/capturar/verificar membership antes de la llamada.
 - Mensajes UI localizables e integracion UI final: AUN NO IMPLEMENTADOS.
 - Semantica completa del motor historico V2: AUN NO IMPLEMENTADA; el job actual
-  solo orquesta el perfil CoreR1 acotado candidato-only.
-- Semantica de schemas/serializers reales, relocalizacion variable, bulk y
-  aceptacion Unreal/Palworld: AUN NO PROBADAS.
+  solo orquesta el perfil CoreR1 acotado candidato-only. 04A-6E agrega recorrido
+  de ArrayProperty con innerType escalar fijo, sin mutacion ni relocalizacion.
+- Fuente/procedencia de schema real, serializers variables y containers complejos,
+  relocalizacion, bulk y aceptacion Unreal/Palworld: AUN NO PROBADAS.
 - Instalacion/reparacion del juego, rollback de mods, firma y distribucion:
   NO IMPLEMENTADOS por esta API.
 

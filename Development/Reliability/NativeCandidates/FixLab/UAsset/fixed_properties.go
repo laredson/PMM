@@ -13,16 +13,19 @@ import (
 
 const (
 	FixedSchemaV1     = "PMM_FIXED_UNVERSIONED_SCHEMA_V1"
+	FixedSchemaV2     = "PMM_FIXED_UNVERSIONED_SCHEMA_V2"
 	MaxSchemaBytes    = 128 << 10
 	MaxSchemaFields   = 1024
 	MaxFragments      = 1024
+	MaxArrayElements  = 1 << 20
 	PostProcessField  = "PostProcessAnimBlueprint"
 	SkeletalMeshClass = "/Script/Engine.SkeletalMesh"
 )
 
 type scalarField struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
+	Name      string `json:"name"`
+	Type      string `json:"type"`
+	InnerType string `json:"innerType,omitempty"`
 }
 type fixedSchema struct {
 	Schema    string        `json:"schema"`
@@ -32,10 +35,12 @@ type fixedSchema struct {
 }
 
 type propertySpan struct {
-	Name        string `json:"name"`
-	Type        string `json:"type"`
-	SchemaIndex int    `json:"schemaIndex"`
-	Zero        bool   `json:"zero"`
+	Name         string `json:"name"`
+	Type         string `json:"type"`
+	InnerType    string `json:"innerType,omitempty"`
+	ElementCount int    `json:"elementCount,omitempty"`
+	SchemaIndex  int    `json:"schemaIndex"`
+	Zero         bool   `json:"zero"`
 	Span
 }
 type propertyPrefix struct {
@@ -101,7 +106,7 @@ func strictSchemaJSON(b []byte) error {
 				if !ok || keys[k] {
 					return fmt.Errorf("%w: duplicate schema key", ErrInvalid)
 				}
-				if k != "schema" && k != "profile" && k != "classPath" && k != "fields" && k != "name" && k != "type" {
+				if k != "schema" && k != "profile" && k != "classPath" && k != "fields" && k != "name" && k != "type" && k != "innerType" {
 					return fmt.Errorf("%w: unknown schema key", ErrUnsupported)
 				}
 				keys[k] = true
@@ -149,7 +154,7 @@ func loadFixedSchema(ctx context.Context, data []byte, pin string) (*fixedSchema
 	if e = d.Decode(&s); e != nil {
 		return nil, e
 	}
-	if s.Schema != FixedSchemaV1 || s.Profile != CookedUE51 || s.ClassPath != SkeletalMeshClass {
+	if (s.Schema != FixedSchemaV1 && s.Schema != FixedSchemaV2) || s.Profile != CookedUE51 || s.ClassPath != SkeletalMeshClass {
 		return nil, fmt.Errorf("%w: fixed schema profile/class", ErrUnsupported)
 	}
 	if len(s.Fields) == 0 || len(s.Fields) > MaxSchemaFields {
@@ -164,8 +169,12 @@ func loadFixedSchema(ctx context.Context, data []byte, pin string) (*fixedSchema
 		if !schemaName(f.Name) || seen[f.Name] {
 			return nil, fmt.Errorf("%w: schema field name", ErrInvalid)
 		}
-		if scalarWidth(f.Type) == 0 {
-			return nil, fmt.Errorf("%w: non-scalar schema type %q", ErrUnsupported, f.Type)
+		if f.Type == "ArrayProperty" {
+			if s.Schema != FixedSchemaV2 || scalarWidth(f.InnerType) == 0 {
+				return nil, fmt.Errorf("%w: array serializer %q", ErrUnsupported, f.InnerType)
+			}
+		} else if scalarWidth(f.Type) == 0 || f.InnerType != "" {
+			return nil, fmt.Errorf("%w: unsupported schema type %q", ErrUnsupported, f.Type)
 		}
 		seen[f.Name] = true
 		if f.Name == PostProcessField {
@@ -181,9 +190,41 @@ func loadFixedSchema(ctx context.Context, data []byte, pin string) (*fixedSchema
 	return &s, nil
 }
 
+func validateScalar(p *Package, typ string, b []byte) error {
+	switch typ {
+	case "ByteProperty", "IntProperty", "UInt32Property", "FloatProperty", "Int64Property", "DoubleProperty":
+		return nil
+	case "BoolProperty":
+		if len(b) != 1 || b[0] > 1 {
+			return fmt.Errorf("%w: property boolean", ErrInvalid)
+		}
+	case "ObjectProperty", "ClassProperty":
+		if len(b) != 4 {
+			return fmt.Errorf("%w: property object width", ErrInvalid)
+		}
+		v := int32(binary.LittleEndian.Uint32(b))
+		if int64(v) < -int64(len(p.Imports)) || int64(v) > int64(len(p.Exports)) {
+			return fmt.Errorf("%w: property object index", ErrInvalid)
+		}
+	case "NameProperty":
+		if len(b) != 8 {
+			return fmt.Errorf("%w: property name width", ErrInvalid)
+		}
+		n := FName{int32(binary.LittleEndian.Uint32(b)), int32(binary.LittleEndian.Uint32(b[4:]))}
+		if _, e := p.ResolveName(n); e != nil {
+			return e
+		}
+	default:
+		return fmt.Errorf("%w: scalar serializer %q", ErrUnsupported, typ)
+	}
+	return nil
+}
+
 // Parse only a complete unversioned property prefix using a hash-pinned external
-// scalar schema. The schema is NOT discovered from values or the recipe offset.
-// Variable-size/custom serializers are unsupported, even if their fields are absent.
+// externally reviewed schema. V1 accepts only scalar fields. V2 additionally
+// accepts ArrayProperty with a fixed-width scalar inner type; all other
+// variable-size/custom serializers remain unsupported. The schema is NOT
+// discovered from values or the recipe offset.
 // After the prefix: native export data, GUID/bulkdata etc. remain opaque and unmoved.
 func readFixedProperties(ctx context.Context, p *Package, x []byte, ex Export, s *fixedSchema) (*propertyPrefix, error) {
 	if p.Summary.Flags&0x2000 == 0 || ex.ObjectFlags&0x10 != 0 {
@@ -264,29 +305,50 @@ func readFixedProperties(ctx context.Context, p *Package, x []byte, ex Export, s
 	}
 	r := &propertyPrefix{}
 	found := false
-	validRef := func(v int32) bool { return int64(v) >= -int64(len(p.Imports)) && int64(v) <= int64(len(p.Exports)) }
 	for _, q := range slots {
 		f := s.Fields[q.index]
-		v := propertySpan{Name: f.Name, Type: f.Type, SchemaIndex: q.index, Span: Span{pos, 0}}
+		v := propertySpan{Name: f.Name, Type: f.Type, InnerType: f.InnerType, SchemaIndex: q.index, Span: Span{pos, 0}}
 		v.Zero = q.bit >= 0 && mask[q.bit/8]&(1<<uint(q.bit%8)) != 0
 		if !v.Zero {
-			v.Size = scalarWidth(f.Type)
-			b, e := take(v.Size)
-			if e != nil {
-				return nil, e
-			}
-			switch f.Type {
-			case "BoolProperty":
-				if b[0] > 1 {
-					return nil, fmt.Errorf("%w: property boolean", ErrInvalid)
+			if f.Type == "ArrayProperty" {
+				header, e := take(4)
+				if e != nil {
+					return nil, e
 				}
-			case "ObjectProperty", "ClassProperty":
-				if !validRef(int32(binary.LittleEndian.Uint32(b))) {
-					return nil, fmt.Errorf("%w: property object index", ErrInvalid)
+				count := int64(int32(binary.LittleEndian.Uint32(header)))
+				if count < 0 || count > MaxArrayElements {
+					return nil, fmt.Errorf("%w: array element count", ErrLimit)
 				}
-			case "NameProperty":
-				n := FName{int32(binary.LittleEndian.Uint32(b)), int32(binary.LittleEndian.Uint32(b[4:]))}
-				if _, e = p.ResolveName(n); e != nil {
+				width := scalarWidth(f.InnerType)
+				if width == 0 {
+					return nil, fmt.Errorf("%w: array serializer %q", ErrUnsupported, f.InnerType)
+				}
+				payload, e := take(int(count) * width)
+				if e != nil {
+					return nil, e
+				}
+				for i := 0; i < int(count); i++ {
+					if i&1023 == 0 {
+						if e := ctx.Err(); e != nil {
+							return nil, e
+						}
+					}
+					if e := validateScalar(p, f.InnerType, payload[i*width:(i+1)*width]); e != nil {
+						return nil, e
+					}
+				}
+				v.ElementCount = int(count)
+				v.Size = 4 + len(payload)
+			} else {
+				v.Size = scalarWidth(f.Type)
+				if v.Size == 0 {
+					return nil, fmt.Errorf("%w: scalar serializer %q", ErrUnsupported, f.Type)
+				}
+				b, e := take(v.Size)
+				if e != nil {
+					return nil, e
+				}
+				if e := validateScalar(p, f.Type, b); e != nil {
 					return nil, e
 				}
 			}

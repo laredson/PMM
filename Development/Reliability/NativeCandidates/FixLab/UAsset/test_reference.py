@@ -11,12 +11,12 @@ HERE=Path(__file__).resolve().parent
 spec=importlib.util.spec_from_file_location('synthetic',HERE/'testdata/make_fixtures.py')
 synthetic=importlib.util.module_from_spec(spec);spec.loader.exec_module(synthetic)
 class ReferenceTests(unittest.TestCase):
-    def setUp(self):self.v=json.loads((HERE/'testdata/vectors.json').read_text())[0];self.b=bytearray(base64.b64decode(self.v['header']));self.data=base64.b64decode(self.v['data'])
+    def setUp(self):self.v=json.loads((HERE/'testdata/vectors.json').read_text(encoding='utf-8'))[0];self.b=bytearray(base64.b64decode(self.v['header']));self.data=base64.b64decode(self.v['data'])
     def test_frozen_vectors_reproduce(self):
-        frozen=json.loads((HERE/'testdata/vectors.json').read_text())
+        frozen=json.loads((HERE/'testdata/vectors.json').read_text(encoding='utf-8'))
         self.assertEqual(frozen,[synthetic.make(v['id']) for v in frozen])
     def test_expected_names_and_offsets(self):
-        for v in json.loads((HERE/'testdata/vectors.json').read_text()):
+        for v in json.loads((HERE/'testdata/vectors.json').read_text(encoding='utf-8')):
             p=ref.inspect(base64.b64decode(v['header']),base64.b64decode(v['data']))
             self.assertEqual([n['text'] for n in p['names']],v['expected']['names']);self.assertEqual(p['summaryEnd'],v['expected']['summaryEnd']);self.assertEqual(p['headerSha256'],v['expected']['headerSha256'])
     def test_truncated_input(self):

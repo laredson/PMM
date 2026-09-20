@@ -71,7 +71,9 @@ No se cambia ningun pin de receta o inventario productivo.
 ## Perfil, errores y memoria
 
 Solo UAsset cooked-ue4-522-ue5-1008; unversioned necesita afirmacion explicita.
-Solo nombres del mismo ancho y postProcess escalar ya admitido. Arrays, serializers
+Solo nombres del mismo ancho y postProcess escalar ya admitido. El schema V2 puede
+recorrer arrays de escalares de ancho fijo anteriores/posteriores al objetivo, sin
+editarlos ni redimensionarlos. Struct/map/set/string, arrays anidados, serializers
 complejos, cambio de layout y familias/soporte con .ubulk/.uptnl son UNSUPPORTED.
 Regiones opacas se conservan en la misma posicion; eso NO prueba semantica correcta.
 Ninguna proteccion de UAsset, PMMDLT1, PAKV11 o captura anterior se elimina.
@@ -96,14 +98,16 @@ TransformReady/BuildReady/Validated/Installed, CoreR1Complete, SchemaSemanticsVe
 y ReviewerAuthenticated SIGUEN FALSE. No se modifican los reportes anteriores:
 sus bloqueos son evidencia historica de cada etapa, no se borran retrospectivamente.
 
-Pruebas SOLO con datos artificiales. Tres escenarios: cada uno tiene 3 familias,
-2 postProcess, 4 archivos de soporte y 10 outputs. Un generador Python independiente
-especifica los bytes antes/despues; otro lector Python comprueba todos los outputs
-y el PAK. No hay aceptacion Unreal, esquema de SkeletalMesh real o PAK de juego.
+Pruebas SOLO con datos artificiales. Cuatro escenarios: cada uno tiene 3 familias,
+2 postProcess, 4 archivos de soporte y 10 outputs. El cuarto coloca un array
+IntProperty delante del objetivo. Un generador Python independiente especifica
+los bytes antes/despues; otro lector Python comprueba todos los outputs y el PAK.
+No hay aceptacion Unreal, esquema de SkeletalMesh real o PAK de juego.
 
-## Proximo bloque
+## Frontera actual
 
-Guardar el MemoryResult de forma transaccional en una carpeta candidata aislada,
-con manifiesto, cancelacion/errores/rollback en fixtures. No instalarlo en el juego.
-La semantica/revision real, relocalizacion variable, V2/CLI y aceptacion del motor
-completo siguen siendo trabajos distintos. La siguiente tanda es 04A-6B.
+PublishCandidate, job V2 y CLI candidato-only ya existen en 04A-6B/6D. 04A-6E
+agrega solo el recorrido acotado de arrays escalares. Lo siguiente es obtener y
+pinnear una fuente de schema real o implementar otro serializer estrecho con
+evidencia primaria. Semantica/revision real, relocalizacion variable y aceptacion
+del motor completo siguen siendo trabajos distintos. No instalar en el juego.

@@ -60,7 +60,10 @@ InspectCandidate; encontrarlos dentro del propio bundle no autentica su origen.
 ## Limites pendientes
 
 Este cierre implementa versionado/orquestacion y una frontera CLI, no completa el
-motor historico V2. Siguen bloqueados schemas/serializers reales, relocalizacion
-variable/bulk, autenticacion de reviewer/build, aceptacion Unreal/Palworld,
-instalacion, rollback de mods, UI final, firma y distribucion. Los fixtures son
-artificiales. No conectar este CLI al PMM distribuido como reemplazo de FixLab.
+motor historico V2. 04A-6E permite atravesar un ArrayProperty solo cuando su
+innerType es un escalar de ancho fijo; no lo edita, redimensiona ni relocaliza.
+Siguen bloqueados una fuente de schema real autenticada, serializers variables y
+containers complejos, relocalizacion/bulk, autenticacion de reviewer/build,
+aceptacion Unreal/Palworld, instalacion, rollback de mods, UI final, firma y
+distribucion. Los fixtures son artificiales. No conectar este CLI al PMM
+distribuido como reemplazo de FixLab.

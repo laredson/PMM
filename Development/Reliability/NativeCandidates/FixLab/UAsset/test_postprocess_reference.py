@@ -21,9 +21,15 @@ def packet(v):
 
 class PostProcessReferenceTests(unittest.TestCase):
     def test_vectors_reproduce(self):
-        self.assertEqual(json.loads(Path(__file__).with_name('testdata').joinpath('postprocess-vectors.json').read_text()),encoded_cases())
-    def test_all_seven(self):
+        self.assertEqual(json.loads(Path(__file__).with_name('testdata').joinpath('postprocess-vectors.json').read_text(encoding='utf-8')),encoded_cases())
+    def test_all_eight(self):
         for v in all_cases():self.assertTrue(verify(packet(v))['allBytesCompared'])
+    def test_array_count_and_inner_type_rejected(self):
+        v=make_case('array');s=json.loads(base64.b64decode(v['request']['schema']))
+        p=packet(v);x=bytearray(base64.b64decode(p['Input']['Data']));x[8:12]=(-1).to_bytes(4,'little',signed=True);p['Input']['Data']=b64(x);p['Input']['Request']['exportSha256']=sha(x)
+        with self.assertRaisesRegex(ValueError,'array count'):verify(p)
+        v=make_case('array');s=json.loads(base64.b64decode(v['request']['schema']));p=packet(v);s['fields'][0]['innerType']='StructProperty';b=jsonb(s);p['Input']['Request'].update(schema=b64(b),schemaSha256=sha(b))
+        with self.assertRaisesRegex(ValueError,'array serializer'):verify(p)
     def test_tamper_outside_edit(self):
         p=packet(make_case());x=bytearray(base64.b64decode(p['ResultData']));x[-1]^=1;p['ResultData']=b64(x)
         with self.assertRaisesRegex(ValueError,'unexpected changed'):verify(p)

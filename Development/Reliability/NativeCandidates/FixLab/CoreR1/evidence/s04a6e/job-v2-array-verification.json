@@ -1,0 +1,29 @@
+{
+  "schema": "PMM_R1_CANDIDATE_JOB_ARRAY_VERIFICATION_V1",
+  "export": {
+    "jobSHA256": "3531135915321dfbfe1b7353b1e74581c8edf7d494e8942de5230bd1feea0528",
+    "state": "CANDIDATE_PUBLISHED_NOT_GAME_ACCEPTED",
+    "candidateName": "PMM-candidate-b55722022d3d8b479389ded37af8405b",
+    "manifestSHA256": "86b5e5558e32824b984c0bd6c2ade3c119578eedd86944b736348c2320e62217"
+  },
+  "finalCLI": {
+    "jobSHA256": "2d7e996f15ff02c70b32f4a94fab234538a6803f68134fad1ec9535316752774",
+    "jobBytes": 2960,
+    "state": "CANDIDATE_PUBLISHED_NOT_GAME_ACCEPTED",
+    "candidateName": "PMM-candidate-eef09e699ee7f43504c197a293efd3b8",
+    "manifestSHA256": "aab979797856c7c4ddddea5654455e29dc5bd1c1a3e3e16a99ccaa4783e092b2",
+    "pakSHA256": "20e7558c624aadd9efc5859050da65ae71b5f455ea3b106bead3e9f41310f179",
+    "candidateCountBefore": 2,
+    "candidateCountAfter": 3,
+    "successExit": 0,
+    "wrongPinExit": 3,
+    "wrongPinCode": "PIN",
+    "usageExit": 2
+  },
+  "outputEntriesCompared": 10,
+  "executionFixture": "array",
+  "candidateOnly": true,
+  "gameAccepted": false,
+  "installed": false,
+  "realAssetsUsed": false
+}

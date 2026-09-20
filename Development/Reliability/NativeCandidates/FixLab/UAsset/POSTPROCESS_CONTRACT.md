@@ -24,9 +24,11 @@ Es una diferencia deliberada, no equivalencia demostrada con el motor historico.
 ## Esquema: frontera de confianza, no deteccion automatica
 
 Es obligatorio aportar bytes JSON y SHA-256 esperado de un esquema externo
-revisado `PMM_FIXED_UNVERSIONED_SCHEMA_V1`, perfil cooked-ue4-522-ue5-1008,
-clase `/Script/Engine.SkeletalMesh`, lista ordenada de campos aplanados, nombres
-unicos y tipos escalares soportados. Esta lista incluye indices heredados.
+revisado. `PMM_FIXED_UNVERSIONED_SCHEMA_V1` admite campos escalares;
+`PMM_FIXED_UNVERSIONED_SCHEMA_V2` agrega solo `ArrayProperty` con `innerType`
+escalar de ancho fijo. Ambos usan perfil cooked-ue4-522-ue5-1008, clase
+`/Script/Engine.SkeletalMesh`, lista ordenada de campos aplanados y nombres unicos.
+Esta lista incluye indices heredados.
 NO se obtiene el esquema de los propios valores ni del numero 120 de la receta.
 NO se lee .usmap en esta entrega. Un hash comprueba identidad, no legitimidad:
 el caller es responsable de autenticar/proveer schema, inputs y resultados esperados.
@@ -38,16 +40,20 @@ la lista presente, incluido lo que viene DESPUES del campo objetivo. Zero-mask
 sin valor fisico/propiedad omitida no puede usarse para esta transformacion.
 Padding de mask distinto de cero no esta admitido por este perfil acotado.
 
-Tipos: Bool/Byte (1), Int/UInt32/Float/Object/Class (4), Int64/Double/Name (8).
-Bool, FName y FPackageIndex se validan. Arrays, estructuras, mapas, strings,
+Tipos escalares: Bool/Byte (1), Int/UInt32/Float/Object/Class (4),
+Int64/Double/Name (8). Bool, FName y FPackageIndex se validan. Un array V2 es
+`int32 count` seguido por `count` elementos del tipo escalar declarado; count debe
+ser 0..1.048.576 y todo el payload debe caber dentro del export. Tambien se validan
+los elementos Bool/FName/FPackageIndex. El array solo se recorre: no se edita ni
+se cambia su longitud. Structs, mapas, sets, strings, arrays anidados,
 serializadores especiales y tagged properties son UNSUPPORTED. El contrato exige
 un esquema completo, pero su completitud no se demuestra a partir de los bytes.
 La API no admite skipBytes, un offset forzado ni flags que eliminen sus controles. JSON nulo, claves duplicadas/alternativas
 con mayusculas, miembros desconocidos y contenido sobrante se rechazan.
 
-No existe un esquema real de SkeletalMesh validado aqui. Los siete esquemas de
+No existe un esquema real de SkeletalMesh validado aqui. Los ocho esquemas de
 fixtures son ARTIFICIALES. No anunciarlos como schemas Palworld ni reducir uno
-real a escalares para que pase. La receta actual por si sola es insuficiente para
+real a los serializers admitidos para que pase. La receta actual por si sola es insuficiente para
 invocar esta API: no aporta schemas ni los hashes de cada familia antes/despues.
 
 ## Identidad y coordenadas
@@ -83,15 +89,17 @@ ni plazos absolutos de SO declarados. No afirma validez semantica de native tail
 
 ## Pruebas y alcance de la evidencia
 
-56 tests Go: 39 anteriores +17 nuevos, incluidos tres exports opt-in. 31 Python:
-20 anteriores +11 nuevos. Siete transformaciones sinteticas contrastadas byte a
-byte con resultados esperados y lector Python independiente. Se mantienen las
-6 lecturas y 12 reescrituras previas. Race Linux y fuzz acotado del nuevo camino.
+6E ejecuta 63 tests Go top-level, incluidos tres exports opt-in, y 32 Python.
+Ocho transformaciones sinteticas se contrastan byte a byte con resultados
+esperados y lector Python independiente; la octava es ArrayProperty<IntProperty>.
+Se mantienen las 6 lecturas y 12 reescrituras previas. Los cuatro corpus semilla
+fuzz pasan; race no se repitio en esta tanda por ausencia de compilador C.
 El corpus de fixtures se guarda comprimido SOLO para evitar duplicar sus bytes;
 se comprueba el hash de los datos decodificados antes de leerlo en los tests.
 No es un empaquetado/ofuscacion del programa ni un mecanismo antivirus.
 
-Hay pruebas de offsets equivocados, schema falso/incompleto, cambios fuera del
+Hay pruebas de offsets equivocados, schema falso/incompleto, arrays truncados o
+con contador/tipo interno invalido, cambios fuera del
 campo, coincidencias opacas, grupos compartidos, referencias duplicadas, hashes,
 zero masks, truncaciones, cancelacion y rechazo de replay. Ninguna prueba usa
 assets propietarios. Ni Unreal, Windows ni PMMFixLab original se ejecutaron.
@@ -101,10 +109,13 @@ assets propietarios. Ni Unreal, Windows ni PMMFixLab original se ejecutaron.
 UAssetAPI fijado a commit 3228c1e86261aa08131f7ec0ff1a395f5d0b2a84:
 - UAssetAPI/Unversioned/FFragment.cs
 - UAssetAPI/Unversioned/FUnversionedHeader.cs
+- UAssetAPI/Unversioned/Usmap.cs
 - UAssetAPI/ExportTypes/NormalExport.cs
 - UAssetAPI/PropertyTypes/Objects/ObjectPropertyData.cs
+- UAssetAPI/PropertyTypes/Objects/ArrayPropertyData.cs
 
 Se consultaron como referencia de formato; no se compilo la biblioteca ni se
 copio su implementacion. Epic documenta USkeletalMesh.PostProcessAnimBlueprint
 como TSubclassOf<UAnimInstance>, y FBulkData expone offsets internos. Eso no
-especifica un esquema 522/1008 para un mesh concreto. Ver evidence/s04a4c/static-origin.json.
+especifica un esquema 522/1008 para un mesh concreto. Ver
+evidence/s04a4c/static-origin.json y evidence/s04a6e/independent-array.json.

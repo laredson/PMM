@@ -1,4 +1,4 @@
-# Retomar - I02 arranca, 04A-6D Win10 validado
+# Retomar - I02 funciona, 04A-6E arrays escalares V2
 
 Punto de entrada obligatorio: `START_HERE_NEW_PROJECT.md`.
 
@@ -9,7 +9,8 @@ ZIP de chats anteriores antes de leer `NEW_PROJECT_HANDOFF.md`,
 ## Estado inmediato
 
 La rama contiene toda la fuente, research, builders, contratos y evidencias hasta
-04A-6D (job V2/CLI candidato-only y commit Windows estable; matriz parcial).
+04A-6E (arrays escalares V2 recorribles, job V2/CLI candidato-only y commit
+Windows estable; schemas reales y matriz entre entornos aun parciales).
 SESSION_I01B reconstruyo localmente e integro los DOS EXE I01 junto con
 sus tres metadatos. La limitacion de transferencia anterior esta cerrada.
 
@@ -26,7 +27,7 @@ I02 integrado:
 1. Comprobar rama, HEAD y `git status`. No pisar trabajo local del usuario.
 2. Confirmar que `PMM/Resources/Metadata/BUILD_ID.txt` identifica I02 y que el
    arbol PMM coincide con `9ef22d5815943ce50413dfa7e09b474b06a22860`.
-3. Conservar el resultado ya recibido: I02 arranca y funciona a nivel basico.
+3. Conservar el resultado ya recibido: I02 parece funcionar bien.
 4. Recoger/priorizar el resto del feedback antes de otra integracion grande:
    UI detallada, cierre, segundo inicio, tiempos y logs si falla.
 5. Registrar el resultado sin convertir una compilacion correcta en aceptacion
@@ -34,16 +35,20 @@ I02 integrado:
 
 ## Siguiente bloque
 
-El propietario autorizo continuar el laboratorio mientras prueba I02. 04A-6D ya
-implemento job V2/CLI candidato-only y sustituyo el rename Windows inestable por
-commit de marcador; NO repetir. Leer SESSION04A6D_FINDINGS/CHECKS,
-JOB_V2_CONTRACT e INTEGRATION_CONTRACT. Lo siguiente es ampliar semantica real
-acotada y completar matriz cuando haya otros entornos. No afirmar paridad completa
-ni sustituir FixLab por este harness/CLI.
+El propietario autorizo continuar el laboratorio mientras prueba I02. 04A-6E ya
+agrega `PMM_FIXED_UNVERSIONED_SCHEMA_V2` para recorrer exclusivamente
+`ArrayProperty` de escalares de ancho fijo, sin editarlos. Tambien conserva el job
+V2/CLI candidato-only y el commit Windows por marcador de 6D; NO repetir. Leer
+SESSION04A6E_FINDINGS/CHECKS, POSTPROCESS_CONTRACT, JOB_V2_CONTRACT e
+INTEGRATION_CONTRACT. Lo siguiente es fijar una fuente de schema real o agregar
+otro serializer estrecho con evidencia primaria. No afirmar paridad completa ni
+sustituir FixLab por este harness/CLI.
 
 - Corregir regresiones y medir/optimizar startup sin quitar verificaciones a ciegas.
-- Completar matriz pendiente de 6D; Win10 NTFS ya tiene evidencia real amplia.
-- Completar schemas/serializers/relocalizacion y V2 completo antes de sustituir FixLab.
+- Completar matriz pendiente; Win10 NTFS ya tiene evidencia real amplia.
+- Obtener `.usmap`/schema real pinneado y revisado, o implementar otro serializer
+  acotado; structs/maps/sets/strings/nested arrays siguen bloqueados.
+- Completar relocalizacion y V2 completo antes de sustituir FixLab.
 - Cerrar Host/Runtime gates restantes.
 - Integrar idiomas mas adelante segun TRANSLATION_INTEGRATION.md.
 - Packaging/firma/preflight al final; no prometer Nexus verde.

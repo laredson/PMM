@@ -32,19 +32,21 @@ Contexto inmediato: todo el research/codigo esta en Git. La limitacion anterior 
 
 Esta rama SI puede quedar temporalmente rota: es una rama experimental para que el propietario pruebe cambios reales mediante GitHub Desktop. Mantener `Development/Reliability/NativeCandidates/` como laboratorio/historial, pero integrar en `PMM/` los bloques suficientemente cerrados.
 
-I02 ya arranca y funciona a nivel basico. Recoger cierre, segundo arranque, UI detallada y tiempos. No acumular otra integracion grande antes de revisar ese feedback.
+I02 parece funcionar bien segun el propietario. Recoger cierre, segundo arranque, UI detallada y tiempos. No acumular otra integracion grande antes de revisar ese feedback.
 
-04A-6D ya implemento job V2/CLI candidato-only y commit Windows por marcador;
-leer sus FINDINGS/CHECKS y contratos. La matriz sigue parcial (Win10 NTFS probado,
-Win11/SMB/disco lleno real/AV/race pendientes). Continuar semantica real acotada
-sin sustituir FixLab ni acumular integraciones PMM.
+04A-6E ya implemento recorrido V2 de ArrayProperty con innerType escalar fijo,
+sin mutar arrays, y lo probo de UAsset a job/CLI candidato-only. Leer sus
+FINDINGS/CHECKS y contratos. Struct/map/set/string/nested arrays, schema real y
+relocalizacion siguen pendientes. La matriz sigue parcial (Win10 NTFS probado,
+Win11/SMB/disco lleno real/AV/race pendientes). Continuar con una fuente de schema
+real pinneada u otro serializer acotado, sin sustituir FixLab ni integrar aun PMM.
 No crear PR/tag/release ni ejecutar Actions. Commits con `[skip ci]`.
 No desactivar antivirus ni pedir exclusiones.
 
 Antes de responderme que falta contexto, demuestra que has leido el handoff y resume:
 - que Host/Runtime I01 estan integrados y FixLab sigue siendo el original;
 - hashes Host/Runtime I01;
-- que hacen 04A-6B/6C/6D y los limites de las pruebas Windows;
+- que hacen 04A-6B/6C/6D/6E y los limites de las pruebas Windows;
 - cual es la siguiente prueba Windows;
 - que queda pendiente para FixLab;
 - como se integraran los idiomas.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent verifier of the three OWN synthetic execution exports.
+"""Independent verifier of the four OWN synthetic execution exports.
 Reads bytes/metadata only. Does not use the Go executor or run any game tools.
 The fixed byte edits come from the authored fixture specification, not the output.
 """
@@ -111,7 +111,7 @@ def check(directory):
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('directory',type=Path);args=parser.parse_args()
     try:
-        result=[check(args.directory / k) for k in ('basic','masked','decoy')]
+        result=[check(args.directory / k) for k in ('basic','masked','decoy','array')]
         print(json.dumps({'schema':'PMM_R1_EXECUTION_INDEPENDENT_V1','fixtures':result,'method':'Authored Python byte edits plus independent PAK reader; not engine acceptance'},indent=2));return 0
     except (OSError,ValueError,KeyError,TypeError,StopIteration) as exc:
         print('Verification failed: '+str(exc),file=sys.stderr);return 2

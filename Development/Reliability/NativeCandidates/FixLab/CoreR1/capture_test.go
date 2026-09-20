@@ -57,7 +57,7 @@ func captureFixture(t *testing.T, withSchema bool) (CaptureRequest, map[string][
 	out := CaptureRequest{Plan: q, Roots: roots, DonorArchive: donor, CurrentProviderSet: set}
 	if withSchema {
 		s := claimFor(q, r, d, c)
-		lay := pinned(scalarLayout{"PMM_FIXED_UNVERSIONED_SCHEMA_V1", s.Profile, s.ClassPath, []scalarLayoutField{{"Prefix", "IntProperty"}, {"PostProcessAnimBlueprint", "ClassProperty"}}})
+		lay := pinned(scalarLayout{"PMM_FIXED_UNVERSIONED_SCHEMA_V1", s.Profile, s.ClassPath, []scalarLayoutField{{"Prefix", "IntProperty", ""}, {"PostProcessAnimBlueprint", "ClassProperty", ""}}})
 		s.LayoutSHA256 = lay.SHA256
 		rev := pinned(SchemaReview{"PMM_R1_SCHEMA_REVIEW_V1", s.RecipeSHA256, s.DonorHeaderSHA256, s.DonorExportSHA256, s.CurrentProviderSHA256, s.LayoutSHA256, s.Profile, s.ClassPath, s.Origin, s.Revision, "synthetic reviewer", "fixture-only, NOT semantic validation", []string{"Artificial layout; not a game schema"}})
 		s.ReviewRecordSHA256 = rev.SHA256
@@ -326,6 +326,39 @@ func TestCaptureDossierStrictLayout(t *testing.T) {
 		})
 	}
 }
+func TestCaptureDossierV2ScalarArray(t *testing.T) {
+	q, _ := captureFixture(t, true)
+	layout := scalarLayout{"PMM_FIXED_UNVERSIONED_SCHEMA_V2", "cooked-ue4-522-ue5-1008", "/Script/Engine.SkeletalMesh", []scalarLayoutField{{"ScalarValues", "ArrayProperty", "IntProperty"}, {"PostProcessAnimBlueprint", "ClassProperty", ""}}}
+	layoutBytes := pinned(layout).Data
+	var review SchemaReview
+	reviewBytes, e := os.ReadFile(filepath.Join(q.Roots.Schemas, "review.json"))
+	if e != nil {
+		t.Fatal(e)
+	}
+	if e = json.Unmarshal(reviewBytes, &review); e != nil {
+		t.Fatal(e)
+	}
+	review.LayoutSHA256 = hash(layoutBytes)
+	repinDossier(t, &q, layoutBytes, pinned(review).Data)
+	got := mustCapture(t, q)
+	report := report(t, got)
+	if len(report.Dossiers) != 1 || !report.Dossiers[0].BytesVerified || !report.Dossiers[0].BindingsChecked || report.Dossiers[0].FieldCount != 2 || report.Dossiers[0].LayoutSemanticsVerified {
+		t.Fatal(report.Dossiers)
+	}
+}
+func TestCaptureDossierV2RejectsInvalidArrayShape(t *testing.T) {
+	for _, inner := range []string{"", "StructProperty", "ArrayProperty"} {
+		q, _ := captureFixture(t, true)
+		layout := scalarLayout{"PMM_FIXED_UNVERSIONED_SCHEMA_V2", "cooked-ue4-522-ue5-1008", "/Script/Engine.SkeletalMesh", []scalarLayoutField{{"Values", "ArrayProperty", inner}, {"PostProcessAnimBlueprint", "ClassProperty", ""}}}
+		layoutBytes := pinned(layout).Data
+		var review SchemaReview
+		reviewBytes, _ := os.ReadFile(filepath.Join(q.Roots.Schemas, "review.json"))
+		json.Unmarshal(reviewBytes, &review)
+		review.LayoutSHA256 = hash(layoutBytes)
+		repinDossier(t, &q, layoutBytes, pinned(review).Data)
+		captureError(t, q)
+	}
+}
 func TestCaptureDossierReviewBindings(t *testing.T) {
 	for _, mode := range []string{"recipe", "provider", "layout", "revision", "reviewer", "unknown", "findings"} {
 		t.Run(mode, func(t *testing.T) {
@@ -479,7 +512,7 @@ func TestCaptureFixtureExport(t *testing.T) {
 	}
 }
 func FuzzDossierDocuments(f *testing.F) {
-	layout := pinned(scalarLayout{"PMM_FIXED_UNVERSIONED_SCHEMA_V1", "cooked-ue4-522-ue5-1008", "/Script/Engine.SkeletalMesh", []scalarLayoutField{{"PostProcessAnimBlueprint", "ClassProperty"}}})
+	layout := pinned(scalarLayout{"PMM_FIXED_UNVERSIONED_SCHEMA_V1", "cooked-ue4-522-ue5-1008", "/Script/Engine.SkeletalMesh", []scalarLayoutField{{"PostProcessAnimBlueprint", "ClassProperty", ""}}})
 	s := SchemaClaim{Schema: "PMM_R1_SCHEMA_PROVENANCE_V1", RecipeSHA256: hash([]byte("recipe")), DonorUasset: "D/Body.uasset", DonorHeaderSHA256: hash([]byte("header")), DonorExportSHA256: hash([]byte("export")), CurrentProviderSHA256: hash([]byte("provider")), Profile: "cooked-ue4-522-ue5-1008", ClassPath: "/Script/Engine.SkeletalMesh", LayoutSHA256: layout.SHA256, Origin: "synthetic", Revision: "1"}
 	review := pinned(SchemaReview{"PMM_R1_SCHEMA_REVIEW_V1", s.RecipeSHA256, s.DonorHeaderSHA256, s.DonorExportSHA256, s.CurrentProviderSHA256, s.LayoutSHA256, s.Profile, s.ClassPath, s.Origin, s.Revision, "fixture", "fixture", []string{"not game evidence"}})
 	f.Add(layout.Data, review.Data)

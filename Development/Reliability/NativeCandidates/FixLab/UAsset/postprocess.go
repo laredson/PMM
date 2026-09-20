@@ -158,9 +158,10 @@ func checkedPreload(ctx context.Context, p *Package, req PostProcessRequest, sta
 // import. It does NOT put safeClass into the serialized property.
 //
 // Frozen input/output SHA-256 pins and a pinned, externally reviewed flattened
-// scalar schema are MANDATORY. Unversioned header fragments derive the property's
+// schema are MANDATORY. V2 may contain bounded ArrayProperty values whose inner
+// serializer is fixed-width scalar. Unversioned fragments derive the property's
 // offset; ExpectedSerializedOffset is a CHECK, never an instruction to seek/write.
-// Real SkeletalMesh schemas with arrays/structs/custom serialization are currently
+// Structs, maps, sets, strings, nested arrays and custom serializers remain
 // UNSUPPORTED. There is no assumed Gura layout or .usmap reader in this component.
 //
 // All inputs/plans must be immutable for this call. Outputs are private copies.

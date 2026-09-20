@@ -1,0 +1,102 @@
+{
+  "schema": "PMM_SESSION04A6E_CHECKS_V1",
+  "date": "2026-09-20",
+  "inputCommit": "4763e6834c9a797b3fece6b6b0517b65f2881b2a",
+  "inputUAssetTree": "5c718b7ef23cd84a1844608dae13438dc4752530",
+  "inputCoreR1Tree": "dbfd1995e545b4dd612e7cc72b706e7d0188bed7",
+  "scopeStatus": "FIXED_WIDTH_SCALAR_ARRAY_TRAVERSAL_IMPLEMENTED; SYNTHETIC_END_TO_END_VALIDATED; REAL_SCHEMA_ACCEPTANCE_PENDING",
+  "evidenceDirectories": [
+    "NativeCandidates/FixLab/UAsset/evidence/s04a6e",
+    "NativeCandidates/FixLab/CoreR1/evidence/s04a6e"
+  ],
+  "implementation": {
+    "schema": "PMM_FIXED_UNVERSIONED_SCHEMA_V2",
+    "supportedContainer": "ArrayProperty",
+    "supportedInner": "fixed-width scalar only",
+    "maxElements": 1048576,
+    "arrayMutationAllowed": false,
+    "variableRelocationAllowed": false,
+    "realUsmapParsed": false,
+    "realSchemaAuthenticated": false
+  },
+  "tests": {
+    "uassetGoPassEventsIncludingPackage": 120,
+    "uassetGoTopLevelPassed": 63,
+    "uassetGoSkipped": 0,
+    "uassetPythonPassed": 32,
+    "uassetIndependentVerifiersPassed": 3,
+    "coreGoPassEventsIncludingPackage": 322,
+    "coreGoTopLevelPassed": 154,
+    "coreGoSkipped": 2,
+    "corePythonPassed": 54,
+    "corePythonSkipped": 2,
+    "coreIndependentVerifiersPassed": 6,
+    "fuzzSeedTargetsPassed": 8,
+    "randomFuzzing": false,
+    "windowsHarnessFullSuiteCountEach": 3
+  },
+  "build": {
+    "uassetHarnessSHA256": "4acd771d44c639cd9bf7639ae0ac89a2807e8215fa823fa8c048eb05dbdcc6fa",
+    "uassetHarnessBytes": 5898240,
+    "coreHarnessSHA256": "225693032eef2c7275e2ad2ce43c5986004d5af2cd4f3368c4c5742e8dccd3dd",
+    "coreHarnessBytes": 6879232,
+    "candidateCLISHA256": "02d4716ab7da5f37ff70406eda22f2eccb70303bf5fdcd78140e068920243d31",
+    "candidateCLIBytes": 4360704,
+    "repeatByteIdentical": true,
+    "windowsExecuted": true,
+    "linuxVet": "PASS_CROSS_TARGET",
+    "linuxCrossBuild": "PASS_NOT_EXECUTED",
+    "engineBuilt": false
+  },
+  "jobV2": {
+    "jobSHA256": "2d7e996f15ff02c70b32f4a94fab234538a6803f68134fad1ec9535316752774",
+    "jobBytes": 2960,
+    "executionFixture": "array",
+    "state": "CANDIDATE_PUBLISHED_NOT_GAME_ACCEPTED",
+    "candidateName": "PMM-candidate-eef09e699ee7f43504c197a293efd3b8",
+    "manifestSHA256": "aab979797856c7c4ddddea5654455e29dc5bd1c1a3e3e16a99ccaa4783e092b2",
+    "pakSHA256": "20e7558c624aadd9efc5859050da65ae71b5f455ea3b106bead3e9f41310f179",
+    "outputEntriesCompared": 10,
+    "candidateOnly": true,
+    "gameAccepted": false,
+    "installed": false,
+    "cliSuccessExit": 0,
+    "cliWrongPinExit": 3,
+    "cliWrongPinCode": "PIN",
+    "cliUsageExit": 2
+  },
+  "package": {
+    "buildId": "PMM-v1.5.0.1-reliability-i02",
+    "tree": "9ef22d5815943ce50413dfa7e09b474b06a22860",
+    "files": 629,
+    "checksumRows": 628,
+    "checksumMismatches": 0,
+    "changed": false,
+    "executedByAgent": false,
+    "ownerFunctionalReport": "appears to work well"
+  },
+  "protectedState": {
+    "gameDataUsed": false,
+    "gameExecuted": false,
+    "PMMChanged": false,
+    "fixLabOriginalChanged": false,
+    "antivirusPolicyChanged": false,
+    "privilegesEnabled": false,
+    "releaseCreated": false,
+    "workflowDispatched": false,
+    "pullRequestCreated": false
+  },
+  "notTested": [
+    "real .usmap or SkeletalMesh schema",
+    "Windows 11",
+    "remote SMB or ReFS",
+    "real disk full",
+    "power loss or hardware crash",
+    "instrumented antivirus interference",
+    "race detector because no C compiler is installed",
+    "random fuzzing",
+    "Linux execution after changes",
+    "real Unreal or Palworld repair"
+  ],
+  "next": "Obtain and pin a real schema source or add one further bounded serializer with primary evidence; retain candidate-only boundary and do not replace PMMFixLab.exe."
+}

@@ -73,4 +73,4 @@ def make(kind='basic'):
 
 if __name__=='__main__':
     path=Path(__file__).with_name('vectors.json')
-    path.write_text(json.dumps([make(k) for k in ('basic','unicode','unversioned','empty','opaque','multi')],indent=2)+'\n')
+    path.write_text(json.dumps([make(k) for k in ('basic','unicode','unversioned','empty','opaque','multi')],indent=2)+'\n',encoding='utf-8')

@@ -1,0 +1,24 @@
+{
+  "schema": "PMM_UASSET_SCALAR_ARRAY_INDEPENDENT_V1",
+  "fixtureCount": 8,
+  "arrayFixture": {
+    "schema": "PMM_FIXED_UNVERSIONED_SCHEMA_V2",
+    "innerType": "IntProperty",
+    "elementCount": 3,
+    "headerSHA256": "e1bd1c4e94b13fb21377ad9981de0f15cf34e4256bcf0becb4e401e1d19ae29c",
+    "exportSHA256": "d30487095c80b229c70c029417a61c81274fa69791a453ed4b3fde65bab5f640",
+    "propertyUexpOffset": 24,
+    "preloadHeaderOffset": 954,
+    "allBytesCompared": true
+  },
+  "unsafeShapesRejected": [
+    "negative count",
+    "count above 1048576",
+    "truncated payload",
+    "non-scalar innerType",
+    "ArrayProperty under V1"
+  ],
+  "syntheticOnly": true,
+  "gameAssetsRead": false,
+  "engineCompatibilityVerified": false
+}

@@ -120,6 +120,111 @@ func TestPostProcessExactlyTwoFixedWidthEdits(t *testing.T) {
 		}
 	}
 }
+func TestFixedPropertiesV2ScalarArray(t *testing.T) {
+	var v postVector
+	for _, candidate := range postVectors(t) {
+		if candidate.ID == "array" {
+			v = candidate
+		}
+	}
+	p, e := Read(context.Background(), v.Header, v.Data, options())
+	if e != nil {
+		t.Fatal(e)
+	}
+	s, e := loadFixedSchema(context.Background(), v.Request.Schema, v.Request.SchemaSHA256)
+	if e != nil {
+		t.Fatal(e)
+	}
+	r, e := readFixedProperties(context.Background(), p, v.Data, p.Exports[v.Request.ExportIndex], s)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if len(r.Fields) != 2 || r.Fields[0].Type != "ArrayProperty" || r.Fields[0].InnerType != "IntProperty" || r.Fields[0].ElementCount != 3 || r.Fields[0].Size != 16 || r.Target.Offset != v.Positions.Property || r.End != v.Positions.PrefixEnd {
+		t.Fatal(r)
+	}
+}
+func TestFixedPropertiesV2ArrayRejectsUnsafeShapes(t *testing.T) {
+	var base postVector
+	for _, candidate := range postVectors(t) {
+		if candidate.ID == "array" {
+			base = candidate
+		}
+	}
+	want := map[string]string{
+		"negative":         "array element count",
+		"oversized":        "array element count",
+		"truncated":        "truncated property prefix",
+		"non-scalar-inner": "array serializer",
+		"v1-array":         "array serializer",
+	}
+	for _, mode := range []string{"negative", "oversized", "truncated", "non-scalar-inner", "v1-array"} {
+		t.Run(mode, func(t *testing.T) {
+			v := base
+			v.Data = append([]byte{}, base.Data...)
+			var schema map[string]any
+			if e := json.Unmarshal(v.Request.Schema, &schema); e != nil {
+				t.Fatal(e)
+			}
+			switch mode {
+			case "negative":
+				binary.LittleEndian.PutUint32(v.Data[8:12], ^uint32(0))
+			case "oversized":
+				binary.LittleEndian.PutUint32(v.Data[8:12], MaxArrayElements+1)
+			case "truncated":
+				binary.LittleEndian.PutUint32(v.Data[8:12], 1000)
+			case "non-scalar-inner":
+				schema["fields"].([]any)[0].(map[string]any)["innerType"] = "StructProperty"
+			case "v1-array":
+				schema["schema"] = FixedSchemaV1
+			}
+			if mode == "non-scalar-inner" || mode == "v1-array" {
+				v.Request.Schema, _ = json.Marshal(schema)
+			}
+			repin(&v)
+			postReject(t, v, want[mode])
+		})
+	}
+}
+func TestFixedPropertiesV2ArrayElementValidation(t *testing.T) {
+	v := postVectors(t)[0]
+	p, e := Read(context.Background(), v.Header, v.Data, options())
+	if e != nil {
+		t.Fatal(e)
+	}
+	tests := []struct {
+		name, inner string
+		count       int32
+		payload     []byte
+		valid       bool
+	}{
+		{"empty", "IntProperty", 0, nil, true},
+		{"bool", "BoolProperty", 2, []byte{0, 1}, true},
+		{"bool-invalid", "BoolProperty", 1, []byte{2}, false},
+		{"object", "ObjectProperty", 2, append(binary.LittleEndian.AppendUint32(nil, 0xfffffffe), make([]byte, 4)...), true},
+		{"object-invalid", "ObjectProperty", 1, binary.LittleEndian.AppendUint32(nil, 1000), false},
+		{"name", "NameProperty", 1, append(binary.LittleEndian.AppendUint32(nil, 11), make([]byte, 4)...), true},
+		{"name-invalid", "NameProperty", 1, append(binary.LittleEndian.AppendUint32(nil, 1000), make([]byte, 4)...), false},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			b := binary.LittleEndian.AppendUint16(nil, uint16(2<<9|256))
+			b = binary.LittleEndian.AppendUint32(b, uint32(tc.count))
+			b = append(b, tc.payload...)
+			b = binary.LittleEndian.AppendUint32(b, 0xfffffffc)
+			ex := p.Exports[1]
+			ex.SerialOffset = int64(len(v.Header))
+			ex.SerialSize = int64(len(b))
+			s := &fixedSchema{Schema: FixedSchemaV2, Fields: []scalarField{{"Values", "ArrayProperty", tc.inner}, {PostProcessField, "ClassProperty", ""}}}
+			r, e := readFixedProperties(context.Background(), p, b, ex, s)
+			if tc.valid && (e != nil || r == nil || r.End != len(b)) {
+				t.Fatal(r, e)
+			}
+			if !tc.valid && (e == nil || r != nil) {
+				t.Fatal("invalid array element accepted", r)
+			}
+		})
+	}
+}
 func TestPostProcessDoesNotReplaceOpaqueDecoy(t *testing.T) {
 	v := postVectors(t)[6]
 	r, e := postCall(v)
@@ -390,9 +495,9 @@ func TestFixedPropertiesMaskWidths(t *testing.T) {
 		t.Run(fmt.Sprint(n), func(t *testing.T) {
 			s := &fixedSchema{}
 			for i := 0; i < n; i++ {
-				s.Fields = append(s.Fields, scalarField{fmt.Sprintf("Pad%d", i), "IntProperty"})
+				s.Fields = append(s.Fields, scalarField{fmt.Sprintf("Pad%d", i), "IntProperty", ""})
 			}
-			s.Fields[n-1] = scalarField{PostProcessField, "ClassProperty"}
+			s.Fields[n-1] = scalarField{PostProcessField, "ClassProperty", ""}
 			b := []byte{}
 			for i := 0; i < n; {
 				count := n - i
@@ -441,7 +546,7 @@ func TestFixedPropertiesMaskWidths(t *testing.T) {
 func TestFixedPropertiesInvalidFragmentsAndValues(t *testing.T) {
 	v := postVectors(t)[0]
 	p, _ := Read(context.Background(), v.Header, v.Data, options())
-	s := &fixedSchema{Fields: []scalarField{{PostProcessField, "ClassProperty"}}}
+	s := &fixedSchema{Fields: []scalarField{{PostProcessField, "ClassProperty", ""}}}
 	for _, b := range [][]byte{nil, {0}, {0, 0}, {127, 3}, {0, 5}, {128, 1}, {128, 3, 255}, {0, 3, 0, 0, 0, 128}, {128, 3, 1}} {
 		ex := p.Exports[1]
 		ex.SerialOffset = int64(len(v.Header))

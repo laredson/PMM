@@ -1,6 +1,6 @@
 """Independent Python check of SYNTHETIC postProcess packets; no game tools.
 This is a second implementation of the same documented, externally supplied
-scalar-schema assumptions. It is not Unreal/game compatibility evidence.
+bounded-schema assumptions. It is not Unreal/game compatibility evidence.
 """
 import base64
 import hashlib
@@ -41,6 +41,8 @@ def import_identity(header, meta, index):
 
 def property_offset(data, start, size, schema):
     end=start+size;pos=start;logical=0;slots=[];mask_bits=0
+    version=schema.get('schema')
+    if version not in ('PMM_FIXED_UNVERSIONED_SCHEMA_V1','PMM_FIXED_UNVERSIONED_SCHEMA_V2'):raise ValueError('schema version')
     if size<2 or start<0 or end>len(data):raise ValueError('export range')
     for _ in range(1024):
         if pos+2>end: raise ValueError('truncated fragment')
@@ -60,12 +62,22 @@ def property_offset(data, start, size, schema):
     widths={'BoolProperty':1,'ByteProperty':1,'IntProperty':4,'UInt32Property':4,'FloatProperty':4,'Int64Property':8,'DoubleProperty':8,'NameProperty':8,'ObjectProperty':4,'ClassProperty':4}
     targets=[]
     for index,bit in slots:
-        f=schema['fields'][index];w=widths[f['type']]
+        f=schema['fields'][index];typ=f['type']
         zero=bit is not None and (mask>>bit)&1
         if f['name']=='PostProcessAnimBlueprint':
-            if f['type']!='ClassProperty' or zero:raise ValueError('target not explicit class reference')
+            if typ!='ClassProperty' or zero:raise ValueError('target not explicit class reference')
             targets.append((pos,index))
-        if not zero:pos+=w
+        if not zero:
+            if typ=='ArrayProperty':
+                inner=f.get('innerType')
+                if version!='PMM_FIXED_UNVERSIONED_SCHEMA_V2' or inner not in widths:raise ValueError('unsupported array serializer')
+                if pos+4>end:raise ValueError('truncated array count')
+                count=i32(data,pos)
+                if count<0 or count>1<<20:raise ValueError('array count')
+                pos+=4+count*widths[inner]
+            else:
+                if f.get('innerType') is not None or typ not in widths:raise ValueError('unsupported scalar serializer')
+                pos+=widths[typ]
         if pos>end:raise ValueError('truncated value')
     if len(targets)!=1:raise ValueError('target count')
     return targets[0],pos
@@ -113,7 +125,7 @@ def main():
     import argparse
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('packets',type=Path);a=p.parse_args()
     paths=sorted(a.packets.glob('*.json'))
-    if len(paths)!=7:raise ValueError('expected seven synthetic packets')
-    rows=[verify(json.loads(q.read_text())) for q in paths]
+    if len(paths)!=8:raise ValueError('expected eight synthetic packets')
+    rows=[verify(json.loads(q.read_text(encoding='utf-8'))) for q in paths]
     print(json.dumps(dict(schema='PMM_POSTPROCESS_INDEPENDENT_V1',fixtures=rows,allCompared=True,syntheticOnly=True,gameAssetsRead=False,engineCompatibilityVerified=False),indent=2))
 if __name__=='__main__':main()

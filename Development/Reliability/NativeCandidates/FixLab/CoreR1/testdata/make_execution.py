@@ -17,7 +17,7 @@ def b64(b): return base64.b64encode(b).decode('ascii')
 def unb64(s): return base64.b64decode(s)
 def make():
     fixtures = []
-    for kind in ('basic', 'masked', 'decoy'):
+    for kind in ('basic', 'masked', 'decoy', 'array'):
         v = make_case(kind)
         h, x = unb64(v['header']), unb64(v['data'])
         pos = struct.unpack_from('<i', h, v['positions']['fields']['nameOffset'])[0]

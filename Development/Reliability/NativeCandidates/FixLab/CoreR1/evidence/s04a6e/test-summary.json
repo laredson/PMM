@@ -1,0 +1,45 @@
+{
+  "schema": "PMM_R1_SCALAR_ARRAY_TEST_SUMMARY_V1",
+  "environment": {
+    "windowsVersion": "10.0.19045",
+    "architecture": "amd64",
+    "fileSystem": "NTFS",
+    "goVersion": "go version go1.23.2 windows/amd64",
+    "cCompiler": "NOT_FOUND"
+  },
+  "go": {
+    "passEventsIncludingPackage": 322,
+    "namedPassEvents": 321,
+    "topLevelPassed": 154,
+    "skipEvents": 2,
+    "failed": 0,
+    "fullSuitePassed": true,
+    "vetWindows": "PASS",
+    "vetLinux": "PASS_CROSS_TARGET",
+    "fuzzSeedTargetsPassed": [
+      "FuzzPinnedRecipe",
+      "FuzzDossierDocuments",
+      "FuzzMembershipProviderBindings",
+      "FuzzExecutionDocument"
+    ]
+  },
+  "python": {
+    "passed": 54,
+    "skipped": [
+      "test_symlink_input_rejected: symlinks unavailable",
+      "test_source_symlink_rejected: symlink creation unavailable"
+    ],
+    "failed": 0,
+    "independentVerifiersPassed": 6
+  },
+  "windowsExecution": {
+    "harnessFullSuiteCount": 3,
+    "cliSuccessExit": 0,
+    "cliWrongPinExit": 3,
+    "cliUsageExit": 2
+  },
+  "publicationStress": "NOT_REPEATED: implementation unchanged; full regression suite passed and s04a6d evidence remains applicable",
+  "race": "NOT_RUN: gcc, clang and zig unavailable",
+  "randomFuzzing": "NOT_RUN: seed corpus only",
+  "linuxExecution": "NOT_RUN: vet and cross-build only"
+}

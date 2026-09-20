@@ -9,8 +9,9 @@ import (
 func bytesDigest(b []byte) string { h := sha256.Sum256(b); return hex.EncodeToString(h[:]) }
 
 type scalarLayoutField struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
+	Name      string `json:"name"`
+	Type      string `json:"type"`
+	InnerType string `json:"innerType,omitempty"`
 }
 type scalarLayout struct {
 	Schema    string              `json:"schema"`
@@ -48,6 +49,13 @@ func fieldIdentifier(s string) bool {
 	}
 	return true
 }
+func scalarLayoutType(s string) bool {
+	switch s {
+	case "BoolProperty", "ByteProperty", "IntProperty", "UInt32Property", "FloatProperty", "ObjectProperty", "ClassProperty", "Int64Property", "DoubleProperty", "NameProperty":
+		return true
+	}
+	return false
+}
 func verifyDossier(ctx context.Context, record ClaimRecord, files DossierFiles, layoutBytes, reviewBytes []byte) (DossierResult, error) {
 	s := record.Claim
 	var layout scalarLayout
@@ -62,7 +70,7 @@ func verifyDossier(ctx context.Context, record ClaimRecord, files DossierFiles, 
 	if e := decode(ctx, PinnedJSON{reviewBytes, s.ReviewRecordSHA256}, 128<<10, "schema review", &review); e != nil {
 		return out, e
 	}
-	if layout.Schema != "PMM_FIXED_UNVERSIONED_SCHEMA_V1" || layout.Profile != s.Profile || layout.ClassPath != s.ClassPath || len(layout.Fields) < 1 || len(layout.Fields) > 1024 {
+	if (layout.Schema != "PMM_FIXED_UNVERSIONED_SCHEMA_V1" && layout.Schema != "PMM_FIXED_UNVERSIONED_SCHEMA_V2") || layout.Profile != s.Profile || layout.ClassPath != s.ClassPath || len(layout.Fields) < 1 || len(layout.Fields) > 1024 {
 		return out, fail("LAYOUT", "schema", "unsupported profile/field count")
 	}
 	seen := map[string]bool{}
@@ -75,10 +83,12 @@ func verifyDossier(ctx context.Context, record ClaimRecord, files DossierFiles, 
 			return out, fail("LAYOUT", f.Name, "invalid or duplicate field name")
 		}
 		seen[f.Name] = true
-		switch f.Type {
-		case "BoolProperty", "ByteProperty", "IntProperty", "UInt32Property", "FloatProperty", "ObjectProperty", "ClassProperty", "Int64Property", "DoubleProperty", "NameProperty":
-		default:
-			return out, fail("UNSUPPORTED", f.Name, "non-scalar serializer")
+		if f.Type == "ArrayProperty" {
+			if layout.Schema != "PMM_FIXED_UNVERSIONED_SCHEMA_V2" || !scalarLayoutType(f.InnerType) {
+				return out, fail("UNSUPPORTED", f.Name, "array requires fixed-width scalar innerType")
+			}
+		} else if !scalarLayoutType(f.Type) || f.InnerType != "" {
+			return out, fail("UNSUPPORTED", f.Name, "unsupported serializer")
 		}
 		if f.Name == "PostProcessAnimBlueprint" {
 			if f.Type != "ClassProperty" {

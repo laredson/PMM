@@ -1,0 +1,13 @@
+{
+  "schema": "PMM_S04A6E_PACKAGE_IDENTITY_V1",
+  "inputCommit": "4763e6834c9a797b3fece6b6b0517b65f2881b2a",
+  "packageTree": "9ef22d5815943ce50413dfa7e09b474b06a22860",
+  "githubTree": "cb881ba48502f8dcea8cead16f47f275069d5945",
+  "packageFiles": 629,
+  "checksumRows": 628,
+  "checksumMismatches": [],
+  "buildId": "PMM-v1.5.0.1-reliability-i02",
+  "packageChanged": false,
+  "packageExecutedByAgent": false,
+  "ownerFunctionalReport": "appears to work well"
+}

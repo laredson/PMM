@@ -1,0 +1,35 @@
+{
+  "schema": "PMM_UASSET_SCALAR_ARRAY_TEST_SUMMARY_V1",
+  "environment": {
+    "windowsVersion": "10.0.19045",
+    "architecture": "amd64",
+    "fileSystem": "NTFS",
+    "goVersion": "go version go1.23.2 windows/amd64"
+  },
+  "go": {
+    "passEventsIncludingPackage": 120,
+    "namedPassEvents": 119,
+    "topLevelPassed": 63,
+    "skipped": 0,
+    "failed": 0,
+    "fullSuitePassed": true,
+    "vetWindows": "PASS",
+    "vetLinux": "PASS_CROSS_TARGET",
+    "fuzzSeedTargetsPassed": [
+      "FuzzRead",
+      "FuzzTables",
+      "FuzzRewritePinned",
+      "FuzzFixedPostProcess"
+    ]
+  },
+  "python": {
+    "passed": 32,
+    "skipped": 0,
+    "failed": 0,
+    "independentVerifiersPassed": 3
+  },
+  "windowsHarnessFullSuiteCount": 3,
+  "race": "NOT_RUN: gcc, clang and zig unavailable",
+  "randomFuzzing": "NOT_RUN: seed corpus only",
+  "linuxExecution": "NOT_RUN: vet and cross-build only"
+}

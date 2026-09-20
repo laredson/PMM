@@ -32,7 +32,7 @@ func executorVectors(t testing.TB) []executionVector {
 		Schema   string
 		Fixtures []executionVector
 	}
-	if e := json.Unmarshal(executionVectors, &v); e != nil || v.Schema != "PMM_R1_EXECUTION_SYNTHETIC_V1" || len(v.Fixtures) != 3 {
+	if e := json.Unmarshal(executionVectors, &v); e != nil || v.Schema != "PMM_R1_EXECUTION_SYNTHETIC_V1" || len(v.Fixtures) != 4 {
 		t.Fatalf("fixture: %v", e)
 	}
 	return v.Fixtures

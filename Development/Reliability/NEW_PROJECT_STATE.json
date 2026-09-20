@@ -72,6 +72,7 @@
     "desktopProjectRoot": "Workspace",
     "desktopProjectConfig": "Workspace/.codex/config.toml",
     "legacyRootConfigDeleted": false,
+    "ownerFunctionalReport": "appears to work well",
     "tests": {
       "desktopRoutingAssertionsPassed": 14,
       "desktopBindingAssertionsPassed": 32,
@@ -86,8 +87,27 @@
   },
   "fixLabResearch": {
     "integratedIntoRemotePMM": false,
-    "latestCompletedResearchStep": "04A-6D pinned job V2, candidate-only CLI and stable Win10 marker commit; cross-environment acceptance partial",
-    "nextResearchStep": "Real schema/serializer and broader V2 semantics, plus remaining cross-environment matrix",
+    "latestCompletedResearchStep": "04A-6E bounded ArrayProperty traversal for fixed-width scalar inner types, validated from UAsset through candidate-only job V2; real schema acceptance pending",
+    "nextResearchStep": "Pin and review a real schema source or add one further bounded serializer with primary evidence; preserve candidate-only boundary",
+    "s04a6eTests": {
+      "uassetGoTopLevelPassed": 63,
+      "uassetGoPassEventsIncludingPackage": 120,
+      "uassetPythonPassed": 32,
+      "uassetIndependentVerifiersPassed": 3,
+      "coreGoTopLevelPassed": 154,
+      "coreGoPassEventsIncludingPackage": 322,
+      "corePythonPassed": 54,
+      "corePythonSkipped": 2,
+      "coreIndependentVerifiersPassed": 6,
+      "fuzzSeedTargetsPassed": 8,
+      "windowsHarnessFullSuiteCountEach": 3,
+      "windows10NTFSExecuted": true,
+      "linuxExecuted": false,
+      "raceExecuted": false,
+      "reproducibleUAssetHarnessSHA256": "4acd771d44c639cd9bf7639ae0ac89a2807e8215fa823fa8c048eb05dbdcc6fa",
+      "reproducibleCoreHarnessSHA256": "225693032eef2c7275e2ad2ce43c5986004d5af2cd4f3368c4c5742e8dccd3dd",
+      "reproducibleCandidateCLISHA256": "02d4716ab7da5f37ff70406eda22f2eccb70303bf5fdcd78140e068920243d31"
+    },
     "s04a6dTests": {
       "goTopLevelPassed": 152,
       "goPassEvents": 317,
@@ -126,7 +146,7 @@
       "windowsOnlyTestsExecuted": false
     },
     "blockers": [
-      "real schema/serializer semantics",
+      "real schema provenance and serializer semantics beyond fixed-width scalar arrays",
       "variable relocation and bulk layouts",
       "full V2 semantics beyond the bounded candidate-only CLI",
       "Windows acceptance",
@@ -140,11 +160,11 @@
   },
   "immediateNext": [
     "Do not rebuild I01 executables without a new reason; they are retained byte-identical in I02.",
-    "Preserve the owner's result that I02 starts and works at a basic level.",
+    "Preserve the owner's result that I02 appears to work well.",
     "Record startup visible/usable time, close, second startup, UI/regressions and logs if failure.",
     "Correct any I02 regression before another large integration.",
-    "Owner authorized laboratory progress while testing; 6D job V2/CLI and Win10 marker commit remain candidate-only.",
-    "Complete remaining cross-environment acceptance where available; advance real schema/serializer semantics next."
+    "Owner authorized laboratory progress while testing; 6E scalar-array traversal, the job V2/CLI and Win10 marker commit remain candidate-only.",
+    "Pin and review a real schema source or add one further bounded serializer with primary evidence; complete remaining cross-environment acceptance where available."
   ],
   "developmentPolicy": {
     "remoteWritesNeedExplicitAuthorization": true,

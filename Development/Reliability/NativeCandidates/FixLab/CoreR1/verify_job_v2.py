@@ -32,6 +32,13 @@ def check(root: Path) -> dict:
         descriptor(docs, rows[key])
     for row in rows['schemaClaims']:
         descriptor(docs, row)
+    need(len(job['dossiers']) == 1, 'dossier coverage')
+    layout_row = job['dossiers'][0]['layout']
+    layout_raw = read(root / 'inputs' / 'schemas' / layout_row['path'])
+    need(len(layout_raw) == layout_row['sizeBytes'] and sha(layout_raw) == layout_row['sha256'], 'layout descriptor')
+    layout = js(layout_raw)
+    need(layout['schema'] in ('PMM_FIXED_UNVERSIONED_SCHEMA_V1', 'PMM_FIXED_UNVERSIONED_SCHEMA_V2'), 'layout schema')
+    fixture_kind = 'array' if layout['schema'] == 'PMM_FIXED_UNVERSIONED_SCHEMA_V2' else 'basic'
     need(result['schema'] == 'PMM_R1_CANDIDATE_JOB_RESULT_V2', 'result schema')
     need(result['state'] == 'CANDIDATE_PUBLISHED_NOT_GAME_ACCEPTED' and result['candidateOnly'] is True, 'candidate result')
     need('error' not in result and 'residueName' not in result, 'clean result')
@@ -51,13 +58,13 @@ def check(root: Path) -> dict:
         need(receipt[flag] is False, 'unsupported receipt claim')
     for flag in ('schemaSemanticsVerified', 'reviewerAuthenticated', 'coreR1Complete', 'transformReady', 'buildReady', 'validated', 'installed'):
         need(report[flag] is False, 'unsupported execution claim')
-    expected, _ = expected_files('basic')
+    expected, _ = expected_files(fixture_kind)
     need(pak.parse(raw['candidate.pak']) == expected, 'independent PAK contents')
     return {
         'schema': 'PMM_R1_CANDIDATE_JOB_FIXTURE_VERIFICATION_V1',
         'jobSHA256': sha(job_raw), 'state': result['state'],
         'candidateName': name, 'manifestSHA256': sha(raw['MANIFEST.json']),
-        'outputEntriesCompared': len(expected), 'candidateOnly': True,
+        'outputEntriesCompared': len(expected), 'executionFixture': fixture_kind, 'candidateOnly': True,
         'gameAccepted': False, 'installed': False, 'realAssetsUsed': False,
     }
 

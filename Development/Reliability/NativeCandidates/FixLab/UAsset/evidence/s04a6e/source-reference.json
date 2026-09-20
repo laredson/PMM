@@ -1,0 +1,26 @@
+{
+  "schema": "PMM_UASSET_SCALAR_ARRAY_SOURCE_REFERENCE_V1",
+  "repository": "atenfyr/UAssetAPI",
+  "commit": "3228c1e86261aa08131f7ec0ff1a395f5d0b2a84",
+  "checkoutClean": true,
+  "files": [
+    {
+      "path": "UAssetAPI/PropertyTypes/Objects/ArrayPropertyData.cs",
+      "url": "https://github.com/atenfyr/UAssetAPI/blob/3228c1e86261aa08131f7ec0ff1a395f5d0b2a84/UAssetAPI/PropertyTypes/Objects/ArrayPropertyData.cs",
+      "relevance": "int32 element count followed by serialized elements"
+    },
+    {
+      "path": "UAssetAPI/Unversioned/Usmap.cs",
+      "url": "https://github.com/atenfyr/UAssetAPI/blob/3228c1e86261aa08131f7ec0ff1a395f5d0b2a84/UAssetAPI/Unversioned/Usmap.cs",
+      "relevance": "array schema carries an inner property type"
+    },
+    {
+      "path": "UAssetAPI/Unversioned/FUnversionedHeader.cs",
+      "url": "https://github.com/atenfyr/UAssetAPI/blob/3228c1e86261aa08131f7ec0ff1a395f5d0b2a84/UAssetAPI/Unversioned/FUnversionedHeader.cs",
+      "relevance": "unversioned fragments select ordered schema fields"
+    }
+  ],
+  "libraryBuilt": false,
+  "implementationCopied": false,
+  "realUsmapAuthenticated": false
+}

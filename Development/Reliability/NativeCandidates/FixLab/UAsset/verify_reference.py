@@ -86,10 +86,10 @@ def inspect(header,data):
                 generations=gens,savedEngine=saved,compatibleEngine=compatible,namesReferenced=namesref,chunkIDs=ids)
 
 def compare(go_dir):
-    vectors=json.loads(Path(__file__).with_name('testdata').joinpath('vectors.json').read_text());rows=[]
+    vectors=json.loads(Path(__file__).with_name('testdata').joinpath('vectors.json').read_text(encoding='utf-8'));rows=[]
     for v in vectors:
         ref=inspect(base64.b64decode(v['header']),base64.b64decode(v['data']))
-        actual=json.loads((Path(go_dir)/(v['id']+'.json')).read_text())
+        actual=json.loads((Path(go_dir)/(v['id']+'.json')).read_text(encoding='utf-8'))
         for key in ('names','imports','exports','depends','preload'):
             if (actual[key] or [])!=ref[key]:raise ValueError(v['id']+' '+key+' mismatch')
         for key in ('headerSha256','exportDataSha256'):

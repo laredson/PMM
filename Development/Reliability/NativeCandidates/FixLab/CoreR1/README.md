@@ -2,6 +2,7 @@
 
 04A-6C corrige PublishCandidate en Windows real y agrega ExecuteAndPublishCandidate.
 04A-6D agrega un job V2 pinneado y un CLI separado, ambos candidato-only.
+04A-6E permite recorrer arrays de escalares fijos en el schema V2, sin mutarlos.
 El paquete PMM/ ya contiene Host/Runtime I01; FixLab permanece original.
 Este modulo y su harness siguen aislados y NO sustituyen PMMFixLab.exe.
 Leer ../../../RUNNING_VERSION.md e INTEGRATION_CONTRACT.md.
@@ -16,8 +17,9 @@ no devuelve un objeto ejecutable ni admite importar JSON como MemoryResult.
 `RunCandidateJobV2` reconstruye toda la evidencia privada en un proceso; ver
 [JOB_V2_CONTRACT](JOB_V2_CONTRACT.md). El CLI no instala ni despliega.
 
-6A reutiliza UAsset para nombres de igual ancho y postProcess escalar. No cambian
-layouts opacos, schemas reales/no escalares o hashes productivos. 6B conserva
+6A reutiliza UAsset para nombres de igual ancho y postProcess escalar. 6E agrega
+solo el recorrido de ArrayProperty con innerType escalar de ancho fijo. No cambian
+arrays, layouts opacos, schemas reales/no soportados o hashes productivos. 6B conserva
 exactamente el PAK/informe, agrega manifiesto/completion y commit sin reemplazo.
 Antes del commit intenta rollback limitado a objetos propios; despues informa
 receipt.Published=true incluso si un error posterior acompana al recibo.
@@ -62,14 +64,21 @@ Stress: 2.000 publicaciones secuenciales y 500 rondas de cuatro concurrentes.
 Harness completo `-test.count=3`, vet Windows/Linux y cross-build Linux PASS;
 sin ejecucion Linux ni race. Win11/AV/disco lleno real siguen pendientes.
 
+6E en Win10 NTFS: 154 tests Go top-level PASS con seis opt-ins, 4 targets fuzz
+con seeds PASS, 54 Python PASS / 2 symlink SKIP y seis verificadores independientes.
+El escenario `array` recorre Capture/Execution/job V2 y compara 10 outputs. Harness
+completo x3, vet Windows/Linux y cross-build Linux PASS; sin ejecucion Linux,
+race, fuzz aleatorio o asset real. El stress de publicacion 6D no se repitio porque
+ese codigo no cambio; la suite completa de regresion pasa.
+
 El builder produce CoreR1-tests.exe y CoreR1-candidate.exe, no PMMFixLab.exe.
 El segundo solo acepta jobs V2 candidato-only; ambos se construyen fuera del repo.
-Dos builds 6D de ambos EXE fueron identicos. Harness SHA-256
-`7d09da6c001d926d077fd32863f2fd31c6708fd98330106d35a4f0caeebd2d8c`;
-CLI SHA-256 `0464e503a96f467e96501d0e71367027501640b7433bb1bd76cb1e159cd781bc`.
+Dos builds 6E de ambos EXE fueron identicos. Harness SHA-256
+`225693032eef2c7275e2ad2ce43c5986004d5af2cd4f3368c4c5742e8dccd3dd`;
+CLI SHA-256 `02d4716ab7da5f37ff70406eda22f2eccb70303bf5fdcd78140e068920243d31`.
 El kit separado incluye RUN_WINDOWS_PUBLICATION_TESTS.cmd para probar los cambios
 reales de esta tanda en TEMP, no el PMM.exe sin actualizar. Ver
 WINDOWS_PUBLICATION_ACCEPTANCE.md antes de ejecutarlo. No pedir exclusiones AV.
 
-Estado/evidencia actual: ../../../STATUS.md, ../../../NEXT_SESSION.md y evidence/s04a6d/.
+Estado/evidencia actual: ../../../STATUS.md, ../../../NEXT_SESSION.md y evidence/s04a6e/.
 No mezclar el commit de fuentes con una release, instalacion o aprobacion Nexus.

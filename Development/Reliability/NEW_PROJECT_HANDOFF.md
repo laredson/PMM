@@ -39,8 +39,8 @@ Ejecutables de la rama:
 - Runtime C2B `PMM/Engine/PMMRuntime.exe`: SHA-256 `b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f`.
 - FixLab original `PMM/Engine/PMMFixLab.exe`: SHA-256 `8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe`.
 
-Importante: el propietario confirmo que I02 arranca y funciona en Windows a nivel
-basico. Falta la aceptacion detallada (cierre, segundo arranque, UI y tiempos);
+Importante: el propietario informa que I02 parece funcionar bien en Windows.
+Falta la aceptacion detallada (cierre, segundo arranque, UI y tiempos);
 compilacion, hashes y arranque basico no equivalen a aceptacion completa.
 
 I02 conserva exactamente los tres ejecutables de I01 y corrige la integracion
@@ -137,7 +137,7 @@ Como el checkout actual ya contiene I01, una reconstruccion futura debe obtener 
 base s01b mediante un worktree o archivo limpio del commit pinneado. No cambiar los
 guards para compilar sobre los EXE I01 ni copiar una carpeta antigua sobre la nueva.
 
-## 7. FixLab - implementacion hasta 04A-6D, NO integrada
+## 7. FixLab - implementacion hasta 04A-6E, NO integrada
 
 El ejecutable original sigue en PMM.
 
@@ -180,8 +180,18 @@ harness x3, 2.000 publicaciones secuenciales y 500x4 concurrentes PASS. Harness
 y CLI tienen builds repetidos byte-identicos. Ver SESSION04A6D_FINDINGS/CHECKS,
 JOB_V2_CONTRACT y evidence/s04a6d. Win11/SMB/AV/disco lleno/race pendientes.
 
-Aun faltan schemas/serializers reales, relocalizacion variable/bulk, V2 completo y
-motor FixLab completo antes de reemplazar `PMMFixLab.exe`.
+04A-6E implementa `PMM_FIXED_UNVERSIONED_SCHEMA_V2` solo para recorrer
+`ArrayProperty` de escalares de ancho fijo. No edita, redimensiona ni relocaliza
+arrays. CaptureCore admite la misma forma sin autenticar semantica, y el cuarto
+escenario sintetico recorre UAsset -> ExecuteBounded -> job/CLI candidato-only.
+UAsset: 63 tests Go top-level/32 Python/tres verificadores. CoreR1: 154 tests Go
+top-level/54 Python PASS + 2 SKIP/seis verificadores. Harnesses Windows x3 y builds
+repetidos identicos; vet/cross-build Linux PASS sin ejecucion. Ver
+SESSION04A6E_FINDINGS/CHECKS y evidence/s04a6e.
+
+Aun faltan una fuente de schema real pinneada/autenticada, serializers variables
+y containers complejos, relocalizacion variable/bulk, V2 completo y motor FixLab
+completo antes de reemplazar `PMMFixLab.exe`.
 
 ## 8. Host/Runtime - gates pendientes
 
@@ -223,8 +233,9 @@ Las nuevas cadenas de reliability deben registrarse para traducirlas antes de ca
 
 1. Recoger la prueba restante de I02: cierre, segundo arranque, UI y tiempos.
 2. Corregir cualquier regresion de I02 y medir/optimizar arranque.
-3. Completar matriz 6D fuera de Win10 NTFS; job V2/CLI acotado ya existe.
-4. Completar schemas/serializers, relocalizacion y semantica V2 real pendientes.
+3. Completar matriz fuera de Win10 NTFS; job V2/CLI acotado ya existe.
+4. Fijar/revisar una fuente de schema real o agregar otro serializer acotado con
+   evidencia primaria; despues completar relocalizacion y semantica V2 restante.
 5. Integrar un PMMFixLab reconstruido cuando tenga paridad suficiente; prueba incremental.
 6. Cerrar Host/Runtime restantes y optimizar arranque.
 7. Cerrar repair/dependencies, manifests/pins/rutas y packaging reproducible.

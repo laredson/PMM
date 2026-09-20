@@ -10,9 +10,12 @@ No es PMMFixLab.exe ni source original recuperado. No instalar el harness de tes
   propiedad PostProcessAnimBlueprint stale->null. No reemplazos globales.
 
 PatchPostProcess requiere snapshots, pins externos de entrada Y salida, identidad
-completa de imports/export y un schema escalar externo revisado. No autodetecta
-el schema ni lo extrae de la receta. No soporta arrays/structs/custom serializers;
-no se ha validado un schema real de SkeletalMesh. Los schemas de tests son ficticios.
+completa de imports/export y un schema externo revisado. V1 admite solo escalares;
+V2 agrega exclusivamente ArrayProperty con elementos escalares de ancho fijo para
+recorrer el prefijo, sin editarlos ni relocalizarlos. No autodetecta el schema ni
+lo extrae de la receta. Struct/map/set/string, arrays anidados y serializers custom
+siguen fuera. No se ha validado un schema real de SkeletalMesh; las pruebas son
+ficticias.
 Todos los API de transformacion devuelven memoria, no instalan ni escriben archivos.
 
 ## Reproduccion
@@ -34,5 +37,7 @@ No sumar SKIP como PASS. Verificadores independientes:
 
 El builder offline conserva hashes de fuentes y genera un harness TEST Windows,
 no el motor. No descarga toolchain/dependencias y nunca ejecuta el EXE generado.
-56 tests Go/31 Python y las regresiones pasaron en Linux; Windows/Unreal siguen
-NOT_RUN. Evidencia nueva en evidence/s04a4c; evidencia previa preservada aparte.
+6E: 63 tests Go top-level, 32 Python y tres verificadores independientes PASS;
+harness Windows completo x3 y dos builds byte-identicos. Vet/cross-build Linux
+PASS sin ejecucion Linux; Unreal sigue NOT_RUN. Evidencia en evidence/s04a6e;
+la evidencia historica permanece separada.

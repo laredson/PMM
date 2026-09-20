@@ -41,8 +41,8 @@ def main():
         report=dict(schema='PMM_UASSET_TEST_BUILD_V1',session='04A-4C',artifact='UAsset TEST harness, not FixLab',
                     goVersion='go1.23.2',buildHost=version[3],target='windows/amd64',sourceSha256=hashes,
                     sha256=sha(exe),bytes=exe.stat().st_size,commands=commands,windowsExecuted=False,engineBuilt=False,packagedBinaryReplaced=False)
-        (out/'build-report.json').write_text(json.dumps(report,indent=2)+'\n')
-        (out/'COMPLETE.txt').write_text('Test harness only. NOT executed. NOT PMMFixLab.exe.\n')
+        (out/'build-report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+        (out/'COMPLETE.txt').write_text('Test harness only. NOT executed. NOT PMMFixLab.exe.\n',encoding='utf-8')
         print(json.dumps({'sha256':report['sha256'],'bytes':report['bytes'],'windowsExecuted':False}));return 0
     except (OSError,ValueError,UnicodeError,subprocess.SubprocessError) as e:
         print('Build failed: '+str(e),file=sys.stderr);return 2

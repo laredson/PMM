@@ -70,10 +70,11 @@ ClaimSHA256, con Layout y Review como File pinneados dentro de Schemas. Se leen
 sus bytes reales y se comprueban tamanos/hashes. JSON estricto rechaza claves
 duplicadas, desconocidas, mal capitalizadas, nulos o valores ambiguos.
 
-Layout: PMM_FIXED_UNVERSIONED_SCHEMA_V1, perfil/clase ligados al claim, 1..1024
-campos con nombres unicos y tipos escalares del contrato UAsset 04A-4C. Debe
-incluir PostProcessAnimBlueprint ClassProperty. Colecciones/structs/custom
-serializers no se convierten a campos simples ni se aceptan por omision.
+Layout: PMM_FIXED_UNVERSIONED_SCHEMA_V1 o V2, perfil/clase ligados al claim,
+1..1024 campos con nombres unicos. V1 solo admite escalares. V2 agrega
+ArrayProperty con innerType escalar de ancho fijo. Debe incluir
+PostProcessAnimBlueprint ClassProperty. Struct/map/set/string, arrays anidados y
+custom serializers no se convierten a campos simples ni se aceptan por omision.
 
 Review: PMM_R1_SCHEMA_REVIEW_V1 liga recipeSHA256, donorHeaderSHA256,
 donorExportSHA256, currentProviderSHA256, layoutSHA256, profile, classPath,
@@ -84,7 +85,8 @@ No se deduce el layout desde offset 120, ni se crean hashes de salida deseados.
 Resultado: BYTES_AND_BINDINGS_CHECKED_NOT_AUTHENTICATED. BytesVerified y
 BindingsChecked son true, pero LayoutSemanticsVerified y ReviewerAuthenticated
 son false. Se comprueba sintaxis/vinculacion, no que el schema describa una malla.
-El schema real no escalar, su procedencia y los outputs revisados siguen faltando.
+El schema real, su procedencia y los outputs revisados siguen faltando. Aceptar la
+forma acotada de un array no autentica que el layout describa un asset real.
 
 ## Informe y techos
 
