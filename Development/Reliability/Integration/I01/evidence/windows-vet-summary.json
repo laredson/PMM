@@ -1,0 +1,22 @@
+[
+  {
+    "module": "Host",
+    "command": "GOOS=windows GOARCH=amd64 go vet ./...",
+    "exitCode": 0
+  },
+  {
+    "module": "Runtime",
+    "command": "GOOS=windows GOARCH=amd64 go vet ./...",
+    "exitCode": 0
+  },
+  {
+    "module": "Supervision",
+    "command": "GOOS=windows GOARCH=amd64 go vet ./...",
+    "exitCode": 0
+  },
+  {
+    "module": "UIBridge",
+    "command": "GOOS=windows GOARCH=amd64 go vet ./...",
+    "exitCode": 0
+  }
+]

@@ -1,52 +1,38 @@
-# Retomar despues de 04A-6B - guardado candidato aislado
+# Retomar: esperar/comprobar primera integracion ejecutable I01
 
-Rama exclusiva v1.5.0.1-PMM-reliability. Entrada de esta tanda:
-fe239c33d1a77c47afa08502656f6e2cbe4f913d. No repetir 6A ni 6B.
-Leer AGENTS -> RUNNING_VERSION.md -> STATUS -> SESSION04A6B_FINDINGS/CHECKS ->
-CoreR1/PUBLICATION_CONTRACT.md y WINDOWS_PUBLICATION_ACCEPTANCE.md.
+Rama exclusiva v1.5.0.1-PMM-reliability. Base de I01: 96287f9.
+Leer AGENTS, RUNNING_VERSION, SESSION_I01_FINDINGS/CHECKS e Integration/I01/README.
+El usuario pide probar ya piezas completas. No repetir 04A-6B ni continuar el
+motor FixLab a ciegas antes de revisar el primer arranque Host/Runtime integrados.
 
-## Aclaracion obligatoria para el usuario
+## Estado que NO se debe confundir
 
-Los cambios se guardan en Development/Reliability/NativeCandidates/ de ESTA rama.
-Los EXE dentro de PMM/ siguen siendo los originales. 1.5.0.1/s01b es la identidad
-alineada en 01B, no un indicador de que las candidatas esten integradas. Pull no
-compila. No llamar pruebas de las candidatas al arranque del PMM.exe conservado.
-Al cambiar por primera vez un binario lanzable, dar BUILD_ID/hash/ruta especificos.
+Se entrego un ZIP de APLICACION REAL con Host/Runtime C2B en sus rutas ejecutables.
+No es CoreR1-tests.exe. Build de esa aplicacion: PMM-v1.5.0.1-reliability-i01.
+FixLab, scripts, UI, idiomas y recetas siguen conservados. Son 5 archivos cambiados.
+Los EXE no se subieron por el conector: GitHub conserva receta, pruebas y registros.
+PMM/ remoto continua s01b hasta que se importen los 5 archivos con un transporte
+binario adecuado. Un overlay permite al usuario copiarlos a su checkout y subirlos
+con Desktop. No afirmar que el Pull por si solo actualiza el programa.
 
-## Conservado
+## Siguiente accion
 
-Plan/Capture/Membership/Execute y codecs intactos. PublishCandidate valida el
-MemoryResult privado, exige boundaries reales y crea un bundle nuevo de cuatro
-archivos: candidate.pak, execution.json, MANIFEST.json, COMPLETE.json.
-Writes/Sync/readback -> rename sin reemplazo. Stage SIEMPRE incompleto para los
-lectores, aunque exista COMPLETE.json. Rollback no recursivo de objetos propios.
-Despues del commit puede retornar receipt!=nil,error con Committed=true: no
-asumir que se borro el candidato. Windows dir sync no demostrado; no garantia
-contra perdida electrica. InspectCandidate solo verifica bytes con pin externo.
-No hay deploy, CLI completa, schemas reales validados o motor R1/V2 general.
+1. Leer HEAD actual. Si el usuario importo el overlay, verificar arbol/hash/build:
+   I01 PMM tree 12e01ba3a24a2c0ce5e74d681b4931307c845a56.
+   Host a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c.
+   Runtime b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f.
+   FixLab original 8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe.
+2. Preguntar/leer SOLO evidencia real de I01: arranque, ventana utilizable, cierre,
+   segundo arranque y tiempos. Si hay error, revisar PMMHost.log/sesion/PalModMerger.log.
+   Abrir el s01b original no es probar esta integracion; comprobar identidad primero.
+3. Corregir fallos reproducibles de integracion en alcance acotado y nueva build.
+   Para velocidad medir etapas primero; no suprimir controles de integridad.
+4. Mantener FixLab original hasta completar/aceptar su reemplazo. Research 04A6C
+   (guardado Windows) y el resto siguen pendientes, pero no bloquean esta prueba de
+   Host/Runtime. No marcar gates como PASS por compilar o tener hashes coincidentes.
+5. La siguiente entrega funcional debe registrar si modifica PMM/ remoto, solo
+   fuentes o un ZIP local. No publicar manifesto/hash de EXE que no se haya subido.
 
-130 tests Go completos y 52 Python con opt-ins. Race SOLO 26 nuevas pruebas PASS;
-los intentos de race total interrumpidos no son PASS. Windows compilado/vet,
-cuatro tests exclusivamente Windows NO ejecutados. El kit contiene harness TEST
-para escribir solo fixtures en TEMP; no reemplazar PMM.exe/PMMFixLab.exe.
-PMM tree 09df5c45aee3390c6b8ea235c8afa4e149a9f1fa; 629 archivos/628 hashes, s01b.
-
-## Siguiente 04A-6C - aceptacion Windows del guardado y cierre de integracion
-
-1. Fijar HEAD. Revisar el log del kit Windows SI el usuario lo aporta; no asumir
-   que correr PMM original ejecuta esos tests. Confirmar SHA del harness en CHECKS.
-2. Resolver errores reproducibles de NtCreateFile/DACL/rename/cierre y registrar
-   los casos de WINDOWS_PUBLICATION_ACCEPTANCE con evidencia real. Si no existe
-   entorno/log Windows, mantener NOT_RUN, no simular aprobacion ni reinstalar EXE.
-3. Dejar cerrada la interfaz entre guardado y futura orquestacion V2/CLI: manejar
-   receipt+error committed, revalidacion posterior y conservacion de staging sin
-   borrados recursivos automaticos. No habilitar deploy al juego.
-4. Antes de ampliar R1 productivo, los schemas/serializers reales y relocalizacion
-   variable siguen bloqueos independientes. No crear hashes/offsets para forzar
-   que pase Gura. No llamar al motor completo hasta que exista su contrato real.
-5. Cada cambio autorizado se guarda en esta rama con [skip ci], sin Actions, PR,
-   tags o release. Registrar al cierre si afecta SOLO fuentes o tambien PMM/.
-
-El kit ya esta preparado; no rehacer las primitivas para poder probar el writer.
-Los gates Host/Runtime, familia de procesos, manifiestos/rutas/pins, reparacion
-06/07 y preflight antivirus no se cierran con esta tanda. No prometer check verde.
+Sin release/tag/PR/Actions. La identidad del producto no es garantia antivirus.
+No pedir que se desactiven protecciones. Los builder C2B historicos conservan el
+pin s01b: para reconstruirlos usar una copia de esa base, no quitar los guards.

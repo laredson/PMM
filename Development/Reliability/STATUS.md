@@ -1,27 +1,27 @@
-# Estado v1.5.0.1 - 04A-6B
+# Estado - I01: primera aplicacion de prueba preparada
 
-**6B implementada como guardado de resultados candidatos; NO incorporada a PMM.exe.**
-Version del paquete: 1.5.0.1 / PMM-v1.5.0.1-reliability-s01b.
-Leer RUNNING_VERSION.md: fuentes en Development/, EXE originales en PMM/.
+Host/Runtime C2B se ensamblaron en un ZIP de APLICACION REAL con build
+PMM-v1.5.0.1-reliability-i01. Incluye Supervision/UIBridge. FixLab original conservado.
+El propietario ha autorizado esta prueba incremental; Windows aun PENDING_USER.
 
-6A publicada en fe239c3; 6B agrega PublishCandidate/InspectCandidate, bundle de
-cuatro archivos, commit sin reemplazo y error que distingue antes/despues del
-commit. Rechaza boundaries protegidos, enlaces/reparse y resultados no verificados.
-Reutiliza sin cambios CaptureCore/PlanCore/VerifyMembership/ExecuteBounded y codecs.
+IMPORTANTE: los EXE compilados no se transfirieron por el conector a GitHub.
+Esta rama registra receta, tests y evidencia; PMM/ remoto sigue s01b coherente.
+El ZIP completo permite probar ya; el overlay de 5 archivos permite actualizar
+la copia local de esta misma rama y subir los binarios con GitHub Desktop.
+No hacer afirmaciones de que Pull instala I01 mientras ese paso no haya ocurrido.
 
-130 Test Go PASS con opt-ins (104 previas +26 nuevas); 52 Python PASS; race sobre
-las 26 nuevas PASS. Race total se intento pero se interrumpio en prueba previa
-costosa; no contado como PASS ni se modifico el test para ocultarlo.
-Tres escenarios/30 entradas de PAK comprobadas por Python tras guardado.
-Dos builds TEST Windows iguales; Windows/NTFS/DACL reales NO ejecutados aqui.
+I01: 629 archivos/628 hashes; 5 cambian y 624 permanecen byte-identicos.
+Tree integrado 12e01ba3a24a2c0ce5e74d681b4931307c845a56.
+Tree remoto conservado 09df5c45aee3390c6b8ea235c8afa4e149a9f1fa.
+No se cambio logica nativa ni se ejecuto una nueva reescritura: integra C2B existente.
+Dos builds/componentes identicos a los hashes conservados. 92 pruebas Go con
+aserciones (incluida una lectura de inventario real), 12 Python de empaquetado;
+vet Windows correcto. No Windows real, race nuevo, antivirus o velocidad medidos.
 
-PMM/ mantiene 629 archivos, 628 hashes y tree
-09df5c45aee3390c6b8ea235c8afa4e149a9f1fa. No cambios funcionales al programa
-distribuido, traducciones, CKL, fuentes historicos u otros candidatos.
-No originales, juego, reparaciones reales, antivirus, Actions, PR, tag o release.
+04A-6B y anteriores permanecen en Research: no estan conectados a FixLab original.
+REL-01, schemas reales, V2/CLI, family/Job Objects, manifests/pins/rutas, repair
+06/07, firma y preflight siguen abiertos. No se cancela ni se pierde ese trabajo.
 
-REL-01/engine completo siguen ABIERTOS. Schemas reales/no escalares, relocalizacion
-opaca, V2/CLI, Windows y restantes gates no resueltos. Siguiente 6C: aceptacion
-Windows del guardado y cierre de interfaz con la futura integracion, no deploy.
-SESSION04A6B_FINDINGS/CHECKS registra evidencia y limites. No confundir el bundle
-PAK candidato con una compilacion nueva y lista para Nexus de la aplicacion PMM.
+Siguiente accion: feedback I01 y correccion/medicion del arranque real, NO seguir
+una nueva tanda de reconstruccion antes de comprobar que la integracion arranca.
+NEXT_SESSION.md y RUNNING_VERSION.md precisan como distinguir las entregas.

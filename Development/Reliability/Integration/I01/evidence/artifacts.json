@@ -1,0 +1,23 @@
+{
+  "schema": "PMM_I01_ARTIFACTS_V1",
+  "application": {
+    "name": "PMM_v1.5.0.1_I01_TEST_APPLICATION.zip",
+    "sha256": "a35f4c414004a44e8c309ef6c09ff722eabb6136f835ebfdbaf5ba0b93fd85d1",
+    "bytes": 53622709
+  },
+  "overlay": {
+    "name": "PMM_I01_APPLY_TO_CHECKOUT.zip",
+    "sha256": "b74d1ca243ac03e7027bd1f00184dc6b5cc6265dd36765ed2cc3cefbc63a161a",
+    "bytes": 4118095
+  },
+  "rollback": {
+    "name": "PMM_I01_ROLLBACK_TO_S01B.zip",
+    "sha256": "378914ff0e4ce2c36d94c0222f1fd8d8e4c91319bf27e6323058650ad4ec2e53",
+    "bytes": 3991363
+  },
+  "overlayReproducesTrialTree": true,
+  "rollbackReproducesBaselineTree": true,
+  "notNexusRelease": true,
+  "trialPackageTree": "12e01ba3a24a2c0ce5e74d681b4931307c845a56",
+  "remoteBinaryTransferPerformed": false
+}

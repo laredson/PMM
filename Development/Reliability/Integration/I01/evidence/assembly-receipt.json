@@ -1,0 +1,43 @@
+{
+  "schema": "PMM_I01_ASSEMBLY_RECEIPT_V1",
+  "buildId": "PMM-v1.5.0.1-reliability-i01",
+  "version": "1.5.0.1",
+  "baseSourceCommit": "96287f98f59b7387a00b29cec7c9316800bde098",
+  "basePackageTree": "09df5c45aee3390c6b8ea235c8afa4e149a9f1fa",
+  "integratedPackageTree": "12e01ba3a24a2c0ce5e74d681b4931307c845a56",
+  "packageFiles": 629,
+  "checksumRows": 628,
+  "changedFiles": [
+    {
+      "path": "Engine/PMMRuntime.exe",
+      "beforeSHA256": "e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a",
+      "afterSHA256": "b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f"
+    },
+    {
+      "path": "PMM.exe",
+      "beforeSHA256": "010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d",
+      "afterSHA256": "a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c"
+    },
+    {
+      "path": "Resources/Metadata/BUILD_ID.txt",
+      "beforeSHA256": "0e51cc82229d6fa8389f09678f36b06ae6d46bd0047d1548fb9a879224e99a34",
+      "afterSHA256": "e78d083b4ae4bfcb2d369306e63f74717b6069e31fc620d157d128b6d0284297"
+    },
+    {
+      "path": "Resources/Metadata/RELEASE_MANIFEST.json",
+      "beforeSHA256": "82185c8c81ea241aff7335b2c506978dd014af28f881eb5e1d9a18c7f9acad56",
+      "afterSHA256": "8bdd91f7db4f8f29d1adafdb9a4a695d55882dac6c41d7745885a85cf471bb9d"
+    },
+    {
+      "path": "Resources/Metadata/SHA256SUMS.txt",
+      "beforeSHA256": "b21945673cd4bc3faa364f1c46d700d7cff6ed6afe4cd87ab074f438fc415493",
+      "afterSHA256": "b5a7d5896da151d1dc5880f8541842d9c3fd0c45b287b9589d97c5ff24fd65cf"
+    }
+  ],
+  "unchangedFiles": 624,
+  "fixLabPreserved": true,
+  "windowsExecuted": false,
+  "functionalParityVerified": false,
+  "antivirusScanned": false,
+  "gitHubBinaryUpload": "NOT_PERFORMED_BY_THIS_TOOL"
+}
