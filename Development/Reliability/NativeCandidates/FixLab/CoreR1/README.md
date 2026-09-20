@@ -1,58 +1,57 @@
-# CoreR1 - plan, captura, pertenencia y ejecucion acotada
+# CoreR1 - candidato de desarrollo, NO motor instalado en PMM
 
-04A-6A publicada desde la entrega preservada (base 587b4ed).
-Ver ../../../SESSION04A6A_PUBLICATION.json para el cierre de publicacion.
-No es PMMFixLab.exe completo ni source original recuperado. PMM/ queda intacto.
+04A-6B agrega PublishCandidate e InspectCandidate. El programa PMM/ sigue usando
+sus ejecutables anteriores; cambiar de rama o hacer Pull no recompila esos EXE.
+Leer ../../../RUNNING_VERSION.md. El build del paquete sigue siendo s01b.
 
-APIs existentes sin cambios:
-- PlanCore: plan declarativo, no verifica assets ni autoriza transformacion.
-- CaptureCore: snapshots locales pinneados y dossiers, no semantica de malla.
-- VerifyMembership: correspondencia con entradas PAK en perfil limitado.
+## Recorrido disponible
 
-Nueva API ExecuteBounded: consume objetos de captura/membership existentes y un
-plan/review explicitos pinneados. Reutiliza RewriteNames y PatchPostProcess de
-UAsset; exige nombres del mismo ancho, preserva bytes ajenos, copia soporte y
-produce/valida un PAK en memoria. No lee rutas ni publica archivos. No se suman
-ready flags a las etapas previas. Ver [EXECUTION_CONTRACT](EXECUTION_CONTRACT.md).
+PlanCore (declaraciones) -> CaptureCore (bytes) -> VerifyMembership (entradas PAK)
+-> ExecuteBounded (transformaciones/PAK en memoria) -> PublishCandidate (bundle
+nuevo aislado). Ninguna etapa significa aceptacion por Unreal o juego instalado.
+InspectCandidate verifica posteriormente un bundle frente a un pin de manifiesto;
+no devuelve un objeto ejecutable ni admite importar JSON como MemoryResult.
 
-Las expectativas de salida y revision vienen de evidencia externa, no de aprobar
-el resultado que acabamos de producir. El reporte no autentica al revisor ni el
-schema. Un PAK consistente no prueba que una malla sea valida en Unreal/Palworld.
-No se aceptan cambios de tamano, serializers no escalares ni bulk sidecars.
+6A reutiliza UAsset para nombres de igual ancho y postProcess escalar. No cambian
+layouts opacos, schemas reales/no escalares o hashes productivos. 6B conserva
+exactamente el PAK/informe, agrega manifiesto/completion y commit sin reemplazo.
+Antes del commit intenta rollback limitado a objetos propios; despues informa
+receipt.Published=true incluso si un error posterior acompana al recibo.
 
-## Modulos y pruebas
+[PUBLICATION_CONTRACT](PUBLICATION_CONTRACT.md) detalla API, limites, aislamiento,
+precondiciones del caller y errores. [EXECUTION_CONTRACT](EXECUTION_CONTRACT.md),
+[CAPTURE_CONTRACT](CAPTURE_CONTRACT.md) y [MEMBERSHIP_CONTRACT](MEMBERSHIP_CONTRACT.md)
+siguen vigentes. La nueva capa no cambia retrospectivamente sus flags.
 
-Go1.23.2 local. Dependencias exclusivamente locales ../PAKV11 y ../UAsset, sin
-copias divergentes ni downloads. Conservar los tres directorios al compilar.
-PMMDLT1 no participa en esta ruta R1; se integrara donde V2 requiera sus parches.
+## Pruebas y build
 
-Desde CoreR1, con GOPROXY=off/GOSUMDB=off/GOTOOLCHAIN=local/GOWORK=off:
+Go1.23.2 instalado separadamente; GOPROXY=off, GOSUMDB=off, GOTOOLCHAIN=local,
+GOWORK=off. Modulos locales ../UAsset y ../PAKV11: deben conservarse al compilar.
 
 ```text
 go test -count=1 ./...
-go test -race -count=1 ./...
-python -B -m unittest -v test_tools test_capture_reference test_membership_reference test_execution_reference
-python -B build.py --out <directorio-nuevo-fuera-del-repositorio>
+go test -race -count=1 -run 'Test(Publication|Candidate)' ./...
+python -B -m unittest -v test_tools test_capture_reference test_membership_reference test_execution_reference test_publication_reference
+python -B build.py --out <directorio-nuevo-externo>
 ```
 
-Los exports opt-in requieren directorios NUEVOS: PMM_R1_PLAN_OUTPUT,
-PMM_R1_CAPTURE_OUTPUT, PMM_R1_MEMBERSHIP_OUTPUT y PMM_R1_EXECUTION_OUTPUT.
-PMM_R1_PACKAGE apunta a PMM solo para leer receta con inventarios SIMULADOS.
-Sin esas variables se omiten cinco tests de entrega; no contar SKIP como PASS.
+130 Test Go PASS con los seis opt-ins de entrega activados; helper de cierre
+abrupto no se cuenta. Sin exportaciones son menos PASS y seis SKIP adicionales.
+52 tests Python con sus cinco directorios de fixtures. Esta tanda paso race sobre
+las 26 pruebas nuevas; dos intentos de race COMPLETO se interrumpieron en un test
+previo costoso de cancelacion y NO se cuentan como PASS. No se cambio ese test.
 
-Los oracles Python usan PMM_R1_TOOL_FIXTURES, PMM_R1_CAPTURE_FIXTURES,
-PMM_R1_MEMBERSHIP_FIXTURES y PMM_R1_EXECUTION_FIXTURES, apuntando a esos exports.
-`python -B verify_execution.py <execution-output>` comprueba tres escenarios,
-30 outputs y sus tres PAK, sin importar Go ni ejecutar herramientas externas.
-La especificacion propia `testdata/make_execution.py` conserva los bytes esperados;
-su reproduccion usa el generador sintetico existente de UAsset, no datos de juego.
+Opt-ins Go: PMM_R1_PLAN_OUTPUT, PMM_R1_CAPTURE_OUTPUT, PMM_R1_MEMBERSHIP_OUTPUT,
+PMM_R1_EXECUTION_OUTPUT, PMM_R1_PUBLICATION_OUTPUT requieren destinos NUEVOS.
+PMM_R1_PACKAGE solo habilita lectura de receta con metadata artificial.
+Opt-ins Python: PMM_R1_TOOL_FIXTURES, PMM_R1_CAPTURE_FIXTURES,
+PMM_R1_MEMBERSHIP_FIXTURES, PMM_R1_EXECUTION_FIXTURES, PMM_R1_PUBLICATION_FIXTURES.
+verify_publication.py usa el lector Python PAK y expectativas propias predefinidas.
 
-build.py solo compila CoreR1-tests.exe con fuentes/fixtures/dependencias fijadas
-en la salida y un informe de hashes. No lo ejecuta, firma o instala. NO copiarlo
-sobre PMMFixLab.exe. Los tests Windows exclusivos de captura siguen NOT_RUN.
+El builder produce CoreR1-tests.exe, no PMMFixLab.exe. Windows solo compilado/vet.
+El kit separado incluye RUN_WINDOWS_PUBLICATION_TESTS.cmd para probar los cambios
+reales de esta tanda en TEMP, no el PMM.exe sin actualizar. Ver
+WINDOWS_PUBLICATION_ACCEPTANCE.md antes de ejecutarlo. No pedir exclusiones AV.
 
-## Registro
-
-Resultados locales 6A en evidence/s04a6a; historia 5A/5B/5C permanece intacta.
-Leer ../../../NEXT_SESSION.md para continuar con 04A-6B; no rehacer
-las primitivas ni usar un ZIP antiguo como estado completo de otras candidatas.
+Estado/evidencia: ../../../STATUS.md, ../../../NEXT_SESSION.md y evidence/s04a6b/.
+No mezclar el commit de fuentes con una release, instalacion o aprobacion Nexus.

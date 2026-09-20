@@ -68,7 +68,7 @@ def build(out):
     if collect_sources(here) != files:
         raise ValueError('Source or local dependency changed during build')
     artifact = (out / 'CoreR1-tests.exe').read_bytes()
-    report = {'schema': 'PMM_CORE_R1_BOUNDED_EXECUTION_TEST_BUILD_V1', 'artifact': 'TEST harness only; not FixLab',
+    report = {'schema': 'PMM_CORE_R1_PUBLICATION_TEST_BUILD_V1', 'artifact': 'TEST harness only; not FixLab',
               'goVersion': version, 'target': 'windows/amd64', 'sha256': sha(artifact), 'bytes': len(artifact),
               'command': [x.replace(str(out), '<OUT>') for x in command],
               'sourceSHA256': {n: sha(b) for n, b in files.items()},

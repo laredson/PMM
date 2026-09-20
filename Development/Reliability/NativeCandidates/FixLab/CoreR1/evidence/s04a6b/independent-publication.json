@@ -1,0 +1,30 @@
+{
+  "schema": "PMM_R1_PUBLICATION_FIXTURE_VERIFICATION_V1",
+  "fixtures": [
+    {
+      "fixture": "basic",
+      "filesInBundle": 4,
+      "outputEntriesCompared": 10,
+      "pakSHA256": "6ea4b12ab567a5f718dc245edafbe0c24997aa688237a7f59263585dea9196a2",
+      "manifestSHA256": "ab92f2472c6ecb290c2098dd35665b124658ea07e8c6d895cf40f0173b9e5829",
+      "gameAccepted": false
+    },
+    {
+      "fixture": "masked",
+      "filesInBundle": 4,
+      "outputEntriesCompared": 10,
+      "pakSHA256": "cbb16ce07075da8ba123ed1f00273a7e965f46130b7a595ffc3df47e04949902",
+      "manifestSHA256": "555e4b3b61a8483eee70ca4538e304d1d329c416230da4784ae4b7669fe6e330",
+      "gameAccepted": false
+    },
+    {
+      "fixture": "decoy",
+      "filesInBundle": 4,
+      "outputEntriesCompared": 10,
+      "pakSHA256": "e196d8a52fc0827f67cf7ef5607a92b231c2140e98453f6466280909688fdec1",
+      "manifestSHA256": "5b9c8e082172a63b27b204495abc3461d0b8db035a0380af82f36cf357c63bae",
+      "gameAccepted": false
+    }
+  ],
+  "realAssetsUsed": false
+}

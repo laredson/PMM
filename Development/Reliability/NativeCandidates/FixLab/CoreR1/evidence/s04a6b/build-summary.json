@@ -1,0 +1,12 @@
+{
+  "schema": "PMM_R1_PUBLICATION_BUILD_SUMMARY_V1",
+  "artifact": "CoreR1 TEST harness; not PMM or FixLab engine",
+  "goVersion": "go version go1.23.2 linux/amd64",
+  "target": "windows/amd64",
+  "sha256": "72f2d6a38dfa2bed53ccb692d3e6adef2bbd244d99cb97e03e1905fa8bc734ab",
+  "bytes": 6676480,
+  "repeatSHA256": "72f2d6a38dfa2bed53ccb692d3e6adef2bbd244d99cb97e03e1905fa8bc734ab",
+  "byteIdentical": true,
+  "windowsExecuted": false,
+  "buildReportSHA256": "efadf22d5b5a5090404f0e21b7a34aabac530cca453607dc9c3dfc3dce9876b3"
+}

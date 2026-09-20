@@ -1,15 +1,17 @@
-# FixLab candidato - reconstruccion por componentes
+# FixLab - componentes candidatos, no motor instalado
 
-04A-6A publicada en la rama de fiabilidad; ver SESSION04A6A_PUBLICATION.json.
-Base remota 587b4ed (5C). Leer ../../NEXT_SESSION.md antes de continuar.
+CoreR1 conserva plan, captura, pertenencia PAK y ejecucion acotada en memoria.
+04A-6B agrega guardado aislado y lectura posterior del resultado, no deploy.
+UAsset, PAKV11 y PMMDLT1 no cambian en esta entrega.
 
-PMMDLT1, PAKV11 y UAsset (lectura/nombres/postProcess) permanecen conservados.
-CoreR1 tiene PlanCore, CaptureCore, VerifyMembership y ahora ExecuteBounded:
-plan explicito, transformaciones de ancho fijo, soporte y PAK en memoria.
-No es receta general Gura ni motor FixLab completo; schemas reales no demostrados.
-No source original recuperado. No cambiar pins o aceptar regiones opacas como
-relocalizables para ocultar una limitacion. No repetir el overlay corrupto.
+El programa PMM/ sigue con sus EXE originales. Las fuentes de ESTA carpeta son
+las candidatas en desarrollo. Leer ../../RUNNING_VERSION.md para no confundir
+la version visible 1.5.0.1 con los reemplazos ya instalados.
 
-Los tests son artificiales, los harness Windows no se ejecutaron ni instalaron.
-PMM/ y PMMFixLab.exe permanecen intactos. Siguiente 6B, que tratara
-el guardado transaccional a carpeta candidata aislada; no despliegue al juego.
+CoreR1/PUBLICATION_CONTRACT.md explica errores antes/despues del commit y los
+limites. El kit de pruebas Windows usa solo datos artificiales en TEMP. No poner
+CoreR1-tests.exe en lugar de PMMFixLab.exe. Windows/Unreal/Palworld no aceptados.
+
+No se recupero la fuente original ni el overlay roto. Core real, schemas/serializers
+no escalares, relocalizacion variable y V2/CLI siguen pendientes.
+Continuacion: ../../NEXT_SESSION.md, 04A-6C, aceptacion Windows del guardado.

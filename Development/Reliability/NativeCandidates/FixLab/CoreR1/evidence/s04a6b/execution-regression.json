@@ -1,0 +1,39 @@
+{
+  "schema": "PMM_R1_EXECUTION_INDEPENDENT_V1",
+  "fixtures": [
+    {
+      "fixture": "basic",
+      "files": 10,
+      "families": 3,
+      "postProcessFamilies": 2,
+      "pakSHA256": "6ea4b12ab567a5f718dc245edafbe0c24997aa688237a7f59263585dea9196a2",
+      "bytes": 6958,
+      "allOutputBytesCompared": true,
+      "unrealAccepted": false,
+      "gameDataUsed": false
+    },
+    {
+      "fixture": "masked",
+      "files": 10,
+      "families": 3,
+      "postProcessFamilies": 2,
+      "pakSHA256": "cbb16ce07075da8ba123ed1f00273a7e965f46130b7a595ffc3df47e04949902",
+      "bytes": 6918,
+      "allOutputBytesCompared": true,
+      "unrealAccepted": false,
+      "gameDataUsed": false
+    },
+    {
+      "fixture": "decoy",
+      "files": 10,
+      "families": 3,
+      "postProcessFamilies": 2,
+      "pakSHA256": "e196d8a52fc0827f67cf7ef5607a92b231c2140e98453f6466280909688fdec1",
+      "bytes": 7158,
+      "allOutputBytesCompared": true,
+      "unrealAccepted": false,
+      "gameDataUsed": false
+    }
+  ],
+  "method": "Authored Python byte edits plus independent PAK reader; not engine acceptance"
+}

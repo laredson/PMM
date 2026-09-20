@@ -1,21 +1,19 @@
-# PMM v1.5.0.1 - fiabilidad independiente
+# PMM v1.5.0.1 - desarrollo de fiabilidad
 
-Rama v1.5.0.1-PMM-reliability. **04A-6A publicada en esta rama.**
-El commit portador de Development/Reliability/SESSION04A6A_PUBLICATION.json
-incorpora la entrega conservada sobre 587b4ed, sin nuevos cambios funcionales.
-Los indicadores PENDING en FINDINGS/CHECKS corresponden al cierre local anterior;
-el registro de publicacion actualiza ese estado, no la evidencia de pruebas.
+**El programa PMM/ sigue usando los ejecutables originales.** La version visible
+1.5.0.1 y build s01b se alinearon en 01B; no indican candidatas instaladas.
+Los cambios de desarrollo estan en Development/Reliability/NativeCandidates/
+DENTRO de esta misma rama. Pull no recompila PMM.exe automaticamente.
+Ver [Que estas ejecutando](Development/Reliability/RUNNING_VERSION.md).
 
-CoreR1 agrega ExecuteBounded: plan/revision, snapshot/membership, transformaciones
-acotadas y PAK verificado en memoria. Sin escritura en juego/PMM ni instalacion.
-104 Test Go/44 Python, race Linux y tres PAK artificiales verificados por Python.
-No equivale a core general ni aceptacion Windows/Unreal/Palworld. REL-01 abierta.
+04A-6B agrega guardado transaccional aislado del resultado acotado de FixLab:
+PAK/informe/manifiesto/completion, verificacion de bytes y commit sin reemplazo.
+No modifica el juego, no es una release de PMM ni una garantia antivirus.
+Windows implementado/compilado pero su aceptacion real sigue pendiente.
 
-[Continuar](Development/Reliability/NEXT_SESSION.md),
-[estado](Development/Reliability/STATUS.md),
-[hallazgos](Development/Reliability/SESSION04A6A_FINDINGS.md) y
-[comprobaciones](Development/Reliability/SESSION04A6A_CHECKS.json).
-Siguiente: guardado transaccional aislado 04A-6B. No repetir la publicacion de 6A.
-
-Paquete intacto: 1.5.0.1/s01b, 629 archivos/628 hashes. Otras candidatas y codecs
-conservados. No copiar CoreR1-tests.exe sobre PMMFixLab.exe. Sin release, PR o tag.
+[STATUS](Development/Reliability/STATUS.md),
+[NEXT_SESSION](Development/Reliability/NEXT_SESSION.md),
+[hallazgos 6B](Development/Reliability/SESSION04A6B_FINDINGS.md) y
+[checks 6B](Development/Reliability/SESSION04A6B_CHECKS.json) conservan el avance.
+CoreR1 incluye un runner de pruebas Windows para usar con el harness separado,
+NO con el ejecutable del programa. Siguiente: 04A-6C, aceptacion Windows del guardado.
