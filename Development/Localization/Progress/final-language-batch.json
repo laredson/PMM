@@ -1,0 +1,63 @@
+{
+  "schema": "PMM_TRANSLATION_BATCH_V1",
+  "date": "2026-09-19",
+  "branch": "v1.5.0.0-PMM-translated",
+  "sourceCommit": "32cd1fc815cedddc8f114badcdd86a5e47d2c633",
+  "sourceCatalogGitBlobSha": "2fa3c4712619cc5f811ce2251cef3daf5b0e2024",
+  "status": "published-for-user-runtime-qa",
+  "newCompletedLocales": [
+    "ro",
+    "th",
+    "id"
+  ],
+  "completedLocaleCount": 3,
+  "locales": {
+    "ro": {
+      "nativeName": "Română",
+      "entries": 1291,
+      "parameterizedEntries": 109,
+      "catalogGitBlobSha": "d63dfdd217e76c9cf56cd98432857640679d84c7",
+      "catalogSha256": "1c74bd75656eb1326ddb7d1492f678592fa851a3978de64ecff3686a97e8604c",
+      "validationPassed": true,
+      "userRuntimeVisualQA": "pending",
+      "nativeSpeakerQA": "pending"
+    },
+    "th": {
+      "nativeName": "ไทย",
+      "entries": 1291,
+      "parameterizedEntries": 109,
+      "catalogGitBlobSha": "ede5b79c33cf6ec033fcf3c92173fca15a12e3c4",
+      "catalogSha256": "8224e8497d9cb4d0357e4602ed0f8a98e30e825642c7a833523a1af4573e1385",
+      "validationPassed": true,
+      "userRuntimeVisualQA": "pending",
+      "nativeSpeakerQA": "pending"
+    },
+    "id": {
+      "nativeName": "Bahasa Indonesia",
+      "entries": 1291,
+      "parameterizedEntries": 109,
+      "catalogGitBlobSha": "ac4f3b9ab0282074aa7e1cd44d1d909f6da1db42",
+      "catalogSha256": "e734c3cfd9e58b1274eed69caf59be72521ebdca4fff62e7badf40d8e84be80a",
+      "validationPassed": true,
+      "userRuntimeVisualQA": "pending",
+      "nativeSpeakerQA": "pending"
+    }
+  },
+  "registry": {
+    "gitBlobSha": "49dc572386b41668265167260d439ebce1a8236a",
+    "registered": 30,
+    "enabled": 19,
+    "default": "en"
+  },
+  "remaining": [
+    "vi",
+    "uk",
+    "cs",
+    "ga"
+  ],
+  "limitations": [
+    "No PMM/WPF or Windows PowerShell 5.1 runtime test.",
+    "No native-speaker acceptance.",
+    "Catalog coverage does not close separately tracked runtime-generated English/layout defects."
+  ]
+}

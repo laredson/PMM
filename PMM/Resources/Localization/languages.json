@@ -53,6 +53,16 @@
       "status": "complete"
     },
     {
+      "code": "ro",
+      "nativeName": "Română",
+      "englishName": "Romanian",
+      "fallback": "en",
+      "direction": "ltr",
+      "xaml": null,
+      "enabled": true,
+      "status": "complete"
+    },
+    {
       "code": "de",
       "nativeName": "Deutsch",
       "englishName": "German",
@@ -219,8 +229,8 @@
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
-      "enabled": false,
-      "status": "template"
+      "enabled": true,
+      "status": "complete"
     },
     {
       "code": "id",
@@ -229,8 +239,8 @@
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
-      "enabled": false,
-      "status": "template"
+      "enabled": true,
+      "status": "complete"
     },
     {
       "code": "vi",

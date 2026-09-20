@@ -1,3 +1,13 @@
+## Romanian, Thai and Indonesian published for user testing — 2026-09-19
+
+Română (`ro`), ไทย (`th`) and Bahasa Indonesia (`id`) now each cover **1,291/1,291 canonical English entries** and are enabled on `v1.5.0.0-PMM-translated` for user testing. Romanian preserves the recovered catalog byte-for-byte; Thai and Indonesian use the jointly validated catalogs. All three have 109 parameterized entries and the joint structural validator reported zero errors.
+
+The registry now contains **30 registered locales, 19 enabled**. Romanian is inserted after Português (Brasil) and before Deutsch; Thai and Indonesian remain in their existing Asian positions. English remains first/default, native labels remain unchanged, and the previously enabled catalogs retain their relative order and metadata.
+
+Runtime/visual QA, Windows PowerShell 5.1/WPF execution and native-speaker acceptance are still pending. Existing dynamic English counters, the legacy Library.UI selector path, Arabic mixed prose/path bidi handling and virtualized technical-cell checks remain separate.
+
+Remaining approved translations: `vi -> uk -> cs -> ga` (Tiếng Việt -> Українська -> Čeština -> Gaeilge). Do not regenerate `ro`, `th` or `id` unless a specific QA defect is reported.
+
 ## Dutch localization complete; Irish next — 2026-09-18
 
 Nederlands (`nl`) now covers **1,291/1,291 canonical English entries** and is enabled for user testing on `v1.5.0.0-PMM-translated`. Publication parent: `f231136769289a9dc56a71bed68fac11cc78833a`. All fifteen previously enabled catalogs, including Turkish and Polish, are unchanged.
