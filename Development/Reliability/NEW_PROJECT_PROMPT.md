@@ -34,12 +34,17 @@ Esta rama SI puede quedar temporalmente rota: es una rama experimental para que 
 
 Pedirme que haga Pull y probar I01: arranque, ventana visible, UI utilizable, cierre, segundo arranque y tiempos. No sigas acumulando integraciones antes de revisar esa prueba.
 
-Luego retomar 04A-6C y el roadmap documentado. No crear PR/tag/release ni ejecutar Actions por iniciativa propia. Commits de desarrollo con `[skip ci]`. No desactivar antivirus ni pedir exclusiones.
+04A-6C ya corrigio publicacion Windows y agrego la interfaz candidata mientras
+el propietario prueba I01; leer sus FINDINGS/CHECKS. La matriz sigue parcial
+(Win10 NTFS probado, Win11/disco lleno real/AV pendientes). Continuar el contrato
+V2/CLI candidato-only sin sustituir FixLab ni acumular integraciones PMM.
+No crear PR/tag/release ni ejecutar Actions. Commits con `[skip ci]`.
+No desactivar antivirus ni pedir exclusiones.
 
 Antes de responderme que falta contexto, demuestra que has leido el handoff y resume:
 - que Host/Runtime I01 estan integrados y FixLab sigue siendo el original;
 - hashes Host/Runtime I01;
-- que hace 04A-6B;
+- que hacen 04A-6B/6C y los limites de las pruebas Windows;
 - cual es la siguiente prueba Windows;
 - que queda pendiente para FixLab;
 - como se integraran los idiomas.

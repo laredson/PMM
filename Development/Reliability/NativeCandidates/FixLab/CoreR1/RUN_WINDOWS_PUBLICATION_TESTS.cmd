@@ -15,7 +15,7 @@ if not exist "CoreR1-tests.exe" (
  echo Missing CoreR1-tests.exe. Use the separate test kit, not PMM.exe.
  exit /b 2
 )
-"CoreR1-tests.exe" -test.v -test.run "Test(Publication|Candidate)" -test.timeout 60s > "Windows-publication-tests.txt" 2>&1
+"CoreR1-tests.exe" -test.v -test.run "Test(Publication|Candidate|CaptureWindows)" -test.timeout 90s > "Windows-publication-tests.txt" 2>&1
 set "RC=%ERRORLEVEL%"
 type "Windows-publication-tests.txt"
 echo.

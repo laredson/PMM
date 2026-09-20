@@ -1,8 +1,9 @@
 # CoreR1 - candidato de desarrollo, NO motor instalado en PMM
 
-04A-6B agrega PublishCandidate e InspectCandidate. El programa PMM/ sigue usando
-sus ejecutables anteriores; cambiar de rama o hacer Pull no recompila esos EXE.
-Leer ../../../RUNNING_VERSION.md. El build del paquete sigue siendo s01b.
+04A-6C corrige PublishCandidate en Windows real y agrega ExecuteAndPublishCandidate.
+El paquete PMM/ ya contiene Host/Runtime I01; FixLab permanece original.
+Este modulo y su harness siguen aislados y NO sustituyen PMMFixLab.exe.
+Leer ../../../RUNNING_VERSION.md e INTEGRATION_CONTRACT.md.
 
 ## Recorrido disponible
 
@@ -35,7 +36,7 @@ python -B -m unittest -v test_tools test_capture_reference test_membership_refer
 python -B build.py --out <directorio-nuevo-externo>
 ```
 
-130 Test Go PASS con los seis opt-ins de entrega activados; helper de cierre
+Evidencia historica 6B (Linux): 130 Test Go PASS con seis opt-ins; helper de cierre
 abrupto no se cuenta. Sin exportaciones son menos PASS y seis SKIP adicionales.
 52 tests Python con sus cinco directorios de fixtures. Esta tanda paso race sobre
 las 26 pruebas nuevas; dos intentos de race COMPLETO se interrumpieron en un test
@@ -48,10 +49,15 @@ Opt-ins Python: PMM_R1_TOOL_FIXTURES, PMM_R1_CAPTURE_FIXTURES,
 PMM_R1_MEMBERSHIP_FIXTURES, PMM_R1_EXECUTION_FIXTURES, PMM_R1_PUBLICATION_FIXTURES.
 verify_publication.py usa el lector Python PAK y expectativas propias predefinidas.
 
-El builder produce CoreR1-tests.exe, no PMMFixLab.exe. Windows solo compilado/vet.
+6C en Win10 NTFS sin elevar: 141 Test Go + 4 targets Fuzz con seeds PASS,
+50 Python PASS / 2 symlink SKIP; 40 Test del EXE independiente PASS, 25 rondas de
+cuatro publicaciones concurrentes PASS. Vet Windows/Linux y cross-build Linux PASS,
+sin ejecucion Linux ni race en esta tanda. Win11/AV/disco lleno real pendientes.
+
+El builder produce CoreR1-tests.exe, no PMMFixLab.exe. Dos builds 6C identicos.
 El kit separado incluye RUN_WINDOWS_PUBLICATION_TESTS.cmd para probar los cambios
 reales de esta tanda en TEMP, no el PMM.exe sin actualizar. Ver
 WINDOWS_PUBLICATION_ACCEPTANCE.md antes de ejecutarlo. No pedir exclusiones AV.
 
-Estado/evidencia: ../../../STATUS.md, ../../../NEXT_SESSION.md y evidence/s04a6b/.
+Estado/evidencia actual: ../../../STATUS.md, ../../../NEXT_SESSION.md y evidence/s04a6c/.
 No mezclar el commit de fuentes con una release, instalacion o aprobacion Nexus.

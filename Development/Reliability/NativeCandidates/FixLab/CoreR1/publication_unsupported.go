@@ -7,7 +7,7 @@ import "os"
 func publicationPlatformError() error {
 	return fail("UNSUPPORTED", "publication", "platform adapter unavailable")
 }
-func candidateParent(*os.File) (*os.File, error) { return nil, publicationPlatformError() }
+func candidateParent(*anchoredRoot, string) (*os.File, error) { return nil, publicationPlatformError() }
 func candidateLookup(*os.File, string, bool) (*os.File, error) {
 	return nil, publicationPlatformError()
 }
@@ -20,3 +20,7 @@ func candidateCommit(*os.File, *os.File, string, string) (bool, error) {
 	return false, publicationPlatformError()
 }
 func candidateSyncDir(*os.File) (bool, error) { return false, publicationPlatformError() }
+
+func candidateSeal(*os.File, []string, []*os.File) (func() error, error) {
+	return nil, publicationPlatformError()
+}

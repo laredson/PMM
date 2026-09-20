@@ -339,17 +339,26 @@ func publishCandidate(ctx context.Context, r *MemoryResult, q PublicationRequest
 	if e != nil {
 		return nil, e
 	}
-	// Retain all objects through commit. Rollback deletes ONLY objects we created,
+	// Retain directory anchors through commit and leaf ownership across sealing.
+	// Rollback deletes ONLY objects we created,
 	// with identity checks, never RemoveAll or traversal of foreign contents.
 	var parent, stage *os.File
 	var files []*os.File
+	var restore func() error
 	created := false
 	committed := false
 	residue := ""
 	defer func() {
 		var cleanup []error
 		if !committed && created && stage != nil {
+			if restore != nil {
+				cleanup = append(cleanup, restore())
+			}
 			for i := len(files) - 1; i >= 0; i-- {
+				if files[i] == nil {
+					cleanup = append(cleanup, fail("CHANGED", names[i], "owned rollback handle unavailable"))
+					continue
+				}
 				de := h.at("cleanup:" + names[i])
 				if de == nil {
 					de = candidateRemove(stage, names[i], files[i], false)
@@ -387,7 +396,7 @@ func publishCandidate(ctx context.Context, r *MemoryResult, q PublicationRequest
 	if e = ctx.Err(); e != nil {
 		return nil, e
 	}
-	parent, e = candidateParent(root.file)
+	parent, e = candidateParent(root, q.Parent)
 	if e != nil {
 		return nil, e
 	}
@@ -441,6 +450,16 @@ func publishCandidate(ctx context.Context, r *MemoryResult, q PublicationRequest
 		return nil, e
 	}
 	if _, e = candidateSyncDir(stage); e != nil {
+		return nil, e
+	}
+	// Windows cannot rename a directory containing open file handles. Seal the
+	// verified leaves immediately before commit. On failure the platform restores
+	// only handles whose file IDs still match; foreign replacements survive.
+	restore, e = candidateSeal(stage, names, files)
+	if e != nil {
+		return nil, e
+	}
+	if e = h.at("sealed-before-commit"); e != nil {
 		return nil, e
 	}
 	if e = ctx.Err(); e != nil {

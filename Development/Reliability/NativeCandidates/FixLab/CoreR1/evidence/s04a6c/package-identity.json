@@ -1,0 +1,12 @@
+{
+  "schema": "PMM_S04A6C_PACKAGE_IDENTITY_V1",
+  "inputCommit": "91f643614142283b50b9c1b1be6178fa796138a1",
+  "packageTree": "12e01ba3a24a2c0ce5e74d681b4931307c845a56",
+  "packageFiles": 629,
+  "checksumRows": 628,
+  "checksumMismatches": [],
+  "buildId": "PMM-v1.5.0.1-reliability-i01",
+  "packageChanged": false,
+  "packageExecuted": false,
+  "untrackedUserDirectory": "PMM/.codex/ preserved and excluded"
+}

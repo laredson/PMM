@@ -9,7 +9,9 @@ import (
 	"unsafe"
 )
 
-func candidateParent(f *os.File) (*os.File, error) { return openChild(f, ".", true) }
+func candidateParent(root *anchoredRoot, _ string) (*os.File, error) {
+	return openChild(root.file, ".", true)
+}
 func candidateLookup(parent *os.File, name string, dir bool) (*os.File, error) {
 	return openChild(parent, name, dir)
 }
@@ -73,3 +75,5 @@ func candidateCommit(parent, stage *os.File, old, new string) (bool, error) {
 	return true, candidateSame(parent, new, stage, true)
 }
 func candidateSyncDir(f *os.File) (bool, error) { e := f.Sync(); return e == nil, e }
+
+func candidateSeal(*os.File, []string, []*os.File) (func() error, error) { return nil, nil }

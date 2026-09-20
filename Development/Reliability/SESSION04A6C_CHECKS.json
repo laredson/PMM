@@ -1,0 +1,62 @@
+{
+  "schema": "PMM_SESSION04A6C_CHECKS_V1",
+  "date": "2026-09-20",
+  "inputCommit": "91f643614142283b50b9c1b1be6178fa796138a1",
+  "inputCoreR1Tree": "fd310b4272caa673db15476b58d0dd8a5f99d8bc",
+  "scopeStatus": "IMPLEMENTED_WIN10_NTFS_VALIDATED; CROSS_ENVIRONMENT_ACCEPTANCE_PARTIAL",
+  "evidenceDirectory": "NativeCandidates/FixLab/CoreR1/evidence/s04a6c",
+  "testSummary": {
+    "goTestPassed": 141,
+    "fuzzSeedTargetsPassed": 4,
+    "pythonPassed": 50,
+    "pythonSkipped": 2,
+    "failed": 0,
+    "harnessTopLevelPassed": 40,
+    "concurrencyRepeats": 25,
+    "publicationsPerRepeat": 4
+  },
+  "build": {
+    "sha256": "4ac6f890581fb7a95fc07bf421d92b1b6bfdab4d79db69960da9a872f208fc07",
+    "bytes": 6762496,
+    "repeatSHA256": "4ac6f890581fb7a95fc07bf421d92b1b6bfdab4d79db69960da9a872f208fc07",
+    "byteIdentical": true,
+    "windowsExecuted": true,
+    "engineBuilt": false
+  },
+  "package": {
+    "schema": "PMM_S04A6C_PACKAGE_IDENTITY_V1",
+    "inputCommit": "91f643614142283b50b9c1b1be6178fa796138a1",
+    "packageTree": "12e01ba3a24a2c0ce5e74d681b4931307c845a56",
+    "packageFiles": 629,
+    "checksumRows": 628,
+    "checksumMismatches": [],
+    "buildId": "PMM-v1.5.0.1-reliability-i01",
+    "packageChanged": false,
+    "packageExecuted": false,
+    "untrackedUserDirectory": "PMM/.codex/ preserved and excluded"
+  },
+  "protectedState": {
+    "gameDataUsed": false,
+    "gameExecuted": false,
+    "PMMExecuted": false,
+    "PMMChanged": false,
+    "codecsChanged": false,
+    "hostRuntimeChanged": false,
+    "antivirusScanned": false,
+    "antivirusPolicyChanged": false,
+    "privilegesEnabled": false,
+    "releaseCreated": false,
+    "workflowDispatched": false
+  },
+  "notTested": [
+    "Windows 11",
+    "real disk full",
+    "power loss/hardware crash",
+    "actual antivirus interference",
+    "remote SMB volume",
+    "Linux execution after changes",
+    "race detector",
+    "real Unreal/Palworld repair"
+  ],
+  "next": "Prioritize owner's I01 feedback; finish remaining Windows matrix where available; next bounded research is V2/CLI candidate-only orchestration contract, not engine replacement."
+}

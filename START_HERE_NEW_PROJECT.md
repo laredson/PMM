@@ -5,6 +5,7 @@ Este archivo es el punto de entrada autoritativo para cualquier chat, proyecto, 
 Repositorio: `laredson/PMM`  
 Rama de trabajo: `v1.5.0.1-PMM-reliability`  
 Base de integracion I01B: `e83b191e56c916b4de12c34a9d054f4bd6bbd485`
+Base de la tanda 04A-6C: `91f643614142283b50b9c1b1be6178fa796138a1`
 
 ## Regla principal
 
@@ -33,7 +34,7 @@ Despues leer el contrato de la candidata concreta antes de modificarla.
 
 ## Estado ejecutivo en una frase
 
-La rama contiene todo el research y las reconstrucciones Host/Runtime/FixLab hasta 04A-6B. Host y Runtime C2B ya estan integrados en `PMM/` como la aplicacion I01 reproducible; FixLab reconstruido sigue aislado en `Development/Reliability/NativeCandidates/FixLab/` y NO sustituye al FixLab original. La aceptacion funcional Windows de I01 sigue pendiente del propietario.
+La rama contiene research hasta 04A-6C: publicacion candidata corregida y ejecutada en Win10 NTFS, mas interfaz de integracion acotada. Host y Runtime C2B siguen integrados en `PMM/` como I01; FixLab candidato sigue aislado y NO sustituye al original. La prueba funcional I01 del propietario sigue pendiente; este autorizo avanzar el laboratorio mientras lo prueba.
 
 ## Objetivo inmediato
 
@@ -42,7 +43,7 @@ La rama contiene todo el research y las reconstrucciones Host/Runtime/FixLab has
 3. pedir al usuario que haga Pull con GitHub Desktop y pruebe el programa real;
 4. registrar arranque, cierre, segundo arranque, ventana visible, UI utilizable y tiempos;
 5. corregir cualquier regresion antes de otra integracion grande;
-6. despues continuar 04A-6C y el resto del plan;
+6. leer SESSION04A6C_FINDINGS/CHECKS: no repetir su implementacion; completar la matriz Windows pendiente y delimitar V2/CLI candidato-only;
 7. no crear PR, tag, release ni ejecutar Actions.
 
 No modificar pins para conseguir que una compilacion distinta pase.

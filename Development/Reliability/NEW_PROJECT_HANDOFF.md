@@ -131,7 +131,7 @@ Como el checkout actual ya contiene I01, una reconstruccion futura debe obtener 
 base s01b mediante un worktree o archivo limpio del commit pinneado. No cambiar los
 guards para compilar sobre los EXE I01 ni copiar una carpeta antigua sobre la nueva.
 
-## 7. FixLab - investigacion completada hasta 04A-6B, NO integrada
+## 7. FixLab - implementacion hasta 04A-6C, NO integrada
 
 El ejecutable original sigue en PMM.
 
@@ -156,7 +156,16 @@ Estado 6B:
 - Windows compilado/vet, cuatro pruebas Windows-only NO ejecutadas;
 - todos los fixtures artificiales.
 
-Siguiente research de esa linea: 04A-6C, aceptacion real Windows del guardado y cierre de su interfaz de integracion. Aun faltan schemas/serializers reales, relocalizacion variable/bulk, V2/CLI y motor FixLab completo antes de reemplazar `PMMFixLab.exe`.
+04A-6C, autorizada mientras el propietario prueba I01, corrige el adapter Windows
+(padre, sharing, rename anclado y sellado de hojas) y agrega
+ExecuteAndPublishCandidate con estados de rechazo/residuo/commit/error.
+Win10 19045 NTFS sin elevar: 141 Test Go + 4 targets Fuzz con seeds PASS,
+50 Python PASS / 2 SKIP, EXE independiente 40 PASS, builds repetidos identicos.
+Win11, disco lleno real, AV y crash fisico siguen pendientes; no race nuevo.
+Ver SESSION04A6C_FINDINGS/CHECKS y CoreR1/INTEGRATION_CONTRACT.md.
+Siguiente: matriz pendiente y contrato de orquestacion V2/CLI candidato-only.
+Aun faltan schemas/serializers reales, relocalizacion variable/bulk, V2/CLI y
+motor FixLab completo antes de reemplazar `PMMFixLab.exe`.
 
 ## 8. Host/Runtime - gates pendientes
 
@@ -197,7 +206,7 @@ Las nuevas cadenas de reliability deben registrarse para traducirlas antes de ca
 
 1. Obtener la prueba Windows del usuario para I01 ya integrado.
 2. Corregir cualquier regresion de I01 y medir arranque.
-3. 04A-6C Windows del guardado FixLab.
+3. Completar matriz 6C fuera de Win10 NTFS y delimitar V2/CLI candidato-only.
 4. Completar las capacidades FixLab reales pendientes y V2/CLI.
 5. Integrar un PMMFixLab reconstruido cuando tenga paridad suficiente; prueba incremental.
 6. Cerrar Host/Runtime restantes y optimizar arranque.

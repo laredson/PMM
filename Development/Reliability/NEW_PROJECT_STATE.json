@@ -72,8 +72,21 @@
   },
   "fixLabResearch": {
     "integratedIntoRemotePMM": false,
-    "latestCompletedResearchStep": "04A-6B",
-    "nextResearchStep": "04A-6C Windows publication acceptance",
+    "latestCompletedResearchStep": "04A-6C implementation and Win10 NTFS validation; cross-environment acceptance partial",
+    "nextResearchStep": "Remaining Windows matrix and bounded V2/CLI candidate-only orchestration contract",
+    "s04a6cTests": {
+      "goTestPassed": 141,
+      "fuzzSeedTargetsPassed": 4,
+      "pythonPassed": 50,
+      "pythonSkipped": 2,
+      "windowsHarnessPassed": 40,
+      "concurrencyRounds": 25,
+      "publicationsPerRound": 4,
+      "windows10NTFSExecutedNonElevated": true,
+      "windows11Executed": false,
+      "raceExecuted": false,
+      "reproducibleHarnessSHA256": "4ac6f890581fb7a95fc07bf421d92b1b6bfdab4d79db69960da9a872f208fc07"
+    },
     "s04a6bTests": {
       "goPassed": 130,
       "pythonPassed": 52,
@@ -96,10 +109,11 @@
   },
   "immediateNext": [
     "Do not rebuild or republish I01 without a new reason; it is already integrated in PMM.",
-    "Ask user to Pull via GitHub Desktop and run I01 on Windows.",
+    "Collect results from the owner's ongoing I01 Windows test.",
     "Record startup visible/usable time, close, second startup, UI/regressions and logs if failure.",
     "Correct any I01 regression before another large integration.",
-    "Then continue 04A-6C and remaining roadmap."
+    "Owner authorized laboratory progress while testing I01; 6C implementation and Win10 NTFS validation are done without changing PMM.",
+    "Complete remaining Windows acceptance where available; delimit V2/CLI candidate-only contract next."
   ],
   "developmentPolicy": {
     "remoteWritesNeedExplicitAuthorization": true,

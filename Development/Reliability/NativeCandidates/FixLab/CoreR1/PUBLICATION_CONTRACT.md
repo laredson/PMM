@@ -34,8 +34,12 @@ sobre una candidata anterior. Linux: mkdirat 0700, ficheros 0600 y O_EXCL/NOFOLL
 Windows: NtCreateFile relativo con FILE_CREATE/OPEN_REPARSE_POINT y DACL protegida
 heredable para usuario del proceso/SYSTEM; API de archivo documentada, sin elevar
 privilegios, tocar procesos, cambiar antivirus o usar syscalls directas Windows.
-Las hojas Windows permiten lectura/borrado compartidos para renombrar el directorio,
-no escritura compartida. La identidad se comprueba de nuevo antes de commit.
+Las hojas Windows permiten lectura/borrado compartidos, no escritura compartida.
+La identidad se comprueba de nuevo antes de commit. Windows exige cerrar las
+hojas para renombrar el directorio: se sellan inmediatamente antes del rename,
+reteniendo identidades de volumen/archivo y los handles de los directorios.
+Ante fallo se reabren SOLO para rollback y se comparan identidades; una hoja
+ajena, enlazada o inaccesible no se borra y se informa posible residuo.
 
 Los checks no son un sandbox frente a otro proceso hostil con el MISMO usuario,
 root/administrador, cambios de mounts o un namespace padre fuera de control.
@@ -51,11 +55,19 @@ La API debe usarse en un padre privado/controlado. No hay fallback path-based.
 3. Crear las cuatro hojas exclusivamente. Escribir por bloques, comprobar cada
    retorno, File.Sync, volver a leer longitud/EOF/hash y comprobar identidad.
 4. Releer y comprobar de nuevo todas las hojas. Sincronizar el directorio donde
-   este soportado. Comprobar cancelacion ANTES del commit.
+   este soportado. Sellar hojas Windows y comprobar cancelacion ANTES del commit.
 5. Renombrar a PMM-candidate-<id> sin reemplazar nada: renameat2/RENAME_NOREPLACE
-   en Linux amd64; SetFileInformationByHandle/FileRenameInfo en Windows.
+   en Linux amd64; NtSetInformationFile/FileRenameInformation (clase 10)
+   via ntdll documentada en Windows, con destino relativo al handle padre.
    NO existe fallback a rename con reemplazo. El rename exitoso es el commit.
 6. Comprobar identidad final y sincronizar el padre en Linux; cerrar handles.
+
+6C corrige el adapter Windows tras ejecutarlo en Win10: NtCreateFile no acepta
+el pseudocomponente "." para reabrir el padre; se usa su basename real relativo
+al ancestro retenido y se compara identidad. El padre existente no pide DELETE,
+pero sigue denegando compartir DELETE. La API Win32 de rename devolvia parametro
+invalido con el destino anclado en este entorno; la llamada nativa conserva ese
+anclaje y el modo no-replace. Ver SESSION04A6C_FINDINGS para evidencia y limites.
 
 Antes del commit: error/cancelacion devuelve nil y revierte solo los archivos
 creados y todavia identificados. No usa RemoveAll ni borra archivos ajenos. Fallos

@@ -1,4 +1,4 @@
-# Estado actual - I01 integrado / aceptacion Windows pendiente
+# Estado actual - I01 en prueba / 04A-6C validado en Win10 NTFS
 
 El contexto necesario para continuar en un proyecto/chat nuevo esta ahora
 centralizado en:
@@ -36,9 +36,18 @@ UI utilizable, cierre, segundo arranque, tiempos y logs ante fallo.
 
 ## Research conservado
 
-04A-6B esta implementado en NativeCandidates/FixLab pero NO integrado al FixLab
-original. Ultima evidencia: 130 Go PASS, 52 Python PASS, race enfocado 26 PASS;
-Windows-specific compilado, no ejecutado. Siguiente research: 04A-6C.
+04A-6C corrige el guardado candidato en Windows e implementa la interfaz
+ExecuteAndPublishCandidate. NO se integra al FixLab original.
+Ultima evidencia: 141 Test Go + 4 targets Fuzz con seeds PASS; 50 Python PASS,
+2 symlink SKIP; harness Windows independiente 40 PASS; dos builds identicos.
+Win10 19045 / NTFS / token no elevado. 25 rondas de cuatro publicaciones
+concurrentes PASS. Vet Windows/Linux y cross-build Linux PASS; no ejecucion
+Linux ni race nuevos. Ver SESSION04A6C_FINDINGS.md y SESSION04A6C_CHECKS.json.
+Aceptacion entre entornos PARCIAL: Win11, AV concurrente y disco lleno real no
+probados. No implica aceptacion Unreal/Palworld ni schemas/serializers reales.
+El propietario autorizo avanzar este laboratorio mientras prueba I01, sin otra
+integracion PMM. Proximo research: contrato V2/CLI candidato-only y pendientes
+de matriz Windows cuando haya entorno; priorizar cualquier regresion I01.
 
 Host/Runtime C2B estan integrados en I01 pero no aceptados aun en Windows real.
 Optimizar inicio queda planificado despues de medir I01.

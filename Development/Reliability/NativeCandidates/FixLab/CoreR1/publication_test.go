@@ -186,7 +186,7 @@ func TestPublicationTokenFailureBeforeIO(t *testing.T) {
 func TestPublicationRollbackAtEveryPrecommitPhase(t *testing.T) {
 	r, q := publicationFixture(t)
 	boom := errors.New("injected disk/flush/read failure")
-	phases := []string{"created", "before-commit"}
+	phases := []string{"created", "before-commit", "sealed-before-commit"}
 	for _, name := range []string{"candidate.pak", "execution.json", "MANIFEST.json", "COMPLETE.json"} {
 		for _, phase := range []string{"write:", "sync:", "readback:"} {
 			phases = append(phases, phase+name)
@@ -224,7 +224,7 @@ func TestPublicationCancellationBeforeAndAfterCommit(t *testing.T) {
 	if p, e := PublishCandidate(nil, r, q); p != nil || e == nil {
 		t.Fatal("nil context")
 	}
-	for _, phase := range []string{"created", "write:candidate.pak", "readback:execution.json", "before-commit", "after-commit"} {
+	for _, phase := range []string{"created", "write:candidate.pak", "readback:execution.json", "before-commit", "sealed-before-commit", "after-commit"} {
 		t.Run(phase, func(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
@@ -388,7 +388,7 @@ func TestPublicationCrashHelper(t *testing.T) {
 	t.Fatalf("crash point not reached: %v", e)
 }
 func TestPublicationAbruptExitRecovery(t *testing.T) {
-	for _, phase := range []string{"before-commit", "after-commit"} {
+	for _, phase := range []string{"before-commit", "sealed-before-commit", "after-commit"} {
 		t.Run(phase, func(t *testing.T) {
 			parent := t.TempDir()
 			cmd := exec.Command(os.Args[0], "-test.run=^TestPublicationCrashHelper$")
@@ -409,7 +409,7 @@ func TestPublicationAbruptExitRecovery(t *testing.T) {
 				t.Fatal(e)
 			}
 			p, e := InspectCandidate(context.Background(), dir, bytesDigest(mb)) // test knows its own synthetic manifest
-			if phase == "before-commit" {
+			if phase != "after-commit" {
 				if p != nil || e == nil {
 					t.Fatal("staging accepted")
 				}

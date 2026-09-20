@@ -144,6 +144,19 @@ Une captura + membership + plan/review y ejecuta SOLO el perfil acotado en memor
 Guardado transaccional de `MemoryResult` a bundle candidato aislado, sin deploy al juego. Readback, rename sin reemplazo, manifest/completion, rollback acotado. 130 tests Go / 52 Python; race enfocado en 26 pruebas nuevas PASS; Windows-only compilado, no ejecutado. Commit:
 `96287f98f59b7387a00b29cec7c9316800bde098`.
 
+### SESSION04A6C - Windows real e interfaz candidata
+
+- `SESSION04A6C_FINDINGS.md`
+- `SESSION04A6C_CHECKS.json`
+- `NativeCandidates/FixLab/CoreR1/INTEGRATION_CONTRACT.md`
+- `NativeCandidates/FixLab/CoreR1/evidence/s04a6c/`
+
+Continua desde I01B mientras el propietario prueba I01. Corrige fallos reales
+del adapter de publicacion Win10 y agrega ExecuteAndPublishCandidate.
+141 Test Go + 4 targets Fuzz con seeds PASS; 50 Python PASS / 2 SKIP;
+harness independiente 40 PASS, dos builds identicos, 25 rondas concurrentes.
+Win10 NTFS no elevado; aceptacion entre entornos parcial. PMM I01 intacto.
+
 ## Primera integracion ejecutable
 
 ### SESSION_I01
