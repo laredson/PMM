@@ -99,8 +99,8 @@
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
-      "enabled": false,
-      "status": "template"
+      "enabled": true,
+      "status": "complete"
     },
     {
       "code": "cs",
@@ -109,8 +109,8 @@
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
-      "enabled": false,
-      "status": "template"
+      "enabled": true,
+      "status": "complete"
     },
     {
       "code": "uk",
@@ -119,8 +119,8 @@
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
-      "enabled": false,
-      "status": "template"
+      "enabled": true,
+      "status": "complete"
     },
     {
       "code": "ru",
@@ -249,8 +249,8 @@
       "fallback": "en",
       "direction": "ltr",
       "xaml": null,
-      "enabled": false,
-      "status": "template"
+      "enabled": true,
+      "status": "complete"
     },
     {
       "code": "tr",
