@@ -1,0 +1,237 @@
+# Handoff completo para nuevo proyecto - PMM development
+
+Este documento resume el contexto que antes vivia repartido entre conversaciones. La evidencia detallada sigue en los archivos de cada sesion; este documento NO sustituye sus contratos tecnicos, sino que indica que existe, que no repetir y como continuar.
+
+## 1. Proyecto y objetivo
+
+PMM es una aplicacion Windows para gestionar/modificar flujos de mods. La linea `v1.5.0.1-PMM-reliability` se creo para mejorar fiabilidad, procedencia, build reproducible, supervision de procesos y distribucion verificable, conservando funcionalidad y traducciones.
+
+No se busca "burlar" antivirus. Se pretende reducir causas legitimas de falsos positivos mediante ingenieria justificable y una cadena fuente -> build -> paquete -> ejecucion auditable.
+
+La rama de traducciones `v1.5.0.0-PMM-translated` sigue independiente. Ancestro comun fijo: `38bd5a934488ac11a6200d3142b889ca86a82f57`.
+
+## 2. Politica Git/GitHub acordada
+
+- Lectura de GitHub libre.
+- Cada escritura remota necesita autorizacion del usuario; "siguiente tanda" o una peticion explicita de publicar cuenta como autorizacion para ese bloque.
+- Desarrollo: commit/push silencioso con `[skip ci]`.
+- No Actions/CI/tests remotos en esta rama salvo peticion expresa.
+- No PR, tag, release o cambio de Latest por iniciativa propia.
+- Las pruebas funcionales de desarrollo las hace el usuario localmente salvo peticion expresa.
+- No sobrescribir una carpeta nueva con una vieja.
+- Antes de escribir: fijar HEAD, comprobar que no avanzo y hacer fast-forward sin force.
+
+## 3. Estado remoto actual
+
+Antes de este handoff el HEAD era `552a4562b53a7142dfc8c2e5a67abacd6b79b61e`.
+
+El paquete `PMM/` REMOTO sigue siendo s01b:
+- producto 1.5.0.1;
+- BUILD_ID `PMM-v1.5.0.1-reliability-s01b`;
+- 629 archivos;
+- 628 filas en SHA256SUMS;
+- 0 mismatches;
+- Git tree `09df5c45aee3390c6b8ea235c8afa4e149a9f1fa`.
+
+Ejecutables remotos aun conservados:
+- Host original `PMM/PMM.exe`: SHA-256 `010c4f656dbe68f0bcf667610accf6cc4e248872120c6acd299f0fca7c209c2d`.
+- Runtime original `PMM/Engine/PMMRuntime.exe`: SHA-256 `e90341d8449b485cb04af3c00d357bc8c67e87070644ff6bf7d27121a00c422a`.
+- FixLab original `PMM/Engine/PMMFixLab.exe`: SHA-256 `8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe`.
+
+Importante: probar actualmente el `PMM.exe` remoto s01b NO ejecuta las nuevas candidatas.
+
+## 4. Candidatas nativas ya construidas
+
+Directorios autoritativos:
+- `Development/Reliability/NativeCandidates/Host/`
+- `Development/Reliability/NativeCandidates/Runtime/`
+- `Development/Reliability/NativeCandidates/Supervision/`
+- `Development/Reliability/NativeCandidates/UIBridge/`
+- `Development/Reliability/NativeCandidates/FixLab/`.
+
+Host C2B:
+- SHA-256 `a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c`.
+- tree de fuentes Host en la preparacion I01: `81414da2ab9c7d37faac5196262228b39732878a`.
+
+Runtime C2B:
+- SHA-256 `b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f`.
+- tree de fuentes Runtime: `869ddc4afe047b0ca86c94119d3d4d8ca8162437`.
+
+Supervision:
+- tree `df63da545d67425ffbf223b6788c88de6f33f6a1`.
+
+UIBridge:
+- tree `b3fb9acc38203873ef6b9ccbfbeb28a2aad98341`.
+
+Estos hashes son identidad de artefactos concretos, no aceptacion Windows ni garantia antivirus.
+
+## 5. I01 - primera integracion ejecutable
+
+El propietario pidio integrar ya piezas maduras para poder probar el programa incrementalmente.
+
+`Development/Reliability/Integration/I01/` contiene:
+- `README.md`: contrato/uso;
+- `assemble.py`: ensamblador puro del paquete;
+- `test_assemble.py`;
+- `evidence/`: recibos y pruebas.
+
+I01 sustituye SOLO:
+1. `PMM/PMM.exe` por Host C2B;
+2. `PMM/Engine/PMMRuntime.exe` por Runtime C2B;
+3. `PMM/Resources/Metadata/BUILD_ID.txt`;
+4. `PMM/Resources/Metadata/RELEASE_MANIFEST.json`;
+5. `PMM/Resources/Metadata/SHA256SUMS.txt`.
+
+Todo lo demas permanece byte-identico. FixLab original se conserva.
+
+Identidad I01:
+- build `PMM-v1.5.0.1-reliability-i01`;
+- tree esperado `12e01ba3a24a2c0ce5e74d681b4931307c845a56`;
+- 629 archivos / 628 checksums / 0 mismatch.
+
+Verificaciones ya realizadas durante I01:
+- 92 pruebas Go con aserciones, incluida lectura real del inventario del paquete integrado;
+- 12 tests Python del ensamblador;
+- vet Windows de Host, Runtime, Supervision y UIBridge;
+- compilaciones repetidas Host/Runtime identicas a los hashes C2B;
+- NO ejecucion real de I01 en Windows;
+- NO medicion de velocidad;
+- NO escaneo antivirus.
+
+### Limitacion de transferencia anterior
+
+El chat que preparo I01 podia compilar los binarios localmente pero el conector GitHub no podia cargar archivos binarios grandes desde `/mnt/data` por ruta. Por eso SOLO las fuentes/receta/evidencia de I01 llegaron a GitHub. No es una limitacion del repositorio.
+
+Un nuevo entorno con checkout local + Git autenticado/Work/Codex debe resolverlo directamente sin pedir al usuario los ZIP anteriores:
+- reconstruir desde Git si hace falta;
+- verificar los hashes exactos;
+- actualizar los cinco archivos en el checkout;
+- commit/push.
+
+## 6. Como reconstruir I01 solo desde Git
+
+Requisitos: checkout limpio de la base compatible s01b, Python 3.9+ y Go 1.23.2. No descargar toolchains desde los builders.
+
+Builders:
+`Development/Reliability/NativeCandidates/Host/build.py`
+`Development/Reliability/NativeCandidates/Runtime/build.py`
+
+Ambos exigen el Host/Runtime s01b originales y construyen fuera del checkout. Los resultados esperados son los hashes C2B anteriores.
+
+Luego:
+`Development/Reliability/Integration/I01/assemble.py`
+
+El ensamblador exige:
+- base PMM tree `09df5c45aee3390c6b8ea235c8afa4e149a9f1fa`;
+- Host/Runtime C2B exactos;
+- salida nueva fuera del repo.
+
+Produce el paquete I01 y regenera manifest/checksums. Nunca relajar pins para aceptar bytes distintos.
+
+Si el checkout actual ya avanzo documentalmente mas alla de la base pero `PMM/` sigue s01b, puede usarse como fuente del paquete; los builders pinnean el binario original. Si una receta exige commit exacto, usar un worktree/copia del commit pinneado en lugar de cambiar guards.
+
+## 7. FixLab - investigacion completada hasta 04A-6B, NO integrada
+
+El ejecutable original sigue en PMM.
+
+Trabajo versionado:
+- 04A: procedencia del PMMFixLab original; source exacto no recuperado, overlay historico corrupto.
+- 04A-2: codec PMMDLT1.
+- 04A-3: PAKV11 acotado.
+- 04A-4: lector UAsset fijado.
+- 04A-4B: `RewriteNames`, solo transformaciones seguras.
+- 04A-4C: `PatchPostProcess` escalar con schema/review; no inferir desde offset 120.
+- 04A-5A: `PlanCore`.
+- 04A-5B: `CaptureCore` + dossiers.
+- 04A-5C: `VerifyMembership` contra PAKs fijados.
+- 04A-6A: `ExecuteBounded` en memoria; nombres mismo ancho + postProcess escalar + PAK.
+- 04A-6B: `PublishCandidate`/guardado transaccional aislado.
+
+Estado 6B:
+- 130 tests Go normales PASS;
+- 52 Python PASS;
+- race enfocado en 26 tests nuevos PASS;
+- intentos de race completo interrumpidos por limite de herramienta, NO contarlos como PASS;
+- Windows compilado/vet, cuatro pruebas Windows-only NO ejecutadas;
+- todos los fixtures artificiales.
+
+Siguiente research de esa linea: 04A-6C, aceptacion real Windows del guardado y cierre de su interfaz de integracion. Aun faltan schemas/serializers reales, relocalizacion variable/bulk, V2/CLI y motor FixLab completo antes de reemplazar `PMMFixLab.exe`.
+
+## 8. Host/Runtime - gates pendientes
+
+Aunque I01 permite una prueba incremental, no declarar Host/Runtime totalmente aceptados todavia.
+
+Pendientes conocidos:
+- aceptacion Windows real;
+- familia de procesos / Job Objects y algunos contratos de supervision;
+- manifests/pins/rutas pendientes del plan de fiabilidad;
+- flujos de reparacion/dependencias;
+- medir y optimizar arranque;
+- verificar compatibilidad completa con UI y workflows reales.
+
+El usuario ha pedido especificamente optimizar el inicio si es posible. Primero medir:
+- tiempo hasta ventana visible;
+- tiempo hasta UI utilizable;
+- segundo arranque;
+- Host -> Runtime -> UI;
+- tareas de integridad/localizacion/dependencias que puedan aplazarse sin perder seguridad.
+
+No eliminar verificaciones a ciegas para acelerar.
+
+## 9. Traducciones
+
+No bloquear toda la integracion nativa esperando a terminar idiomas.
+
+La rama `v1.5.0.0-PMM-translated` continua independiente. Mas adelante integrar cambios hacia reliability mediante revision de tres vias y el contrato de `TRANSLATION_INTEGRATION.md`.
+
+Nunca:
+- copiar toda una carpeta PMM antigua sobre la nueva;
+- recuperar EXE antiguos por accidente;
+- resolver conflictos con ours/theirs global;
+- perder claves/placeholders/fallback/nativeName/RTL.
+
+Las nuevas cadenas de reliability deben registrarse para traducirlas antes de candidata final.
+
+## 10. Roadmap restante, nivel alto
+
+1. Publicar I01 realmente en `PMM/` remoto y obtener prueba Windows del usuario.
+2. Corregir cualquier regresion de I01 y medir arranque.
+3. 04A-6C Windows del guardado FixLab.
+4. Completar las capacidades FixLab reales pendientes y V2/CLI.
+5. Integrar un PMMFixLab reconstruido cuando tenga paridad suficiente; prueba incremental.
+6. Cerrar Host/Runtime restantes y optimizar arranque.
+7. Cerrar repair/dependencies, manifests/pins/rutas y packaging reproducible.
+8. Integrar idiomas de forma controlada.
+9. Windows end-to-end, firma si el propietario la provisiona y preflight final.
+10. Solo despues valorar upload/release/Nexus. No se garantiza check verde.
+
+Es normal que algunos hitos se dividan en A/B.
+
+## 11. Que NO repetir
+
+- No volver a buscar el source/overlay historico de FixLab sin una pista nueva.
+- No reprogramar PMMDLT1/PAKV11/UAsset desde cero.
+- No tratar `expectedSerializedOffsets: [120]` como permiso de escritura ciega.
+- No elevar `TransformReady/BuildReady/Validated/Installed` por tener hashes.
+- No afirmar que fixtures sinteticos prueban compatibilidad Unreal/Palworld.
+- No contar tests compilados como ejecutados.
+- No llamar al PMM s01b "programa modificado" solo porque VERSION diga 1.5.0.1.
+- No pedir ZIPs antiguos antes de revisar Git.
+
+## 12. Donde esta la historia completa
+
+Leer `Development/Reliability/HISTORY_INDEX.md`. Cada etapa conserva su `SESSION...FINDINGS.md` y, cuando existe, su `SESSION...CHECKS.json`. Esa evidencia es historica e inmutable; un archivo posterior puede resolver un bloqueo de publicacion sin reescribir el resultado original.
+
+## 13. Entorno recomendado para el nuevo proyecto
+
+Ideal:
+- ChatGPT Work o Codex con acceso a un checkout local;
+- Git + autenticacion al repo;
+- GitHub Desktop puede coexistir para que el usuario vea/pullee;
+- Windows disponible para pruebas funcionales;
+- Python 3.9+;
+- Go 1.23.2 exacto para builds pinneados.
+
+Si se trabaja desde Linux para compilar Windows, mantener `GOTOOLCHAIN=local`, `GOPROXY=off`, `GOSUMDB=off`, `GOWORK=off`, `CGO_ENABLED=0` donde los builders lo indiquen.
+
+Primera accion del nuevo agente: leer `START_HERE_NEW_PROJECT.md`, no preguntar "que hicimos antes".

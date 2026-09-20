@@ -1,0 +1,178 @@
+# Indice historico - PMM reliability
+
+Este indice permite reconstruir la historia del proyecto leyendo Git. Los archivos FINDINGS describen conclusiones/limites; los CHECKS guardan evidencias, hashes y recuentos. No sustituir evidencia historica por afirmaciones posteriores.
+
+## Fundacion / identidad
+
+### SESSION01 / SESSION01B
+Archivos:
+- `SESSION01_FINDINGS.md`
+- `SESSION01B_FINDINGS.md`
+- `SESSION01B_CHECKS.json`
+
+Trabajo: inventario inicial, separacion de la linea reliability, identidad coherente 1.5.0.1, BUILD_ID s01b y regeneracion de checksums. El paquete queda 629 archivos / 628 checksums.
+
+## Host
+
+### SESSION02A
+- `SESSION02A_FINDINGS.md`
+- `SESSION02A_CHECKS.json`
+
+Primera reconstruccion conservadora del Host en `NativeCandidates/Host/`. No source original recuperado y no sustitucion del binario empaquetado.
+
+### SESSION02B
+- `SESSION02B_FINDINGS.md`
+- `SESSION02B_CHECKS.json`
+
+Comparacion/correcciones del Host reconstruido: framing, prioridad de cierres/fallos y orden de foreground checks. Evidencia PE/build separada de equivalencia funcional.
+
+### SESSION02C1
+- `SESSION02C1_FINDINGS.md`
+- `SESSION02C1_CHECKS.json`
+
+Introduce `NativeCandidates/Supervision/` como modulo local compartido. Mejora supervision/cancelacion sin instalar candidatos.
+
+### SESSION02C2A / SESSION02C2B
+- `SESSION02C2A_FINDINGS.md`, `SESSION02C2A_CHECKS.json`
+- `SESSION02C2B_FINDINGS.md`, `SESSION02C2B_CHECKS.json`
+
+Cierre del canal Host/Runtime/UIBridge e integracion de los modulos compartidos. C2B produce las candidatas que posteriormente usa I01.
+
+Hashes C2B autoritativos:
+- Host `a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c`
+- Runtime `b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f`.
+
+## Runtime
+
+### SESSION03A
+- `SESSION03A_FINDINGS.md`
+- `SESSION03A_CHECKS.json`
+
+Reconstruccion Runtime inicial y contratos de UI/procesos.
+
+### SESSION03B
+- `SESSION03B_FINDINGS.md`
+- `SESSION03B_CHECKS.json`
+
+Refuerzo del inventario Runtime: lectura interrumpida, duplicados y errores de recorrido. No equivalencia Windows declarada.
+
+## FixLab / REL-01
+
+### SESSION04A
+- `SESSION04A_FINDINGS.md`
+- `SESSION04A_CHECKS.json`
+
+Procedencia del PMMFixLab original. Binario original:
+SHA-256 `8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe`.
+Se confirma que el source exacto no esta en el snapshot y que el overlay bootstrap historico esta corrupto. No repetir esa busqueda sin pista nueva.
+
+Commit de cierre de procedencia conocido: `1b15621cf988bd7e582af19e46ea7ad81796fad8`.
+
+### SESSION04A2 - PMMDLT1
+- `SESSION04A2_FINDINGS.md`
+- `SESSION04A2_CHECKS.json`
+- modulo `NativeCandidates/FixLab/PMMDLT1/`
+
+Codec delta acotado con hashes/limites/cancelacion. Commit conocido:
+`f7c8359a8e0f089311cc01a6133bdfd9790e702a`.
+
+### SESSION04A3 - PAKV11
+- `SESSION04A3_FINDINGS.md`
+- `SESSION04A3_CHECKS.json`
+- modulo `NativeCandidates/FixLab/PAKV11/`
+
+Perfil UE PAK v11 deliberadamente estrecho: ASCII, compact32, PHI/FDI, sin compresion/cifrado. Commit:
+`a66cea06e673a169623b3c12821739b0fa6d0b9f`.
+
+### SESSION04A4 - UAsset read
+- `SESSION04A4_FINDINGS.md`
+- `SESSION04A4_CHECKS.json`
+
+Lector UAsset fijado a perfil cooked UE4 522 / UE5 1008 y revision UAssetAPI conocida. Commit:
+`e8608cf0f0283180d99a1c88e085e1a78cfae295`.
+
+### SESSION04A4B - RewriteNames
+- `SESSION04A4B_FINDINGS.md`
+- `SESSION04A4B_CHECKS.json`
+
+`RewriteNames` solo sobre fuentes serializadas conocidas; cambios de ancho bloqueados si implican relocalizacion opaca. Commit:
+`7b0a030ec3f5dd38249a6c47582d8f8c72cd1900`.
+
+### SESSION04A4C - postProcess
+- `SESSION04A4C_FINDINGS.md`
+- `SESSION04A4C_CHECKS.json`
+
+`PatchPostProcess` escalar ligado a schema/review; no se deriva schema de offsets. El offset 120 es comprobacion, NO permiso de escritura. Commit:
+`4d8b0ca142dc55fbf066b1a18fac1658dfd6b87b`.
+
+### SESSION04A5A - PlanCore
+- `SESSION04A5A_FINDINGS.md`
+- `SESSION04A5A_CHECKS.json`
+
+Plan declarativo estricto, soporte/alternativas/familias/path safety. `PLAN_VALID` solo significa coherencia de metadata. Commit:
+`a97966e351a307902d6d66ecd012a017ad6febb1`.
+
+### SESSION04A5B - CaptureCore
+- `SESSION04A5B_FINDINGS.md`
+- `SESSION04A5B_CHECKS.json`
+
+Snapshots privados de assets/archives, dossiers y bindings. No autentica build/semantica. Commit:
+`d5af1bff255b94e0e47bf9b2ed6f3277712ae346`.
+
+### SESSION04A5C - VerifyMembership
+- `SESSION04A5C_FINDINGS.md`
+- `SESSION04A5C_CHECKS.json`
+
+Comprueba pertenencia byte-exact de todos los archivos declarados dentro de proveedores PAK pinneados usando PAKV11. Propiedad current conservadora: exactamente un proveedor; duplicados bloquean. Commit:
+`587b4ed0c026ff97bb043fad84bd16d09803b02c`.
+
+### SESSION04A6A - ExecuteBounded
+- `SESSION04A6A_FINDINGS.md`
+- `SESSION04A6A_CHECKS.json`
+- `SESSION04A6A_PUBLICATION.json`
+- contrato `NativeCandidates/FixLab/CoreR1/EXECUTION_CONTRACT.md`
+
+Une captura + membership + plan/review y ejecuta SOLO el perfil acotado en memoria: nombres del mismo ancho, postProcess escalar, soporte y PAKV11. 104 tests Go / 44 Python en la evidencia de esa tanda; Windows test build compilado, no ejecutado. Publicacion final:
+`fe239c33d1a77c47afa08502656f6e2cbe4f913d`.
+
+### SESSION04A6B - PublishCandidate
+- `SESSION04A6B_FINDINGS.md`
+- `SESSION04A6B_CHECKS.json`
+- `NativeCandidates/FixLab/CoreR1/PUBLICATION_CONTRACT.md`
+- `NativeCandidates/FixLab/CoreR1/WINDOWS_PUBLICATION_ACCEPTANCE.md`
+
+Guardado transaccional de `MemoryResult` a bundle candidato aislado, sin deploy al juego. Readback, rename sin reemplazo, manifest/completion, rollback acotado. 130 tests Go / 52 Python; race enfocado en 26 pruebas nuevas PASS; Windows-only compilado, no ejecutado. Commit:
+`96287f98f59b7387a00b29cec7c9316800bde098`.
+
+## Primera integracion ejecutable
+
+### SESSION_I01
+- `SESSION_I01_FINDINGS.md`
+- `SESSION_I01_CHECKS.json`
+- `Integration/I01/README.md`
+- `Integration/I01/assemble.py`
+- `Integration/I01/evidence/`
+
+Se ensambla una aplicacion real de prueba usando Host/Runtime C2B y FixLab original. Cinco archivos del paquete cambian. Build `PMM-v1.5.0.1-reliability-i01`. 92 tests Go + 12 Python del ensamblador y Windows vet; aun sin ejecucion Windows real.
+
+El conector del chat no pudo transferir los dos EXE grandes, asi que el commit documental conserva receta/evidencia, pero `PMM/` remoto sigue s01b. Commit:
+`552a4562b53a7142dfc8c2e5a67abacd6b79b61e`.
+
+## Documentos transversales
+
+- `IMPLEMENTATION_PLAN.md`: REL-00..REL-07.
+- `SESSION_PLAN.md`: orden operativo de sesiones/areas.
+- `NATIVE_ARTIFACTS.json`: inventario nativo.
+- `WINDOWS_HOST_ACCEPTANCE.md`
+- `WINDOWS_RUNTIME_ACCEPTANCE.md`
+- `WINDOWS_UIBRIDGE_ACCEPTANCE.md`
+- `TRANSLATION_INTEGRATION.md`
+- `RUNNING_VERSION.md`
+- `NEXT_SESSION.md`
+- `STATUS.md`.
+
+## Como usar este indice
+
+Para retomar una etapa concreta, leer primero su FINDINGS y luego CHECKS/contrato. Si un documento mas nuevo dice que una publicacion pendiente ya se resolvio, eso actualiza el estado de entrega pero NO reescribe las condiciones de prueba del archivo historico.
+
+No deducir "PASS" de un commit existente. Revisar siempre si la prueba fue estatica, Linux, compilacion Windows o ejecucion Windows real.

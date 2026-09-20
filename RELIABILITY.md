@@ -1,19 +1,31 @@
-# PMM 1.5.0.1 - integracion incremental de prueba
+# PMM 1.5.0.1 - reliability
 
-Primera aplicacion de prueba I01 preparada: Host/Runtime nuevos, FixLab conservado.
-Build del ZIP ejecutable: PMM-v1.5.0.1-reliability-i01. No es un harness de tests.
+**Nuevo proyecto/chat:** empezar por [START_HERE_NEW_PROJECT.md](START_HERE_NEW_PROJECT.md).
 
-**Estado de GitHub:** esta entrega registra fuentes de ensamblado y pruebas.
-Los EXE grandes no se transfirieron por el conector: PMM/ remoto permanece s01b.
-El ZIP ejecutable permite probar y el overlay de cinco archivos permite importar
-esa integracion a la copia local de esta rama y subirla mediante GitHub Desktop.
-No confundir Pull de los documentos con sustitucion de los EXE.
+El repositorio contiene un handoff autosuficiente con el estado actual, historia,
+identidades, fuentes, pruebas, limitaciones y siguientes pasos. No es necesario
+recuperar el chat anterior ni pedir ZIPs antiguos para entender el proyecto.
 
-Leer [RUNNING_VERSION](Development/Reliability/RUNNING_VERSION.md),
-[Integration/I01](Development/Reliability/Integration/I01/README.md) y
-[NEXT_SESSION](Development/Reliability/NEXT_SESSION.md).
+Estado actual:
+- rama `v1.5.0.1-PMM-reliability`;
+- PMM remoto sigue `PMM-v1.5.0.1-reliability-s01b`;
+- Host/Runtime C2B e integracion I01 son reproducibles desde Git;
+- los dos EXE I01 aun no estan en `PMM/` remoto por una limitacion del conector anterior;
+- FixLab research llega a 04A-6B pero el executable original sigue distribuido;
+- siguiente objetivo ejecutable: publicar I01 realmente en la rama y probarlo en Windows;
+- siguiente research FixLab: 04A-6C.
 
-El propietario ha pedido pruebas incrementales del programa antes de continuar.
-La proxima accion es comprobar arranque/cierre/tiempos reales de I01. No se ha
-aceptado Windows ni medido aceleracion. Las reconstrucciones incompletas FixLab
-permanecen aisladas. No es una release final ni garantia de check verde de Nexus.
+Leer:
+- [handoff completo](Development/Reliability/NEW_PROJECT_HANDOFF.md)
+- [estado machine-readable](Development/Reliability/NEW_PROJECT_STATE.json)
+- [historia por sesiones](Development/Reliability/HISTORY_INDEX.md)
+- [siguiente sesion](Development/Reliability/NEXT_SESSION.md)
+- [estado](Development/Reliability/STATUS.md)
+- [version ejecutable](Development/Reliability/RUNNING_VERSION.md).
+
+La rama es experimental y puede romperse temporalmente durante integraciones
+controladas. `NativeCandidates/` se conserva como laboratorio/historial; las
+piezas maduras se integran incrementalmente en `PMM/` para pruebas del usuario.
+
+No prometer cero detecciones ni check verde de Nexus. No ocultar comportamiento,
+desactivar protecciones, pedir exclusiones ni restaurar cuarentenas automaticamente.
