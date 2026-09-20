@@ -1,0 +1,34 @@
+{
+  "schema": "PMM_CORE_R1_CANDIDATE_CLI_BUILD_SUMMARY_V2",
+  "goVersion": "go version go1.23.2 windows/amd64",
+  "target": "windows/amd64",
+  "harness": {
+    "file": "CoreR1-tests.exe",
+    "sha256": "7d09da6c001d926d077fd32863f2fd31c6708fd98330106d35a4f0caeebd2d8c",
+    "bytes": 6860288,
+    "repeatSHA256": "7d09da6c001d926d077fd32863f2fd31c6708fd98330106d35a4f0caeebd2d8c",
+    "windowsFullSuiteCount": 3
+  },
+  "candidateCLI": {
+    "file": "CoreR1-candidate.exe",
+    "sha256": "0464e503a96f467e96501d0e71367027501640b7433bb1bd76cb1e159cd781bc",
+    "bytes": 4353536,
+    "repeatSHA256": "0464e503a96f467e96501d0e71367027501640b7433bb1bd76cb1e159cd781bc",
+    "candidateOnly": true,
+    "installs": false,
+    "deploys": false,
+    "successExit": 0,
+    "wrongPinExit": 3,
+    "usageExit": 2
+  },
+  "byteIdentical": true,
+  "buildReportByteIdentical": true,
+  "linuxCrossBuild": {
+    "harnessSHA256": "e230278c3d4ea02c0617c805784113536923fa5bc66b4d42c7292f404fb92207",
+    "harnessBytes": 6596526,
+    "candidateCLISHA256": "cc2142a4c7ca08b91ef69e942265bd49be7cf05a6360078498abaf7502debf09",
+    "candidateCLIBytes": 4199672,
+    "executed": false
+  },
+  "engineBuilt": false
+}

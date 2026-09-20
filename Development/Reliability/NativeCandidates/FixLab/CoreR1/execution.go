@@ -347,7 +347,7 @@ func ExecuteBounded(ctx context.Context, c *CapturedInputs, m *MembershipEvidenc
 		return nil, e
 	}
 	result := &MemoryResult{files: map[string][]byte{}}
-	report := ExecutionReport{Schema: "PMM_R1_BOUNDED_EXECUTION_REPORT_V1", Status: "MEMORY_OUTPUTS_VERIFIED_NOT_GAME_ACCEPTED", ExecutionPlanSHA256: q.Plan.SHA256, ReviewSHA256: q.Review.SHA256, CaptureSHA256: p.CaptureSHA256, MembershipSHA256: p.MembershipSHA256, RecipeSHA256: p.RecipeSHA256, Families: []ExecutedFamily{}, Outputs: []File{}, ReviewState: "BYTES_AND_BINDINGS_CHECKED_NOT_AUTHENTICATED", Blockers: []string{"REAL_SCHEMA_SEMANTICS_UNVERIFIED", "VARIABLE_LAYOUT_RELOCATION_UNSUPPORTED", "FULL_CORE_R1_V2_CLI_NOT_IMPLEMENTED", "UNREAL_WINDOWS_ACCEPTANCE_NOT_RUN", "TRANSACTIONAL_PUBLICATION_NOT_IMPLEMENTED"}}
+	report := ExecutionReport{Schema: "PMM_R1_BOUNDED_EXECUTION_REPORT_V1", Status: "MEMORY_OUTPUTS_VERIFIED_NOT_GAME_ACCEPTED", ExecutionPlanSHA256: q.Plan.SHA256, ReviewSHA256: q.Review.SHA256, CaptureSHA256: p.CaptureSHA256, MembershipSHA256: p.MembershipSHA256, RecipeSHA256: p.RecipeSHA256, Families: []ExecutedFamily{}, Outputs: []File{}, ReviewState: "BYTES_AND_BINDINGS_CHECKED_NOT_AUTHENTICATED", Blockers: []string{"REAL_SCHEMA_SEMANTICS_UNVERIFIED", "VARIABLE_LAYOUT_RELOCATION_UNSUPPORTED", "PRODUCTION_RECIPE_V2_SEMANTICS_INCOMPLETE", "UNREAL_WINDOWS_ACCEPTANCE_NOT_RUN", "CANDIDATE_ONLY_NOT_INSTALLED"}}
 	opt := uasset.Options{Profile: p.UAssetProfile, AllowUnversioned: p.AllowUnversioned}
 	for _, t := range tasks {
 		if e = ctx.Err(); e != nil {

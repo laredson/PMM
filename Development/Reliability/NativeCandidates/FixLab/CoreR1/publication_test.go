@@ -152,11 +152,14 @@ func TestPublicationRepeatedCallsDoNotOverwrite(t *testing.T) {
 	}
 }
 func TestPublicationNameCollisionPreservesExisting(t *testing.T) {
-	for _, prefix := range []string{candidatePrefix, stagingPrefix} {
-		t.Run(prefix, func(t *testing.T) {
+	id := strings.Repeat("a", 32)
+	finalName := candidatePrefix + id
+	stageName, _ := candidateLayout(id, finalName)
+	collisions := map[string]bool{finalName: true, stageName: true}
+	for collision := range collisions {
+		t.Run(collision, func(t *testing.T) {
 			r, q := publicationFixture(t)
-			id := strings.Repeat("a", 32)
-			existing := filepath.Join(q.Parent, prefix+id)
+			existing := filepath.Join(q.Parent, collision)
 			os.Mkdir(existing, 0700)
 			os.WriteFile(filepath.Join(existing, "foreign"), []byte("keep"), 0600)
 			p, e := publishCandidate(context.Background(), r, q, publicationHooks{token: func() (string, error) { return id, nil }})
@@ -278,7 +281,11 @@ func TestPublicationCleanupFailureNamesResidue(t *testing.T) {
 		return nil
 	}})
 	var pe *PublicationError
-	if p != nil || !errors.As(e, &pe) || pe.Committed || !strings.HasPrefix(pe.ResidueName, stagingPrefix) {
+	wantPrefix := stagingPrefix
+	if runtime.GOOS == "windows" {
+		wantPrefix = candidatePrefix
+	}
+	if p != nil || !errors.As(e, &pe) || pe.Committed || !strings.HasPrefix(pe.ResidueName, wantPrefix) {
 		t.Fatal(p, e)
 	}
 	fs, _ := os.ReadDir(q.Parent)
@@ -399,11 +406,13 @@ func TestPublicationAbruptExitRecovery(t *testing.T) {
 			if !errors.As(e, &ex) || ex.ExitCode() != 23 {
 				t.Fatal(string(b), e)
 			}
-			prefix := stagingPrefix
+			id := strings.Repeat("c", 32)
+			finalName := candidatePrefix + id
+			dirName, _ := candidateLayout(id, finalName)
 			if phase == "after-commit" {
-				prefix = candidatePrefix
+				dirName = finalName
 			}
-			dir := filepath.Join(parent, prefix+strings.Repeat("c", 32))
+			dir := filepath.Join(parent, dirName)
 			mb, e := os.ReadFile(filepath.Join(dir, "MANIFEST.json"))
 			if e != nil {
 				t.Fatal(e)
@@ -411,7 +420,7 @@ func TestPublicationAbruptExitRecovery(t *testing.T) {
 			p, e := InspectCandidate(context.Background(), dir, bytesDigest(mb)) // test knows its own synthetic manifest
 			if phase != "after-commit" {
 				if p != nil || e == nil {
-					t.Fatal("staging accepted")
+					t.Fatal("uncommitted candidate accepted")
 				}
 			} else if e != nil || p == nil || !p.ListedBytesVerified {
 				t.Fatal(p, e)

@@ -1,4 +1,4 @@
-# Estado actual - I02 en prueba / 04A-6C validado en Win10 NTFS
+# Estado actual - I02 arranca / 04A-6D validado en Win10 NTFS
 
 El contexto necesario para continuar en un proyecto/chat nuevo esta ahora
 centralizado en:
@@ -36,27 +36,28 @@ Esperados:
 - PMM tree I01 `12e01ba3a24a2c0ce5e74d681b4931307c845a56`
 - Build `PMM-v1.5.0.1-reliability-i01`.
 
-Los cinco cambios del paquete ya estan integrados juntos. La siguiente accion es
-que el propietario haga Pull y pruebe el programa real en Windows: ventana visible,
-UI utilizable, cierre, segundo arranque, tiempos y logs ante fallo.
+Los cinco cambios del paquete ya estan integrados juntos. El propietario confirmo
+que el programa arranca y funciona. Faltan registrar cierre, segundo arranque,
+UI detallada, tiempos y logs si aparece una regresion.
 
 ## Research conservado
 
-04A-6C corrige el guardado candidato en Windows e implementa la interfaz
-ExecuteAndPublishCandidate. NO se integra al FixLab original.
-Ultima evidencia: 141 Test Go + 4 targets Fuzz con seeds PASS; 50 Python PASS,
-2 symlink SKIP; harness Windows independiente 40 PASS; dos builds identicos.
-Win10 19045 / NTFS / token no elevado. 25 rondas de cuatro publicaciones
+04A-6D agrega job V2/CLI candidato-only y estabiliza el commit Windows con un
+marcador COMPLETE atomico. NO se integra al FixLab original.
+Ultima evidencia: 152 tests Go top-level + 4 fuzz seeds; 54 Python PASS,
+2 symlink SKIP; seis verificadores; harness completo x3; dos builds identicos.
+Win10 19045 / NTFS. 2.000 publicaciones secuenciales y 500 rondas de cuatro
 concurrentes PASS. Vet Windows/Linux y cross-build Linux PASS; no ejecucion
-Linux ni race nuevos. Ver SESSION04A6C_FINDINGS.md y SESSION04A6C_CHECKS.json.
+Linux ni race. Ver SESSION04A6D_FINDINGS.md y SESSION04A6D_CHECKS.json.
 Aceptacion entre entornos PARCIAL: Win11, AV concurrente y disco lleno real no
 probados. No implica aceptacion Unreal/Palworld ni schemas/serializers reales.
-El propietario autorizo avanzar este laboratorio mientras prueba I01, sin otra
-integracion PMM. Proximo research: contrato V2/CLI candidato-only y pendientes
-de matriz Windows cuando haya entorno; priorizar cualquier regresion I01.
+El propietario autorizo avanzar este laboratorio mientras prueba I02, sin otra
+integracion PMM. Proximo research: semantica real de schemas/serializers y V2 mas
+alla del perfil acotado, ademas de matriz cuando haya otro entorno. Priorizar I02.
 
-Host/Runtime C2B estan integrados en I01 pero no aceptados aun en Windows real.
-Optimizar inicio queda planificado despues de medir I01.
+Host/Runtime C2B estan integrados en I02 y su arranque basico fue confirmado en
+Windows real; falta aceptacion detallada de cierre, segundo arranque, UI y tiempos.
+Optimizar inicio queda planificado despues de medir I02.
 
 Traducciones continuan separadas y se integraran de forma controlada mas adelante.
 

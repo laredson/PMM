@@ -35,11 +35,12 @@ Windows: NtCreateFile relativo con FILE_CREATE/OPEN_REPARSE_POINT y DACL protegi
 heredable para usuario del proceso/SYSTEM; API de archivo documentada, sin elevar
 privilegios, tocar procesos, cambiar antivirus o usar syscalls directas Windows.
 Las hojas Windows permiten lectura/borrado compartidos, no escritura compartida.
-La identidad se comprueba de nuevo antes de commit. Windows exige cerrar las
-hojas para renombrar el directorio: se sellan inmediatamente antes del rename,
-reteniendo identidades de volumen/archivo y los handles de los directorios.
-Ante fallo se reabren SOLO para rollback y se comparan identidades; una hoja
-ajena, enlazada o inaccesible no se borra y se informa posible residuo.
+La identidad se comprueba de nuevo antes de commit. En Windows el handle amplio
+que crea el directorio se cierra y se conserva un ancla verificada con solo
+FILE_TRAVERSE, FILE_READ_ATTRIBUTES y SYNCHRONIZE. Las cuatro hojas permanecen
+abiertas/fijadas; el marcador temporal es la unica que cambia de nombre. Ante
+fallo el rollback solo elimina handles propios tras volver a comprobar identidad;
+una hoja ajena, enlazada o inaccesible no se borra y se informa posible residuo.
 
 Los checks no son un sandbox frente a otro proceso hostil con el MISMO usuario,
 root/administrador, cambios de mounts o un namespace padre fuera de control.
@@ -50,24 +51,33 @@ La API debe usarse en un padre privado/controlado. No hay fallback path-based.
 ## Transaccion y errores
 
 1. Revalidar MemoryResult, limites, todos los outputs y PAKV11.Verify en memoria.
-2. Crear .pmm-stage-<id> nuevo por handles. MaxBundleBytes <=288 MiB, solo reducible;
-   maximos previos del executor/PAK permanecen. No es una cota RSS.
-3. Crear las cuatro hojas exclusivamente. Escribir por bloques, comprobar cada
-   retorno, File.Sync, volver a leer longitud/EOF/hash y comprobar identidad.
+2. Crear un hijo nuevo por handles. Linux usa .pmm-stage-<id>; Windows crea
+   directamente PMM-candidate-<id>, aun NO comprometido. MaxBundleBytes <=288 MiB,
+   solo reducible; maximos previos del executor/PAK permanecen. No es cota RSS.
+3. Crear cuatro hojas exclusivamente. Linux usa los cuatro nombres finales;
+   Windows escribe COMPLETE bajo .pmm-complete-pending. Escribir por bloques,
+   comprobar cada retorno, File.Sync, releer longitud/EOF/hash e identidad.
 4. Releer y comprobar de nuevo todas las hojas. Sincronizar el directorio donde
-   este soportado. Sellar hojas Windows y comprobar cancelacion ANTES del commit.
-5. Renombrar a PMM-candidate-<id> sin reemplazar nada: renameat2/RENAME_NOREPLACE
-   en Linux amd64; NtSetInformationFile/FileRenameInformation (clase 10)
-   via ntdll documentada en Windows, con destino relativo al handle padre.
-   NO existe fallback a rename con reemplazo. El rename exitoso es el commit.
+   este soportado y comprobar cancelacion ANTES del commit.
+5. Commit sin reemplazo. Linux renombra el directorio con
+   renameat2/RENAME_NOREPLACE. Windows renombra el handle de
+   .pmm-complete-pending a COMPLETE.json con NtSetInformationFile,
+   FileRenameInformation clase 10, destino relativo al ancla minima retenida y
+   ReplaceIfExists=false. La aparicion atomica de COMPLETE es el commit Windows.
+   No existe fallback con reemplazo ni retry automatico.
 6. Comprobar identidad final y sincronizar el padre en Linux; cerrar handles.
 
 6C corrige el adapter Windows tras ejecutarlo en Win10: NtCreateFile no acepta
 el pseudocomponente "." para reabrir el padre; se usa su basename real relativo
-al ancestro retenido y se compara identidad. El padre existente no pide DELETE,
-pero sigue denegando compartir DELETE. La API Win32 de rename devolvia parametro
-invalido con el destino anclado en este entorno; la llamada nativa conserva ese
-anclaje y el modo no-replace. Ver SESSION04A6C_FINDINGS para evidencia y limites.
+al ancestro retenido y se compara identidad. El padre existente no pide DELETE.
+6D reproduce STATUS_ACCESS_DENIED intermitente al renombrar en Win10 un directorio
+inmediatamente despues de cerrar hojas (incluido bajo carga secuencial). Compartir
+DELETE y serializar publicaciones no resolvieron la causa. El protocolo Windows
+ya no depende de ese rename: fija las hojas y usa COMPLETE como marcador atomico.
+Tambien confirma el requisito documentado de usar RootDirectory con acceso minimo;
+reutilizar el handle amplio causa STATUS_SHARING_VIOLATION estable. La API Win32
+rechaza el destino relativo en este entorno; la llamada nativa conserva el anclaje
+y no-replace. Ver SESSION04A6C/6D_FINDINGS para evidencia y limites.
 
 Antes del commit: error/cancelacion devuelve nil y revierte solo los archivos
 creados y todavia identificados. No usa RemoveAll ni borra archivos ajenos. Fallos
@@ -87,12 +97,13 @@ cooperativa y no interrumpe I/O kernel bloqueada.
 
 ## Interrupcion y lectura posterior
 
-Un cierre abrupto ANTES del rename puede dejar staging incluso con COMPLETE.json.
-InspectCandidate rechaza SIEMPRE el prefijo de staging. No renombrarlo manualmente
-para aprobarlo ni eliminarlo recursivamente por encontrar ese nombre.
-Despues del rename puede existir un resultado completo aunque el llamador no
-recibiera respuesta. Un recibo/pin retenido externamente permite comprobarlo sin
-reescribirlo. Sin pin confiable se podra investigar, no declarar origen autentico.
+Un cierre abrupto ANTES del commit puede dejar .pmm-stage-<id> en Linux o un
+PMM-candidate-<id> sin COMPLETE.json y con .pmm-complete-pending en Windows.
+InspectCandidate rechaza ambos estados. No promoverlos manualmente ni eliminarlos
+recursivamente solo por el nombre. Despues del commit puede existir un resultado
+completo aunque el llamador no recibiera respuesta. Un recibo/pin retenido
+externamente permite comprobarlo sin reescribirlo. Sin pin confiable se podra
+investigar, no declarar origen autentico.
 
 InspectCandidate exige nombre final y pin de manifiesto externo. Comprueba los
 cuatro archivos, PAK/outputs e identidades del informe; no ejecuta ni procesa
@@ -107,10 +118,12 @@ Todos los flags de aceptacion de juego/instalacion siguen false.
 
 ## Estado de pruebas y fuentes
 
-Linux amd64 probado con archivos artificiales, fallos inyectados, salidas abruptas
-y carreras controladas. Windows solo compilado/vet; ver WINDOWS_PUBLICATION_ACCEPTANCE.
-No se ejecutaron originales, juego, antivirus, build/deploy productivo ni CI remoto.
-Fuentes primarias consultadas 2026-09-19:
+Linux amd64 conserva cobertura artificial, fallos inyectados, salidas abruptas y
+carreras controladas. Windows 10 19045 se ejecuto localmente, incluido stress 6D
+de 2.000 publicaciones secuenciales y 500 tandas concurrentes de cuatro; ver
+WINDOWS_PUBLICATION_ACCEPTANCE y SESSION04A6D_FINDINGS. No se probaron Windows 11,
+SMB/ReFS, corte electrico, juego, originales, build/deploy productivo ni CI remoto.
+Fuentes primarias consultadas 2026-09-19/20:
 https://man7.org/linux/man-pages/man2/rename.2.html
 https://man7.org/linux/man-pages/man2/fsync.2.html
 https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_rename_info

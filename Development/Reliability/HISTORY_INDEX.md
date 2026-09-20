@@ -157,6 +157,21 @@ del adapter de publicacion Win10 y agrega ExecuteAndPublishCandidate.
 harness independiente 40 PASS, dos builds identicos, 25 rondas concurrentes.
 Win10 NTFS no elevado; aceptacion entre entornos parcial. PMM I01 intacto.
 
+### SESSION04A6D - job V2/CLI y commit Windows por marcador
+
+- `SESSION04A6D_FINDINGS.md`
+- `SESSION04A6D_CHECKS.json`
+- `NativeCandidates/FixLab/CoreR1/JOB_V2_CONTRACT.md`
+- `NativeCandidates/FixLab/CoreR1/evidence/s04a6d/`
+
+Agrega job V2 pinneado y CLI candidato-only que orquestan el perfil CoreR1 sin
+install/deploy. El stress descubre que el rename de directorio Windows era
+intermitente incluso secuencial; se reemplaza en Windows por commit atomico de
+COMPLETE con RootDirectory de acceso minimo, sin retry. 152 tests Go top-level,
+4 fuzz seeds, 54 Python, seis verificadores, harness x3, 2.000 publicaciones
+secuenciales y 500x4 concurrentes PASS. Dos builds de harness/CLI reproducibles.
+Win10 NTFS; Win11/SMB/AV/disco lleno/race siguen pendientes. PMM I02 intacto.
+
 ## Primera integracion ejecutable
 
 ### SESSION_I01

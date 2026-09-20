@@ -1,0 +1,18 @@
+{
+  "schema": "PMM_R1_CANDIDATE_JOB_FIXTURE_VERIFICATION_V1",
+  "jobSHA256": "927262fa09ccd3977467ec3a27e57fdbaf9bcb7a2e41d25097f7031c7c75e7f5",
+  "jobBytes": 2961,
+  "state": "CANDIDATE_PUBLISHED_NOT_GAME_ACCEPTED",
+  "exportCandidateName": "PMM-candidate-81512ccecdf9b9aded988df0258a2262",
+  "exportManifestSHA256": "50c816e5f592fa4bdc76ff10510e0088dd122b5094bed95e7a7b6fcf850fd596",
+  "cliCandidateName": "PMM-candidate-0303f0f85566d352a84c525f73610eb5",
+  "cliManifestSHA256": "3a11eeb5e5849b804b75020d19e5fecd70535b7e68b09ea5ace0f124abcd2e29",
+  "outputEntriesCompared": 10,
+  "candidateOnly": true,
+  "gameAccepted": false,
+  "installed": false,
+  "realAssetsUsed": false,
+  "cliCandidateCountBefore": 2,
+  "cliCandidateCountAfter": 3,
+  "wrongPinRejected": true
+}

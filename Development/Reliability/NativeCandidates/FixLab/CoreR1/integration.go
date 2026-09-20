@@ -10,6 +10,7 @@ import (
 type CandidateRunState string
 
 const (
+	CandidateJobRejected         CandidateRunState = "JOB_REJECTED"
 	CandidateExecutionRejected   CandidateRunState = "EXECUTION_REJECTED"
 	CandidatePublicationRejected CandidateRunState = "PUBLICATION_REJECTED"
 	CandidatePublicationResidue  CandidateRunState = "PUBLICATION_REJECTED_WITH_POSSIBLE_RESIDUE"

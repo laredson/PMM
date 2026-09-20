@@ -109,7 +109,7 @@ func candidateID(s string) bool {
 
 // PublishCandidate persists only the verified MemoryResult, never an imported
 // execution JSON or arbitrary directory. The four-file bundle is NOT a deploy.
-// Cancellation is honored before rename. After successful rename, completion
+// Cancellation is honored before the platform commit. After a successful commit,
 // wins cancellation and any subsequent I/O error is returned with a receipt.
 func PublishCandidate(ctx context.Context, r *MemoryResult, q PublicationRequest) (*PublicationReceipt, error) {
 	return publishCandidate(ctx, r, q, publicationHooks{})
@@ -316,7 +316,8 @@ func publishCandidate(ctx context.Context, r *MemoryResult, q PublicationRequest
 	if !candidateID(id) {
 		return nil, fail("TOKEN", "publication", "invalid random identifier")
 	}
-	name, stageName := candidatePrefix+id, stagingPrefix+id
+	name := candidatePrefix + id
+	stageName, completionName := candidateLayout(id, name)
 	manifest := CandidateManifest{Schema: "PMM_R1_CANDIDATE_MANIFEST_V1", Profile: CandidateBundleProfile, CandidateName: name, Files: []File{{"candidate.pak", report.PAKSHA256, int64(len(r.pak))}, {"execution.json", bytesDigest(r.report), int64(len(r.report))}}, ExecutionPlanSHA256: report.ExecutionPlanSHA256, RecipeSHA256: report.RecipeSHA256, CandidateOnly: true}
 	mb, e := candidateJSON(manifest)
 	if e != nil {
@@ -327,7 +328,8 @@ func publishCandidate(ctx context.Context, r *MemoryResult, q PublicationRequest
 		return nil, e
 	}
 	payload := [][]byte{r.pak, r.report, mb, cb}
-	names := []string{"candidate.pak", "execution.json", "MANIFEST.json", "COMPLETE.json"}
+	logicalNames := []string{"candidate.pak", "execution.json", "MANIFEST.json", "COMPLETE.json"}
+	diskNames := []string{"candidate.pak", "execution.json", "MANIFEST.json", completionName}
 	var total int64
 	for _, b := range payload {
 		total += int64(len(b))
@@ -356,12 +358,12 @@ func publishCandidate(ctx context.Context, r *MemoryResult, q PublicationRequest
 			}
 			for i := len(files) - 1; i >= 0; i-- {
 				if files[i] == nil {
-					cleanup = append(cleanup, fail("CHANGED", names[i], "owned rollback handle unavailable"))
+					cleanup = append(cleanup, fail("CHANGED", logicalNames[i], "owned rollback handle unavailable"))
 					continue
 				}
-				de := h.at("cleanup:" + names[i])
+				de := h.at("cleanup:" + logicalNames[i])
 				if de == nil {
-					de = candidateRemove(stage, names[i], files[i], false)
+					de = candidateRemove(stage, diskNames[i], files[i], false)
 				}
 				cleanup = append(cleanup, de, files[i].Close())
 				files[i] = nil
@@ -411,27 +413,27 @@ func publishCandidate(ctx context.Context, r *MemoryResult, q PublicationRequest
 		if e = ctx.Err(); e != nil {
 			return nil, e
 		}
-		f, e := candidateCreate(stage, names[i])
+		f, e := candidateCreate(stage, diskNames[i])
 		if e != nil {
 			return nil, e
 		}
 		files = append(files, f)
-		if e = h.at("write:" + names[i]); e != nil {
+		if e = h.at("write:" + logicalNames[i]); e != nil {
 			return nil, e
 		}
 		if e = candidateWrite(ctx, f, b, h); e != nil {
 			return nil, e
 		}
-		if e = h.at("sync:" + names[i]); e != nil {
+		if e = h.at("sync:" + logicalNames[i]); e != nil {
 			return nil, e
 		}
 		if e = f.Sync(); e != nil {
 			return nil, e
 		}
-		if e = h.at("readback:" + names[i]); e != nil {
+		if e = h.at("readback:" + logicalNames[i]); e != nil {
 			return nil, e
 		}
-		if e = candidateReadback(ctx, f, File{names[i], bytesDigest(b), int64(len(b))}); e != nil {
+		if e = candidateReadback(ctx, f, File{logicalNames[i], bytesDigest(b), int64(len(b))}); e != nil {
 			return nil, e
 		}
 	}
@@ -439,10 +441,10 @@ func publishCandidate(ctx context.Context, r *MemoryResult, q PublicationRequest
 		return nil, e
 	}
 	for i, f := range files {
-		if e = candidateSame(stage, names[i], f, false); e != nil {
+		if e = candidateSame(stage, diskNames[i], f, false); e != nil {
 			return nil, e
 		}
-		if e = candidateReadback(ctx, f, File{names[i], bytesDigest(payload[i]), int64(len(payload[i]))}); e != nil {
+		if e = candidateReadback(ctx, f, File{logicalNames[i], bytesDigest(payload[i]), int64(len(payload[i]))}); e != nil {
 			return nil, e
 		}
 	}
@@ -452,10 +454,10 @@ func publishCandidate(ctx context.Context, r *MemoryResult, q PublicationRequest
 	if _, e = candidateSyncDir(stage); e != nil {
 		return nil, e
 	}
-	// Windows cannot rename a directory containing open file handles. Seal the
-	// verified leaves immediately before commit. On failure the platform restores
-	// only handles whose file IDs still match; foreign replacements survive.
-	restore, e = candidateSeal(stage, names, files)
+	// Apply the platform seal immediately before commit. Linux keeps the leaves
+	// open across directory rename. Windows keeps verified data leaves pinned and
+	// commits by renaming the completion marker. Restore is identity-limited.
+	restore, e = candidateSeal(stage, diskNames, files)
 	if e != nil {
 		return nil, e
 	}
@@ -465,7 +467,7 @@ func publishCandidate(ctx context.Context, r *MemoryResult, q PublicationRequest
 	if e = ctx.Err(); e != nil {
 		return nil, e
 	}
-	committed, e = candidateCommit(parent, stage, stageName, name)
+	committed, e = candidateCommit(parent, stage, stageName, name, completionName, files[len(files)-1])
 	if !committed {
 		return nil, e
 	}

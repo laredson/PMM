@@ -8,6 +8,9 @@ func publicationPlatformError() error {
 	return fail("UNSUPPORTED", "publication", "platform adapter unavailable")
 }
 func candidateParent(*anchoredRoot, string) (*os.File, error) { return nil, publicationPlatformError() }
+func candidateLayout(id, _ string) (string, string) {
+	return stagingPrefix + id, "COMPLETE.json"
+}
 func candidateLookup(*os.File, string, bool) (*os.File, error) {
 	return nil, publicationPlatformError()
 }
@@ -16,7 +19,7 @@ func candidateMkdir(*os.File, string) (*os.File, bool, error) {
 }
 func candidateCreate(*os.File, string) (*os.File, error)     { return nil, publicationPlatformError() }
 func candidateRemove(*os.File, string, *os.File, bool) error { return publicationPlatformError() }
-func candidateCommit(*os.File, *os.File, string, string) (bool, error) {
+func candidateCommit(*os.File, *os.File, string, string, string, *os.File) (bool, error) {
 	return false, publicationPlatformError()
 }
 func candidateSyncDir(*os.File) (bool, error) { return false, publicationPlatformError() }

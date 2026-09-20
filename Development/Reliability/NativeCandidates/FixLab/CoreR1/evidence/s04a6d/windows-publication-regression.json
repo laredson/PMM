@@ -1,0 +1,32 @@
+{
+  "schema": "PMM_R1_WINDOWS_MARKER_COMMIT_REGRESSION_V1",
+  "oldDirectoryRename": {
+    "status": "REPLACED",
+    "failure": "intermittent NTSTATUS 0xc0000022 after child handles close",
+    "sequentialFailuresObserved": true,
+    "concurrentFailuresObserved": true,
+    "retryAdded": false
+  },
+  "rejectedHypotheses": [
+    "parent FILE_SHARE_DELETE alone",
+    "staging FILE_SHARE_DELETE alone",
+    "process-local parent serialization",
+    "FileRenameInformationEx alone"
+  ],
+  "newWindowsCommit": {
+    "directoryName": "PMM-candidate-<128-bit-id>",
+    "precommitMarker": ".pmm-complete-pending",
+    "commitMarker": "COMPLETE.json",
+    "replaceIfExists": false,
+    "rootDirectoryAccess": "FILE_TRAVERSE|FILE_READ_ATTRIBUTES|SYNCHRONIZE",
+    "sourceByHandle": true,
+    "identityCheckedBeforeAndAfter": true
+  },
+  "finalStress": {
+    "directCommitRepeats": 100,
+    "sequentialPublications": 2000,
+    "concurrentRounds": 500,
+    "publicationsPerRound": 4,
+    "failed": 0
+  }
+}

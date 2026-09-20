@@ -39,8 +39,9 @@ Ejecutables de la rama:
 - Runtime C2B `PMM/Engine/PMMRuntime.exe`: SHA-256 `b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f`.
 - FixLab original `PMM/Engine/PMMFixLab.exe`: SHA-256 `8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe`.
 
-Importante: I01 esta compilado e integrado, pero su ejecucion funcional Windows
-sigue pendiente; compilacion y hashes no equivalen a aceptacion.
+Importante: el propietario confirmo que I02 arranca y funciona en Windows a nivel
+basico. Falta la aceptacion detallada (cierre, segundo arranque, UI y tiempos);
+compilacion, hashes y arranque basico no equivalen a aceptacion completa.
 
 I02 conserva exactamente los tres ejecutables de I01 y corrige la integracion
 Desktop: usa `Workspace` como raiz del proyecto, escribe la configuracion privada
@@ -136,7 +137,7 @@ Como el checkout actual ya contiene I01, una reconstruccion futura debe obtener 
 base s01b mediante un worktree o archivo limpio del commit pinneado. No cambiar los
 guards para compilar sobre los EXE I01 ni copiar una carpeta antigua sobre la nueva.
 
-## 7. FixLab - implementacion hasta 04A-6C, NO integrada
+## 7. FixLab - implementacion hasta 04A-6D, NO integrada
 
 El ejecutable original sigue en PMM.
 
@@ -168,16 +169,27 @@ Win10 19045 NTFS sin elevar: 141 Test Go + 4 targets Fuzz con seeds PASS,
 50 Python PASS / 2 SKIP, EXE independiente 40 PASS, builds repetidos identicos.
 Win11, disco lleno real, AV y crash fisico siguen pendientes; no race nuevo.
 Ver SESSION04A6C_FINDINGS/CHECKS y CoreR1/INTEGRATION_CONTRACT.md.
-Siguiente: matriz pendiente y contrato de orquestacion V2/CLI candidato-only.
-Aun faltan schemas/serializers reales, relocalizacion variable/bulk, V2/CLI y
+Ese siguiente paso queda resuelto por 04A-6D; se conserva aqui solo como contexto
+historico de 04A-6C.
+
+04A-6D implementa ese job V2 pinneado y un CLI separado candidato-only. Durante
+stress descubre que el rename de directorio Windows falla intermitentemente aun
+secuencial; Windows pasa a commit atomico de COMPLETE con ancla minima, sin retry.
+Win10 NTFS: 152 tests Go top-level, 4 fuzz seeds, 54 Python, seis verificadores,
+harness x3, 2.000 publicaciones secuenciales y 500x4 concurrentes PASS. Harness
+y CLI tienen builds repetidos byte-identicos. Ver SESSION04A6D_FINDINGS/CHECKS,
+JOB_V2_CONTRACT y evidence/s04a6d. Win11/SMB/AV/disco lleno/race pendientes.
+
+Aun faltan schemas/serializers reales, relocalizacion variable/bulk, V2 completo y
 motor FixLab completo antes de reemplazar `PMMFixLab.exe`.
 
 ## 8. Host/Runtime - gates pendientes
 
-Aunque I01 permite una prueba incremental, no declarar Host/Runtime totalmente aceptados todavia.
+I02 ya permite una prueba incremental y su arranque basico fue confirmado; no
+declarar Host/Runtime totalmente aceptados todavia.
 
 Pendientes conocidos:
-- aceptacion Windows real;
+- aceptacion Windows detallada (cierre, segundo arranque, UI y tiempos);
 - familia de procesos / Job Objects y algunos contratos de supervision;
 - manifests/pins/rutas pendientes del plan de fiabilidad;
 - flujos de reparacion/dependencias;
@@ -209,10 +221,10 @@ Las nuevas cadenas de reliability deben registrarse para traducirlas antes de ca
 
 ## 10. Roadmap restante, nivel alto
 
-1. Obtener la prueba Windows del usuario para I01 ya integrado.
-2. Corregir cualquier regresion de I01 y medir arranque.
-3. Completar matriz 6C fuera de Win10 NTFS y delimitar V2/CLI candidato-only.
-4. Completar las capacidades FixLab reales pendientes y V2/CLI.
+1. Recoger la prueba restante de I02: cierre, segundo arranque, UI y tiempos.
+2. Corregir cualquier regresion de I02 y medir/optimizar arranque.
+3. Completar matriz 6D fuera de Win10 NTFS; job V2/CLI acotado ya existe.
+4. Completar schemas/serializers, relocalizacion y semantica V2 real pendientes.
 5. Integrar un PMMFixLab reconstruido cuando tenga paridad suficiente; prueba incremental.
 6. Cerrar Host/Runtime restantes y optimizar arranque.
 7. Cerrar repair/dependencies, manifests/pins/rutas y packaging reproducible.

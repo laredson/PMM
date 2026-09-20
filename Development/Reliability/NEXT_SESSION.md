@@ -1,4 +1,4 @@
-# Retomar - I02 en prueba, 04A-6C Win10 validado
+# Retomar - I02 arranca, 04A-6D Win10 validado
 
 Punto de entrada obligatorio: `START_HERE_NEW_PROJECT.md`.
 
@@ -9,7 +9,7 @@ ZIP de chats anteriores antes de leer `NEW_PROJECT_HANDOFF.md`,
 ## Estado inmediato
 
 La rama contiene toda la fuente, research, builders, contratos y evidencias hasta
-04A-6C (Win10 NTFS e interfaz candidata; matriz entre entornos parcial).
+04A-6D (job V2/CLI candidato-only y commit Windows estable; matriz parcial).
 SESSION_I01B reconstruyo localmente e integro los DOS EXE I01 junto con
 sus tres metadatos. La limitacion de transferencia anterior esta cerrada.
 
@@ -26,24 +26,24 @@ I02 integrado:
 1. Comprobar rama, HEAD y `git status`. No pisar trabajo local del usuario.
 2. Confirmar que `PMM/Resources/Metadata/BUILD_ID.txt` identifica I02 y que el
    arbol PMM coincide con `9ef22d5815943ce50413dfa7e09b474b06a22860`.
-3. Recoger el resultado de la prueba I02 que el propietario esta realizando.
-4. Esperar/priorizar feedback real antes de otra integracion grande:
-   ventana visible, UI utilizable, cierre, segundo inicio, tiempos y logs si falla.
+3. Conservar el resultado ya recibido: I02 arranca y funciona a nivel basico.
+4. Recoger/priorizar el resto del feedback antes de otra integracion grande:
+   UI detallada, cierre, segundo inicio, tiempos y logs si falla.
 5. Registrar el resultado sin convertir una compilacion correcta en aceptacion
    funcional. Ante una regresion, corregirla antes de integrar otro bloque grande.
 
 ## Siguiente bloque
 
-El propietario autorizo continuar el laboratorio mientras prueba I01. 04A-6C
-ya corrigio publicacion Windows y agrego ExecuteAndPublishCandidate; NO repetir.
-Leer SESSION04A6C_FINDINGS/CHECKS e INTEGRATION_CONTRACT.md. Las siguientes
-acciones son delimitar la orquestacion V2/CLI candidato-only (sin instalar) y
-completar la matriz en otros entornos cuando esten disponibles. No afirmar
-schemas reales/paridad completa ni sustituir FixLab por este harness.
+El propietario autorizo continuar el laboratorio mientras prueba I02. 04A-6D ya
+implemento job V2/CLI candidato-only y sustituyo el rename Windows inestable por
+commit de marcador; NO repetir. Leer SESSION04A6D_FINDINGS/CHECKS,
+JOB_V2_CONTRACT e INTEGRATION_CONTRACT. Lo siguiente es ampliar semantica real
+acotada y completar matriz cuando haya otros entornos. No afirmar paridad completa
+ni sustituir FixLab por este harness/CLI.
 
 - Corregir regresiones y medir/optimizar startup sin quitar verificaciones a ciegas.
-- Completar matriz Windows pendiente de 6C; Win10 NTFS ya tiene evidencia real.
-- Completar schemas/serializers/relocalizacion/V2-CLI antes de sustituir FixLab.
+- Completar matriz pendiente de 6D; Win10 NTFS ya tiene evidencia real amplia.
+- Completar schemas/serializers/relocalizacion y V2 completo antes de sustituir FixLab.
 - Cerrar Host/Runtime gates restantes.
 - Integrar idiomas mas adelante segun TRANSLATION_INTEGRATION.md.
 - Packaging/firma/preflight al final; no prometer Nexus verde.

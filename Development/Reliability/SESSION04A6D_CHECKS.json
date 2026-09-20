@@ -1,0 +1,77 @@
+{
+  "schema": "PMM_SESSION04A6D_CHECKS_V1",
+  "date": "2026-09-20",
+  "inputCommit": "e6324e6cf6e0163ea210cdbe930f611961743b0a",
+  "inputCoreR1Tree": "d7ded7b17ae7d193f63fbc4201e9a830e7781e42",
+  "scopeStatus": "JOB_V2_AND_CLI_IMPLEMENTED; WIN10_NTFS_VALIDATED; CROSS_ENVIRONMENT_ACCEPTANCE_PARTIAL",
+  "evidenceDirectory": "NativeCandidates/FixLab/CoreR1/evidence/s04a6d",
+  "tests": {
+    "goPassEventsWithSixOptIns": 317,
+    "goTopLevelPassedWithSixOptIns": 152,
+    "goSkipEventsWithSixOptIns": 3,
+    "goFailed": 0,
+    "fuzzSeedTargetsPassed": 4,
+    "pythonPassed": 54,
+    "pythonSkipped": 2,
+    "independentVerifiersPassed": 6,
+    "harnessFullSuiteCount": 3,
+    "sequentialPublicationRepeats": 2000,
+    "concurrencyRepeats": 500,
+    "publicationsPerConcurrencyRepeat": 4
+  },
+  "build": {
+    "harnessSHA256": "7d09da6c001d926d077fd32863f2fd31c6708fd98330106d35a4f0caeebd2d8c",
+    "harnessBytes": 6860288,
+    "candidateCLISHA256": "0464e503a96f467e96501d0e71367027501640b7433bb1bd76cb1e159cd781bc",
+    "candidateCLIBytes": 4353536,
+    "repeatByteIdentical": true,
+    "windowsExecuted": true,
+    "linuxVet": "PASS",
+    "linuxCrossBuild": "PASS_NOT_EXECUTED",
+    "engineBuilt": false
+  },
+  "jobV2": {
+    "jobSHA256": "927262fa09ccd3977467ec3a27e57fdbaf9bcb7a2e41d25097f7031c7c75e7f5",
+    "jobBytes": 2961,
+    "state": "CANDIDATE_PUBLISHED_NOT_GAME_ACCEPTED",
+    "outputEntriesCompared": 10,
+    "candidateOnly": true,
+    "gameAccepted": false,
+    "installed": false,
+    "cliSuccessExit": 0,
+    "cliWrongPinExit": 3,
+    "cliUsageExit": 2
+  },
+  "package": {
+    "buildId": "PMM-v1.5.0.1-reliability-i02",
+    "tree": "9ef22d5815943ce50413dfa7e09b474b06a22860",
+    "files": 629,
+    "checksumRows": 628,
+    "checksumMismatches": 0,
+    "changed": false,
+    "executedByAgent": false,
+    "ownerBasicStartupPassed": true
+  },
+  "protectedState": {
+    "gameDataUsed": false,
+    "gameExecuted": false,
+    "PMMChanged": false,
+    "fixLabOriginalChanged": false,
+    "antivirusPolicyChanged": false,
+    "privilegesEnabled": false,
+    "releaseCreated": false,
+    "workflowDispatched": false,
+    "pullRequestCreated": false
+  },
+  "notTested": [
+    "Windows 11",
+    "remote SMB or ReFS",
+    "real disk full",
+    "power loss or hardware crash",
+    "instrumented antivirus interference",
+    "race detector because no C compiler is installed",
+    "Linux execution after changes",
+    "real Unreal or Palworld repair"
+  ],
+  "next": "Prioritize further owner I02 feedback; keep CoreR1 candidate-only; next bounded work is real schema/serializer and V2 semantic coverage, not replacement or deploy."
+}

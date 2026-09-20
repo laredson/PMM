@@ -12,6 +12,9 @@ import (
 func candidateParent(root *anchoredRoot, _ string) (*os.File, error) {
 	return openChild(root.file, ".", true)
 }
+func candidateLayout(id, _ string) (string, string) {
+	return stagingPrefix + id, "COMPLETE.json"
+}
 func candidateLookup(parent *os.File, name string, dir bool) (*os.File, error) {
 	return openChild(parent, name, dir)
 }
@@ -50,7 +53,7 @@ func candidateRemove(parent *os.File, name string, f *os.File, dir bool) error {
 	}
 	return nil
 }
-func candidateCommit(parent, stage *os.File, old, new string) (bool, error) {
+func candidateCommit(parent, stage *os.File, old, new, _ string, _ *os.File) (bool, error) {
 	if e := candidateSame(parent, old, stage, true); e != nil {
 		return false, e
 	}

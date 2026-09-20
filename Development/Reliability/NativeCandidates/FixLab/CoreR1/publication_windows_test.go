@@ -211,7 +211,7 @@ func TestPublicationWindowsEmptyDestinationNotReplaced(t *testing.T) {
 	emptyCandidateParent(t, dest)
 }
 
-func TestPublicationWindowsSealedLeafRenameDenied(t *testing.T) {
+func TestPublicationWindowsPinnedLeafBlocksForeignWrite(t *testing.T) {
 	r, q := publicationFixture(t)
 	var stage string
 	boom := errors.New("abort after denied rename")
@@ -223,20 +223,19 @@ func TestPublicationWindowsSealedLeafRenameDenied(t *testing.T) {
 			return nil
 		}
 		path := filepath.Join(q.Parent, stage, "candidate.pak")
-		// The held writable stage also blocks this independent leaf rename.
+		// The retained verified leaf denies a second writable handle.
 		anchor, e := openRoot(filepath.Dir(path))
 		if e != nil {
 			t.Fatal(e)
 		}
 		original, e := candidateNt(anchor.file, "candidate.pak", false, false, true, 0)
-		if e != nil {
+		if e == nil {
+			original.Close()
 			anchor.Close()
-			t.Fatal(e)
+			t.Fatal("foreign writable handle was accepted")
 		}
-		e = candidateRenameRelative(anchor.file, original, "displaced-original")
-		closeError := errors.Join(original.Close(), anchor.Close())
-		if e == nil || closeError != nil {
-			t.Fatal(e, closeError)
+		if e := anchor.Close(); e != nil {
+			t.Fatal(e)
 		}
 		return boom
 	}})
@@ -247,9 +246,7 @@ func TestPublicationWindowsSealedLeafRenameDenied(t *testing.T) {
 	emptyCandidateParent(t, q.Parent)
 }
 
-func TestPublicationWindowsSealRestoreRejectsForeignIdentity(t *testing.T) {
-	// Unit-level ownership check without the production stage's deny-delete lock.
-	// A broader sharing policy here deliberately permits the replacement.
+func TestPublicationWindowsSealKeepsVerifiedHandlesPinned(t *testing.T) {
 	dir := t.TempDir()
 	root, e := openRoot(dir)
 	if e != nil {
@@ -262,61 +259,42 @@ func TestPublicationWindowsSealRestoreRejectsForeignIdentity(t *testing.T) {
 	}
 	files := []*os.File{f}
 	restore, e := candidateSeal(root.file, []string{"owned"}, files)
-	if e != nil || restore == nil || files[0] != nil {
+	if e != nil || restore == nil || files[0] != f {
 		t.Fatal("seal", e)
 	}
-	if e := os.Rename(filepath.Join(dir, "owned"), filepath.Join(dir, "displaced")); e != nil {
+	if e := restore(); e != nil {
 		t.Fatal(e)
 	}
-	if e := os.WriteFile(filepath.Join(dir, "owned"), []byte("foreign"), 0600); e != nil {
-		t.Fatal(e)
-	}
-	if e := restore(); e == nil || files[0] != nil {
-		if files[0] != nil {
-			files[0].Close()
-		}
-		t.Fatal("foreign ownership accepted", e)
-	}
-	data, e := os.ReadFile(filepath.Join(dir, "owned"))
-	if e != nil || string(data) != "foreign" {
-		t.Fatal("foreign changed", e)
-	}
+	f.Close()
 }
 
-func TestPublicationWindowsSealedSharingViolationNamesResidue(t *testing.T) {
+func TestPublicationWindowsPinnedLeavesDenyIncompatibleOpen(t *testing.T) {
 	r, q := publicationFixture(t)
-	var stage string
-	var held *os.File
-	defer func() {
-		if held != nil {
-			held.Close()
-		}
-	}()
+	boom := errors.New("stop after sharing check")
 	p, e := publishCandidate(context.Background(), r, q, publicationHooks{event: func(event string) error {
-		if strings.HasPrefix(event, "created:") {
-			stage = strings.TrimPrefix(event, "created:")
-		}
 		if event != "sealed-before-commit" {
 			return nil
 		}
-		path, e := syscall.UTF16PtrFromString(filepath.Join(q.Parent, stage, "candidate.pak"))
+		entries, e := os.ReadDir(q.Parent)
+		if e != nil || len(entries) != 1 {
+			t.Fatal(entries, e)
+		}
+		path, e := syscall.UTF16PtrFromString(filepath.Join(q.Parent, entries[0].Name(), "candidate.pak"))
 		if e != nil {
 			t.Fatal(e)
 		}
 		h, e := syscall.CreateFile(path, syscall.GENERIC_READ, syscall.FILE_SHARE_READ, nil, syscall.OPEN_EXISTING, 0, 0)
-		if e != nil {
-			t.Fatal(e)
+		if e == nil {
+			syscall.CloseHandle(h)
+			t.Fatal("incompatible external handle was accepted")
 		}
-		held = os.NewFile(uintptr(h), "test-sharing-lock")
-		return nil // Real rename and identity-safe rollback encounter the lock.
+		return boom
 	}})
 	var pe *PublicationError
-	if p != nil || !errors.As(e, &pe) || pe.Committed || pe.ResidueName != stage {
+	if p != nil || !errors.Is(e, boom) || !errors.As(e, &pe) || pe.Committed || pe.ResidueName != "" {
 		t.Fatal(p, e)
 	}
-	if _, e := os.Stat(filepath.Join(q.Parent, stage, "candidate.pak")); e != nil {
-		t.Fatal(e)
-	}
+	emptyCandidateParent(t, q.Parent)
 }
 
 func TestPublicationWindowsInspectionRejectsHardlink(t *testing.T) {
@@ -331,7 +309,7 @@ func TestPublicationWindowsInspectionRejectsHardlink(t *testing.T) {
 	}
 }
 
-func TestPublicationWindowsAnchoredParentAndEmptyRename(t *testing.T) {
+func TestPublicationWindowsAnchoredParentAndMarkerCommit(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "parent with spaces ñ")
 	if e := os.Mkdir(path, 0700); e != nil {
 		t.Fatal(e)
@@ -346,16 +324,22 @@ func TestPublicationWindowsAnchoredParentAndEmptyRename(t *testing.T) {
 		t.Fatal("parent", e)
 	}
 	defer parent.Close()
-	stage, created, e := candidateMkdir(parent, "stage")
+	stage, created, e := candidateMkdir(parent, "final")
 	if e != nil || !created {
 		t.Fatal("mkdir", e)
 	}
 	defer stage.Close()
-	committed, e := candidateCommit(parent, stage, "stage", "final")
-	if !committed || e != nil {
-		t.Fatal("rename", e)
+	completionName := ".pmm-complete-pending"
+	completion, e := candidateCreate(stage, completionName)
+	if e != nil {
+		t.Fatal("completion", e)
 	}
-	if _, e := os.Stat(filepath.Join(path, "final")); e != nil {
+	defer completion.Close()
+	committed, e := candidateCommit(parent, stage, "final", "final", completionName, completion)
+	if !committed || e != nil {
+		t.Fatal("marker", e)
+	}
+	if _, e := os.Stat(filepath.Join(path, "final", "COMPLETE.json")); e != nil {
 		t.Fatal(e)
 	}
 }

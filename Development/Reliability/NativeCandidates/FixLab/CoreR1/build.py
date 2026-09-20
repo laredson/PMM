@@ -28,13 +28,14 @@ def collect_sources(here):
     for module in (here, here.parent / 'PAKV11', here.parent / 'UAsset'):
         if module.is_symlink() or not module.is_dir():
             raise ValueError('Missing module or module symlink')
-        paths = sorted(module.glob('*.go')) + [module / 'go.mod']
+        paths = sorted(module.rglob('*.go')) + [module / 'go.mod'] if module == here else sorted(module.glob('*.go')) + [module / 'go.mod']
         for p in paths:
             if module.name != 'CoreR1' and p.name.endswith('_test.go'):
                 continue
             if p.is_symlink() or not p.is_file() or p.stat().st_size > (1 << 20):
                 raise ValueError('Missing, symlink or oversized source')
-            files[module.name + '/' + p.name] = p.read_bytes()
+            relative = p.relative_to(module).as_posix()
+            files[module.name + '/' + relative] = p.read_bytes()
     if not any(n.startswith('PAKV11/') and n.endswith('.go') for n in files):
         raise ValueError('PAKV11 source absent')
     fixture = here / 'testdata' / 'execution-vectors.json'
@@ -65,16 +66,24 @@ def build(out):
     p = subprocess.run(command, cwd=source / 'CoreR1', env=env, capture_output=True, text=True, timeout=90)
     if p.returncode:
         raise ValueError('Compilation failed: ' + p.stderr)
+    cli_command = ['go', 'build', '-trimpath', '-buildvcs=false', '-mod=readonly', '-o', str(out / 'CoreR1-candidate.exe'), './cmd/candidatecli']
+    p = subprocess.run(cli_command, cwd=source / 'CoreR1', env=env, capture_output=True, text=True, timeout=90)
+    if p.returncode:
+        raise ValueError('Candidate CLI compilation failed: ' + p.stderr)
     if collect_sources(here) != files:
         raise ValueError('Source or local dependency changed during build')
     artifact = (out / 'CoreR1-tests.exe').read_bytes()
-    report = {'schema': 'PMM_CORE_R1_PUBLICATION_TEST_BUILD_V1', 'artifact': 'TEST harness only; not FixLab',
+    cli = (out / 'CoreR1-candidate.exe').read_bytes()
+    report = {'schema': 'PMM_CORE_R1_CANDIDATE_CLI_BUILD_V2', 'artifact': 'TEST harness plus candidate-only CLI; neither is PMMFixLab',
               'goVersion': version, 'target': 'windows/amd64', 'sha256': sha(artifact), 'bytes': len(artifact),
+              'candidateCLI': {'file': 'CoreR1-candidate.exe', 'sha256': sha(cli), 'bytes': len(cli),
+                               'candidateOnly': True, 'installs': False, 'deploys': False},
               'command': [x.replace(str(out), '<OUT>') for x in command],
+              'cliCommand': [x.replace(str(out), '<OUT>') for x in cli_command],
               'sourceSHA256': {n: sha(b) for n, b in files.items()},
               'windowsExecuted': False, 'engineBuilt': False}
     (out / 'build-report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
-    (out / 'COMPLETE.txt').write_text('TEST HARNESS ONLY. Not executed or installed.\n', encoding='utf-8')
+    (out / 'COMPLETE.txt').write_text('TEST HARNESS AND CANDIDATE-ONLY CLI. Not executed against game data or installed.\n', encoding='utf-8')
     return report
 
 

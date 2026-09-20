@@ -86,8 +86,25 @@
   },
   "fixLabResearch": {
     "integratedIntoRemotePMM": false,
-    "latestCompletedResearchStep": "04A-6C implementation and Win10 NTFS validation; cross-environment acceptance partial",
-    "nextResearchStep": "Remaining Windows matrix and bounded V2/CLI candidate-only orchestration contract",
+    "latestCompletedResearchStep": "04A-6D pinned job V2, candidate-only CLI and stable Win10 marker commit; cross-environment acceptance partial",
+    "nextResearchStep": "Real schema/serializer and broader V2 semantics, plus remaining cross-environment matrix",
+    "s04a6dTests": {
+      "goTopLevelPassed": 152,
+      "goPassEvents": 317,
+      "fuzzSeedTargetsPassed": 4,
+      "pythonPassed": 54,
+      "pythonSkipped": 2,
+      "independentVerifiersPassed": 6,
+      "windowsHarnessFullSuiteCount": 3,
+      "sequentialPublications": 2000,
+      "concurrencyRounds": 500,
+      "publicationsPerRound": 4,
+      "windows10NTFSExecuted": true,
+      "windows11Executed": false,
+      "raceExecuted": false,
+      "reproducibleHarnessSHA256": "7d09da6c001d926d077fd32863f2fd31c6708fd98330106d35a4f0caeebd2d8c",
+      "reproducibleCandidateCLISHA256": "0464e503a96f467e96501d0e71367027501640b7433bb1bd76cb1e159cd781bc"
+    },
     "s04a6cTests": {
       "goTestPassed": 141,
       "fuzzSeedTargetsPassed": 4,
@@ -111,7 +128,7 @@
     "blockers": [
       "real schema/serializer semantics",
       "variable relocation and bulk layouts",
-      "V2/CLI/full engine orchestration",
+      "full V2 semantics beyond the bounded candidate-only CLI",
       "Windows acceptance",
       "remaining Host/Runtime gates",
       "repair/dependency policy",
@@ -123,11 +140,11 @@
   },
   "immediateNext": [
     "Do not rebuild I01 executables without a new reason; they are retained byte-identical in I02.",
-    "Collect results from the owner's ongoing I02 Windows test.",
+    "Preserve the owner's result that I02 starts and works at a basic level.",
     "Record startup visible/usable time, close, second startup, UI/regressions and logs if failure.",
     "Correct any I02 regression before another large integration.",
-    "Owner authorized laboratory progress while testing; 6C implementation and Win10 NTFS validation remain candidate-only.",
-    "Complete remaining Windows acceptance where available; delimit V2/CLI candidate-only contract next."
+    "Owner authorized laboratory progress while testing; 6D job V2/CLI and Win10 marker commit remain candidate-only.",
+    "Complete remaining cross-environment acceptance where available; advance real schema/serializer semantics next."
   ],
   "developmentPolicy": {
     "remoteWritesNeedExplicitAuthorization": true,

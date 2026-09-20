@@ -5,7 +5,7 @@ Este archivo es el punto de entrada autoritativo para cualquier chat, proyecto, 
 Repositorio: `laredson/PMM`  
 Rama de trabajo: `v1.5.0.1-PMM-reliability`  
 Base de integracion I01B: `e83b191e56c916b4de12c34a9d054f4bd6bbd485`
-Base de la tanda 04A-6C: `91f643614142283b50b9c1b1be6178fa796138a1`
+Base de la tanda 04A-6D: `e6324e6cf6e0163ea210cdbe930f611961743b0a`
 
 ## Regla principal
 
@@ -34,16 +34,16 @@ Despues leer el contrato de la candidata concreta antes de modificarla.
 
 ## Estado ejecutivo en una frase
 
-La rama contiene research hasta 04A-6C y el paquete I02. Host y Runtime C2B de I01 siguen integrados; I02 mueve el proyecto/configuracion privada de Codex a `Workspace`. FixLab candidato sigue aislado y NO sustituye al original. La prueba funcional del propietario sigue pendiente.
+La rama contiene research hasta 04A-6D y el paquete I02. Host y Runtime C2B de I01 siguen integrados; I02 mueve el proyecto/configuracion privada de Codex a `Workspace`. FixLab candidato/CLI sigue aislado y NO sustituye al original. El propietario confirmo arranque y funcionamiento basico; faltan detalles de cierre, segundo arranque, UI y tiempos.
 
 ## Objetivo inmediato
 
 1. comprobar que la rama/checkout corresponden a este handoff;
 2. confirmar BUILD_ID I02, hashes y arbol PMM esperado;
-3. pedir al usuario que haga Pull con GitHub Desktop y pruebe el programa real;
-4. registrar arranque, cierre, segundo arranque, ventana visible, UI utilizable y tiempos;
+3. recoger el resto de la prueba I02: cierre, segundo arranque, UI utilizable y tiempos;
+4. registrar el arranque/funcionamiento basico ya confirmado sin inferir aceptacion completa;
 5. corregir cualquier regresion antes de otra integracion grande;
-6. leer SESSION04A6C_FINDINGS/CHECKS: no repetir su implementacion; completar la matriz Windows pendiente y delimitar V2/CLI candidato-only;
+6. leer SESSION04A6D_FINDINGS/CHECKS: no repetir job V2/CLI ni el commit Windows por marcador; completar matriz pendiente y avanzar semantica real acotada;
 7. no crear PR, tag, release ni ejecutar Actions.
 
 No modificar pins para conseguir que una compilacion distinta pase.

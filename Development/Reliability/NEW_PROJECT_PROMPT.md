@@ -28,23 +28,23 @@ Lee, en orden:
 
 Si tienes acceso a una carpeta local del repo, usala como fuente de trabajo y comprueba `git status`, rama y HEAD antes de cambiar nada. Si solo tienes GitHub remoto, inspecciona la rama antes de pedir archivos al usuario.
 
-Contexto inmediato: todo el research/codigo esta en Git. La limitacion anterior de transferencia de los dos EXE I01 ya quedo cerrada en SESSION_I01B: `PMM/` contiene Host/Runtime C2B y los tres metadatos I01, con arbol `12e01ba3a24a2c0ce5e74d681b4931307c845a56`. No cambies pins ni reconstruyas I01 otra vez sin una razon nueva.
+Contexto inmediato: todo el research/codigo esta en Git. La limitacion anterior de transferencia de los dos EXE I01 ya quedo cerrada en SESSION_I01B. `PMM/` es I02, conserva Host/Runtime C2B y usa Workspace para configuracion privada, con arbol `9ef22d5815943ce50413dfa7e09b474b06a22860`. No cambies pins ni reconstruyas I01 otra vez sin una razon nueva.
 
 Esta rama SI puede quedar temporalmente rota: es una rama experimental para que el propietario pruebe cambios reales mediante GitHub Desktop. Mantener `Development/Reliability/NativeCandidates/` como laboratorio/historial, pero integrar en `PMM/` los bloques suficientemente cerrados.
 
-Pedirme que haga Pull y probar I01: arranque, ventana visible, UI utilizable, cierre, segundo arranque y tiempos. No sigas acumulando integraciones antes de revisar esa prueba.
+I02 ya arranca y funciona a nivel basico. Recoger cierre, segundo arranque, UI detallada y tiempos. No acumular otra integracion grande antes de revisar ese feedback.
 
-04A-6C ya corrigio publicacion Windows y agrego la interfaz candidata mientras
-el propietario prueba I01; leer sus FINDINGS/CHECKS. La matriz sigue parcial
-(Win10 NTFS probado, Win11/disco lleno real/AV pendientes). Continuar el contrato
-V2/CLI candidato-only sin sustituir FixLab ni acumular integraciones PMM.
+04A-6D ya implemento job V2/CLI candidato-only y commit Windows por marcador;
+leer sus FINDINGS/CHECKS y contratos. La matriz sigue parcial (Win10 NTFS probado,
+Win11/SMB/disco lleno real/AV/race pendientes). Continuar semantica real acotada
+sin sustituir FixLab ni acumular integraciones PMM.
 No crear PR/tag/release ni ejecutar Actions. Commits con `[skip ci]`.
 No desactivar antivirus ni pedir exclusiones.
 
 Antes de responderme que falta contexto, demuestra que has leido el handoff y resume:
 - que Host/Runtime I01 estan integrados y FixLab sigue siendo el original;
 - hashes Host/Runtime I01;
-- que hacen 04A-6B/6C y los limites de las pruebas Windows;
+- que hacen 04A-6B/6C/6D y los limites de las pruebas Windows;
 - cual es la siguiente prueba Windows;
 - que queda pendiente para FixLab;
 - como se integraran los idiomas.

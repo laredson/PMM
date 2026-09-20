@@ -47,6 +47,27 @@ func candidateSecurity() (uintptr, error) {
 	return sd, nil
 }
 func candidateNt(parent *os.File, name string, dir, create, writable bool, sd uintptr) (*os.File, error) {
+	access := uint32(0x00100081)
+	share := uint32(7)
+	if writable {
+		access = 0xc0110000
+		share = 5
+		if dir {
+			share = 7
+			if !create {
+				// The existing parent is never deleted. It neither requests DELETE
+				// nor denies delete sharing: Windows may require FILE_SHARE_DELETE
+				// on every retained parent handle while independent children are
+				// renamed. The anchored root handle uses the same sharing.
+				access &^= 0x00010000
+				share = 7
+			}
+		}
+	} // GENERIC_READ/WRITE, DELETE, SYNCHRONIZE
+	return candidateNtRaw(parent, name, dir, create, access, share, sd)
+}
+
+func candidateNtRaw(parent *os.File, name string, dir, create bool, access, share uint32, sd uintptr) (*os.File, error) {
 	b, e := syscall.UTF16FromString(name)
 	if e != nil || len(b) > 32767 {
 		return nil, fail("PATH", "candidate", "invalid name")
@@ -62,20 +83,6 @@ func candidateNt(parent *os.File, name string, dir, create, writable bool, sd ui
 	} else {
 		opts |= 0x40
 	}
-	access := uint32(0x00100081)
-	share := uint32(7)
-	if writable {
-		access = 0xc0110000
-		share = 5
-		if dir {
-			share = 3
-			if !create {
-				// The existing parent is never deleted. Requesting DELETE while
-				// denying delete sharing made independent publications conflict.
-				access &^= 0x00010000
-			}
-		}
-	} // GENERIC_READ/WRITE, DELETE, SYNCHRONIZE
 	disposition := uintptr(1)
 	if create {
 		disposition = 2
@@ -110,6 +117,12 @@ func candidateParent(root *anchoredRoot, path string) (*os.File, error) {
 	}
 	return f, nil
 }
+func candidateLayout(_ string, final string) (string, string) {
+	// Windows cannot reliably rename a directory immediately after closing its
+	// scanned children. Create the uncommitted final namespace directly and use
+	// an atomically renamed completion marker as the commit point instead.
+	return final, ".pmm-complete-pending"
+}
 func candidateLookup(parent *os.File, name string, dir bool) (*os.File, error) {
 	return candidateNt(parent, name, dir, false, false, 0)
 }
@@ -123,8 +136,22 @@ func candidateMkdir(parent *os.File, name string) (*os.File, bool, error) {
 	if e != nil {
 		return nil, false, e
 	}
-	_, e = stamp(f, true)
-	return f, true, e
+	want, e := stamp(f, true)
+	if e != nil {
+		return f, true, e
+	}
+	// Retain only traverse/read-attributes/synchronize. Microsoft documents
+	// this access set for a rename RootDirectory without sharing conflicts.
+	anchor, ae := candidateNtRaw(parent, name, true, false, 0x001000a0, 7, 0)
+	if ae != nil {
+		return f, true, ae
+	}
+	got, se := stamp(anchor, true)
+	ce := f.Close()
+	if se != nil || ce != nil || want.volume != got.volume || want.id != got.id {
+		return anchor, true, errors.Join(se, ce, fail("CHANGED", name, "created directory anchor differs"))
+	}
+	return anchor, true, nil
 }
 func candidateCreate(parent *os.File, name string) (*os.File, error) {
 	return candidateNt(parent, name, false, true, true, 0)
@@ -133,30 +160,55 @@ func candidateRemove(parent *os.File, name string, f *os.File, dir bool) error {
 	if e := candidateSame(parent, name, f, dir); e != nil {
 		return e
 	}
+	deleteHandle := f
+	if dir {
+		var e error
+		deleteHandle, e = candidateNtRaw(parent, name, true, false, 0x00110080, 7, 0)
+		if e != nil {
+			return e
+		}
+		a, ae := stamp(f, true)
+		b, be := stamp(deleteHandle, true)
+		if ae != nil || be != nil || a.volume != b.volume || a.id != b.id {
+			return errors.Join(ae, be, deleteHandle.Close(), fail("CHANGED", name, "delete handle identity differs"))
+		}
+	}
 	var deleteFile byte = 1
-	ok, _, e := candidateSetInfo.Call(f.Fd(), 4, uintptr(unsafe.Pointer(&deleteFile)), 1)
-	runtime.KeepAlive(f)
+	ok, _, e := candidateSetInfo.Call(deleteHandle.Fd(), 4, uintptr(unsafe.Pointer(&deleteFile)), 1)
+	runtime.KeepAlive(deleteHandle)
 	if ok == 0 {
+		if dir {
+			return errors.Join(e, deleteHandle.Close())
+		}
 		return e
+	}
+	if dir {
+		return deleteHandle.Close()
 	}
 	return nil
 }
 
 type candidateRenameInfo struct {
-	Replace uint32
-	Root    syscall.Handle
-	Length  uint32
-	Name    [1]uint16
+	Flags  uint32
+	Root   syscall.Handle
+	Length uint32
+	Name   [1]uint16
 }
 
-func candidateCommit(parent, stage *os.File, old, new string) (bool, error) {
-	if e := candidateSame(parent, old, stage, true); e != nil {
+func candidateCommit(parent, stage *os.File, old, new, completionName string, completion *os.File) (bool, error) {
+	if old != new || completionName == "COMPLETE.json" || completion == nil {
+		return false, fail("COMMIT", "candidate", "invalid Windows marker layout")
+	}
+	runtime.KeepAlive(parent)
+	runtime.KeepAlive(stage)
+	// The generic commit path has just re-resolved both directory and marker,
+	// while their original handles remain held. Do not introduce another
+	// transient lookup handle between that verification and this rename.
+	// candidateMkdir retained stage with the documented minimal access set.
+	if e := candidateRenameRelative(stage, completion, "COMPLETE.json"); e != nil {
 		return false, e
 	}
-	if e := candidateRenameRelative(parent, stage, new); e != nil {
-		return false, e
-	}
-	return true, candidateSame(parent, new, stage, true)
+	return true, candidateSame(stage, "COMPLETE.json", completion, false)
 }
 
 func candidateRenameRelative(parent, object *os.File, new string) error {
@@ -165,11 +217,13 @@ func candidateRenameRelative(parent, object *os.File, new string) error {
 		return e
 	}
 	off := unsafe.Offsetof(candidateRenameInfo{}.Name)
-	raw := make([]byte, int(unsafe.Sizeof(candidateRenameInfo{}))+2*len(b))
+	nameBytes := 2 * (len(b) - 1)
+	raw := make([]byte, int(unsafe.Sizeof(candidateRenameInfo{}))+nameBytes)
 	info := (*candidateRenameInfo)(unsafe.Pointer(&raw[0]))
+	info.Flags = 0 // FileRenameInformation ReplaceIfExists remains FALSE
 	info.Root = syscall.Handle(parent.Fd())
-	info.Length = uint32(2 * (len(b) - 1)) // Replace remains FALSE
-	copy(unsafe.Slice((*uint16)(unsafe.Pointer(&raw[off])), len(b)), b)
+	info.Length = uint32(nameBytes)
+	copy(unsafe.Slice((*uint16)(unsafe.Pointer(&raw[off])), len(b)-1), b[:len(b)-1])
 	// Win10's Win32 FileRenameInfo wrapper rejects this root-relative request
 	// with ERROR_INVALID_PARAMETER. Use the documented native file-information
 	// API through ntdll, preserving the anchored destination and no-replace bit.
@@ -189,38 +243,10 @@ func candidateRenameRelative(parent, object *os.File, new string) error {
 func candidateSyncDir(*os.File) (bool, error) { return false, nil }
 
 func candidateSeal(stage *os.File, names []string, files []*os.File) (func() error, error) {
-	stamps := make([]diskStamp, len(files))
-	for i, f := range files {
-		st, e := stamp(f, false)
-		if e != nil {
+	for _, f := range files {
+		if _, e := stamp(f, false); e != nil {
 			return nil, e
 		}
-		stamps[i] = st
 	}
-	restore := func() error {
-		var failures []error
-		for i := range files {
-			if files[i] != nil {
-				continue
-			}
-			f, e := candidateNt(stage, names[i], false, false, true, 0)
-			if e != nil {
-				failures = append(failures, e)
-				continue
-			}
-			st, e := stamp(f, false)
-			if e != nil || st.volume != stamps[i].volume || st.id != stamps[i].id {
-				failures = append(failures, errors.Join(e, f.Close(), fail("CHANGED", names[i], "rollback identity differs")))
-				continue
-			}
-			files[i] = f
-		}
-		return errors.Join(failures...)
-	}
-	var failures []error
-	for i, f := range files {
-		failures = append(failures, f.Close())
-		files[i] = nil
-	}
-	return restore, errors.Join(failures...)
+	return func() error { return nil }, nil
 }

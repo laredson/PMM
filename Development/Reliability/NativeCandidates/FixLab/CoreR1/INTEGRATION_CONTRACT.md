@@ -22,16 +22,25 @@ mas tarde, llama InspectCandidate con ese pin; no confia en un pin descubierto
 solo dentro del mismo directorio. Los estados serializados sirven para UI/logs,
 no autorizan nuevas ejecuciones, reparaciones ni cambios en politicas.
 
-Cancelacion antes del rename: rechazo/rollback. Despues: gana el commit.
+Cancelacion antes del commit de plataforma: rechazo/rollback. Despues: gana el commit.
 No hay reintento por colision, fallo de acceso, bloqueo de antivirus o cancelacion.
 No se silencian errores de disco. No se amplian limites del perfil acotado.
 El contrato no garantiza persistencia del recibo si muere el proceso llamador.
+
+## Orquestacion V2 acotada
+
+`RunCandidateJobV2` y el CLI separado implementan el recorrido candidato-only
+descrito en JOB_V2_CONTRACT.md. Reconstruyen captura/membership/resultados privados
+en una sola ejecucion y fijan todos los documentos externos. No agregan install,
+deploy, retry ni importacion de evidencia serializada.
 
 ## Responsabilidades aun fuera de esta API
 
 - Autenticar politica/rutas/review y controlar el padre; no aceptar roots falsos.
 - Planificar/capturar/verificar membership antes de la llamada.
-- Mensajes UI localizables y versionado del protocolo V2/CLI: AUN NO IMPLEMENTADOS.
+- Mensajes UI localizables e integracion UI final: AUN NO IMPLEMENTADOS.
+- Semantica completa del motor historico V2: AUN NO IMPLEMENTADA; el job actual
+  solo orquesta el perfil CoreR1 acotado candidato-only.
 - Semantica de schemas/serializers reales, relocalizacion variable, bulk y
   aceptacion Unreal/Palworld: AUN NO PROBADAS.
 - Instalacion/reparacion del juego, rollback de mods, firma y distribucion:
