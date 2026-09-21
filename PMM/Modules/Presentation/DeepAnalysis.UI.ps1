@@ -1,6 +1,7 @@
 ﻿function Get-PMMDeepUIOptions {
   $o=New-PMMDeepAnalysisOptions
-  foreach($name in @('CheckUpdates','IncludePatch','AutomaticSolution','AllowDeploy','AllowGame','TestWorld','Isolate','AllowDependencies')){$o.$name=[bool]$Script:DeepControls[$name].IsChecked}
+  $o.CheckUpdates=$false
+  foreach($name in @('IncludePatch','AutomaticSolution','AllowDeploy','AllowGame','TestWorld','Isolate','AllowDependencies')){$o.$name=[bool]$Script:DeepControls[$name].IsChecked}
   foreach($name in @('MaxActiveMinutes','MaxCandidates','MaxTestRuns')){$value=0;if(-not[int]::TryParse($Script:DeepControls[$name].Text,[ref]$value) -or $value -lt 1 -or $value -gt 10000){throw (L 'Limits must be positive numbers.' 'Los limites deben ser numeros positivos.')};$o.$name=$value}
   Write-PMMJsonAtomic (Join-PMMPath 'State' 'deep-analysis-options.json') $o
   return $o
@@ -33,12 +34,12 @@ function Initialize-PMMDeepAnalysisUI {
   $body=[Windows.Controls.StackPanel]::new();$exp.Content=$body
   $options=[Windows.Controls.WrapPanel]::new()
   $labels=@{
-    CheckUpdates=@('Check mod updates','Buscar actualizaciones');IncludePatch=@('Include selected patch','Incluir parche seleccionado')
+    IncludePatch=@('Include selected patch','Incluir parche seleccionado')
     AutomaticSolution=@('Automatic solution (preview)','Solucion automatica (preview)');AllowDeploy=@('Allow temporary deployment','Permitir despliegue temporal')
     AllowGame=@('Allow game tests','Permitir pruebas del juego');TestWorld=@('Test temporary world','Probar mundo temporal')
     Isolate=@('Isolate suspects','Aislar sospechosos');AllowDependencies=@('Allow catalog dependencies','Permitir dependencias del catalogo')
   }
-  foreach($name in @('CheckUpdates','IncludePatch','AutomaticSolution','AllowDeploy','AllowGame','TestWorld','Isolate','AllowDependencies')){
+  foreach($name in @('IncludePatch','AutomaticSolution','AllowDeploy','AllowGame','TestWorld','Isolate','AllowDependencies')){
     $control=[Windows.Controls.CheckBox]::new();$control.Content=L $labels[$name][0] $labels[$name][1];$control.Margin=[Windows.Thickness]::new(4);$control.IsChecked=($name -in @('CheckUpdates','IncludePatch'))
     if($name -eq 'AutomaticSolution'){$control.ToolTip=L 'Persistent local investigation. Shared control of a conversation already open in GPTD is awaiting a supported Windows adapter. Game testing remains disabled.' 'Investigacion local persistente. El control compartido de una conversacion abierta en GPTD requiere un adaptador compatible con Windows. Las pruebas del juego siguen desactivadas.'}
     $Script:DeepControls[$name]=$control;[void]$options.Children.Add($control)
@@ -53,13 +54,13 @@ function Initialize-PMMDeepAnalysisUI {
   }
   [void]$body.Children.Add($limits)
   $actions=[Windows.Controls.WrapPanel]::new()
-  foreach($row in @(@('Run','Run deep analysis','Analizar en profundidad'),@('CreateCase','Create case','Crear caso'),@('Export','View/export report','Ver/exportar informe'),@('OpenChat','Open GPTD conversation','Abrir conversacion GPTD'),@('Stop','Stop and restore','Detener y restaurar'),@('History','Candidates and attempts','Candidatos e intentos'),@('Source','Update sources...','Origen de actualizaciones...'),@('AIPolicy','AI level...','Nivel de IA...'),@('ResumeAI','Continue investigation','Continuar investigacion'))){
+  foreach($row in @(@('Run','Run deep analysis','Analizar en profundidad'),@('CreateCase','Create case','Crear caso'),@('Export','View/export report','Ver/exportar informe'),@('OpenChat','Open GPTD conversation','Abrir conversacion GPTD'),@('Stop','Stop and restore','Detener y restaurar'),@('History','Candidates and attempts','Candidatos e intentos'),@('AIPolicy','AI level...','Nivel de IA...'),@('ResumeAI','Continue investigation','Continuar investigacion'))){
     $button=[Windows.Controls.Button]::new();$button.Content=L $row[1] $row[2];$button.Margin=[Windows.Thickness]::new(3);$Script:DeepControls[$row[0]]=$button;[void]$actions.Children.Add($button)
   }
   $preference=Join-PMMPath 'State' 'deep-analysis-options.json'
   if(Test-Path -LiteralPath $preference){
     try{$saved=Read-PMMJsonFile $preference -Schema PMM_DEEP_OPTIONS_V1
-      foreach($name in @('CheckUpdates','IncludePatch','AutomaticSolution','AllowDependencies')){$Script:DeepControls[$name].IsChecked=[bool]$saved.$name}
+      foreach($name in @('IncludePatch','AutomaticSolution','AllowDependencies')){$Script:DeepControls[$name].IsChecked=[bool]$saved.$name}
       foreach($name in @('MaxActiveMinutes','MaxCandidates','MaxTestRuns')){$Script:DeepControls[$name].Text=[string]$saved.$name}
     }catch{}
   }
@@ -73,9 +74,7 @@ function Initialize-PMMDeepAnalysisUI {
     $column=[Windows.Controls.DataGridTextColumn]::new();$column.Header=L $col[1] $col[2];$column.Binding=[Windows.Data.Binding]::new($col[0]);$column.Width=$col[3];if($col[0] -eq 'Message'){$column.MinWidth=280;$column.Width=[Windows.Controls.DataGridLength]::new(1,[Windows.Controls.DataGridLengthUnitType]::Star)}[void]$grid.Columns.Add($column)
   }
   $grid.Add_MouseDoubleClick({try{Show-PMMDeepFindingDetail}catch{Handle-UIError $_ 'Finding'}});$grid.Add_KeyDown({if($_.Key -eq 'Enter'){Show-PMMDeepFindingDetail}});$Script:DeepControls.Findings=$grid;[void]$body.Children.Add($grid)
-  $analysis=$Window.FindName('ExpAnalysis');$parent=$analysis.Parent;$row=[Windows.Controls.Grid]::GetRow($analysis);$parent.Children.Remove($analysis)
-  $dock=[Windows.Controls.DockPanel]::new();[Windows.Controls.Grid]::SetRow($dock,$row);[Windows.Controls.DockPanel]::SetDock($exp,'Top')
-  [void]$dock.Children.Add($exp);[void]$dock.Children.Add($analysis);[void]$parent.Children.Add($dock)
+  $Script:DeepAnalysisHost.Content=$exp
   $Script:DeepControls.Run.Add_Click({try{Start-PMMDeepUIOperation DeepAnalysis @{Options=(Get-PMMDeepUIOptions)} {param($r)Show-PMMDeepReport $r.AnalysisId;if($r.RepairSessionId){$Script:DeepRepairSessionId=$r.RepairSessionId}}}catch{Handle-UIError $_ 'Deep analysis'}})
   $Script:DeepControls.CreateCase.Add_Click({try{Show-PMMDeepCaseDialog}catch{Handle-UIError $_ 'Deep case'}})
   $Script:DeepControls.Export.Add_Click({if($Script:DeepReportView){Start-Process (Join-Path (Get-PMMAnalysisPath $Script:DeepReportView.Id) 'report.html')}})
@@ -83,7 +82,7 @@ function Initialize-PMMDeepAnalysisUI {
   $Script:DeepControls.Stop.Add_Click({try{if($Script:DeepRepairSessionId){Stop-PMMRepairSession $Script:DeepRepairSessionId|Out-Null}else{Stop-PMMBackgroundOperation};$Script:DeepControls.Status.Text=L 'Cancellation requested; recovery records are preserved.' 'Cancelacion solicitada; se conservan los datos de recuperacion.'}catch{Handle-UIError $_ 'Repair cancellation'}})
   $Script:DeepControls.OpenChat.Add_Click({try{if(-not$Script:DeepRepairSessionId){throw (L 'Start an automatic solution from the analysis first.' 'Inicia primero una solucion automatica desde el analisis.')};$s=Get-PMMRepairSession $Script:DeepRepairSessionId;if($s.ThreadId){[void](Open-PMMDesktopLink ('codex://threads/'+$s.ThreadId))}else{$Script:DeepControls.Status.Text=$s.LastMessage}}catch{Handle-UIError $_ 'GPTD'}})
   $Script:DeepControls.History.Add_Click({try{Show-PMMRepairHistory}catch{Handle-UIError $_ 'Repair history'}})
-  $Script:DeepControls.Source.Add_Click({Show-PMMUpdateSourceDialog})
+
   $Script:DeepControls.AIPolicy.Add_Click({try{Show-PMMAIPolicyDialog}catch{Handle-UIError $_ 'AI policy'}})
   $Script:DeepControls.ResumeAI.Add_Click({try{if(-not$Script:DeepRepairSessionId){throw (L 'Create an investigation session first.' 'Crea primero una sesion de investigacion.')};$s=Get-PMMRepairSession $Script:DeepRepairSessionId;Select-PMMCaseLocation (Get-PMMAIIOCase $s.CaseId);if((Get-PMMCaseClient (Get-PMMAIIOCase $s.CaseId)) -in @('CHATGPT','CODEX_DESKTOP')){Show-PMMChatGPTCase}else{(Get-PMMAIIOCaseControl 'ChatTabs').SelectedIndex=1;(Get-PMMAIIOCaseControl 'ChatAdvanced').IsExpanded=$true}}catch{Handle-UIError $_ 'Continue investigation'}})
   $timer=[Windows.Threading.DispatcherTimer]::new();$timer.Interval=[TimeSpan]::FromSeconds(2)

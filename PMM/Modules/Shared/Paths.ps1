@@ -47,12 +47,13 @@ function Initialize-PMMPaths([string]$Root) {
     ValidationEvents=Join-Path $appRoot 'Workspace\Validation\Events'
     ValidationFeedback=Join-Path $appRoot 'Workspace\Validation\Feedback'
     SaveActivity=Join-Path $appRoot 'Workspace\State\SaveActivity'
+    ModUpdates=Join-Path $appRoot 'Workspace\ModUpdates'
     FixLab=Join-Path $appRoot 'Workspace\FixLab'
     FixLabJobs=Join-Path $appRoot 'Workspace\FixLab\Jobs'
     FixLabCache=Join-Path $appRoot 'Workspace\FixLab\Cache'
     FixLabHandoffs=Join-Path $appRoot 'Workspace\FixLab\Handoffs'
   }
-  foreach($key in @('Workspace','State','Cache','Temp','Mods','Builds','Saves','Review','Handoffs','AIIO','AIIOSessions','AIIOInbox','AIIOOutbox','AIIODiagnostics','AIIOArtifacts','AIIODevelopment','Logs','GameReference','ManualSolutions','KnowledgeContributions','Themes','ThemeDrafts','ThemeHandoffs','Sounds','Validation','ValidationEvents','ValidationFeedback','SaveActivity','FixLab','FixLabJobs','FixLabCache','FixLabHandoffs')){
+  foreach($key in @('Workspace','State','Cache','Temp','Mods','Builds','Saves','Review','Handoffs','AIIO','AIIOSessions','AIIOInbox','AIIOOutbox','AIIODiagnostics','AIIOArtifacts','AIIODevelopment','Logs','GameReference','ManualSolutions','KnowledgeContributions','Themes','ThemeDrafts','ThemeHandoffs','Sounds','Validation','ValidationEvents','ValidationFeedback','SaveActivity','ModUpdates','FixLab','FixLabJobs','FixLabCache','FixLabHandoffs')){
     $p=[string]$Script:PMMPaths[$key]
     if(-not(Test-Path -LiteralPath $p -PathType Container)){New-Item -ItemType Directory -Force -Path $p|Out-Null}
   }

@@ -29,26 +29,27 @@ La excepcion anterior de DOS binarios I01 sin transferir quedo cerrada en SESSIO
 8. `Development/Reliability/IMPLEMENTATION_PLAN.md`
 9. `Development/Reliability/TRANSLATION_INTEGRATION.md`
 10. `Development/Reliability/SESSION_PLAN.md`
-11. `Development/Reliability/Integration/I03/README.md`
-12. `Development/Reliability/SESSION_I03_TRANSLATION_FINDINGS.md`
-13. `Development/Reliability/SESSION_I03_TRANSLATION_CHECKS.json`
-14. `Development/Reliability/Integration/I01/README.md`
-15. Ultimos `SESSION*_FINDINGS.md` / `SESSION*_CHECKS.json` relevantes al bloque que se vaya a tocar.
+11. `Development/Reliability/Integration/I04/README.md`
+12. `Development/Reliability/Integration/I03/README.md`
+13. `Development/Reliability/SESSION_I03_TRANSLATION_FINDINGS.md`
+14. `Development/Reliability/SESSION_I03_TRANSLATION_CHECKS.json`
+15. `Development/Reliability/Integration/I01/README.md`
+16. Ultimos `SESSION*_FINDINGS.md` / `SESSION*_CHECKS.json` relevantes al bloque que se vaya a tocar.
 
 Despues leer el contrato de la candidata concreta antes de modificarla.
 
 ## Estado ejecutivo en una frase
 
-La rama contiene research hasta 04A-6E y el paquete I03. Host y Runtime C2B de I01 siguen integrados; I02 movio el proyecto/configuracion privada de Codex a `Workspace`; I03 integra 30 idiomas registrados y 23 habilitados sin cambiar los ejecutables. FixLab candidato/CLI sigue aislado y NO sustituye al original.
+El checkout de desarrollo contiene research hasta 04A-6E y el paquete I04 preparado: conserva los 23 idiomas de I03 y añade actualizaciones Nexus seguras, transaccionales y recuperables sin cambiar ejecutables. La rama remota sigue en I03 hasta que el propietario autorice commit/push. FixLab candidato/CLI sigue aislado y NO sustituye al original.
 
 ## Objetivo inmediato
 
-1. comprobar que la rama/checkout corresponden a este handoff;
-2. confirmar BUILD_ID I03, hashes y arbol PMM esperado;
-3. probar I03 en Windows: selector, aplicar, cierre, segundo arranque y persistencia;
-4. revisar al menos English, Español, العربية y varios idiomas importados;
-5. conservar el resultado previo: I02 arranca y funciona; vi/uk/cs/ga funcionaron en el donante;
-6. corregir cualquier regresion I03 antes de otra integracion grande;
+1. comprobar que la rama/checkout corresponden a este handoff y que el diff I04 sigue sin publicar;
+2. confirmar BUILD_ID I04, 635 archivos, 634 checksums y binarios congelados;
+3. probar Updates primero sin credencial y luego con la cuenta Nexus del propietario;
+4. validar un caso Premium o Free real, espera `nxm://`, archivo, lote, aplazamiento con Palworld abierto, sustitucion, restauracion y segundo arranque;
+5. mantener la prueba de idiomas I03, en especial العربية y persistencia tras reiniciar;
+6. corregir cualquier regresion antes de autorizar un unico commit/push `[skip ci]`;
 7. continuar despues con SESSION04A6E sin repetir trabajo;
 8. no crear PR, tag, release ni ejecutar Actions.
 
@@ -56,10 +57,10 @@ No modificar pins para conseguir que una compilacion distinta pase.
 
 ## Identidades importantes
 
-Paquete actual I03:
-- build: `PMM-v1.5.0.1-reliability-i03`
-- PMM tree esperado: `e0c394997f1dbc172fef3cfc1a755f80f63e1692`
-- 631 archivos / 630 filas de checksum / 0 mismatches.
+Paquete de trabajo I04 (pendiente de commit/push):
+- build: `PMM-v1.5.0.1-reliability-i04-nexus-updates`
+- inventario: SHA-256 `761e8afe03041278d86e26912b07a9bbfceb4dc28179ed3768526a45d206e776`
+- 635 archivos / 634 filas de checksum / 0 mismatches.
 - 30 idiomas registrados / 23 habilitados / 7 reservas.
 - proyecto Desktop y configuracion privada: `Workspace` y `Workspace/.codex/config.toml`.
 - Host SHA-256: `a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c`

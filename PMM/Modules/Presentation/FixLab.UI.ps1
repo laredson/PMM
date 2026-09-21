@@ -295,7 +295,7 @@ function Queue-PMMFixLabUiRefresh {
       # Let WPF paint the selected tab/expanded card first. The refresh still
       # runs on the dispatcher because it binds WPF controls, but navigation is
       # no longer blocked inside SelectionChanged or Expander.Expanded.
-      if($Script:MainTabs.SelectedItem -ne $Script:TabFixLab -and -not$forceNow){return}
+      if(-not(Test-PMMFixLabTabSelected) -and -not$forceNow){return}
       $stateUpdated=$false
       if(-not$Script:FixLabLoaded){
         $stateUpdated=[bool](Initialize-PMMFixLabFeature)

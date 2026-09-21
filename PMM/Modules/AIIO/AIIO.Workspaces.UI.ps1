@@ -45,46 +45,60 @@ function New-PMMAreaTab([string]$Header,[string]$Area){
     $Script:PMMAreaHosts[$Area]=$hostPanel
     return $tab
 }
+function Test-PMMFixLabTabSelected { return ($Script:MainTabs.SelectedItem -eq $Script:PMMMergeTab -and $Script:ModsWorkflowTabs.SelectedItem -eq $Script:TabFixLab) }
+function Select-PMMFixLabTab {
+    $Script:MainTabs.SelectedItem=$Script:PMMMergeTab
+    $Script:ModsWorkflowTabs.SelectedItem=$Script:TabFixLab
+}
+function New-PMMWorkflowTab([string]$Header,$Content,[string]$Tag='MERGE'){
+    $tab=[Windows.Controls.TabItem]::new();$tab.Header=$Header;$tab.Tag=$Tag;$tab.Content=$Content;return $tab
+}
 function Initialize-PMMWorkspaces {
     if($Script:PMMWorkspacesInitialized){return}
     if(-not $Script:PMMAIIOCaseWorkspaceInitialized){Initialize-PMMAIIOCaseWorkspaceUI}
     $main=$Script:MainTabs;$help=$Script:TabAIHelp
-    $caseTab=$Script:AIHelpTabs.Items|Where-Object {$_.Name -eq 'TabCaseWorkspace'}|Select-Object -First 1;$caseTab.Tag='CASES'
-    $Script:PMMHelpCaseTab=$caseTab
+    $caseTab=$Script:AIHelpTabs.Items|Where-Object {$_.Name -eq 'TabCaseWorkspace'}|Select-Object -First 1;$caseTab.Tag='CASES';$Script:PMMHelpCaseTab=$caseTab
     $Script:PMMHelpFeedbackTab=$Window.FindName('TabHelpFeedback');$Script:PMMHelpFeedbackTab.Tag='FEEDBACK'
-    $Script:PMMHelpThemeTab=$Window.FindName('TabHelpTheme');$Script:PMMHelpThemeTab.Tag='THEME'
-    Initialize-PMMCaseClientSelector
-    $Script:PMMCaseEditor=$caseTab.Content;$caseTab.Content=$null
-    $helpHost=[Windows.Controls.ContentControl]::new();$caseTab.Content=$helpHost
-    $caseTab.Header=L 'Research cases' 'Casos de investigacion'
-    $Script:PMMAreaHosts['HELP']=$helpHost
-    $help.Header=L 'Help' 'Ayuda';$help.Tag='HELP'
-    $merge=$Window.FindName('TabMerge');$merge.Name='TabMerge';$merge.Tag='MERGE';$Script:PMMMergeTab=$merge
-    $fix=$Script:TabFixLab;$fix.Tag='FIX'
-    foreach($pair in @(@($merge,'MERGE'),@($fix,'FIX'))){
-        $tab=$pair[0];$content=$tab.Content;$tab.Content=$null
-        $tabs=[Windows.Controls.TabControl]::new()
-        $flow=[Windows.Controls.TabItem]::new();$flow.Header=L 'Workflow' 'Trabajo';$flow.Content=$content
-        [void]$tabs.Items.Add($flow);[void]$tabs.Items.Add((New-PMMAreaTab (L 'AI assistant' 'Asistente IA') $pair[1]))
-        $tab.Content=$tabs
-    }
-    $creation=[Windows.Controls.TabItem]::new();$creation.Header=L 'Mod Creation' 'Creacion de mods';$creation.Name='TabModCreation';$creation.Tag='CREATE'
-    $tabs=[Windows.Controls.TabControl]::new()
-    [void]$tabs.Items.Add((New-PMMAreaTab (L 'Projects' 'Proyectos') 'CREATE'))
-    $creation.Content=$tabs
-    $main.Items.Insert($main.Items.IndexOf($help),$creation)
-    Initialize-PMMSettingsWorkspaces
-    $main.Add_SelectionChanged({
-        if($_.OriginalSource -ne $Script:MainTabs){return}
-        $tag=[string]$Script:MainTabs.SelectedItem.Tag
-        if($tag -in @('MERGE','FIX','CREATE','HELP')){Switch-PMMCaseArea $tag}
-    })
-    if(-not $main.SelectedItem){$main.SelectedItem=$merge}
-    Switch-PMMCaseArea ([string]$main.SelectedItem.Tag)
-    try{Invoke-PMMLocalizeVisualTree $Window}catch{}
-    $Script:PMMWorkspacesInitialized=$true
-}
+    $Script:PMMHelpThemeTab=$Window.FindName('TabHelpTheme');$Script:PMMHelpThemeTab.Tag='THEME';Initialize-PMMCaseClientSelector
+    $Script:PMMCaseEditor=$caseTab.Content;$caseTab.Content=$null;$helpHost=[Windows.Controls.ContentControl]::new();$caseTab.Content=$helpHost
+    $caseTab.Header=L 'Research cases' 'Casos de investigacion';$Script:PMMAreaHosts['HELP']=$helpHost;$help.Header=L 'Help' 'Ayuda';$help.Tag='HELP'
 
+    $merge=$Window.FindName('TabMerge');$merge.Name='TabMerge';$merge.Tag='MERGE';$Script:PMMMergeTab=$merge
+    $outer=$merge.Content
+    $library=@($outer.Children|Where-Object{[Windows.Controls.Grid]::GetColumn($_) -eq 0 -and $_ -is [Windows.Controls.Border]}|Select-Object -First 1)[0]
+    $analysis=@($outer.Children|Where-Object{[Windows.Controls.Grid]::GetColumn($_) -eq 2 -and $_ -is [Windows.Controls.Grid]}|Select-Object -First 1)[0]
+    $build=@($analysis.Children|Where-Object{[Windows.Controls.Grid]::GetRow($_) -eq 5}|Select-Object -First 1)[0]
+    [void]$outer.Children.Remove($library);[void]$analysis.Children.Remove($build)
+    $analyzeGrid=[Windows.Controls.Grid]::new();$analyzeGrid.Margin=[Windows.Thickness]::new(8)
+    foreach($index in 0..3){$row=[Windows.Controls.RowDefinition]::new();$row.Height=if($index -eq 0){[Windows.GridLength]::new(1,[Windows.GridUnitType]::Star)}else{[Windows.GridLength]::Auto};[void]$analyzeGrid.RowDefinitions.Add($row)}
+    foreach($control in @($analysis.Children|Where-Object{[Windows.Controls.Grid]::GetRow($_) -le 3})){$row=[Windows.Controls.Grid]::GetRow($control);[void]$analysis.Children.Remove($control);[Windows.Controls.Grid]::SetRow($control,$row);[void]$analyzeGrid.Children.Add($control)}
+
+    $fix=$Script:TabFixLab;$fixContent=$fix.Content;$fix.Content=$null;[void]$main.Items.Remove($fix);$fix.Header=L 'Fix Lab' 'Fix Lab';$fix.Tag='FIX';$fix.Content=$fixContent
+    $tabs=[Windows.Controls.TabControl]::new();$Script:ModsWorkflowTabs=$tabs
+    $libraryHost=[Windows.Controls.Grid]::new();$libraryHost.Margin=[Windows.Thickness]::new(8);[void]$libraryHost.Children.Add($library)
+    $Script:TabLibrary=New-PMMWorkflowTab (L 'Library & Import' 'Biblioteca e importacion') $libraryHost
+    $Script:UpdatesHost=[Windows.Controls.ContentControl]::new();$Script:TabUpdates=New-PMMWorkflowTab (L 'Updates' 'Actualizaciones') $Script:UpdatesHost
+    $Script:TabFixLab=$fix
+    $Script:TabAnalyze=New-PMMWorkflowTab (L 'Analyze & Resolve' 'Analizar y resolver') $analyzeGrid
+    $Script:DeepAnalysisHost=[Windows.Controls.ContentControl]::new();$Script:TabDeepAnalysis=New-PMMWorkflowTab (L 'Deep Analysis' 'Analisis profundo') $Script:DeepAnalysisHost
+    $buildHost=[Windows.Controls.Grid]::new();$buildHost.Margin=[Windows.Thickness]::new(8);[void]$buildHost.Children.Add($build)
+    $Script:TabBuildDeploy=New-PMMWorkflowTab (L 'Build & Deploy' 'Construir y desplegar') $buildHost
+    $Script:TabMergeAI=New-PMMAreaTab (L 'AI Assistant' 'Asistente IA') 'MERGE'
+    foreach($tab in @($Script:TabLibrary,$Script:TabUpdates,$Script:TabFixLab,$Script:TabAnalyze,$Script:TabDeepAnalysis,$Script:TabBuildDeploy,$Script:TabMergeAI)){[void]$tabs.Items.Add($tab)}
+    $merge.Content=$tabs
+
+    $creation=[Windows.Controls.TabItem]::new();$creation.Header=L 'Mod Creation' 'Creacion de mods';$creation.Name='TabModCreation';$creation.Tag='CREATE'
+    $creationTabs=[Windows.Controls.TabControl]::new();[void]$creationTabs.Items.Add((New-PMMAreaTab (L 'Projects' 'Proyectos') 'CREATE'));$creation.Content=$creationTabs
+    $main.Items.Insert($main.Items.IndexOf($help),$creation);Initialize-PMMSettingsWorkspaces
+    $main.Add_SelectionChanged({if($_.OriginalSource -ne $Script:MainTabs){return};$tag=[string]$Script:MainTabs.SelectedItem.Tag;if($tag -in @('MERGE','CREATE','HELP')){Switch-PMMCaseArea $tag}})
+    $tabs.Add_SelectionChanged({
+      if($_.OriginalSource -ne $Script:ModsWorkflowTabs){return}
+      if($Script:ModsWorkflowTabs.SelectedItem -eq $Script:TabFixLab){Switch-PMMCaseArea 'FIX';try{Queue-PMMFixLabUiRefresh}catch{}}
+      else{Switch-PMMCaseArea 'MERGE'}
+    })
+    if(-not $main.SelectedItem){$main.SelectedItem=$merge};$tabs.SelectedItem=$Script:TabLibrary
+    Switch-PMMCaseArea ([string]$main.SelectedItem.Tag);try{Invoke-PMMLocalizeVisualTree $Window}catch{};$Script:PMMWorkspacesInitialized=$true
+}
 function Show-PMMStructuredCandidates {
     $case=Get-PMMAIIOSelectedCase
     if(-not $case){throw 'Select a case first.'}

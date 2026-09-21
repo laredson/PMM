@@ -10,6 +10,8 @@ No se busca "burlar" antivirus. Se pretende reducir causas legitimas de falsos p
 
 La rama de traducciones `v1.5.0.0-PMM-translated` sigue independiente. Ancestro comun fijo: `38bd5a934488ac11a6200d3142b889ca86a82f57`. I03 integra de forma revisada su snapshot final `681f7994474ebfd6c2538775767d2002014170f7`; los deltas futuros no se fusionan automaticamente.
 
+I04 esta preparado en el worktree, aun sin commit/push: añade Updates Nexus seguro sobre I03, conserva los 23 idiomas y no modifica binarios. Su contrato y evidencia estan en `Development/Reliability/Integration/I04/`.
+
 ## 2. Politica Git/GitHub acordada
 
 - Lectura de GitHub libre.
@@ -42,6 +44,8 @@ propietario informa que arranca y funciona. I03 añade idiomas y corrige el
 selector heredado, pero su persistencia entre dos arranques y revision visual
 siguen pendientes de prueba del propietario. vi, uk, cs y ga fueron probados en
 el donante antes de integrarlos.
+
+El worktree actual prepara I04 con BUILD_ID `PMM-v1.5.0.1-reliability-i04-nexus-updates`, 635 archivos, 634 checksums y cero mismatches. La rama remota sigue en I03 hasta autorizacion de escritura. I04 no tiene prueba con cuenta Nexus real ni Palworld.
 
 ## 4. Candidatas nativas ya construidas
 
@@ -225,17 +229,18 @@ declara aceptacion visual completa por las comprobaciones automaticas.
 
 ## 10. Roadmap restante, nivel alto
 
-1. Probar I03: selector, persistencia tras reinicio, RTL, UI y tiempos.
-2. Corregir cualquier regresion de I03 y medir/optimizar arranque.
-3. Completar matriz fuera de Win10 NTFS; job V2/CLI acotado ya existe.
-4. Fijar/revisar una fuente de schema real o agregar otro serializer acotado con
+1. Probar I04 con la cuenta Nexus del propietario: identidad, cuotas, Check read-only, Premium o Free `nxm://`, archivo, sustitucion y rollback.
+2. Completar la aceptacion I03 heredada: selector, persistencia tras reinicio, RTL, UI y tiempos.
+3. Revisar el diff y, solo con autorizacion, publicar I04 en un unico commit `[skip ci]`.
+4. Completar matriz fuera de Win10 NTFS; job V2/CLI acotado ya existe.
+5. Fijar/revisar una fuente de schema real o agregar otro serializer acotado con
    evidencia primaria; despues completar relocalizacion y semantica V2 restante.
-5. Integrar un PMMFixLab reconstruido cuando tenga paridad suficiente; prueba incremental.
-6. Cerrar Host/Runtime restantes y optimizar arranque.
-7. Cerrar repair/dependencies, manifests/pins/rutas y packaging reproducible.
-8. Mantener idiomas I03 y revisar semanticamente cualquier delta futuro.
-9. Windows end-to-end, firma si el propietario la provisiona y preflight final.
-10. Solo despues valorar upload/release/Nexus. No se garantiza check verde.
+6. Integrar un PMMFixLab reconstruido cuando tenga paridad suficiente; prueba incremental.
+7. Cerrar Host/Runtime restantes y optimizar arranque.
+8. Cerrar repair/dependencies, manifests/pins/rutas y packaging reproducible.
+9. Mantener idiomas I03 y revisar semanticamente cualquier delta futuro.
+10. Windows end-to-end, firma si el propietario la provisiona y preflight final.
+11. Solo despues valorar upload/release/Nexus. No se garantiza check verde.
 
 Es normal que algunos hitos se dividan en A/B.
 

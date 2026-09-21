@@ -297,7 +297,7 @@ $Script:MainTabs.Add_SelectionChanged({
       [void]$Window.Dispatcher.BeginInvoke([System.Action]{try{Refresh-PMMAIHelpUi -EnsureUnsupported}catch{Write-PMMLog ('AI & Help refresh failed: '+$_.Exception.Message)}},[System.Windows.Threading.DispatcherPriority]::ContextIdle)
       return
     }
-    if($Script:MainTabs.SelectedItem -eq $Script:TabFixLab){
+    if(Test-PMMFixLabTabSelected){
       # Queue the lazy load or at-most-once-per-minute refresh at ContextIdle so
       # WPF paints the selected tab before any filesystem snapshot/rebinding.
       Queue-PMMFixLabUiRefresh
@@ -1437,6 +1437,7 @@ if (-not $autoDepsOk) {
 . (Join-Path $Script:Root 'Modules\Unreal\Dependencies.UI.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.Workspaces.UI.ps1')
 Initialize-PMMWorkspaces
+Initialize-PMMUpdatesUI
 Initialize-PMMLibraryCaseMenu
 Initialize-PMMDeepAnalysisUI
 . (Join-Path $Script:Root 'Modules/MCP/AppServer.UI.ps1')

@@ -17,6 +17,7 @@
     "Development/Reliability/IMPLEMENTATION_PLAN.md",
     "Development/Reliability/TRANSLATION_INTEGRATION.md",
     "Development/Reliability/SESSION_PLAN.md",
+    "Development/Reliability/Integration/I04/README.md",
     "Development/Reliability/Integration/I03/README.md",
     "Development/Reliability/SESSION_I03_TRANSLATION_FINDINGS.md",
     "Development/Reliability/SESSION_I03_TRANSLATION_CHECKS.json",
@@ -196,15 +197,17 @@
     ]
   },
   "immediateNext": [
-    "Do not rebuild I01 executables without a new reason; they remain byte-identical in I03.",
-    "Preserve the owner's result that I02 starts and works and that vi/uk/cs/ga worked in the donor.",
-    "Test I03 language selection, Apply, close, second startup, persistence, RTL and representative screens.",
-    "Correct any I03 regression before another large integration.",
-    "After I03 acceptance, pin and review a real schema source or add one further bounded serializer with primary evidence."
+    "Do not lose or overwrite the uncommitted I04 worktree; the remote branch still contains I03.",
+    "Test I04 with the owner Nexus account without exposing the API key: account identity, limits, read-only check, one exact update, archive and restore.",
+    "Exercise either Premium direct download or Free nxm:// continuation; cover the unavailable mode with fixtures.",
+    "Retain I03 language restart/RTL acceptance and the frozen I01 executables.",
+    "Only after diff review and explicit authorization, create one development commit/push with [skip ci].",
+    "Then resume the bounded 04A-6E serializer roadmap without replacing PMMFixLab early."
   ],
   "developmentPolicy": {
     "remoteWritesNeedExplicitAuthorization": true,
     "currentHandoffWriteWasExplicitlyAuthorized": true,
+    "currentI04RemoteWriteAuthorized": false,
     "devCommitSuffix": "[skip ci]",
     "runGitHubActionsByDefault": false,
     "createPRTagReleaseByDefault": false,
@@ -225,5 +228,41 @@
     "requiredForUnderstanding": false,
     "requiredForRebuild": false,
     "note": "Prior I01 ZIP/overlay existed only as convenience. A capable local environment should rebuild from versioned source and pins instead of asking the user for those ZIPs."
+  },
+  "workingPackageI04": {
+    "version": "1.5.0.1",
+    "buildId": "PMM-v1.5.0.1-reliability-i04-nexus-updates",
+    "status": "PREPARED_LOCALLY_PENDING_COMMIT_PUSH_AND_LIVE_ACCEPTANCE",
+    "packageFiles": 635,
+    "checksumRows": 634,
+    "checksumMismatches": 0,
+    "checksumInventorySha256": "761e8afe03041278d86e26912b07a9bbfceb4dc28179ed3768526a45d206e776",
+    "moduleCount": 51,
+    "nativeBinariesChanged": false
+  },
+  "i04": {
+    "status": "PREPARED_LOCALLY_PENDING_USER_NEXUS_TEST_AND_PUBLICATION",
+    "buildId": "PMM-v1.5.0.1-reliability-i04-nexus-updates",
+    "inheritsI03Languages": true,
+    "enabledLanguages": 23,
+    "credentialStorage": "Windows DPAPI under Workspace/State",
+    "premiumDirect": true,
+    "freeNxmContinuation": true,
+    "safeBatchPlanRebase": true,
+    "gameRunningDeferredResume": true,
+    "ssoStatus": "BLOCKED_UNTIL_PMM_NEXUS_REGISTRATION",
+    "liveNexusAccountTested": false,
+    "palworldRuntimeTested": false,
+    "tests": {
+      "nexusRegression": "PASS",
+      "transactionRollback": "PASS",
+      "restartRecovery": "PASS",
+      "moduleRuntime": "PASS",
+      "workers": "PASS",
+      "wpfEnglishAssertions": 27,
+      "wpfSpanishAssertions": 27,
+      "powerShell51Languages": 23,
+      "checksumMismatches": 0
+    }
   }
 }

@@ -1,6 +1,6 @@
-﻿param(
+param(
   [Parameter(Mandatory=$true)][string]$Root,
-  [Parameter(Mandatory=$true)][ValidateSet('Analyze','Build','AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','FixLabBuild','MappingsImport','DeepAnalysis','DeepCase','DeepSource','Recovery')][string]$Operation,
+  [Parameter(Mandatory=$true)][ValidateSet('Analyze','Build','AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','FixLabBuild','MappingsImport','DeepAnalysis','DeepCase','DeepSource','UpdateCheck','UpdateApply','UpdateRestore','Recovery')][string]$Operation,
   [Parameter(Mandatory=$true)][string]$ProgressPath,
   [Parameter(Mandatory=$true)][string]$ResultPath,
   [switch]$Force,
@@ -122,13 +122,71 @@ try{
     'AIIOModBuild' {'Building the selected standalone mod candidate without deploying it...'}
     'AIIOArtifactRefresh' {'Refreshing the local artifact inventory in the background...'}
     'FixLabBuild' {'Starting Fix Lab repair in background...'}
+    'UpdateCheck' {'Checking mod updates...'}
+    'UpdateApply' {'Downloading, analyzing and applying safe updates...'}
+    'UpdateRestore' {'Restoring the archived mod version...'}
   }
   Write-PMMOperationProgress 0 0 $startMessage $true
   Write-PMMJournalStep -OperationId $journalId -Kind $Operation -Step 'WorkerStarted' -Status Running
 
   $resultText=''
   $extra=[ordered]@{}
-  if($Operation -eq 'Recovery'){
+  if($Operation -in @('UpdateCheck','UpdateApply','UpdateRestore')){
+    [void](Assert-PMMRecoveryPath $RequestPath (Join-PMMPath 'Cache' 'UpdateRequests') -DirectChild)
+    $request=Read-PMMJsonFile $RequestPath
+    if($Operation -eq 'UpdateCheck'){
+      $plan=Invoke-PMMUpdateCheck
+      $extra['PlanPath']=Get-PMMUpdatePlanPath;$extra['UpdateCount']=@($plan.Results|Where-Object{$_.Status -eq 'UPDATE_AVAILABLE'}).Count
+      $resultText='Update check complete: '+$extra['UpdateCount']+' candidate(s).'
+    }elseif($Operation -eq 'UpdateApply'){
+      $plan=Read-PMMUpdatePlan;if(-not$plan -or -not$plan.IsCurrent){throw 'The update plan is stale.'}
+      $applied=0;$skipped=0;$waiting=0;$deferred=[Collections.Generic.List[object]]::new()
+      $resumeItems=@(Get-PMMAnalysisValue $request 'DeferredItems' @())
+      if($resumeItems.Count){
+        foreach($item in $resumeItems){
+          $candidate=$null
+          try{
+            $currentPlan=Read-PMMUpdatePlan;if(-not$currentPlan -or -not$currentPlan.IsCurrent -or [string]$currentPlan.Id -cne [string]$plan.Id){throw 'The deferred update plan is stale.'}
+            $update=@($currentPlan.Results|Where-Object{[string]$_.LocalSha256 -ceq [string]$item.LocalSha256 -and $_.Status -eq 'UPDATE_AVAILABLE'}|Select-Object -First 1);if(-not$update.Count){$skipped++;continue}
+            $candidatePath=Assert-PMMRecoveryPath ([string]$item.CandidatePath) (Join-Path (Get-PMMUpdateRoot) 'Candidates')
+            if([IO.Path]::GetFileName($candidatePath) -cne 'candidate.json'){throw 'Deferred candidate path is invalid.'}
+            $candidate=Read-PMMJsonFile $candidatePath -Schema PMM_MOD_UPDATE_CANDIDATE_V2
+            if([string]$candidate.OriginalSha256 -cne [string]$item.LocalSha256){throw 'Deferred candidate identity changed.'}
+            if([string]$candidate.LibraryFingerprint -cne (Get-PMMUpdateFingerprint)){$candidate=Test-PMMUpdateCandidate $update ([pscustomobject]@{Path=[string]$candidate.ArchivePath;Sha256=[string]$candidate.ArchiveSha256})}
+            if([bool]$request.Auto -and -not$candidate.AutomaticEligible){$skipped++;continue}
+            $transaction=Invoke-PMMUpdateApply $candidate -Auto:([bool]$request.Auto);Update-PMMUpdatePlanAfterApply $candidate $transaction;$applied++
+          }catch{
+            if($_.Exception.Message -eq 'GAME_RUNNING_DEFERRED' -and $candidate){$deferred.Add([pscustomobject]@{LocalSha256=[string]$item.LocalSha256;CandidatePath=[string]$candidate.CandidatePath});continue}
+            if([bool]$request.Auto){$skipped++;Write-PMMLog ('AUTO skipped deferred update '+[string]$item.LocalSha256+': '+$_.Exception.Message);continue}
+            throw
+          }
+        }
+      }else{
+        $selected=@($plan.Results|Where-Object{$_.Status -eq 'UPDATE_AVAILABLE' -and ($request.LocalSha256 -eq '*' -or $_.LocalSha256 -eq $request.LocalSha256)})
+        foreach($update in $selected){
+          $candidate=$null
+          try{
+            $nxm=@(Receive-PMMNxmQueue ([string]$update.Origin.ModId) ([string]$update.Candidate.FileId)|Select-Object -First 1)
+            $download=Receive-PMMUpdateArchive $update $(if($nxm.Count){$nxm[0]}else{$null})
+            $candidate=Test-PMMUpdateCandidate $update $download
+            if([bool]$request.Auto -and -not$candidate.AutomaticEligible){$skipped++;continue}
+            $transaction=Invoke-PMMUpdateApply $candidate -Auto:([bool]$request.Auto);Update-PMMUpdatePlanAfterApply $candidate $transaction;$applied++
+          }catch{
+            if($_.Exception.Message -in @('NEXUS_WEB_CONFIRMATION_REQUIRED','AUTHENTICATION_REQUIRED')){$waiting++;continue}
+            if($_.Exception.Message -eq 'GAME_RUNNING_DEFERRED' -and $candidate){$deferred.Add([pscustomobject]@{LocalSha256=[string]$update.LocalSha256;CandidatePath=[string]$candidate.CandidatePath});continue}
+            if([bool]$request.Auto){$skipped++;Write-PMMLog ('AUTO skipped update for '+$update.Mod+': '+$_.Exception.Message);continue}
+            throw
+          }
+        }
+      }
+      $extra['Applied']=$applied;$extra['Skipped']=$skipped;$extra['Waiting']=$waiting;$extra['Deferred']=$deferred.Count
+      if($deferred.Count){Set-PMMPendingUpdateApply ([string]$plan.Id) $deferred.ToArray() ([bool]$request.Auto)}else{Clear-PMMPendingUpdateApply}
+      Write-PMMJsonAtomic (Join-PMMPath 'State' 'update-attempt.json') ([ordered]@{Schema='PMM_UPDATE_ATTEMPT_V1';PlanId=$plan.Id;Applied=$applied;Skipped=$skipped;Waiting=$waiting;Deferred=$deferred.Count;CompletedUtc=[DateTime]::UtcNow.ToString('o')})
+      $resultText='Updates complete: applied='+$applied+', skipped='+$skipped+', waiting='+$waiting+', deferred='+$deferred.Count+'.'
+    }else{
+      $restored=Restore-PMMArchivedUpdate ([string]$request.TransactionId);$extra['TransactionId']=[string]$restored.Id;$resultText='Archived mod version restored.'
+    }
+  }elseif($Operation -eq 'Recovery'){
     $recovered=@(Invoke-PMMDeploymentRecovery)
     $blocked=@($recovered|Where-Object{-not$_.Recovered})
     if($blocked.Count){throw (($blocked|ForEach-Object{$_.Error}) -join '; ')}
@@ -301,6 +359,9 @@ try{
     'AIIOModBuild' {'Standalone mod PAK built locally and left undeployed.'}
     'AIIOArtifactRefresh' {'Local artifact inventory refreshed.'}
     'FixLabBuild' {'Fix Lab repair build complete.'}
+    'UpdateCheck' {'Update check complete.'}
+    'UpdateApply' {'Safe update batch complete.'}
+    'UpdateRestore' {'Archived version restored.'}
   }
   Write-PMMOperationProgress 1 1 $doneMessage $false
   Stop-PMMLogSession 'Normal'

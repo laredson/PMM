@@ -117,8 +117,8 @@
   "dotnetRuntimeInventorySha256": "8b2f4fe11635f18fa419d5e4fedad456bc7c3d7395272ee91e89b62e3ac72ed0",
   "gameReferenceBackgroundWorker": "Modules/GameReference/GameReferenceWorker.ps1",
   "gameReferenceProgressUi": "Shared normal Settings + Fix Lab progress bars plus both Game Reference buttons as ColorFlow progress surfaces. AUTO invokes the canonical Settings Game Reference command before Fix Lab navigation; output choice may be highlighted concurrently while the worker runs.",
-  "releaseCandidate": "1.5.0.1-reliability-i03",
-  "buildId": "PMM-v1.5.0.1-reliability-i03",
+  "releaseCandidate": "1.5.0.1-reliability-i04-nexus-updates",
+  "buildId": "PMM-v1.5.0.1-reliability-i04-nexus-updates",
   "buildIdentityFile": "Resources/Metadata/BUILD_ID.txt",
   "uiContract": "Public tabs are Mods & Merge, FIX LAB, AI & Help, World Save and Settings. Fresh size is 1460x900 and the normal minimum is 900x600; startup clamps to the Windows work area in device-independent pixels. Branding and action areas occupy equal header halves. Header actions are ordered Detect/status, folder/Play controls, then SemiAUTO/AUTO. SemiAUTO arms continuation after a manually started workflow action; the wider AUTO button runs the remaining safe workflow once and uses an idle-only sparkle treatment. AI & Help contains five focused subtabs: AI assistance, AI reception, Feedback & Knowledge, color-scheme editor and AI settings. AI assistance exposes separate diagnostic-case and standalone-mod-project entry points. Normal Settings also owns Vanilla Game Reference. General Settings follows the Sound events architecture by separating official PMM schemes from a bordered user-scheme collection. ColorFlow ends by highlighting Play as optional readiness without an action-required popup.",
   "bundledThemeCount": 11,
@@ -142,7 +142,10 @@
     "AIIOUseCandidate",
     "AIIOModBuild",
     "AIIOArtifactRefresh",
-    "FixLabBuild"
+    "FixLabBuild",
+    "UpdateCheck",
+    "UpdateApply",
+    "UpdateRestore"
   ],
   "mergeOutputModel": "Preserve original mods and generate only the PMM compatibility patch needed for conflicting content.",
   "megaMergeSupported": false,
@@ -433,7 +436,7 @@
     "targetBroker": "native PMMRuntime/PMMEngine operation subcommands",
     "uiHeavyWorkAllowed": false
   },
-  "release": "PMM v1.5.0.1 I03 - reliability localization integration",
+  "release": "PMM v1.5.0.1 I04 - safe Nexus updates",
   "fixLabEngineVersion": "0.2.0-variant-recipes",
   "fixLabRecipeSchema": "PMM_FIXLAB_VARIANT_RECIPE_V2",
   "fixLabCase001VariantCount": 5,
@@ -514,7 +517,7 @@
   },
   "releaseName": "1.5.0.1",
   "releaseValidation": {
-    "programRegression": "PENDING full Windows acceptance of I03; owner reports I02 startup works and vi/uk/cs/ga worked in the donor build",
+    "programRegression": "PASS static/PS5.1 update, rollback, recovery, worker, WPF EN/ES and 23-language catalog regressions; live Nexus account and Palworld runtime remain NOT_VERIFIED",
     "gameRuntime": "NOT_VERIFIED",
     "freeAccount": "NOT_VERIFIED",
     "inventoryModIncluded": false
@@ -545,7 +548,7 @@
     "schema": "PMM_DEEP_REPORT_V1",
     "module": "Modules/Analysis/Analysis.Service.ps1",
     "reportOnlyByDefault": true,
-    "checkUpdatesByDefault": true,
+    "checkUpdatesByDefault": false,
     "providers": [
       "Nexus",
       "GitHub"
@@ -558,14 +561,24 @@
       "activeMinutes": 40,
       "distinctCandidates": 6,
       "gameRuns": 12
-    }
+    },
+    "updateSource": "Consumes the current PMM_UPDATE_PLAN_V1; it does not repeat provider network queries."
   },
   "architecture133": {
     "baseCommit": "3e57247f823317c85ceb71a4272b0a813f1f34fc",
-    "ui": "Existing six-tab layout",
+    "ui": "Five top-level areas; Mods & Merge owns seven ordered workflow subtabs.",
     "catalog": "Modules/modules.json",
     "moduleReload": "Compatible function modules activate only while idle; native changes require restart",
-    "selectiveBackport": "1.4.0-ReUI operations, deployment recovery, knowledge and observation services"
+    "selectiveBackport": "1.4.0-ReUI operations, deployment recovery, knowledge and observation services",
+    "modsMergeSubtabs": [
+      "Library & Import",
+      "Updates",
+      "Fix Lab",
+      "Analyze & Resolve",
+      "Deep Analysis",
+      "Build & Deploy",
+      "AI Assistant"
+    ]
   },
   "persistentAgent": {
     "protocol": "Codex App Server JSON-RPC",
@@ -619,12 +632,13 @@
     }
   },
   "reliabilityPreparation": {
-    "session": "I03",
-    "state": "host-runtime-integrated-with-workspace-local-desktop-project-and-23-enabled-languages",
+    "session": "I04",
+    "state": "safe-nexus-update-workflow-prepared",
     "nativeSourceParityVerified": false,
     "nativeBinariesRebuilt": true,
     "antivirusScanned": false,
-    "publicReleaseCreated": false
+    "publicReleaseCreated": false,
+    "nativeBinariesChanged": false
   },
   "integrationTrial": {
     "id": "I02",
@@ -702,5 +716,28 @@
       "ga"
     ],
     "fullWindowsAcceptance": false
+  },
+  "nexusUpdates": {
+    "schema": "PMM_NEXUS_UPDATE_INTEGRATION_V1",
+    "id": "I04",
+    "apiClient": "isolated official Nexus API adapter; v1 endpoints retained for MD5, successor metadata and download links",
+    "credentials": "personal development API key encrypted with Windows DPAPI under Workspace/State; SSO remains disabled until PMM registration",
+    "accountModes": [
+      "Premium direct download",
+      "Free per-file Nexus web confirmation via validated nxm:// callback"
+    ],
+    "originSchema": "PMM_MOD_ORIGIN_V2 with V1 read compatibility",
+    "planSchema": "PMM_UPDATE_PLAN_V1",
+    "transactionSchema": "PMM_MOD_UPDATE_TRANSACTION_V1",
+    "nxmSchema": "PMM_NXM_REQUEST_V1",
+    "variantPolicy": "Only a unique exact Nexus FileId successor chain is eligible; forks, cycles and name similarity are blocked.",
+    "automaticPackagePolicy": "Exactly one safe PAK; unchanged installed hash; current plan/fingerprint; sufficient Deep Analysis coverage; no new blocking findings, pending removals or stale deployed compatibility patch.",
+    "archive": "Workspace/ModUpdates/Archive; indefinite retention until explicit user deletion; restore supported.",
+    "deployment": "Uses the existing PMM deployment transaction for managed ~mods synchronization and keeps a separate update rollback record.",
+    "batchPlan": "After each verified commit, PMM advances the saved fingerprint only to the exact resulting library; remaining cached candidates are reanalyzed against that library.",
+    "gameRunning": "Download and analysis may finish while Palworld runs; commit is persisted locally and resumes automatically after the game exits.",
+    "protocolRegistration": "Explicit opt-in; previous nxm handler preserved and restorable.",
+    "liveNexusAccountValidation": "NOT_VERIFIED",
+    "palworldRuntimeValidation": "NOT_VERIFIED"
   }
 }

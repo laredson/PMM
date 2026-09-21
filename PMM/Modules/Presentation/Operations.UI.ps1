@@ -254,6 +254,7 @@ function Stop-PMMBackgroundOperation([switch]$Silent) {
   elseif($kind -eq 'Build'){Set-PMMBuildBusy $false}
   elseif($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','MappingsImport','DeepCase','DeepSource')){Set-PMMAIIOBusy $false}
   elseif($kind -eq 'FixLabBuild'){Set-PMMFixLabBusy $false}
+  elseif($kind -like 'Update*'){Set-PMMUpdateBusy $false}
   if(-not$Silent -and -not[string]::IsNullOrWhiteSpace($kind)){
     $Script:TxtStatus.Text=(L ($kind+' stopped.') ($kind+' detenido.'))
   }
@@ -313,6 +314,7 @@ function Complete-PMMBackgroundOperation {
   elseif($kind -eq 'Build'){Set-PMMBuildBusy $false}
   elseif($kind -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','MappingsImport','DeepCase','DeepSource')){Set-PMMAIIOBusy $false}
   elseif($kind -eq 'FixLabBuild'){Set-PMMFixLabBusy $false}
+  elseif($kind -like 'Update*'){Set-PMMUpdateBusy $false}
 
   if($result -and [bool]$result.Success -and @('Analyze','Build','FixLabBuild') -contains $kind){Notify-PMMWorkflowStepComplete}
 
@@ -334,7 +336,7 @@ function Complete-PMMBackgroundOperation {
 
 function Start-PMMBackgroundOperation {
   param(
-    [Parameter(Mandatory=$true)][ValidateSet('Analyze','Build','AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','FixLabBuild','MappingsImport','DeepAnalysis','DeepCase','DeepSource','Recovery')][string]$Operation,
+    [Parameter(Mandatory=$true)][ValidateSet('Analyze','Build','AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','FixLabBuild','MappingsImport','DeepAnalysis','DeepCase','DeepSource','UpdateCheck','UpdateApply','UpdateRestore','Recovery')][string]$Operation,
     [switch]$Force,
     [switch]$AllowOversize,
     [ValidateSet('ConflictGroups')][string]$Mode='ConflictGroups',
@@ -420,6 +422,9 @@ function Start-PMMBackgroundOperation {
     }
     Set-PMMAIIOProgress 0 0 $message -Indeterminate
     $Script:TxtStatus.Text=$message
+  }elseif($Operation -like 'Update*'){
+    Set-PMMUpdateBusy $true
+    $Script:TxtStatus.Text=L 'Processing mod updates in the background...' 'Procesando actualizaciones de mods en segundo plano...'
   }elseif($Operation -eq 'Recovery'){
     $Script:TxtStatus.Text=L 'Recovering interrupted deployment...' 'Recuperando el despliegue interrumpido...'
   }else{
@@ -434,7 +439,7 @@ function Start-PMMBackgroundOperation {
     try{$Script:BackgroundOperationProcess.PriorityClass=[System.Diagnostics.ProcessPriorityClass]::BelowNormal}catch{}
     Write-PMMLog ('Background processing worker started: '+$Operation+' | pid='+[string]$Script:BackgroundOperationProcess.Id+' | host='+$hostExe)
   }catch{
-    if($Operation -in @('Analyze','DeepAnalysis')){Set-PMMAnalyzeBusy $false}elseif($Operation -eq 'Build'){Set-PMMBuildBusy $false}elseif($Operation -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','MappingsImport','DeepCase','DeepSource')){Set-PMMAIIOBusy $false}else{Set-PMMFixLabBusy $false}
+    if($Operation -in @('Analyze','DeepAnalysis')){Set-PMMAnalyzeBusy $false}elseif($Operation -eq 'Build'){Set-PMMBuildBusy $false}elseif($Operation -like 'Update*'){Set-PMMUpdateBusy $false}elseif($Operation -in @('AIHandoff','AIIOPrepare','AIIOPendingData','AIIOImportResponse','AIIOUseCandidate','AIIOModBuild','AIIOArtifactRefresh','MappingsImport','DeepCase','DeepSource')){Set-PMMAIIOBusy $false}else{Set-PMMFixLabBusy $false}
     if((Get-Variable PMMUIOperationLease -Scope Script -ErrorAction SilentlyContinue) -and $Script:PMMUIOperationLease){Complete-PMMModuleOperation $Script:PMMUIOperationLease.Id;$Script:PMMUIOperationLease=$null}
     $Script:BackgroundOperationKind=''
     $Script:BackgroundOperationFixLabJobId=''

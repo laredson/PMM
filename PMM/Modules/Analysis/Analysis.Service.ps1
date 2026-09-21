@@ -200,6 +200,9 @@ function Invoke-PMMDeepAnalysis($Options=$null,$ProposedReplacement=$null) {
     }
   }
   foreach($finding in @(Get-PMMResourceFindings $resources.ToArray() @($known) $snapshot.MountPriorityVerified $indexComplete)){$findings.Add($finding)}
+  if(-not$Options.CheckUpdates -and (Get-Command Read-PMMUpdatePlan -ErrorAction SilentlyContinue)){
+    try{$updatePlan=Read-PMMUpdatePlan;if($updatePlan -and $updatePlan.IsCurrent){$activeHashes=@($snapshot.Active|ForEach-Object{[string]$_.Hash});foreach($savedUpdate in @($updatePlan.Results|Where-Object{[string]$_.LocalSha256 -in $activeHashes})){$updates.Add($savedUpdate)}}}catch{}
+  }
   foreach($update in $updates){
     $findings.Add((New-PMMAnalysisFinding -Rule ('UPDATE_'+$update.Status) -Mods @($update.Mod) -Severity $(if($update.Status -eq 'UPDATE_AVAILABLE'){'Medium'}else{'Info'}) -Confidence $(if($update.Status -eq 'UPDATE_AVAILABLE'){'High'}else{'Indeterminate'}) -Classification $(if($update.Status -eq 'UPDATE_AVAILABLE'){'UpdateAvailable'}else{'Indeterminate'}) -Message $update.Message -Action $(if($update.Status -eq 'UPDATE_AVAILABLE'){'Review or stage the author update before attempting a repair.'}else{'Check or link the update source.'}) -Evidence @($update)))
   }

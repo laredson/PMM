@@ -1,0 +1,19 @@
+{
+  "schema": "PMM_I04_PACKAGE_CHECKS_V1",
+  "ok": true,
+  "buildId": "PMM-v1.5.0.1-reliability-i04-nexus-updates",
+  "packageFiles": 635,
+  "checksumRows": 634,
+  "checksumMismatches": 0,
+  "checksumInventorySha256": "761e8afe03041278d86e26912b07a9bbfceb4dc28179ed3768526a45d206e776",
+  "moduleCount": 51,
+  "frozenExecutableSha256": {
+    "PMM.exe": "a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c",
+    "Engine/PMMRuntime.exe": "b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f",
+    "Engine/PMMFixLab.exe": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe"
+  },
+  "workspaceRead": false,
+  "networkUsed": false,
+  "liveNexusAccountTested": false,
+  "palworldRuntimeTested": false
+}

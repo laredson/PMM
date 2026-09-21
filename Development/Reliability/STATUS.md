@@ -1,47 +1,33 @@
-# Estado actual - I03 localizacion integrada / 04A-6E arrays escalares V2
+# Estado actual - I04 actualizaciones Nexus seguras / I03 idiomas conservados
 
-## Paquete ejecutable actual
+## Paquete de trabajo
 
-`PMM/` es I03:
+`PMM/` esta preparado como I04, aun sin commit/push:
 - version `1.5.0.1`;
-- BUILD_ID `PMM-v1.5.0.1-reliability-i03`;
-- PMM tree `e0c394997f1dbc172fef3cfc1a755f80f63e1692`;
-- 631 archivos / 630 checksums / 0 mismatches;
-- 30 idiomas registrados / 23 habilitados / 7 reservas.
+- BUILD_ID `PMM-v1.5.0.1-reliability-i04-nexus-updates`;
+- 635 archivos / 634 checksums / 0 mismatches;
+- inventario SHA-256 `761e8afe03041278d86e26912b07a9bbfceb4dc28179ed3768526a45d206e776`;
+- 30 idiomas registrados / 23 habilitados / 7 reservas;
+- Host, Runtime y FixLab byte-identicos a I03.
 
-I03 hereda el routing privado de I02 a `Workspace/.codex/config.toml` y
-conserva byte-identicos Host C2B, Runtime C2B y FixLab original. No se
-reconstruyeron binarios para una integracion de JSON/PowerShell.
+La rama remota continua en I03 hasta autorizacion expresa del propietario.
 
-## Localizacion I03
+## Actualizaciones Nexus I04
 
-Donante fijado: `v1.5.0.0-PMM-translated@681f7994474ebfd6c2538775767d2002014170f7`.
-English sigue como default/fallback. El idioma se selecciona, aplica, guarda y
-entra en vigor al reiniciar; no hay cambio en vivo. `Refresh-UI` ya no reduce
-el selector a en/es. Las excepciones RTL incluyen campos tecnicos virtualizados
-sin forzar a LTR los textos mixtos de estado/log.
+Updates es una subpestaña propia dentro de Mods & Merge. Check Updates produce un plan de solo lectura ligado al fingerprint. AUTO descarga e instala solo cadenas FileId unicas con un unico PAK seguro, hash instalado intacto, analisis suficiente, cero bloqueos nuevos, cero retiradas pendientes y ningun parche desplegado que quede obsoleto.
 
-Validaciones locales:
-- 1.292 claves canonicas; cero faltantes y cero placeholders incompatibles;
-- 23/23 catalogos PowerShell 7 PASS;
-- 23/23 cargas WPF PowerShell 5.1 PASS;
-- smoke zh-CN, ar, vi, uk, cs y ga PASS;
-- 3/3 pruebas Python I03 PASS;
-- paquete e inventario PASS.
+La credencial personal se cifra con DPAPI en `Workspace/State`. Premium usa descarga directa. Free abre Nexus y reanuda solo cuando recibe el `nxm://` exacto, vigente y no repetido correspondiente al plan pendiente. El registro del protocolo es opt-in y restaura la asociacion anterior.
 
-Español conserva 58 claves dinamicas adicionales autorizadas y fijadas por hash.
-El propietario confirmo vi, uk, cs y ga en el donante. Falta ejecutar I03 completo
-y comprobar visualmente persistencia, RTL/BiDi y pantallas reales tras reiniciar.
+La descarga controla HTTPS, cada redireccion, espacio, tiempo, tamaño, cancelacion y hash. La extraccion bloquea traversal, ADS, enlaces, colisiones, ejecutables y archivos anidados peligrosos. La sustitucion archiva indefinidamente la version anterior y coordina la biblioteca con la transaccion de despliegue existente; fallos e interrupciones revierten biblioteca, `~mods` y estado. Un lote avanza su fingerprint solo tras verificar el cambio propio; si Palworld esta abierto, conserva el candidato ya descargado/analizado y lo reanuda automaticamente cuando el juego se cierra.
+
+Deep Analysis consume el plan de Updates y ya no consulta proveedores por separado.
+
+## Validacion
+
+PASS local: parser PowerShell 5.1, módulos, Nexus/NXM, rollback post-despliegue, recuperación tras reinicio, workers, persistencia, analisis, compatibilidad semantica y WPF EN/ES (27 aserciones por idioma). Localizacion I03: 1.292 claves, 23/23 cargas PS5.1 y smoke zh-CN/ar/vi/uk/cs/ga.
+
+Pendiente: cuenta Nexus real, modalidad Premium/Free no disponible, SSO tras registro de PMM, Palworld real y aceptacion visual del propietario. La regresion RC28 heredada busca funciones ya modularizadas en un archivo antiguo y falla tambien contra la base I03.
 
 ## Research conservado
 
-04A-6E agrega V2 para recorrer arrays de escalares de ancho fijo sin editarlos y
-lo valida desde UAsset hasta job/CLI candidato-only. NO se integra al FixLab
-original. UAsset: 63 tests Go top-level, 32 Python y tres verificadores. CoreR1:
-154 tests Go top-level, 54 Python PASS / 2 symlink SKIP y seis verificadores.
-Ambos harnesses Windows pasaron x3; builds repetidos identicos. La evidencia 6D
-de 2.000 publicaciones secuenciales y 500x4 concurrentes permanece vigente.
-Win11, AV concurrente, disco lleno real, schema real y aceptacion Palworld siguen
-pendientes.
-
-No release, no tag, no PR, no workflow. No garantia antivirus/Nexus.
+04A-6E permanece candidato-only y no sustituye PMMFixLab. No release, tag, PR, workflow ni Actions.

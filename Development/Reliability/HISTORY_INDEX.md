@@ -241,3 +241,15 @@ ventanas WPF; el usuario debe completar la aceptacion visual/persistencia I03.
 Para retomar una etapa concreta, leer primero su FINDINGS y luego CHECKS/contrato. Si un documento mas nuevo dice que una publicacion pendiente ya se resolvio, eso actualiza el estado de entrega pero NO reescribe las condiciones de prueba del archivo historico.
 
 No deducir "PASS" de un commit existente. Revisar siempre si la prueba fue estatica, Linux, compilacion Windows o ejecucion Windows real.
+
+## INTEGRATION_I04_NEXUS_UPDATES
+- `Integration/I04/README.md`
+- `Integration/I04/prepare_i04.py`
+- `Integration/I04/verify_i04.py`
+- `Integration/I04/evidence/package-checks.json`
+
+Prepara sobre I03 el flujo Nexus visible y recuperable: cliente/credencial DPAPI,
+plan por fingerprint, `nxm://` Free validado, descarga/extraccion acotadas,
+Deep Analysis previo, archivo indefinido, rollback y despliegue transaccional.
+Los tres ejecutables permanecen byte-identicos. La cuenta Nexus real, SSO y
+Palworld siguen pendientes. El cambio aun no se ha publicado.

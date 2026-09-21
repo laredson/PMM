@@ -98,7 +98,7 @@ function Update-PMMCancelButtonState {
   try{$workerRunning=($Script:BackgroundOperationProcess -and -not$Script:BackgroundOperationProcess.HasExited)}catch{}
   $gameRefRunning=$false
   try{$gameRefRunning=($Script:GameReferenceProcess -and -not$Script:GameReferenceProcess.HasExited)}catch{}
-  $busy=([bool]$Script:ImportBusy -or [bool]$Script:AnalyzeBusy -or [bool]$Script:BuildBusy -or [bool]$Script:DeployBusy -or [bool]$Script:AIIOBusy -or [bool]$Script:FixLabOperationBusy -or $workerRunning -or $gameRefRunning -or [bool]$Script:AutoPipelineActive)
+  $busy=([bool]$Script:ImportBusy -or [bool]$Script:AnalyzeBusy -or [bool]$Script:BuildBusy -or [bool]$Script:DeployBusy -or [bool]$Script:AIIOBusy -or [bool]$Script:FixLabOperationBusy -or $Script:UpdateBusy -or $workerRunning -or $gameRefRunning -or [bool]$Script:AutoPipelineActive)
   $Script:BtnCancelOperation.IsEnabled=$busy
 }
 
@@ -748,7 +748,7 @@ function Get-PMMFixLabRequirementLightweight {
 
 function Get-PMMWorkflowState {
   # ONE state machine is authoritative for both ColorFlow and AUTO.
-  # Detect -> Import -> [Fix Lab: reference -> choice -> repair -> deploy] -> Analyze -> Build -> Deploy -> Play(optional)
+  # Detect -> Import -> Check Updates -> [Fix Lab: reference -> choice -> repair -> deploy] -> Analyze -> Build -> Deploy -> Play(optional)
   if(-not(Test-PMMGameInstallationReady)){
     return [pscustomobject]@{Action='Detect';Target=$Script:BtnDetectGame;Palette='Import';Key='Flow:Detect';Detail=(L 'Detect the Palworld installation before importing or deploying mods.' 'Detecta la instalacion de Palworld antes de importar o desplegar mods.')}
   }
@@ -757,6 +757,11 @@ function Get-PMMWorkflowState {
   $importTarget=Get-PMMImportGuidanceTarget
   if($importTarget -eq 'GameMods' -and $Script:BtnImportGameMods.IsEnabled){return [pscustomobject]@{Action='ImportGameMods';Target=$Script:BtnImportGameMods;Palette='Import';Key='Flow:ImportGameMods';Detail=(L 'Import the mods currently found in Palworld ~mods.' 'Importa los mods que estan actualmente en ~mods de Palworld.')}}
   if($importTarget -eq 'Files' -and $Script:BtnImport.IsEnabled){return [pscustomobject]@{Action='ImportFiles';Target=$Script:BtnImport;Palette='Import';Key='Flow:ImportFiles';Detail=(L 'Import mod files or a folder to begin.' 'Importa archivos de mod o una carpeta para comenzar.')}}
+  if($sourceMods.Count -gt 0 -and (Get-Command Get-PMMUpdateWorkflowAction -ErrorAction SilentlyContinue)){
+    $updateAction=Get-PMMUpdateWorkflowAction
+    if($updateAction -eq 'Check'){return [pscustomobject]@{Action='CheckUpdates';Target=$Script:BtnCheckUpdates;Palette='Import';Key='Flow:CheckUpdates';Detail=(L 'Check author updates before Fix Lab or Analyze. You may skip this recommendation for offline work.' 'Busca actualizaciones de autores antes de Fix Lab o Analizar. Puedes omitir esta recomendacion para trabajar sin conexion.')}}
+    if($updateAction -eq 'Apply'){return [pscustomobject]@{Action='UpdateSafe';Target=$Script:BtnUpdateSafe;Palette='Import';Key='Flow:UpdateSafe';Detail=(L 'Safe author updates are available. PMM will archive the old version and analyze the proposed library before replacement.' 'Hay actualizaciones seguras disponibles. PMM archivara la version anterior y analizara la biblioteca propuesta antes del reemplazo.')}}
+  }
 
   # A supported legacy repair always precedes normal Analyze.
   # Game Reference is a dependency, not a navigation step: AUTO starts the
@@ -799,7 +804,7 @@ function Get-PMMWorkflowState {
         }
         $Script:FixLabSelectedRecipeId=[string]$candidate.RecipeId
         if([string]::IsNullOrWhiteSpace($selected) -and $variants.Count -gt 1){
-          $choiceOnTab=($Script:MainTabs.SelectedItem -ne $Script:TabFixLab)
+          $choiceOnTab=(-not(Test-PMMFixLabTabSelected))
           $choiceTarget=if($choiceOnTab){$Script:TabFixLab}else{$Script:CmbFixLabVariant}
           $choiceKey=if($choiceOnTab){'Flow:FixLabVariantWhileReference:'+[string]$candidate.RecipeId+':Tab'}else{'Flow:FixLabVariantWhileReference:'+[string]$candidate.RecipeId+':Combo'}
           return [pscustomobject]@{Action='FixLabChooseVariant';Target=$choiceTarget;Palette='Build';Key=$choiceKey;Detail=((L 'Game Reference is building in the background. Choose one of {0} repair outputs now; AUTO will continue as soon as the reference is ready.' 'Game Reference se esta creando en segundo plano. Elige ahora una de las {0} salidas de reparacion; AUTO continuara en cuanto la referencia este lista.') -f $variants.Count)}
@@ -828,7 +833,7 @@ function Get-PMMWorkflowState {
     if($variants.Count -eq 1 -and [string]::IsNullOrWhiteSpace($selected)){$selected=[string]$variants[0].id;$Script:FixLabSelectedVariantId=$selected;try{$Script:CmbFixLabVariant.SelectedValue=$selected}catch{}}
 
     if([string]::IsNullOrWhiteSpace($selected)){
-      $choiceOnTab=($Script:MainTabs.SelectedItem -ne $Script:TabFixLab)
+      $choiceOnTab=(-not(Test-PMMFixLabTabSelected))
       $choiceTarget=if($choiceOnTab){$Script:TabFixLab}else{$Script:CmbFixLabVariant}
       $choiceKey=if($choiceOnTab){'Flow:FixLabVariant:'+[string]$candidate.RecipeId+':Tab'}else{'Flow:FixLabVariant:'+[string]$candidate.RecipeId+':Combo'}
       return [pscustomobject]@{Action='FixLabChooseVariant';Target=$choiceTarget;Palette='Build';Key=$choiceKey;Detail=((L 'Choose one of {0} repair outputs.' 'Elige una de las {0} salidas de reparacion.') -f $variants.Count)}
@@ -883,6 +888,8 @@ function Update-PMMGuidedActionState {
     'Detect' { if($Script:BtnDetectGame.Visibility -eq [System.Windows.Visibility]::Visible){Set-PMMGuideButtonStyle $Script:BtnDetectGame 'Import'} }
     'ImportGameMods' { Set-PMMGuideButtonStyle $Script:BtnImportGameMods 'Import' }
     'ImportFiles' { Set-PMMGuideButtonStyle $Script:BtnImport 'Import' }
+    'CheckUpdates' { Set-PMMGuideButtonStyle $Script:BtnCheckUpdates 'Import' }
+    'UpdateSafe' { Set-PMMGuideButtonStyle $Script:BtnUpdateSafe 'Import' }
     'FixLabGameReference' { Set-PMMGuideButtonStyle $Script:BtnFixLabBuildReference 'Build' }
     'FixLabWaitReference' { Clear-PMMRequiredAction;return }
     'FixLabRepair' { Set-PMMGuideButtonStyle $Script:BtnFixLabRepair 'Build' }
@@ -1006,7 +1013,7 @@ function Invoke-PMMAutoContinue {
   # dispatcher turn after the previous operation actually releases its slot.
   [void](Ensure-PMMAutoFixLabGameReference)
 
-  if($Script:AutoStepInProgress -or $Script:ImportBusy -or $Script:AnalyzeBusy -or $Script:BuildBusy -or $Script:DeployBusy -or $Script:AIIOBusy -or $Script:FixLabOperationBusy){return}
+  if($Script:AutoStepInProgress -or $Script:ImportBusy -or $Script:AnalyzeBusy -or $Script:BuildBusy -or $Script:DeployBusy -or $Script:AIIOBusy -or $Script:FixLabOperationBusy -or $Script:UpdateBusy){return}
   try{if($Script:BackgroundOperationProcess -and -not$Script:BackgroundOperationProcess.HasExited){return}}catch{}
   $gameReferenceRunning=$false
   try{$gameReferenceRunning=($Script:GameReferenceProcess -and -not$Script:GameReferenceProcess.HasExited)}catch{}
@@ -1039,7 +1046,7 @@ function Invoke-PMMAutoContinue {
         if(-not $Script:FixLabLoaded){[void](Initialize-PMMFixLabFeature)}
         if($Script:FixLabLoaded){
           Refresh-PMMFixLabUI
-          $Script:MainTabs.SelectedItem=$Script:TabFixLab
+          Select-PMMFixLabTab
           $Script:AutoFixLabPresentedRecipeId=$routeRecipeId
           Write-PMMLog ('AUTO presented Fix Lab once for recipe '+$routeRecipeId)
         }
@@ -1062,6 +1069,8 @@ function Invoke-PMMAutoContinue {
       }
       'ImportGameMods' { Reset-PMMOperationCancellation;Invoke-PMMButtonClick $Script:BtnImportGameMods }
       'ImportFiles' { Stop-PMMAutoPipeline (L 'Auto paused: choose the mod files/folder to import, then press AUTO again (or enable SemiAUTO).' 'Auto pausado: elige los archivos/carpeta de mods que quieres importar y despues pulsa AUTO de nuevo (o activa SemiAUTO).') }
+      'CheckUpdates' { Reset-PMMOperationCancellation;Invoke-PMMButtonClick $Script:BtnCheckUpdates }
+      'UpdateSafe' { Reset-PMMOperationCancellation;Invoke-PMMButtonClick $Script:BtnUpdateSafe }
       'FixLabOpen' {
         if(-not $Script:FixLabLoaded){[void](Initialize-PMMFixLabFeature)}
         if($Script:FixLabLoaded){Refresh-PMMFixLabUI}

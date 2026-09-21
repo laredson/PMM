@@ -1,4 +1,4 @@
-﻿{
+{
   "Schema": "PMM_MODULE_MANIFEST_V1",
   "ContractVersion": 1,
   "Description": "Legacy entries document already-loaded compatibility prerequisites. Stage Extension is loaded once by Workbench.Services after those prerequisites. Restart policies preserve top-level state and event ownership.",
@@ -695,12 +695,34 @@
       "Reload": "Functions"
     },
     {
+      "Id": "analysis.nexus-client",
+      "Version": "1.5.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Analysis/Nexus.Client.ps1",
+      "Dependencies": [
+        "analysis.model"
+      ],
+      "Capabilities": [
+        "nexus.account",
+        "nexus.api",
+        "nexus.nxm"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Extension",
+      "Reload": "Restart"
+    },
+    {
       "Id": "analysis.updates",
-      "Version": "1.3.3",
+      "Version": "1.5.0",
       "ContractVersion": 1,
       "Path": "Modules/Analysis/Updates.Service.ps1",
       "Dependencies": [
-        "analysis.model"
+        "analysis.model",
+        "analysis.nexus-client"
       ],
       "Capabilities": [
         "analysis.updates"
@@ -734,7 +756,7 @@
     },
     {
       "Id": "analysis.service",
-      "Version": "1.3.3",
+      "Version": "1.5.0",
       "ContractVersion": 1,
       "Path": "Modules/Analysis/Analysis.Service.ps1",
       "Dependencies": [
@@ -758,9 +780,17 @@
       "Version": "1.3.3",
       "ContractVersion": 1,
       "Path": "Modules/MCP/MCP.Client.ps1",
-      "Dependencies": ["mcp"],
-      "Capabilities": ["agent.runtime"],
-      "Profiles": ["UI", "Worker", "MCP"],
+      "Dependencies": [
+        "mcp"
+      ],
+      "Capabilities": [
+        "agent.runtime"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
       "Stage": "Extension",
       "Reload": "Functions"
     },
@@ -861,6 +891,30 @@
       "Reload": "Functions"
     },
     {
+      "Id": "analysis.update-transaction",
+      "Version": "1.5.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Analysis/Updates.Transaction.ps1",
+      "Dependencies": [
+        "analysis.update-stage",
+        "analysis.nexus-client",
+        "library"
+      ],
+      "Capabilities": [
+        "updates.plan",
+        "updates.download",
+        "updates.transaction",
+        "updates.rollback"
+      ],
+      "Profiles": [
+        "UI",
+        "Worker",
+        "MCP"
+      ],
+      "Stage": "Extension",
+      "Reload": "Restart"
+    },
+    {
       "Id": "agent.policy",
       "Version": "1.3.3",
       "ContractVersion": 1,
@@ -878,6 +932,24 @@
       ],
       "Stage": "Extension",
       "Reload": "Functions"
+    },
+    {
+      "Id": "presentation.updates.ui",
+      "Version": "1.5.0",
+      "ContractVersion": 1,
+      "Path": "Modules/Presentation/Updates.UI.ps1",
+      "Dependencies": [
+        "analysis.update-transaction",
+        "analysis.ui"
+      ],
+      "Capabilities": [
+        "updates.ui"
+      ],
+      "Profiles": [
+        "UI"
+      ],
+      "Stage": "Extension",
+      "Reload": "Restart"
     },
     {
       "Id": "agent.policy.ui",
