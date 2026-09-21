@@ -1,0 +1,107 @@
+{
+  "schema": "PMM_TRANSLATION_CHECKPOINT_V1",
+  "language": "nl",
+  "nativeName": "Nederlands",
+  "date": "2026-09-18",
+  "branch": "v1.5.0.0-PMM-translated",
+  "sourceCommit": "f231136769289a9dc56a71bed68fac11cc78833a",
+  "catalogPath": "PMM/Resources/Localization/nl.json",
+  "sourceCatalogPath": "PMM/Resources/Localization/en.json",
+  "status": "complete",
+  "enabled": true,
+  "completedEntries": 1291,
+  "remainingEntries": 0,
+  "nextKey": null,
+  "nextLanguage": "ga",
+  "userRuntimeVisualQA": "pending",
+  "nativeSpeakerQA": "pending",
+  "sourceByteIdentityVerified": true,
+  "uploadedBlobMatchesLocal": true,
+  "validation": {
+    "sourceGitBlobSha": "2fa3c4712619cc5f811ce2251cef3daf5b0e2024",
+    "targetGitBlobSha": "f5609d59648da08956cf40c0a083e5aa21ad08ab",
+    "targetSha256": "42eb98c97506de551f30c57566cc0cd789b0fd8b09493b7b8ccf36f63dbe2bc5",
+    "sourceBytes": 132005,
+    "targetBytes": 142275,
+    "sourceEntries": 1291,
+    "targetEntries": 1291,
+    "parameterizedEntries": 109,
+    "intentionalInvariantEntries": 37,
+    "intentionalInvariants": [
+      ".NET Runtime x64", "Adapter", "AI / MCP", "Asset", "AUTO",
+      "ChatGPT Desktop", "Codex Desktop", "en", "English", "Español",
+      "Filter", "FIX LAB", "Fix Lab", "Git", "Hash", "Interface", "Mod",
+      "Mods", "Nexus", "PALWORLD", "Palworld Modding Kit", "Parameter",
+      "Patch", "PMM", "SemiAUTO", "Status", "Status: {0}. {1}", "Transport",
+      "Type", "Unreal Engine / Epic Launcher", "Visual Studio 2022 + MSVC",
+      "Volume:", "Windows SDK", "Workflow", "Wwise SDK", "X", "简体中文"
+    ],
+    "missingKeys": [],
+    "extraKeys": [],
+    "emptyValues": [],
+    "errors": [],
+    "passed": true,
+    "checks": [
+      "Strict JSON and duplicate rejection",
+      "Schema and locale metadata",
+      "Exact case-sensitive key parity and order",
+      "Nonempty values",
+      "Complete placeholder and format multisets",
+      "Brace counts and numeric literals",
+      "Leading and trailing whitespace",
+      "Literal PowerShell escapes",
+      "Selected technical-token multisets with documented contextual rules",
+      "File extensions and file-dialog filter patterns",
+      "Units, ~mods references and color syntax",
+      "Unicode controls, replacement characters and NFC",
+      "Explicit invariant allowlist",
+      "Native language names unchanged",
+      "Source Git blob identity and uploaded Dutch blob matching validated local bytes",
+      "Registry enables only nl and preserves all other metadata and ordering"
+    ],
+    "technicalTokenPolicy": {
+      "pluralNormalization": ["PAKs -> PAK", "ZIPs -> ZIP"],
+      "localizedProse": ["Vanilla", "Knowledge", "cooked", "generic status labels"],
+      "NormalLocalizedOnlyForKeys": [
+        "Identical repeated failures reuse one open case. Normal validation and Waiting for AI sessions never create a main-tab alert.",
+        "Manager-only mode selected. {0} compatibility decision(s) are unresolved, but Deploy can still install the active source mods without a PMM overlay. Normal PAK load order will decide those overlaps.",
+        "Normal button"
+      ],
+      "NormalIdentifierPreservedForGuraRecipe": true,
+      "idCapitalization": {
+        "key": "PMM could not match this package to a known AI exchange. Standard responses route themselves by their embedded session id; standalone cooked solutions still require their exact existing case.",
+        "change": "session id -> sessie-ID"
+      },
+      "unprovenWarning": "ONBEWEZEN (UNPROVEN)"
+    },
+    "limitations": [
+      "No PMM/WPF execution or Windows PowerShell 5.1 test.",
+      "No full source-code localization audit or native-speaker acceptance.",
+      "Known dynamic-runtime localization issues are unchanged."
+    ]
+  },
+  "registryValidation": {
+    "beforeGitBlobSha": "5045c649730ae8cd50864285ecc6da5948008c46",
+    "afterGitBlobSha": "8cf947332960f320ca3f39628b38b1dc2f089f4e",
+    "registeredLocales": 29,
+    "enabledLocales": 16,
+    "default": "en",
+    "onlyActivatedLocale": "nl",
+    "preservesExistingNamesFallbacksDirectionsXamlAndOrder": true
+  },
+  "publication": {
+    "parentCommit": "f231136769289a9dc56a71bed68fac11cc78833a",
+    "method": "Single fast-forward development commit with [skip ci]; no history rewriting",
+    "acceptance": "Catalog ready for user testing, not release acceptance"
+  },
+  "nextQueueAfterThisCheckpoint": ["ga"],
+  "scopePreserved": [
+    "Fifteen previously enabled catalogs, including Turkish and Polish",
+    "English first/default and all native language names",
+    "Quasi-continental selector order; Deutsch -> Polski -> Nederlands",
+    "Restart-based language changes",
+    "Runtime code, native binaries and Arabic bidi behavior",
+    "Main, releases, tags, workflows and existing branch history"
+  ],
+  "feedbackNote": "No new Turkish or Polish user runtime acceptance was supplied in the request to continue; their existing pending QA remains pending."
+}

@@ -761,7 +761,7 @@ function Refresh-UI {
     $Script:TglAutoMode.IsChecked = [bool]$cfg.AutoMode
     $Script:ChkAutoPlay.IsChecked = [bool]$cfg.AutoIncludePlay
     Update-PMMDeploymentOptionsState
-    $Script:CmbLanguage.SelectedValue = if ($cfg.Language -eq 'es') { 'es' } else { 'en' }
+    $Script:CmbLanguage.SelectedValue = Resolve-PMMLanguageCode ([string]$cfg.Language)
     $hintSeconds=5
     try{$hintSeconds=[int]$cfg.ActionHintSeconds}catch{$hintSeconds=5}
     if(-($hintSeconds -eq -1 -or ($hintSeconds -ge 0 -and $hintSeconds -le 120))){$hintSeconds=5}

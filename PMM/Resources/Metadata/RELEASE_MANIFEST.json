@@ -117,8 +117,8 @@
   "dotnetRuntimeInventorySha256": "8b2f4fe11635f18fa419d5e4fedad456bc7c3d7395272ee91e89b62e3ac72ed0",
   "gameReferenceBackgroundWorker": "Modules/GameReference/GameReferenceWorker.ps1",
   "gameReferenceProgressUi": "Shared normal Settings + Fix Lab progress bars plus both Game Reference buttons as ColorFlow progress surfaces. AUTO invokes the canonical Settings Game Reference command before Fix Lab navigation; output choice may be highlighted concurrently while the worker runs.",
-  "releaseCandidate": "1.5.0.1-reliability-i02",
-  "buildId": "PMM-v1.5.0.1-reliability-i02",
+  "releaseCandidate": "1.5.0.1-reliability-i03",
+  "buildId": "PMM-v1.5.0.1-reliability-i03",
   "buildIdentityFile": "Resources/Metadata/BUILD_ID.txt",
   "uiContract": "Public tabs are Mods & Merge, FIX LAB, AI & Help, World Save and Settings. Fresh size is 1460x900 and the normal minimum is 900x600; startup clamps to the Windows work area in device-independent pixels. Branding and action areas occupy equal header halves. Header actions are ordered Detect/status, folder/Play controls, then SemiAUTO/AUTO. SemiAUTO arms continuation after a manually started workflow action; the wider AUTO button runs the remaining safe workflow once and uses an idle-only sparkle treatment. AI & Help contains five focused subtabs: AI assistance, AI reception, Feedback & Knowledge, color-scheme editor and AI settings. AI assistance exposes separate diagnostic-case and standalone-mod-project entry points. Normal Settings also owns Vanilla Game Reference. General Settings follows the Sound events architecture by separating official PMM schemes from a bordered user-scheme collection. ColorFlow ends by highlighting Play as optional readiness without an action-required popup.",
   "bundledThemeCount": 11,
@@ -433,7 +433,7 @@
     "targetBroker": "native PMMRuntime/PMMEngine operation subcommands",
     "uiHeavyWorkAllowed": false
   },
-  "release": "PMM v1.5.0.1 I01 - experimental Host/Runtime integration",
+  "release": "PMM v1.5.0.1 I03 - reliability localization integration",
   "fixLabEngineVersion": "0.2.0-variant-recipes",
   "fixLabRecipeSchema": "PMM_FIXLAB_VARIANT_RECIPE_V2",
   "fixLabCase001VariantCount": 5,
@@ -514,7 +514,7 @@
   },
   "releaseName": "1.5.0.1",
   "releaseValidation": {
-    "programRegression": "PENDING user Windows acceptance of integrated I01 application",
+    "programRegression": "PENDING full Windows acceptance of I03; owner reports I02 startup works and vi/uk/cs/ga worked in the donor build",
     "gameRuntime": "NOT_VERIFIED",
     "freeAccount": "NOT_VERIFIED",
     "inventoryModIncluded": false
@@ -619,8 +619,8 @@
     }
   },
   "reliabilityPreparation": {
-    "session": "I02",
-    "state": "host-runtime-integrated-with-workspace-local-desktop-project",
+    "session": "I03",
+    "state": "host-runtime-integrated-with-workspace-local-desktop-project-and-23-enabled-languages",
     "nativeSourceParityVerified": false,
     "nativeBinariesRebuilt": true,
     "antivirusScanned": false,
@@ -648,5 +648,59 @@
       "automatic dependency repair paths"
     ],
     "sourceBuildHistory": "Candidate build recipes retain the s01b input guard; rebuild from that baseline."
+  },
+  "localizationIntegration": {
+    "schema": "PMM_LOCALIZATION_INTEGRATION_V1",
+    "id": "I03",
+    "targetBaseCommit": "fcd4b5ef8401ada4b6b8c2d79b9477738e15a3ee",
+    "donorBranch": "v1.5.0.0-PMM-translated",
+    "donorCommit": "681f7994474ebfd6c2538775767d2002014170f7",
+    "registeredLanguageCount": 30,
+    "enabledLanguageCount": 23,
+    "enabledLanguages": [
+      "en",
+      "es",
+      "fr",
+      "it",
+      "pt-BR",
+      "ro",
+      "de",
+      "pl",
+      "nl",
+      "ga",
+      "cs",
+      "uk",
+      "ru",
+      "ja",
+      "zh-CN",
+      "zh-TW",
+      "ko",
+      "hi",
+      "th",
+      "id",
+      "vi",
+      "tr",
+      "ar"
+    ],
+    "reserveLanguages": [
+      "bn",
+      "ur",
+      "mr",
+      "te",
+      "arz",
+      "pcm",
+      "ha"
+    ],
+    "defaultLanguage": "en",
+    "fallbackLanguage": "en",
+    "languageChangePolicy": "select, apply, save and restart PMM; no live switch",
+    "spanishCompatibilityExtraKeys": 58,
+    "latestOwnerTestedLanguages": [
+      "vi",
+      "uk",
+      "cs",
+      "ga"
+    ],
+    "fullWindowsAcceptance": false
   }
 }

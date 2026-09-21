@@ -212,6 +212,17 @@ del paquete queda `12e01ba3a24a2c0ce5e74d681b4931307c845a56`, con 628 checksums 
 0 mismatches. La publicacion binaria pendiente de SESSION_I01 queda cerrada; la
 aceptacion funcional Windows del programa sigue pendiente del propietario.
 
+## SESSION_I03_TRANSLATION
+- `SESSION_I03_TRANSLATION_FINDINGS.md`
+- `SESSION_I03_TRANSLATION_CHECKS.json`
+- `Integration/I03/`
+
+Integra semanticamente el commit de traducciones
+`681f7994474ebfd6c2538775767d2002014170f7` sobre I02. El paquete I03 registra
+30 idiomas, habilita 23, conserva siete reservas y mantiene los tres ejecutables
+byte-identicos. PowerShell 7 valida 23 catalogos; PowerShell 5.1 carga las 23
+ventanas WPF; el usuario debe completar la aceptacion visual/persistencia I03.
+
 ## Documentos transversales
 
 - `IMPLEMENTATION_PLAN.md`: REL-00..REL-07.

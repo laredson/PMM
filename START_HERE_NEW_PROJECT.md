@@ -6,6 +6,8 @@ Repositorio: `laredson/PMM`
 Rama de trabajo: `v1.5.0.1-PMM-reliability`  
 Base de integracion I01B: `e83b191e56c916b4de12c34a9d054f4bd6bbd485`
 Base de la tanda 04A-6E: `4763e6834c9a797b3fece6b6b0517b65f2881b2a`
+Base del paquete I03: `fcd4b5ef8401ada4b6b8c2d79b9477738e15a3ee`
+Donante de traducciones I03: `681f7994474ebfd6c2538775767d2002014170f7`
 
 ## Regla principal
 
@@ -27,33 +29,38 @@ La excepcion anterior de DOS binarios I01 sin transferir quedo cerrada en SESSIO
 8. `Development/Reliability/IMPLEMENTATION_PLAN.md`
 9. `Development/Reliability/TRANSLATION_INTEGRATION.md`
 10. `Development/Reliability/SESSION_PLAN.md`
-11. `Development/Reliability/Integration/I01/README.md`
-12. Ultimos `SESSION*_FINDINGS.md` / `SESSION*_CHECKS.json` relevantes al bloque que se vaya a tocar.
+11. `Development/Reliability/Integration/I03/README.md`
+12. `Development/Reliability/SESSION_I03_TRANSLATION_FINDINGS.md`
+13. `Development/Reliability/SESSION_I03_TRANSLATION_CHECKS.json`
+14. `Development/Reliability/Integration/I01/README.md`
+15. Ultimos `SESSION*_FINDINGS.md` / `SESSION*_CHECKS.json` relevantes al bloque que se vaya a tocar.
 
 Despues leer el contrato de la candidata concreta antes de modificarla.
 
 ## Estado ejecutivo en una frase
 
-La rama contiene research hasta 04A-6E y el paquete I02. Host y Runtime C2B de I01 siguen integrados; I02 mueve el proyecto/configuracion privada de Codex a `Workspace`. FixLab candidato/CLI sigue aislado y NO sustituye al original. El propietario informa que parece funcionar bien; faltan detalles de cierre, segundo arranque, UI y tiempos.
+La rama contiene research hasta 04A-6E y el paquete I03. Host y Runtime C2B de I01 siguen integrados; I02 movio el proyecto/configuracion privada de Codex a `Workspace`; I03 integra 30 idiomas registrados y 23 habilitados sin cambiar los ejecutables. FixLab candidato/CLI sigue aislado y NO sustituye al original.
 
 ## Objetivo inmediato
 
 1. comprobar que la rama/checkout corresponden a este handoff;
-2. confirmar BUILD_ID I02, hashes y arbol PMM esperado;
-3. recoger el resto de la prueba I02: cierre, segundo arranque, UI utilizable y tiempos;
-4. registrar el arranque/funcionamiento basico ya confirmado sin inferir aceptacion completa;
-5. corregir cualquier regresion antes de otra integracion grande;
-6. leer SESSION04A6E_FINDINGS/CHECKS: no repetir arrays escalares V2, job/CLI ni el commit Windows por marcador; obtener una fuente de schema real pinneada o avanzar otro serializer acotado con evidencia primaria;
-7. no crear PR, tag, release ni ejecutar Actions.
+2. confirmar BUILD_ID I03, hashes y arbol PMM esperado;
+3. probar I03 en Windows: selector, aplicar, cierre, segundo arranque y persistencia;
+4. revisar al menos English, Español, العربية y varios idiomas importados;
+5. conservar el resultado previo: I02 arranca y funciona; vi/uk/cs/ga funcionaron en el donante;
+6. corregir cualquier regresion I03 antes de otra integracion grande;
+7. continuar despues con SESSION04A6E sin repetir trabajo;
+8. no crear PR, tag, release ni ejecutar Actions.
 
 No modificar pins para conseguir que una compilacion distinta pase.
 
 ## Identidades importantes
 
-Paquete actual I02:
-- build: `PMM-v1.5.0.1-reliability-i02`
-- PMM tree esperado: `9ef22d5815943ce50413dfa7e09b474b06a22860`
-- 629 archivos / 628 filas de checksum / 0 mismatches.
+Paquete actual I03:
+- build: `PMM-v1.5.0.1-reliability-i03`
+- PMM tree esperado: `e0c394997f1dbc172fef3cfc1a755f80f63e1692`
+- 631 archivos / 630 filas de checksum / 0 mismatches.
+- 30 idiomas registrados / 23 habilitados / 7 reservas.
 - proyecto Desktop y configuracion privada: `Workspace` y `Workspace/.codex/config.toml`.
 - Host SHA-256: `a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c`
 - Runtime SHA-256: `b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f`
@@ -67,7 +74,7 @@ Evitar acumular todos los reemplazos hasta el final. Preferir:
 
 `candidata -> pruebas -> integracion PMM -> prueba Windows del usuario -> siguiente bloque`.
 
-Las traducciones siguen en una linea separada y se integraran de forma controlada mas adelante; no copiar carpetas completas ni traer binarios antiguos durante ese merge.
+El snapshot aprobado de traducciones ya esta integrado en I03. La rama donante sigue separada para cambios futuros; cualquier delta posterior requiere otra revision controlada.
 
 ## Seguridad y AV
 

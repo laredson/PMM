@@ -1,0 +1,107 @@
+{
+  "schema": "PMM_TRANSLATION_CHECKPOINT_V1",
+  "language": "tr",
+  "nativeName": "Türkçe",
+  "date": "2026-09-18",
+  "branch": "v1.5.0.0-PMM-translated",
+  "sourceCommit": "7b0209836ddcf8027c604bad9ea5c9e9ee0da9d2",
+  "catalogPath": "PMM/Resources/Localization/tr.json",
+  "sourceCatalogPath": "PMM/Resources/Localization/en.json",
+  "status": "complete",
+  "enabled": true,
+  "completedEntries": 1291,
+  "remainingEntries": 0,
+  "nextKey": null,
+  "nextLanguage": "nl",
+  "userRuntimeVisualQA": "pending",
+  "nativeSpeakerQA": "pending",
+  "publication": {
+    "status": "published",
+    "commit": "Git commit containing this record",
+    "baseCommit": "7b0209836ddcf8027c604bad9ea5c9e9ee0da9d2",
+    "method": "single fast-forward development commit; no history rewrite",
+    "message": "feat(i18n): publish Turkish and Polish translations [skip ci]",
+    "catalogReusedWithoutRetranslation": true,
+    "registryGitBlobSha": "5045c649730ae8cd50864285ecc6da5948008c46",
+    "registeredLocales": 29,
+    "enabledLocales": 15
+  },
+  "sourceByteIdentityVerified": true,
+  "uploadedBlobMatchesLocal": true,
+  "validationContext": "Retained local preparation evidence; the publication block above records current branch publication. The original Turkish-only registry had 14 enabled locales, while the cumulative published registry has 15.",
+  "validation": {
+    "schema": "PMM_LOCAL_CATALOG_VALIDATION_V1",
+    "language": "tr",
+    "sourceCommit": "7b0209836ddcf8027c604bad9ea5c9e9ee0da9d2",
+    "sourceGitBlobSha": "2fa3c4712619cc5f811ce2251cef3daf5b0e2024",
+    "targetGitBlobSha": "a91f23d0efc9b1fd53570b2f94f1078c6fec0487",
+    "targetSha256": "06d9235a5f6b59c9e2901c76d8ea438f317c34cd4ee72898584ef9de87a5142e",
+    "sourceBytes": 132005,
+    "targetBytes": 142665,
+    "sourceEntries": 1291,
+    "targetEntries": 1291,
+    "missingKeys": [],
+    "extraKeys": [],
+    "emptyValues": [],
+    "parameterizedEntries": 109,
+    "intentionalInvariantEntries": 21,
+    "intentionalInvariants": ["AUTO", "ChatGPT Desktop", "Codex Desktop", "en", "English", "Español", "FIX LAB", "Fix Lab", "Git", "Mod", "Nexus", "PALWORLD", "Palworld Modding Kit", "PMM", "SemiAUTO", "Unreal Engine / Epic Launcher", "Visual Studio 2022 + MSVC", "Windows SDK", "Wwise SDK", "X", "简体中文"],
+    "registryBeforeGitBlobSha": "0bbac7221e8bd16c128758a50710e63c9b5d73e9",
+    "registryAfterGitBlobSha": "7f88c7a1ca61f8c7baa9ba0d6431291b826e680a",
+    "registeredLocales": 29,
+    "preparedEnabledLocales": 14,
+    "errors": [],
+    "passed": true,
+    "checks": [
+      "Strict UTF-8 JSON and duplicate-key rejection",
+      "Source byte identity against current GitHub English blob",
+      "Metadata, complete case-sensitive key set and order",
+      "Nonempty strings, full placeholders and format specifiers",
+      "Remaining braces, numeric literals, edge whitespace and literal escapes",
+      "Selected protected technical tokens (PAKs/ZIPs normalize to PAK/ZIP)",
+      "File extensions, dialog filters, units, color formats and ~mods",
+      "NFC and unexpected Unicode controls/replacement characters",
+      "Explicit invariant allowlist and native language names",
+      "Exact registry preservation except tr enabled/status"
+    ],
+    "limitations": [
+      "Structural checks are not native-speaker review.",
+      "No PMM/WPF, Windows PowerShell 5.1 or full source-code localization audit ran.",
+      "Known dynamic-runtime localization gaps remain unchanged.",
+      "Git blob hashes are computed locally; this report does not assert GitHub publication."
+    ]
+  },
+  "technicalTokenPolicy": {
+    "localizedProse": ["AI -> YZ", "Vanilla", "Knowledge", "cooked", "native"],
+    "pluralNormalization": ["PAKs -> PAK", "ZIPs -> ZIP"],
+    "unprovenWarning": "KANITLANMADI (UNPROVEN)",
+    "canonicalKeys": "Case-sensitive English keys, including case-only distinctions, are unchanged."
+  },
+  "productOrder": {
+    "note": "Unchanged quasi-continental display order; separate from execution priority.",
+    "codes": ["en", "es", "fr", "it", "pt-BR", "de", "pl", "nl", "ga", "cs", "uk", "ru", "ja", "zh-CN", "zh-TW", "ko", "hi", "bn", "ur", "mr", "te", "th", "id", "vi", "tr", "ar", "arz", "pcm", "ha"]
+  },
+  "nextQueueAfterThisCheckpoint": ["nl", "ga"],
+  "previousLanguageUserFeedback": {
+    "language": "it",
+    "date": "2026-09-18",
+    "userText": "italiano probado. ok.\ncontinua por favor",
+    "result": "User-confirmed Italian runtime feedback",
+    "scope": "Not exhaustive QA and does not close other languages or generic runtime issues."
+  },
+  "scopePreserved": [
+    "Thirteen previously active catalogs including Italian and Japanese",
+    "All native language labels, locale order, fallbacks, directions and XAML settings",
+    "English first/default and restart-based language changes",
+    "Runtime code, binaries, Arabic bidi behavior and known runtime QA issues",
+    "Main, tags, releases, workflows and existing branch history"
+  ],
+  "enabledScope": "Published translation branch registry",
+  "publicationRevalidation": {
+    "packageChecksums": "passed",
+    "localStructuralValidator": "passed",
+    "errors": [],
+    "remoteCatalogBlobRetrieved": true,
+    "runtimeTestPerformed": false
+  }
+}

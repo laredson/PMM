@@ -1,4 +1,17 @@
-# Integracion futura de idiomas: 1.5.0.0 -> 1.5.0.1
+# Integracion de idiomas: 1.5.0.0 -> 1.5.0.1
+
+## Estado I03
+
+El snapshot aprobado
+`v1.5.0.0-PMM-translated@681f7994474ebfd6c2538775767d2002014170f7`
+se integro sobre
+`v1.5.0.1-PMM-reliability@fcd4b5ef8401ada4b6b8c2d79b9477738e15a3ee`
+como I03. Fue una integracion por archivos revisados, no un merge global. El
+resultado tiene 30 idiomas registrados, 23 habilitados, siete reservas y English
+como default/fallback. La evidencia vive en `Integration/I03/`.
+
+La rama donante permanece independiente y cualquier delta nuevo vuelve a seguir
+este contrato.
 
 ## Contrato entre las dos ramas
 
@@ -38,7 +51,7 @@ Tambien acepta el SHA exacto de la entrega de traducciones en lugar de la refere
 
 **Limites:** es un inventario acumulado desde la bifurcacion, no una simulacion de conflictos ni una aprobacion del merge. Los renombrados aparecen como baja/alta. Despues de una integracion anterior puede listar cambios ya incorporados; contrastar los ancestros comunes actuales. La ausencia de archivos compartidos no garantiza compatibilidad funcional. Solo se ha comprobado sintaxis Python en esta entrega.
 
-## Procedimiento cuando las traducciones esten listas
+## Procedimiento aplicado en I03 y obligatorio para deltas futuros
 
 1. Obtener autorizacion para la integracion y fijar el commit de traducciones terminado. Actualizar referencias mediante fetch de lectura, sin pull automatico ni cambios en la rama remota de idiomas.
 2. Trabajar localmente sobre la rama de fiabilidad, con el arbol de trabajo limpio y un punto de recuperacion. Revisar el inventario y las diferencias reales.

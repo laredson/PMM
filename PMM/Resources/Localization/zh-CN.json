@@ -1181,6 +1181,7 @@
     "The recognized repair case is missing an accepted build provider.": "已确认的修理案件缺少一个已确认的建筑供应商。",
     "The repair case is recognized, but the required build provider is missing. For Gura Case 001 the proven provider is FullReplacement; Normal-only reconstruction is not yet proven.": "修理案已确认,但缺少所需的建筑供应商。 对于Gura Case 001, 经证实的提供者是FullReplacement; 正常的重建尚未证明。",
     "The request is already prepared. Send it in the existing chat. A new chat will only be opened if you choose the button below. ChatGPT must investigate and ask for your approval before changes. If the project is missing, add the PMM folder as a local project.": "请求已经提出。 在已有的聊天中发送 。 只有当您选择下面的按钮时, 才会打开新的聊天 。ChatGPT更改前,您必须调查并征得您的同意。 如果项目缺失,请添加PMM作为本地工程的文件夹 。",
+    "The request is already prepared. Send it in the existing chat. A new chat will only be opened if you choose the button below. ChatGPT must investigate and ask for your approval before changes. If the project is missing, add the PMM Workspace folder as a local project.": "请求已经提出。 在已有的聊天中发送 。 只有当您选择下面的按钮时, 才会打开新的聊天 。ChatGPT更改前,您必须调查并征得您的同意。 如果项目缺失,请添加PMM作为本地工程的文件夹 。",
     "The result is recorded locally against a deterministic buildId. It is not uploaded.": "当地根据确定性建筑指数记录结果。 未上传。",
     "The save backup needs about {0:N1} GB of temporary space, but only {1:N1} GB are free. Restore was stopped before extraction.": "保存备份需要关于{0:N1}GB 临时空间,但仅限{1:N1}GB是免费的。 提取前已停止还原 。",
     "The selected backup file does not exist.": "选中的备份文件不存在 。",

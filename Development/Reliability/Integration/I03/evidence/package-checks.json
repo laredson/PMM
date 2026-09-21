@@ -1,0 +1,12 @@
+{
+  "schema": "PMM_I03_PACKAGE_CHECKS_V1",
+  "version": "1.5.0.1",
+  "buildId": "PMM-v1.5.0.1-reliability-i03",
+  "pmmTree": "e0c394997f1dbc172fef3cfc1a755f80f63e1692",
+  "packageFiles": 631,
+  "checksumRows": 630,
+  "checksumMismatches": 0,
+  "pmmExecuted": false,
+  "antivirusScanned": false,
+  "sourceParityVerified": false
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "PMM_I03_LOCALIZATION_CHECKS_V1",
+  "ok": true,
+  "registeredLanguages": 30,
+  "enabledLanguages": ["en","es","fr","it","pt-BR","ro","de","pl","nl","ga","cs","uk","ru","ja","zh-CN","zh-TW","ko","hi","th","id","vi","tr","ar"],
+  "reserveLanguages": ["bn","ur","mr","te","arz","pcm","ha"],
+  "canonicalKeyCount": 1292,
+  "catalogKeyCounts": {
+    "en":1292,"es":1350,"fr":1292,"it":1292,"pt-BR":1292,"ro":1292,
+    "de":1292,"pl":1292,"nl":1292,"ga":1292,"cs":1292,"uk":1292,
+    "ru":1292,"ja":1292,"zh-CN":1292,"zh-TW":1292,"ko":1292,"hi":1292,
+    "th":1292,"id":1292,"vi":1292,"tr":1292,"ar":1292
+  },
+  "placeholderMismatches": 0,
+  "missingCanonicalKeys": 0,
+  "spanishCompatibilityExtraKeys": 58,
+  "spanishCompatibilityExtraKeysSha256": "14a47a3db8969d4864b8cdc6bfe28be68333946bdc89e2dd30a30fd5186147c4",
+  "defaultLanguage": "en",
+  "fallbackLanguage": "en",
+  "languageChangePolicy": "save-and-restart"
+}

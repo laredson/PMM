@@ -17,14 +17,17 @@
     "Development/Reliability/IMPLEMENTATION_PLAN.md",
     "Development/Reliability/TRANSLATION_INTEGRATION.md",
     "Development/Reliability/SESSION_PLAN.md",
+    "Development/Reliability/Integration/I03/README.md",
+    "Development/Reliability/SESSION_I03_TRANSLATION_FINDINGS.md",
+    "Development/Reliability/SESSION_I03_TRANSLATION_CHECKS.json",
     "Development/Reliability/Integration/I01/README.md"
   ],
   "remotePackage": {
     "version": "1.5.0.1",
-    "buildId": "PMM-v1.5.0.1-reliability-i02",
-    "tree": "9ef22d5815943ce50413dfa7e09b474b06a22860",
-    "files": 629,
-    "checksumRows": 628,
+    "buildId": "PMM-v1.5.0.1-reliability-i03",
+    "tree": "e0c394997f1dbc172fef3cfc1a755f80f63e1692",
+    "files": 631,
+    "checksumRows": 630,
     "checksumMismatches": 0,
     "executableSha256": {
       "PMM/PMM.exe": "a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c",
@@ -77,6 +80,41 @@
       "desktopRoutingAssertionsPassed": 14,
       "desktopBindingAssertionsPassed": 32,
       "packageChecksumMismatches": 0
+    }
+  },
+  "i03": {
+    "status": "INTEGRATED_IN_PMM_PENDING_USER_WINDOWS_ACCEPTANCE",
+    "buildId": "PMM-v1.5.0.1-reliability-i03",
+    "expectedPackageTree": "e0c394997f1dbc172fef3cfc1a755f80f63e1692",
+    "targetBaseCommit": "fcd4b5ef8401ada4b6b8c2d79b9477738e15a3ee",
+    "translationDonorCommit": "681f7994474ebfd6c2538775767d2002014170f7",
+    "inheritsI02Executables": true,
+    "registeredLanguages": 30,
+    "enabledLanguages": 23,
+    "reserveLanguages": 7,
+    "defaultLanguage": "en",
+    "languageChangePolicy": "save-and-restart",
+    "ownerTestedInDonor": [
+      "vi",
+      "uk",
+      "cs",
+      "ga"
+    ],
+    "tests": {
+      "pythonAssertionsPassed": 3,
+      "powerShell7CatalogsPassed": 23,
+      "powerShell51WpfLanguagesPassed": 23,
+      "smokeLanguagesPassed": [
+        "zh-CN",
+        "ar",
+        "vi",
+        "uk",
+        "cs",
+        "ga"
+      ],
+      "packageChecksumMismatches": 0,
+      "desktopRoutingAssertionsPassed": 14,
+      "desktopBindingAssertionsPassed": 32
     }
   },
   "nativeCandidateTrees": {
@@ -154,17 +192,15 @@
       "repair/dependency policy",
       "manifest/pin/path gates",
       "startup measurement/optimization",
-      "translation integration",
       "signing/final distribution preflight"
     ]
   },
   "immediateNext": [
-    "Do not rebuild I01 executables without a new reason; they are retained byte-identical in I02.",
-    "Preserve the owner's result that I02 appears to work well.",
-    "Record startup visible/usable time, close, second startup, UI/regressions and logs if failure.",
-    "Correct any I02 regression before another large integration.",
-    "Owner authorized laboratory progress while testing; 6E scalar-array traversal, the job V2/CLI and Win10 marker commit remain candidate-only.",
-    "Pin and review a real schema source or add one further bounded serializer with primary evidence; complete remaining cross-environment acceptance where available."
+    "Do not rebuild I01 executables without a new reason; they remain byte-identical in I03.",
+    "Preserve the owner's result that I02 starts and works and that vi/uk/cs/ga worked in the donor.",
+    "Test I03 language selection, Apply, close, second startup, persistence, RTL and representative screens.",
+    "Correct any I03 regression before another large integration.",
+    "After I03 acceptance, pin and review a real schema source or add one further bounded serializer with primary evidence."
   ],
   "developmentPolicy": {
     "remoteWritesNeedExplicitAuthorization": true,
@@ -179,8 +215,11 @@
   "translationLine": {
     "branch": "v1.5.0.0-PMM-translated",
     "commonAncestor": "38bd5a934488ac11a6200d3142b889ca86a82f57",
-    "direction": "translations -> reliability after review",
-    "automaticMergeAuthorized": false
+    "direction": "approved snapshot integrated; future deltas require semantic review",
+    "automaticMergeAuthorized": false,
+    "finalDonorCommit": "681f7994474ebfd6c2538775767d2002014170f7",
+    "integratedIntoReliability": true,
+    "integrationId": "I03"
   },
   "localArtifactsFromPriorChat": {
     "requiredForUnderstanding": false,

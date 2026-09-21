@@ -1,0 +1,56 @@
+{
+  "schema": "PMM_TRANSLATION_PROGRESS_V1",
+  "language": "ko",
+  "nativeName": "한국어",
+  "direction": "ltr",
+  "status": "complete",
+  "enabled": true,
+  "partCompleted": 2,
+  "plannedParts": 2,
+  "sourceCommit": "ef68aeef85b5160948030a0eb358b932ed68a82f",
+  "sourceCatalog": "PMM/Resources/Localization/en.json",
+  "sourceBlob": "2fa3c4712619cc5f811ce2251cef3daf5b0e2024",
+  "sourceTotal": 1291,
+  "completedEntries": 1291,
+  "remainingEntries": 0,
+  "completedRange": {
+    "firstKey": "(not detected)",
+    "lastKey": "Load draft",
+    "sourceFirstLine": 7,
+    "sourceLastLine": 651
+  },
+  "nextKey": null,
+  "catalog": "PMM/Resources/Localization/ko.json",
+  "catalogBlob": "e239428f7eab5b6ff954dbebfb50e3b198308cc9",
+  "catalogSha256": "ef8391cf4279e8686a906108818c75b1e7a735762e91d6f88bd102e98737d9a5",
+  "unchangedIntentional": [
+    ".NET Runtime x64",
+    "AI / MCP",
+    "AUTO",
+    "ChatGPT Desktop",
+    "Codex Desktop",
+    "en",
+    "English",
+    "Español",
+    "FIX LAB",
+    "Fix Lab",
+    "Git"
+  ],
+  "validation": {
+    "scope": "Single structural pass after part 2 publication",
+    "sourceEntries": 1291,
+    "koreanEntries": 1291,
+    "missingKeys": 0,
+    "extraKeys": 0,
+    "emptyValues": 0,
+    "placeholderErrors": 0,
+    "notRun": [
+      "WPF visual/runtime QA",
+      "GitHub Actions",
+      "full repository audit"
+    ]
+  },
+  "resume": "Korean catalog is complete and enabled. Next step is user runtime/visual QA after restart; do not translate Korean again unless QA finds an issue.",
+  "handoff": "Development/Localization/KOREAN_HANDOFF.md",
+  "publication": "Published to v1.5.0.0-PMM-translated through the connected GitHub integration on 2026-09-18."
+}

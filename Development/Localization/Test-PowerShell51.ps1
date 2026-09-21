@@ -26,8 +26,8 @@ $catalog=Get-PMMLanguageCatalog $Language
 if(-not $catalog -or $catalog.Count -lt 1200){throw "Localization catalog did not load correctly under Windows PowerShell 5.1. Count=$($catalog.Count)"}
 
 $translated=Get-PMMLocalizedText 'Settings' $Language
-if([string]::IsNullOrWhiteSpace($translated) -or $translated -ceq 'Settings'){
-  throw "Catalog lookup did not return a translated value for Settings. Value='$translated'"
+if([string]::IsNullOrWhiteSpace($translated)){
+  throw "Catalog lookup returned an empty value for Settings. Language='$Language'"
 }
 
 $registry=Get-PMMLanguageRegistry
@@ -75,8 +75,8 @@ $normalCombo=New-Object Windows.Controls.ComboBox
 $normalCombo.DisplayMemberPath='Label'
 $normalCombo.ItemsSource=@($normalItem)
 Invoke-PMMLocalizeVisualTree $normalCombo $Language
-if([string]$normalItem.Label -ceq 'Settings'){
-  throw 'Normal data-bound labels stopped localizing while protecting native language names.'
+if([string]$normalItem.Label -cne [string]$translated){
+  throw "Normal data-bound label differs from the catalog. Expected='$translated' Actual='$([string]$normalItem.Label)'"
 }
 
 $xamlPath=Get-PMMLanguageXamlPath $Language

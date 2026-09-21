@@ -47,6 +47,7 @@ $xamlPath=Get-PMMLanguageXamlPath $Language
 $reader=[System.Xml.XmlNodeReader]::new($xml)
 $window=[Windows.Markup.XamlReader]::Load($reader)
 if(-not $window){throw 'Localized WPF window did not load'}
-Register-PMMLiveLocalization $window $Language
+Invoke-PMMLocalizeVisualTree $window $Language
+Set-PMMLanguageDirection $window $Language
 $window.Close()
 Write-Host "Localization smoke $Language OK"

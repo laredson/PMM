@@ -84,14 +84,16 @@ function Convert-PMMXamlLocalization([string]$Xaml,[string]$LanguageCode=''){
 # Presentation-only bidi exceptions. Do not inject Unicode direction controls
 # into paths, identifiers, clipboard text, user input, or stored catalog values.
 # Layout and localized captions continue to inherit the window's RTL direction.
+# TxtStatus and TxtLog are deliberately excluded: they also contain localized
+# sentences, not just technical data. Mixed captions need separate inline runs.
 $Script:PMMLtrControlNames=@(
-  'TxtGamePath','TxtLibraryPath','TxtStatus','TxtLog',
+  'TxtGamePath','TxtLibraryPath',
   'TxtThemeEditorId','TxtAIOTargetId','TxtCompletionVolume'
 )
 $Script:PMMLtrBindingPaths=@(
-  'Path','FullPath','FilePath','AssetPath','Hash','Sha256','SHA256',
+  'Path','FullPath','FilePath','AssetPath','Hash','HashShort','Sha256','SHA256',
   'MappingsSha256','Id','BuildId','RecipeId','TargetId','SizeMb',
-  'SizeMB','SizeBytes','Order','Version','Url','URL'
+  'SizeMB','SizeBytes','SizeText','Order','Priority','Version','Url','URL'
 )
 function Test-PMMTechnicalTextElement($Element){
   if(-not($Element -is [Windows.Controls.TextBlock] -or $Element -is [Windows.Controls.TextBox])){return $false}

@@ -8,7 +8,7 @@ PMM es una aplicacion Windows para gestionar/modificar flujos de mods. La linea 
 
 No se busca "burlar" antivirus. Se pretende reducir causas legitimas de falsos positivos mediante ingenieria justificable y una cadena fuente -> build -> paquete -> ejecucion auditable.
 
-La rama de traducciones `v1.5.0.0-PMM-translated` sigue independiente. Ancestro comun fijo: `38bd5a934488ac11a6200d3142b889ca86a82f57`.
+La rama de traducciones `v1.5.0.0-PMM-translated` sigue independiente. Ancestro comun fijo: `38bd5a934488ac11a6200d3142b889ca86a82f57`. I03 integra de forma revisada su snapshot final `681f7994474ebfd6c2538775767d2002014170f7`; los deltas futuros no se fusionan automaticamente.
 
 ## 2. Politica Git/GitHub acordada
 
@@ -23,30 +23,25 @@ La rama de traducciones `v1.5.0.0-PMM-translated` sigue independiente. Ancestro 
 
 ## 3. Estado remoto actual
 
-SESSION_I01B parte de `e83b191e56c916b4de12c34a9d054f4bd6bbd485` y cierra la
-transferencia binaria pendiente del handoff anterior.
-
-El paquete `PMM/` de la rama es I02:
+El paquete `PMM/` de la rama es I03:
 - producto 1.5.0.1;
-- BUILD_ID `PMM-v1.5.0.1-reliability-i02`;
-- 629 archivos;
-- 628 filas en SHA256SUMS;
+- BUILD_ID `PMM-v1.5.0.1-reliability-i03`;
+- PMM tree `e0c394997f1dbc172fef3cfc1a755f80f63e1692`;
+- 631 archivos;
+- 630 filas en SHA256SUMS;
 - 0 mismatches;
-- Git tree `9ef22d5815943ce50413dfa7e09b474b06a22860`.
+- 30 idiomas registrados, 23 habilitados y siete reservas.
 
-Ejecutables de la rama:
+Ejecutables conservados byte-identicos desde I02:
 - Host C2B `PMM/PMM.exe`: SHA-256 `a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c`.
 - Runtime C2B `PMM/Engine/PMMRuntime.exe`: SHA-256 `b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f`.
 - FixLab original `PMM/Engine/PMMFixLab.exe`: SHA-256 `8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe`.
 
-Importante: el propietario informa que I02 parece funcionar bien en Windows.
-Falta la aceptacion detallada (cierre, segundo arranque, UI y tiempos);
-compilacion, hashes y arranque basico no equivalen a aceptacion completa.
-
-I02 conserva exactamente los tres ejecutables de I01 y corrige la integracion
-Desktop: usa `Workspace` como raiz del proyecto, escribe la configuracion privada
-en `Workspace/.codex/config.toml`, conserva otras entradas y deja de generar
-`PMM/.codex/config.toml`. La ruta antigua no se borra automaticamente.
+I02 movio el proyecto Desktop y su configuracion privada a `Workspace`; el
+propietario informa que arranca y funciona. I03 añade idiomas y corrige el
+selector heredado, pero su persistencia entre dos arranques y revision visual
+siguen pendientes de prueba del propietario. vi, uk, cs y ga fueron probados en
+el donante antes de integrarlos.
 
 ## 4. Candidatas nativas ya construidas
 
@@ -195,7 +190,7 @@ completo antes de reemplazar `PMMFixLab.exe`.
 
 ## 8. Host/Runtime - gates pendientes
 
-I02 ya permite una prueba incremental y su arranque basico fue confirmado; no
+I03 hereda la prueba incremental de I02 y su arranque basico confirmado; no
 declarar Host/Runtime totalmente aceptados todavia.
 
 Pendientes conocidos:
@@ -217,29 +212,28 @@ No eliminar verificaciones a ciegas para acelerar.
 
 ## 9. Traducciones
 
-No bloquear toda la integracion nativa esperando a terminar idiomas.
+I03 integra el commit donante `681f7994474ebfd6c2538775767d2002014170f7`
+mediante revision semantica, no merge global. Conserva English como
+default/fallback, el modelo aplicar y reiniciar, nativeName, RTL/LTR y
+compatibilidad PowerShell 5.1.
 
-La rama `v1.5.0.0-PMM-translated` continua independiente. Mas adelante integrar cambios hacia reliability mediante revision de tres vias y el contrato de `TRANSLATION_INTEGRATION.md`.
-
-Nunca:
-- copiar toda una carpeta PMM antigua sobre la nueva;
-- recuperar EXE antiguos por accidente;
-- resolver conflictos con ours/theirs global;
-- perder claves/placeholders/fallback/nativeName/RTL.
-
-Las nuevas cadenas de reliability deben registrarse para traducirlas antes de candidata final.
+La evidencia esta en `Integration/I03/`,
+`SESSION_I03_TRANSLATION_FINDINGS.md` y
+`SESSION_I03_TRANSLATION_CHECKS.json`. Español conserva 58 claves dinamicas
+adicionales fijadas por hash. I03 requiere prueba Windows del propietario; no se
+declara aceptacion visual completa por las comprobaciones automaticas.
 
 ## 10. Roadmap restante, nivel alto
 
-1. Recoger la prueba restante de I02: cierre, segundo arranque, UI y tiempos.
-2. Corregir cualquier regresion de I02 y medir/optimizar arranque.
+1. Probar I03: selector, persistencia tras reinicio, RTL, UI y tiempos.
+2. Corregir cualquier regresion de I03 y medir/optimizar arranque.
 3. Completar matriz fuera de Win10 NTFS; job V2/CLI acotado ya existe.
 4. Fijar/revisar una fuente de schema real o agregar otro serializer acotado con
    evidencia primaria; despues completar relocalizacion y semantica V2 restante.
 5. Integrar un PMMFixLab reconstruido cuando tenga paridad suficiente; prueba incremental.
 6. Cerrar Host/Runtime restantes y optimizar arranque.
 7. Cerrar repair/dependencies, manifests/pins/rutas y packaging reproducible.
-8. Integrar idiomas de forma controlada.
+8. Mantener idiomas I03 y revisar semanticamente cualquier delta futuro.
 9. Windows end-to-end, firma si el propietario la provisiona y preflight final.
 10. Solo despues valorar upload/release/Nexus. No se garantiza check verde.
 

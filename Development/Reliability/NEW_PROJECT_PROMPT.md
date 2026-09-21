@@ -24,31 +24,41 @@ Lee, en orden:
 9. `Development/Reliability/IMPLEMENTATION_PLAN.md`
 10. `Development/Reliability/TRANSLATION_INTEGRATION.md`
 11. `Development/Reliability/SESSION_PLAN.md`
-12. `Development/Reliability/Integration/I01/README.md`
+12. `Development/Reliability/Integration/I03/README.md`
+13. `Development/Reliability/SESSION_I03_TRANSLATION_FINDINGS.md`
+14. `Development/Reliability/SESSION_I03_TRANSLATION_CHECKS.json`
+15. `Development/Reliability/Integration/I01/README.md`
 
-Si tienes acceso a una carpeta local del repo, usala como fuente de trabajo y comprueba `git status`, rama y HEAD antes de cambiar nada. Si solo tienes GitHub remoto, inspecciona la rama antes de pedir archivos al usuario.
+Si tienes acceso local, usalo y comprueba `git status`, rama, HEAD, BUILD_ID y
+checksums antes de cambiar nada.
 
-Contexto inmediato: todo el research/codigo esta en Git. La limitacion anterior de transferencia de los dos EXE I01 ya quedo cerrada en SESSION_I01B. `PMM/` es I02, conserva Host/Runtime C2B y usa Workspace para configuracion privada, con arbol `9ef22d5815943ce50413dfa7e09b474b06a22860`. No cambies pins ni reconstruyas I01 otra vez sin una razon nueva.
+Contexto inmediato: `PMM/` es I03,
+`PMM-v1.5.0.1-reliability-i03`, con tree
+`e0c394997f1dbc172fef3cfc1a755f80f63e1692`, 631 archivos y 630 checksums.
+Conserva Host/Runtime C2B, FixLab original y el routing I02 a Workspace. Integra
+el commit de traducciones
+`681f7994474ebfd6c2538775767d2002014170f7`: 30 idiomas registrados, 23
+habilitados y siete reservas. English sigue default/fallback y el cambio requiere
+Apply + reinicio.
 
-Esta rama SI puede quedar temporalmente rota: es una rama experimental para que el propietario pruebe cambios reales mediante GitHub Desktop. Mantener `Development/Reliability/NativeCandidates/` como laboratorio/historial, pero integrar en `PMM/` los bloques suficientemente cerrados.
-
-I02 parece funcionar bien segun el propietario. Recoger cierre, segundo arranque, UI detallada y tiempos. No acumular otra integracion grande antes de revisar ese feedback.
+El propietario informo que I02 arranca y funciona y que vi/uk/cs/ga funcionaban
+en el donante. La siguiente prueba es ejecutar I03, confirmar selector,
+persistencia tras cerrar/abrir, RTL arabe, pantallas representativas y tiempos.
+Corregir cualquier regresion antes de otra integracion grande.
 
 04A-6E ya implemento recorrido V2 de ArrayProperty con innerType escalar fijo,
-sin mutar arrays, y lo probo de UAsset a job/CLI candidato-only. Leer sus
-FINDINGS/CHECKS y contratos. Struct/map/set/string/nested arrays, schema real y
-relocalizacion siguen pendientes. La matriz sigue parcial (Win10 NTFS probado,
-Win11/SMB/disco lleno real/AV/race pendientes). Continuar con una fuente de schema
-real pinneada u otro serializer acotado, sin sustituir FixLab ni integrar aun PMM.
-No crear PR/tag/release ni ejecutar Actions. Commits con `[skip ci]`.
-No desactivar antivirus ni pedir exclusiones.
+sin mutar arrays, y lo probo de UAsset a job/CLI candidato-only. Struct/map/set/
+string/nested arrays, schema real y relocalizacion siguen pendientes. Continuar
+despues de la aceptacion I03 con una fuente de schema real pinneada u otro
+serializer acotado, sin sustituir FixLab.
 
-Antes de responderme que falta contexto, demuestra que has leido el handoff y resume:
-- que Host/Runtime I01 estan integrados y FixLab sigue siendo el original;
-- hashes Host/Runtime I01;
-- que hacen 04A-6B/6C/6D/6E y los limites de las pruebas Windows;
-- cual es la siguiente prueba Windows;
-- que queda pendiente para FixLab;
-- como se integraran los idiomas.
+No crear PR/tag/release ni ejecutar Actions. Commits con `[skip ci]`. No
+desactivar antivirus ni pedir exclusiones.
+
+Antes de responder que falta contexto, resume:
+- identidad, tree, idiomas y limites de I03;
+- hashes Host/Runtime/FixLab conservados;
+- resultado y pendientes de la prueba Windows I03;
+- que hacen 04A-6B/6C/6D/6E y que falta para FixLab.
 
 ---

@@ -7,6 +7,8 @@
 
 Esta rama es `v1.5.0.1-PMM-reliability`, derivada de `v1.5.0.0-PMM-translated` en el commit `38bd5a934488ac11a6200d3142b889ca86a82f57`.
 
+I03 integra el snapshot de traducciones `681f7994474ebfd6c2538775767d2002014170f7`: 30 idiomas registrados, 23 habilitados y siete reservas. Los cambios futuros de la rama donante siguen requiriendo revision semantica; no repetir ni convertir esta integracion en un merge automatico.
+
 ## Leer primero
 
 1. `START_HERE_NEW_PROJECT.md`.
@@ -15,7 +17,8 @@ Esta rama es `v1.5.0.1-PMM-reliability`, derivada de `v1.5.0.0-PMM-translated` e
 4. `Development/Reliability/NEXT_SESSION.md`, `STATUS.md` y el ultimo registro; BASELINE.json es historico.
 5. `Development/Reliability/IMPLEMENTATION_PLAN.md`.
 6. `Development/Reliability/TRANSLATION_INTEGRATION.md`.
-7. `Development/Source/SOURCE_STATUS.md` antes de cualquier compilacion nativa; despues, los handoffs historicos de `Development/AI/` como contexto, no como estado de esta nueva linea.
+7. `Development/Reliability/Integration/I03/README.md` y `SESSION_I03_TRANSLATION_FINDINGS.md`.
+8. `Development/Source/SOURCE_STATUS.md` antes de cualquier compilacion nativa; despues, los handoffs historicos de `Development/AI/` como contexto, no como estado de esta nueva linea.
 
 ## Limites de esta linea
 

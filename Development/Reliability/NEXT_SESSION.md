@@ -1,56 +1,36 @@
-# Retomar - I02 funciona, 04A-6E arrays escalares V2
+# Retomar - I03 traducciones integradas / 04A-6E conservado
 
-Punto de entrada obligatorio: `START_HERE_NEW_PROJECT.md`.
+## Estado actual
 
-Este handoff hace que el contexto necesario viva en GitHub. No pedir al usuario un
-ZIP de chats anteriores antes de leer `NEW_PROJECT_HANDOFF.md`,
-`NEW_PROJECT_STATE.json` y `HISTORY_INDEX.md`.
+Paquete I03:
+- BUILD_ID `PMM-v1.5.0.1-reliability-i03`.
+- PMM tree `e0c394997f1dbc172fef3cfc1a755f80f63e1692`.
+- 631 archivos / 630 checksums / 0 mismatches.
+- 30 idiomas registrados / 23 habilitados / 7 reservas.
+- Donante fijado en `681f7994474ebfd6c2538775767d2002014170f7`.
+- Host, Runtime y FixLab byte-identicos a I02.
+- Workspace/.codex conserva la configuracion privada.
 
-## Estado inmediato
-
-La rama contiene toda la fuente, research, builders, contratos y evidencias hasta
-04A-6E (arrays escalares V2 recorribles, job V2/CLI candidato-only y commit
-Windows estable; schemas reales y matriz entre entornos aun parciales).
-SESSION_I01B reconstruyo localmente e integro los DOS EXE I01 junto con
-sus tres metadatos. La limitacion de transferencia anterior esta cerrada.
-
-I02 integrado:
-- Host C2B SHA-256: a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c
-- Runtime C2B SHA-256: b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f
-- I02 PMM tree esperado: 9ef22d5815943ce50413dfa7e09b474b06a22860
-- Build: PMM-v1.5.0.1-reliability-i02
-- Proyecto/configuracion Desktop: Workspace / Workspace/.codex/config.toml
-- FixLab permanece original.
+Validacion local: 3 Python PASS, 23/23 catalogos PowerShell 7 PASS, 23/23
+idiomas con carga WPF PowerShell 5.1 PASS y smoke zh-CN/ar/vi/uk/cs/ga PASS.
+No se ejecuto PMM I03 end-to-end.
 
 ## Primera accion
 
-1. Comprobar rama, HEAD y `git status`. No pisar trabajo local del usuario.
-2. Confirmar que `PMM/Resources/Metadata/BUILD_ID.txt` identifica I02 y que el
-   arbol PMM coincide con `9ef22d5815943ce50413dfa7e09b474b06a22860`.
-3. Conservar el resultado ya recibido: I02 parece funcionar bien.
-4. Recoger/priorizar el resto del feedback antes de otra integracion grande:
-   UI detallada, cierre, segundo inicio, tiempos y logs si falla.
-5. Registrar el resultado sin convertir una compilacion correcta en aceptacion
-   funcional. Ante una regresion, corregirla antes de integrar otro bloque grande.
+1. Comprobar rama, HEAD, BUILD_ID y `git status`.
+2. Hacer Pull con PMM cerrado y confirmar que BUILD_ID muestra I03.
+3. Abrir PMM, cambiar idioma, pulsar Apply, cerrar y abrir de nuevo.
+4. Probar como minimo English, Español, العربية y dos idiomas importados.
+5. Confirmar selector persistente, textos legibles, rutas tecnicas LTR en arabe,
+   cierre limpio, segundo arranque y tiempos aproximados.
+6. Ante regresion, conservar logs y corregirla antes de otro bloque grande.
 
-## Siguiente bloque
+## Despues de la aceptacion I03
 
-El propietario autorizo continuar el laboratorio mientras prueba I02. 04A-6E ya
-agrega `PMM_FIXED_UNVERSIONED_SCHEMA_V2` para recorrer exclusivamente
-`ArrayProperty` de escalares de ancho fijo, sin editarlos. Tambien conserva el job
-V2/CLI candidato-only y el commit Windows por marcador de 6D; NO repetir. Leer
-SESSION04A6E_FINDINGS/CHECKS, POSTPROCESS_CONTRACT, JOB_V2_CONTRACT e
-INTEGRATION_CONTRACT. Lo siguiente es fijar una fuente de schema real o agregar
-otro serializer estrecho con evidencia primaria. No afirmar paridad completa ni
-sustituir FixLab por este harness/CLI.
+Retomar SESSION04A6E_FINDINGS/CHECKS. No repetir arrays escalares V2, job/CLI ni
+el commit Windows por marcador. Lo siguiente sigue siendo fijar una fuente de
+schema real o agregar otro serializer estrecho con evidencia primaria, completar
+la matriz pendiente y mantener FixLab candidato-only hasta alcanzar sus gates.
 
-- Corregir regresiones y medir/optimizar startup sin quitar verificaciones a ciegas.
-- Completar matriz pendiente; Win10 NTFS ya tiene evidencia real amplia.
-- Obtener `.usmap`/schema real pinneado y revisado, o implementar otro serializer
-  acotado; structs/maps/sets/strings/nested arrays siguen bloqueados.
-- Completar relocalizacion y V2 completo antes de sustituir FixLab.
-- Cerrar Host/Runtime gates restantes.
-- Integrar idiomas mas adelante segun TRANSLATION_INTEGRATION.md.
-- Packaging/firma/preflight al final; no prometer Nexus verde.
-
-Research completado NO se repite. Consultar HISTORY_INDEX.md para cada tanda.
+No PR, tag, release, Actions, firma ni promesas antivirus/Nexus por iniciativa
+propia. Consultar HISTORY_INDEX.md para la evidencia historica.
