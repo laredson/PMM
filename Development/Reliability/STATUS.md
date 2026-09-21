@@ -5,8 +5,8 @@
 `PMM/` esta preparado como I04, aun sin commit/push:
 - version `1.5.0.1`;
 - BUILD_ID `PMM-v1.5.0.1-reliability-i04-nexus-updates`;
-- 635 archivos / 634 checksums / 0 mismatches;
-- inventario SHA-256 `761e8afe03041278d86e26912b07a9bbfceb4dc28179ed3768526a45d206e776`;
+- 637 archivos / 636 checksums / 0 mismatches;
+- inventario SHA-256 `41dcf96d70be3dbd433d97e90d02c858845eb85d43d8cb839978ee75b1dae5e2`;
 - 30 idiomas registrados / 23 habilitados / 7 reservas;
 - Host, Runtime y FixLab byte-identicos a I03.
 
@@ -21,6 +21,8 @@ La credencial personal se cifra con DPAPI en `Workspace/State`. Premium usa desc
 La descarga controla HTTPS, cada redireccion, espacio, tiempo, tamaño, cancelacion y hash. La extraccion bloquea traversal, ADS, enlaces, colisiones, ejecutables y archivos anidados peligrosos. La sustitucion archiva indefinidamente la version anterior y coordina la biblioteca con la transaccion de despliegue existente; fallos e interrupciones revierten biblioteca, `~mods` y estado. Un lote avanza su fingerprint solo tras verificar el cambio propio; si Palworld esta abierto, conserva el candidato ya descargado/analizado y lo reanuda automaticamente cuando el juego se cierra.
 
 Deep Analysis consume el plan de Updates y ya no consulta proveedores por separado.
+
+Correccion posterior I04: el arranque ya no evalua botones de Updates antes de que WPF los cree. ColorFlow espera esos controles y se recalcula tras inicializarlos; la regresion de orden de inicio lo cubre.
 
 ## Validacion
 

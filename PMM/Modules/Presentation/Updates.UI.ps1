@@ -3,6 +3,13 @@ $Script:UpdateBusy=$false
 $Script:UpdateRows=@()
 $Script:PendingFreeUpdateHash=''
 $Script:PendingDeferredLaunching=$false
+# GuidedFlow can run before WPF creates the Updates tab. Keep early startup passes harmless under StrictMode.
+$Script:BtnCheckUpdates=$null
+$Script:BtnUpdateSelected=$null
+$Script:BtnUpdateSafe=$null
+$Script:BtnCancelUpdates=$null
+$Script:BtnRestoreUpdate=$null
+$Script:BtnDeleteUpdateArchive=$null
 
 function New-PMMUpdateRequest([string]$Operation,$Value) {
   $root=Join-PMMPath 'Cache' 'UpdateRequests';[void][IO.Directory]::CreateDirectory($root)
@@ -126,4 +133,5 @@ function Initialize-PMMUpdatesUI {
     if(-not$Script:UpdateBusy -and -not$Script:PendingDeferredLaunching -and -not(Test-PMMPalworldRunning)){$deferred=Get-PMMPendingUpdateApply;if($deferred){$plan=Read-PMMUpdatePlan;if(-not$plan -or -not$plan.IsCurrent -or [string]$plan.Id -cne [string]$deferred.PlanId){Clear-PMMPendingUpdateApply;$Script:TxtUpdatesStatus.Text=L 'A deferred update was cancelled because the library changed.' 'Se cancelo una actualizacion aplazada porque cambio la biblioteca.'}else{try{Start-PMMDeferredUpdateApplyUI $deferred}catch{$Script:PendingDeferredLaunching=$false;$Script:TxtUpdatesStatus.Text=$_.Exception.Message}}}}
   });$timer.Start();$Script:UpdateNxmTimer=$timer
   Refresh-PMMUpdatesUI;Restore-PMMPendingNxmUI
+  try{Update-PMMGuidedActionState}catch{Write-PMMLog ('Updates guided-flow refresh warning: '+$_.Exception.Message)}
 }

@@ -2,10 +2,10 @@
   "schema": "PMM_I04_PACKAGE_CHECKS_V1",
   "ok": true,
   "buildId": "PMM-v1.5.0.1-reliability-i04-nexus-updates",
-  "packageFiles": 635,
-  "checksumRows": 634,
+  "packageFiles": 637,
+  "checksumRows": 636,
   "checksumMismatches": 0,
-  "checksumInventorySha256": "761e8afe03041278d86e26912b07a9bbfceb4dc28179ed3768526a45d206e776",
+  "checksumInventorySha256": "41dcf96d70be3dbd433d97e90d02c858845eb85d43d8cb839978ee75b1dae5e2",
   "moduleCount": 51,
   "frozenExecutableSha256": {
     "PMM.exe": "a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c",

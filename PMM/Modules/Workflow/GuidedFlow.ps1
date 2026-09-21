@@ -759,8 +759,10 @@ function Get-PMMWorkflowState {
   if($importTarget -eq 'Files' -and $Script:BtnImport.IsEnabled){return [pscustomobject]@{Action='ImportFiles';Target=$Script:BtnImport;Palette='Import';Key='Flow:ImportFiles';Detail=(L 'Import mod files or a folder to begin.' 'Importa archivos de mod o una carpeta para comenzar.')}}
   if($sourceMods.Count -gt 0 -and (Get-Command Get-PMMUpdateWorkflowAction -ErrorAction SilentlyContinue)){
     $updateAction=Get-PMMUpdateWorkflowAction
-    if($updateAction -eq 'Check'){return [pscustomobject]@{Action='CheckUpdates';Target=$Script:BtnCheckUpdates;Palette='Import';Key='Flow:CheckUpdates';Detail=(L 'Check author updates before Fix Lab or Analyze. You may skip this recommendation for offline work.' 'Busca actualizaciones de autores antes de Fix Lab o Analizar. Puedes omitir esta recomendacion para trabajar sin conexion.')}}
-    if($updateAction -eq 'Apply'){return [pscustomobject]@{Action='UpdateSafe';Target=$Script:BtnUpdateSafe;Palette='Import';Key='Flow:UpdateSafe';Detail=(L 'Safe author updates are available. PMM will archive the old version and analyze the proposed library before replacement.' 'Hay actualizaciones seguras disponibles. PMM archivara la version anterior y analizara la biblioteca propuesta antes del reemplazo.')}}
+    $checkUpdatesTarget=Get-Variable -Scope Script -Name BtnCheckUpdates -ValueOnly -ErrorAction SilentlyContinue
+    $updateSafeTarget=Get-Variable -Scope Script -Name BtnUpdateSafe -ValueOnly -ErrorAction SilentlyContinue
+    if($updateAction -eq 'Check' -and $checkUpdatesTarget){return [pscustomobject]@{Action='CheckUpdates';Target=$checkUpdatesTarget;Palette='Import';Key='Flow:CheckUpdates';Detail=(L 'Check author updates before Fix Lab or Analyze. You may skip this recommendation for offline work.' 'Busca actualizaciones de autores antes de Fix Lab o Analizar. Puedes omitir esta recomendacion para trabajar sin conexion.')}}
+    if($updateAction -eq 'Apply' -and $updateSafeTarget){return [pscustomobject]@{Action='UpdateSafe';Target=$updateSafeTarget;Palette='Import';Key='Flow:UpdateSafe';Detail=(L 'Safe author updates are available. PMM will archive the old version and analyze the proposed library before replacement.' 'Hay actualizaciones seguras disponibles. PMM archivara la version anterior y analizara la biblioteca propuesta antes del reemplazo.')}}
   }
 
   # A supported legacy repair always precedes normal Analyze.
@@ -888,8 +890,8 @@ function Update-PMMGuidedActionState {
     'Detect' { if($Script:BtnDetectGame.Visibility -eq [System.Windows.Visibility]::Visible){Set-PMMGuideButtonStyle $Script:BtnDetectGame 'Import'} }
     'ImportGameMods' { Set-PMMGuideButtonStyle $Script:BtnImportGameMods 'Import' }
     'ImportFiles' { Set-PMMGuideButtonStyle $Script:BtnImport 'Import' }
-    'CheckUpdates' { Set-PMMGuideButtonStyle $Script:BtnCheckUpdates 'Import' }
-    'UpdateSafe' { Set-PMMGuideButtonStyle $Script:BtnUpdateSafe 'Import' }
+    'CheckUpdates' { if($target){Set-PMMGuideButtonStyle $target 'Import'} }
+    'UpdateSafe' { if($target){Set-PMMGuideButtonStyle $target 'Import'} }
     'FixLabGameReference' { Set-PMMGuideButtonStyle $Script:BtnFixLabBuildReference 'Build' }
     'FixLabWaitReference' { Clear-PMMRequiredAction;return }
     'FixLabRepair' { Set-PMMGuideButtonStyle $Script:BtnFixLabRepair 'Build' }
@@ -1069,8 +1071,8 @@ function Invoke-PMMAutoContinue {
       }
       'ImportGameMods' { Reset-PMMOperationCancellation;Invoke-PMMButtonClick $Script:BtnImportGameMods }
       'ImportFiles' { Stop-PMMAutoPipeline (L 'Auto paused: choose the mod files/folder to import, then press AUTO again (or enable SemiAUTO).' 'Auto pausado: elige los archivos/carpeta de mods que quieres importar y despues pulsa AUTO de nuevo (o activa SemiAUTO).') }
-      'CheckUpdates' { Reset-PMMOperationCancellation;Invoke-PMMButtonClick $Script:BtnCheckUpdates }
-      'UpdateSafe' { Reset-PMMOperationCancellation;Invoke-PMMButtonClick $Script:BtnUpdateSafe }
+      'CheckUpdates' { Reset-PMMOperationCancellation;Invoke-PMMButtonClick $state.Target }
+      'UpdateSafe' { Reset-PMMOperationCancellation;Invoke-PMMButtonClick $state.Target }
       'FixLabOpen' {
         if(-not $Script:FixLabLoaded){[void](Initialize-PMMFixLabFeature)}
         if($Script:FixLabLoaded){Refresh-PMMFixLabUI}

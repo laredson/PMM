@@ -45,7 +45,7 @@ El checkout de desarrollo contiene research hasta 04A-6E y el paquete I04 prepar
 ## Objetivo inmediato
 
 1. comprobar que la rama/checkout corresponden a este handoff y que el diff I04 sigue sin publicar;
-2. confirmar BUILD_ID I04, 635 archivos, 634 checksums y binarios congelados;
+2. confirmar BUILD_ID I04, 637 archivos, 636 checksums y binarios congelados;
 3. probar Updates primero sin credencial y luego con la cuenta Nexus del propietario;
 4. validar un caso Premium o Free real, espera `nxm://`, archivo, lote, aplazamiento con Palworld abierto, sustitucion, restauracion y segundo arranque;
 5. mantener la prueba de idiomas I03, en especial العربية y persistencia tras reiniciar;
@@ -59,8 +59,8 @@ No modificar pins para conseguir que una compilacion distinta pase.
 
 Paquete de trabajo I04 (pendiente de commit/push):
 - build: `PMM-v1.5.0.1-reliability-i04-nexus-updates`
-- inventario: SHA-256 `761e8afe03041278d86e26912b07a9bbfceb4dc28179ed3768526a45d206e776`
-- 635 archivos / 634 filas de checksum / 0 mismatches.
+- inventario: SHA-256 `41dcf96d70be3dbd433d97e90d02c858845eb85d43d8cb839978ee75b1dae5e2`
+- 637 archivos / 636 filas de checksum / 0 mismatches.
 - 30 idiomas registrados / 23 habilitados / 7 reservas.
 - proyecto Desktop y configuracion privada: `Workspace` y `Workspace/.codex/config.toml`.
 - Host SHA-256: `a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c`
