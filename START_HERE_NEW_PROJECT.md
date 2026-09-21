@@ -59,7 +59,7 @@ No modificar pins para conseguir que una compilacion distinta pase.
 
 Paquete de trabajo I04 (pendiente de commit/push):
 - build: `PMM-v1.5.0.1-reliability-i04-nexus-updates`
-- inventario: SHA-256 `41dcf96d70be3dbd433d97e90d02c858845eb85d43d8cb839978ee75b1dae5e2`
+- inventario: SHA-256 `8c996734234ba200c2a198be92fe5c178fe1102839a2d1790ac7641afe7cc456`
 - 637 archivos / 636 filas de checksum / 0 mismatches.
 - 30 idiomas registrados / 23 habilitados / 7 reservas.
 - proyecto Desktop y configuracion privada: `Workspace` y `Workspace/.codex/config.toml`.

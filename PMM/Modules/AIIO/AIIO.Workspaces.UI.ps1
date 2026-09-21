@@ -64,27 +64,16 @@ function Initialize-PMMWorkspaces {
     $caseTab.Header=L 'Research cases' 'Casos de investigacion';$Script:PMMAreaHosts['HELP']=$helpHost;$help.Header=L 'Help' 'Ayuda';$help.Tag='HELP'
 
     $merge=$Window.FindName('TabMerge');$merge.Name='TabMerge';$merge.Tag='MERGE';$Script:PMMMergeTab=$merge
-    $outer=$merge.Content
-    $library=@($outer.Children|Where-Object{[Windows.Controls.Grid]::GetColumn($_) -eq 0 -and $_ -is [Windows.Controls.Border]}|Select-Object -First 1)[0]
-    $analysis=@($outer.Children|Where-Object{[Windows.Controls.Grid]::GetColumn($_) -eq 2 -and $_ -is [Windows.Controls.Grid]}|Select-Object -First 1)[0]
-    $build=@($analysis.Children|Where-Object{[Windows.Controls.Grid]::GetRow($_) -eq 5}|Select-Object -First 1)[0]
-    [void]$outer.Children.Remove($library);[void]$analysis.Children.Remove($build)
-    $analyzeGrid=[Windows.Controls.Grid]::new();$analyzeGrid.Margin=[Windows.Thickness]::new(8)
-    foreach($index in 0..3){$row=[Windows.Controls.RowDefinition]::new();$row.Height=if($index -eq 0){[Windows.GridLength]::new(1,[Windows.GridUnitType]::Star)}else{[Windows.GridLength]::Auto};[void]$analyzeGrid.RowDefinitions.Add($row)}
-    foreach($control in @($analysis.Children|Where-Object{[Windows.Controls.Grid]::GetRow($_) -le 3})){$row=[Windows.Controls.Grid]::GetRow($control);[void]$analysis.Children.Remove($control);[Windows.Controls.Grid]::SetRow($control,$row);[void]$analyzeGrid.Children.Add($control)}
-
     $fix=$Script:TabFixLab;$fixContent=$fix.Content;$fix.Content=$null;[void]$main.Items.Remove($fix);$fix.Header=L 'Fix Lab' 'Fix Lab';$fix.Tag='FIX';$fix.Content=$fixContent
     $tabs=[Windows.Controls.TabControl]::new();$Script:ModsWorkflowTabs=$tabs
-    $libraryHost=[Windows.Controls.Grid]::new();$libraryHost.Margin=[Windows.Thickness]::new(8);[void]$libraryHost.Children.Add($library)
-    $Script:TabLibrary=New-PMMWorkflowTab (L 'Library & Import' 'Biblioteca e importacion') $libraryHost
+    # Keep the established library, analysis, build and deploy workspace together.
+    # Only auxiliary workflows are split into subtabs.
+    $Script:TabLibrary=New-PMMWorkflowTab (L 'Mods & Merge' 'Mods y Merge') $merge.Content
     $Script:UpdatesHost=[Windows.Controls.ContentControl]::new();$Script:TabUpdates=New-PMMWorkflowTab (L 'Updates' 'Actualizaciones') $Script:UpdatesHost
     $Script:TabFixLab=$fix
-    $Script:TabAnalyze=New-PMMWorkflowTab (L 'Analyze & Resolve' 'Analizar y resolver') $analyzeGrid
     $Script:DeepAnalysisHost=[Windows.Controls.ContentControl]::new();$Script:TabDeepAnalysis=New-PMMWorkflowTab (L 'Deep Analysis' 'Analisis profundo') $Script:DeepAnalysisHost
-    $buildHost=[Windows.Controls.Grid]::new();$buildHost.Margin=[Windows.Thickness]::new(8);[void]$buildHost.Children.Add($build)
-    $Script:TabBuildDeploy=New-PMMWorkflowTab (L 'Build & Deploy' 'Construir y desplegar') $buildHost
     $Script:TabMergeAI=New-PMMAreaTab (L 'AI Assistant' 'Asistente IA') 'MERGE'
-    foreach($tab in @($Script:TabLibrary,$Script:TabUpdates,$Script:TabFixLab,$Script:TabAnalyze,$Script:TabDeepAnalysis,$Script:TabBuildDeploy,$Script:TabMergeAI)){[void]$tabs.Items.Add($tab)}
+    foreach($tab in @($Script:TabLibrary,$Script:TabUpdates,$Script:TabFixLab,$Script:TabDeepAnalysis,$Script:TabMergeAI)){[void]$tabs.Items.Add($tab)}
     $merge.Content=$tabs
 
     $creation=[Windows.Controls.TabItem]::new();$creation.Header=L 'Mod Creation' 'Creacion de mods';$creation.Name='TabModCreation';$creation.Tag='CREATE'

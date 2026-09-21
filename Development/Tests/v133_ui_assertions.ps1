@@ -3,8 +3,8 @@ function Assert-DeepUI($condition,[string]$message){if(-not$condition){throw $me
 Assert-DeepUI (-not($Script:DeepControls.ContainsKey('CheckUpdates')) -and -not$Script:DeepControls.AutomaticSolution.IsChecked) 'Deep Analysis still owns update-network controls.'
 Assert-DeepUI (-not$Script:DeepControls.AllowGame.IsEnabled -and -not$Script:DeepControls.AllowGame.IsChecked) 'Unverified game automation was enabled.'
 Assert-DeepUI ($Script:MainTabs.Items.Count -eq 5) 'Fix Lab was not moved out of top-level navigation.'
-Assert-DeepUI ($Script:ModsWorkflowTabs.Items.Count -eq 7) 'Mods & Merge does not expose the seven workflow subtabs.'
-$expectedWorkflowTabs=if($Language -eq 'es'){'Biblioteca e importacion|Actualizaciones|Fix Lab|Analizar y resolver|Analisis profundo|Construir y desplegar|Asistente IA'}else{'Library & Import|Updates|Fix Lab|Analyze & Resolve|Deep Analysis|Build & Deploy|AI Assistant'}
+Assert-DeepUI ($Script:ModsWorkflowTabs.Items.Count -eq 5) 'Mods & Merge does not expose the five workflow subtabs.'
+$expectedWorkflowTabs=if($Language -eq 'es'){'Mods y Merge|Actualizaciones|Fix Lab|Analisis profundo|Asistente IA'}else{'Mods & Merge|Updates|Fix Lab|Deep Analysis|AI Assistant'}
 Assert-DeepUI ((@($Script:ModsWorkflowTabs.Items|ForEach-Object{[string]$_.Header}) -join '|') -eq $expectedWorkflowTabs) 'Workflow subtab order changed.'
 Assert-DeepUI ($Script:UpdatesHost -and $Script:BtnCheckUpdates -and $Script:BtnUpdateSelected -and $Script:BtnUpdateSafe -and $Script:BtnCancelUpdates) 'Updates actions were not initialized.'
 Assert-DeepUI ($Script:BtnRestoreUpdate -and $Script:BtnDeleteUpdateArchive -and $Script:DgUpdateArchives) 'Update history and rollback controls were not initialized.'

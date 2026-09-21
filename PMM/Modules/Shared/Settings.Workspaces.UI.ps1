@@ -62,6 +62,5 @@ function Initialize-PMMSettingsWorkspaces {
     foreach($name in @('BtnUnrealInstall','BtnUnrealRunInstaller','BtnUnrealEnginePath','BtnUnrealWwiseSdk','BtnUnrealWwiseIntegration','BtnUnrealGuide')){Move-PMMSettingsElement ($Window.FindName($name)) $extra}
     [void]$Script:PMMDependencyHelpPanel.Children.Add($extra)
     Add-PMMOptionsAccess $Script:PMMHelpCaseTab 'HELP'
-    $flow=$Script:PMMMergeTab.Content.Items | Where-Object {$_.Tag -ne 'MERGE'} | Select-Object -First 1
-    if($flow){Add-PMMOptionsAccess $flow 'MERGE'}
+    if($Script:TabLibrary){Add-PMMOptionsAccess $Script:TabLibrary 'MERGE'}
 }
