@@ -1,130 +1,70 @@
-# Plan v1.5.0.2 - fiabilidad y reduccion de falsos positivos
+# Plan v1.5.0.2 - execution index
 
-Objetivo: conservar todas las funciones heredadas y reducir causas legitimas de deteccion mediante una cadena fuente -> build -> paquete -> ejecucion mas simple, observable y verificable.
+The authoritative detailed plan is now:
 
-No es un plan de evasion de antivirus. No se desactivan protecciones, no se piden exclusiones y no se ocultan funciones a analizadores.
+`Development/Reliability/V1502_SINGLE_EXE_AND_NOFLAG_PLAN.md`
 
-## Baseline
+This file is retained as a short index so older links do not become misleading.
 
-Origen: `2586b4c3999ccc094344bc65710d6559f4858871`.
-Incluye I03 (23 idiomas habilitados) e I04 (Nexus Updates), Host/Runtime C2B y el resto de funciones de esa linea.
+## Direction adopted 2026-09-23
 
-## V1502-S00 - Bootstrap de rama
+PMM 1.5.0.2 will:
 
-Estado: **CERRADO**.
+1. preserve the open/module-oriented architecture;
+2. converge PMM-owned native executables toward one `PMM.exe`;
+3. keep heavy work isolated in separate processes by launching the same executable in worker modes;
+4. leave Modules/Resources/CKL and other useful project surfaces externally inspectable/editable;
+5. keep external third-party executables external;
+6. harden startup/process/dependency behavior after establishing the unified core;
+7. use a conventional reproducible PE build;
+8. then repair/finish the current product features;
+9. finally validate the actual release candidate with Windows/scanner/Nexus evidence.
 
-- Crear `v1.5.0.2` desde el HEAD real de reliability.
-- No copiar carpetas antiguas.
-- Registrar historial, estado, plan e incidencia pre-UI.
-- Mantener el paquete I04 byte-identico durante el bootstrap.
+## Active phase
 
-## V1502-S01 - Startup observable + baseline
+**NF00 CLOSED - planning/architecture contract committed.**
 
-Estado: **SIGUIENTE**.
+**NF01 NEXT - exact baseline + executable/worker contract inventory.**
 
-- Instrumentar de forma acotada el tramo splash -> UI.
-- Preservar evidencia de excepcion/etapa.
-- Inventariar procesos, PowerShell, repair, red y binarios/scripts del startup.
-- Fijar hashes del baseline.
-- Usar el fallo pre-UI como gate de fiabilidad, sin inventar su causa.
+NF01 is inspection/evidence, not a speculative rewrite.
 
-Relacion heredada: completa la parte de evidencia de REL-00/REL-01 y prepara los cambios de REL-03/04.
+## Execution order
 
-## V1502-S02 - Procesos y PowerShell
+- NF01: exact baseline and migration matrix.
+- NF02: Host + Runtime -> one PMM.exe; preserve isolated process model.
+- NF03: startup offline, explicit Repair, remove inherited ExecutionPolicy Bypass.
+- NF04: migrate stable worker/safety boundary to PMM.exe worker modes.
+- NF04F: merge FixLab only after parity/Windows acceptance.
+- NF05: conventional reproducible PMM.exe build/resources/version.
+- P01: make Updates behave as intended.
+- P02: verify/fix compatibility patch workflow.
+- P03: verify/fix old-mod restoration/FixLab.
+- P04: verify AI-created mod workflow using PMM as capability/tool plane.
+- NF06: full functional regression/package preflight.
+- NF07: current-artifact Defender/authorized VirusTotal/Nexus validation.
+- NF08: optional SignPath/Authenticode later; not a 1.5.0.2 release blocker.
 
-- Localizar cada uso real de PowerShell y `ExecutionPolicy Bypass`.
-- Retirar Bypass donde exista una ruta soportada.
-- No cambiar politicas globales.
-- Argumentos estructurados y directorios permitidos.
-- Timeouts, cancelacion, codigos de salida y logs.
-- Conservar CREATE_NO_WINDOW cuando solo evita parpadeo de consola en una GUI legitima.
-- No construir comandos de shell con texto no confiable.
+## AI mod-creation rule
 
-Cruce historico: REL-03 / tanda 08.
+The AI, not an unfinished internal PMM editor, is responsible for creating the requested mod.
 
-## V1502-S03 - Check separado de Repair
+PMM provides bounded tools, game/reference evidence, staging, build, validation, deployment/recovery and permitted game-test/observation capabilities so the AI can carry out the user's intent safely.
 
-- Arranque sano sin red.
-- Check de dependencias de solo lectura.
-- Falta/alteracion -> diagnostico claro.
-- Repair solo por accion explicita.
-- Descarga con origen fijado, HTTPS, limites, hash/firma cuando exista, staging y rollback.
-- No reinstalar automaticamente algo que pudiera haber sido puesto en cuarentena.
-- No repetir descargas para vencer un bloqueo.
+Do not make a full internal editor a prerequisite for 1.5.0.2.
 
-Cruce historico: REL-04 / tandas 06-07.
+## Historical startup incident
 
-## V1502-S04 - Broker de operaciones estrecho
+`Incidents/STARTUP_PRE_UI_2026-09.md` remains OPEN / NOT REPRODUCED / CAUSE UNKNOWN.
 
-Estado heredado:
-`Modules/Operations/OperationWorker.ps1` sigue siendo broker actual; el objetivo historico es mover operaciones a subcomandos nativos PMMRuntime/PMMEngine cuando sea justificable.
+It is a regression watchpoint, not the active next task. If architecture/hardening work removes its underlying condition, good; if it remains/reappears with evidence, investigate it then.
 
-- Definir operaciones concretas, no "ejecutar cualquier comando".
-- Limitar rutas/argumentos/tiempo/cancelacion.
-- Migrar gradualmente sin perder workflows.
-- Mantener compatibilidad de UI y recuperacion.
+## Security intent
 
-Cruce historico: parte pendiente de REL-03.
+Reduce legitimate false positives through conventional, auditable behavior.
 
-## V1502-S05 - Build reproducible y recursos PE estandar
-
-- Toolchain fijado.
-- Fuente -> artefacto reproducible.
-- VERSIONINFO, manifest e icono mediante recursos estandar.
-- Metadata de publisher/producto coherente.
-- Separar artefactos propios de terceros y conservar sus firmas/licencias.
-- Regenerar inventarios desde bytes finales.
-
-Cruce historico: REL-05 / tanda 09.
-
-## V1502-S06 - Firma real
-
-- Requiere identidad/certificado provisionados expresamente por el propietario.
-- Authenticode/timestamp en artefactos propios pertinentes.
-- Verificar cadena e integridad en Windows.
-- No autofirmar instalando raices silenciosamente.
-- Inventario final despues de firmar.
-
-Cruce historico: REL-06 / tanda 10.
-
-## V1502-S07 - Preflight y matriz de escaneos
-
-- Paquete limpio y autocontenido.
-- Verificacion de versiones, hashes, procedencia, firmas y rutas.
-- Windows real con protecciones activas.
-- Instalacion nueva y actualizacion.
-- Defender y otros escaneos autorizados registrados por hash/fecha.
-- VirusTotal solo con autorizacion expresa para subir la muestra.
-- Nexus como prueba real de distribucion, no como API privada emulada.
-- Comparar builds por hash y cambios de ingenieria, no mutar arbitrariamente hasta quedar "indetectable".
-
-Cruce historico: REL-07 / tanda 12.
-
-## V1502-S08 - Falsos positivos de vendors
-
-Solo si persisten detecciones despues de S02-S07:
-- identificar motor, nombre de deteccion, hash y fecha;
-- comprobar si es heuristica/reputacion o hallazgo concreto;
-- enviar falsos positivos por canales oficiales cuando proceda;
-- conservar recibos/evidencia;
-- no degradar la aplicacion solo para satisfacer una heuristica no explicada.
-
-## Gates transversales
-
-Cada etapa debe conservar:
-- 23 idiomas habilitados y reservas I03;
-- nativeName, RTL/LTR y persistencia;
-- I04 Nexus Updates;
-- Workspace y datos del usuario;
-- rollback/despliegue;
-- Deep Analysis y flujos Mods & Merge;
-- binarios/candidatas FixLab solo segun sus gates existentes.
-
-## Incidencia STARTUP-PRE-UI
-
-El cierre de una etapa que toque startup debe comprobar que:
-- un fallo sigue produciendo evidencia;
-- no se esconde con retries infinitos;
-- no se borra estado del usuario para arrancar;
-- no se atribuye a idioma/locale sin prueba;
-- si aparece una causa demostrada, se agrega una regresion especifica.
+Do not:
+- disable antivirus;
+- request exclusions;
+- hide behavior from scanners;
+- silently restore quarantined files;
+- mutate builds repeatedly for the purpose of evading detection.

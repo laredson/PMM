@@ -79,3 +79,26 @@ No perder funcionalidades heredadas para reducir detecciones. Cada cambio debe c
 - Pruebas funcionales de desarrollo: locales por el propietario salvo peticion expresa.
 
 Continua en `Development/Reliability/STATUS.md`.
+
+
+## Plan arquitectonico aprobado para 1.5.0.2 (2026-09-23)
+
+Antes de iniciar trabajo nuevo, leer:
+
+`Development/Reliability/V1502_SINGLE_EXE_AND_NOFLAG_PLAN.md`
+
+Ese documento **supera el orden anterior S01-S08** para la ejecucion activa de 1.5.0.2.
+
+La direccion actual es:
+- unificar los ejecutables propios de PMM en un solo `PMM.exe`;
+- conservar procesos separados mediante worker modes del mismo ejecutable;
+- mantener Modules/Resources/CKL abiertos y editables;
+- no absorber ejecutables externos;
+- despues hacer hardening startup/PowerShell/dependencias;
+- despues cerrar el build PE;
+- despues reparar/validar las funciones actuales del producto;
+- al final validar el candidato real en Windows/Nexus.
+
+La incidencia de startup pre-UI permanece registrada como watchpoint, pero no es el siguiente bloque mientras no sea reproducible.
+
+La creacion de mods actual es **AI-directed**: la IA crea la solucion solicitada por el usuario usando las capacidades acotadas que PMM le proporciona. Un editor interno general no es requisito de esta version.

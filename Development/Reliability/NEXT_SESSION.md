@@ -1,67 +1,92 @@
 # NEXT SESSION - PMM v1.5.0.2
 
-## Bloque siguiente: V1502-S01
+## Read first
 
-**Startup diagnosable + inventario de superficie de ejecucion**
+1. `START_HERE_NEW_PROJECT.md`
+2. `Development/Reliability/V1502_SINGLE_EXE_AND_NOFLAG_PLAN.md`
+3. `Development/Reliability/STATUS.md`
+4. `Development/Reliability/V1502_STATE.json`
+5. relevant prior FINDINGS/CHECKS only as historical evidence.
 
-No empezar por mutar binarios al azar para intentar bajar detecciones. Primero dejar el arranque observable y fijar la superficie real que puede estar contribuyendo tanto al fallo pre-UI como a falsos positivos.
+## Active block: NF01
 
-## Entrada
+**Exact baseline + executable/worker contract inventory**
 
-Rama: `v1.5.0.2`.
-Base funcional heredada: I04 del commit `2586b4c3999ccc094344bc65710d6559f4858871`.
+Do not start by fixing the unreproduced startup incident.
 
-El paquete inicial sigue identificado como 1.5.0.1/I04 hasta la primera integracion funcional de 1.5.0.2.
+Do not start by rewriting all PowerShell.
 
-## Incidencia a conservar
+Do not delete PMMRuntime.exe or PMMFixLab.exe during NF01.
 
-`Development/Reliability/Incidents/STARTUP_PRE_UI_2026-09.md`
+### Objective
 
-No intentar "arreglarla" borrando Workspace, añadiendo retries ciegos o tragando excepciones. La primera mejora debe aumentar observabilidad.
+Prepare the exact, reversible migration from the current multi-PMM-executable arrangement toward one PMM-owned executable while preserving the open module architecture and every existing user-facing capability.
 
-## Trabajo de S01
+### Required NF01 outputs
 
-1. Trazar el recorrido real desde `PMM.exe` hasta ventana WPF utilizable.
-2. Enumerar las etapas ya visibles en splash y relacionarlas con codigo real.
-3. Garantizar un log de arranque acotado que sobreviva a un fallo pre-UI.
-4. Capturar de forma segura:
-   - etapa alcanzada;
-   - componente/proceso;
-   - codigo de salida o excepcion;
-   - version/build;
-   - arquitectura/Windows/PowerShell/.NET relevantes;
-   - locale/cultura solo como dato diagnostico, nunca como diagnostico automatico;
-   - sin credenciales, tokens ni datos personales.
-5. Revisar manejadores de excepcion y handoff Host -> Runtime -> UI para evitar fallos silenciosos.
-6. Inventariar, sin cambiar aun por conveniencia:
-   - invocaciones PowerShell y argumentos de politica;
-   - creacion de procesos ocultos/sin consola;
-   - broker generico;
-   - comprobacion/reparacion de dependencias;
-   - descargas o red durante arranque;
-   - ejecutables/scripts distribuidos.
-7. Registrar hashes del baseline que se vaya a comparar en S02+.
-8. Preparar la integracion 1.5.0.2 de metadata solo cuando exista un cambio funcional real; VERSION/BUILD_ID/manifiesto/checksums se actualizan juntos.
+Create/update reliability evidence that contains:
 
-## Criterio de cierre S01
+1. exact checked-out branch HEAD;
+2. SHA-256/size/source status for:
+   - PMM.exe;
+   - PMMRuntime.exe;
+   - PMMFixLab.exe;
+3. current Host route/command matrix;
+4. current Runtime subcommand matrix;
+5. current FixLab commands actually consumed by PMM;
+6. every PMM background-worker launch site grouped by feature;
+7. every current `ExecutionPolicy Bypass` launch site grouped by feature;
+8. startup network/repair-capable paths;
+9. current progress/result/locking schemas used between UI and workers;
+10. a migration table:
+   `current entrypoint -> proposed PMM.exe role/subcommand -> files/callers -> acceptance gate`;
+11. an NF02A file-level implementation proposal for merging Host + Runtime first;
+12. explicit rollback path.
 
-- un fallo entre splash y UI deja evidencia suficiente para localizar la etapa;
-- un arranque sano no gana reparaciones o red silenciosas;
-- existe inventario concreto de procesos/PowerShell/repair/startup;
-- ninguna feature I03/I04 se elimina;
-- queda definido el cambio exacto de S02;
-- pruebas realizadas y no realizadas quedan separadas.
+Reuse prior Reliability evidence where valid; verify against the actual branch rather than copying old claims.
 
-## S02 previsto
+### Architectural constraints
 
-Reducir superficie de ejecucion:
-- retirar `ExecutionPolicy Bypass` donde no sea necesario;
-- conservar errores claros cuando la politica bloquee;
-- estructurar argumentos;
-- evitar shell generico cuando exista operacion concreta;
-- mantener GUI sin consola donde sea normal, sin confundir eso con ocultacion maliciosa.
+Target:
 
-## GitHub
+```text
+PMM.exe
+PMM.exe --worker <known-operation>
+Modules/
+Resources/
+CKL/
+Tools/
+Documentation/
+Workspace/
+```
 
-Commit/push silencioso con `[skip ci]` solo tras autorizacion del propietario para el bloque.
-Sin Actions, PR, tag ni release.
+This means one **PMM-owned binary**, not one process.
+
+Workers remain separate OS processes, so a worker crash must not terminate the UI.
+
+Do not embed all Modules/Resources/CKL into the EXE. Ordinary module/data development should remain possible without recompiling PMM.exe.
+
+External executables such as repak/.NET are not migration targets merely because they are executable files.
+
+### AI mod-creation constraint
+
+Do not design a full internal editor as part of this migration.
+
+The AI is the primary creator of a user-requested mod. PMM exposes bounded evidence/tool/build/test/deploy capabilities that the AI can use safely.
+
+### NF01 exit gate
+
+NF01 is complete when a reviewer can answer, from repository evidence:
+
+- exactly what PMM.exe, Runtime and FixLab each do today;
+- which parts can move into one executable without changing product behavior;
+- what the smallest NF02A code change is;
+- how to test it;
+- how to roll it back;
+- which behaviors remain deliberately external/open.
+
+### GitHub
+
+Development commit/push only after owner authorization for the implementation block.
+Use `[skip ci]`.
+No Actions/CI, PR, tag or release during development unless explicitly requested.
