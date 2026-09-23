@@ -33,6 +33,7 @@ function Set-PMMHostStartupState([string]$Value) {
   } catch {}
 }
 Set-PMMHostStartupState 'startup:UI-script-loading'
+$Script:PMMStartupUiVisible=$false
 
 # ---------------------------------------------------------------------------
 # Load core services in dependency order.
@@ -105,7 +106,8 @@ public static class PMMShellIdentity {
   Write-PMMLog ('Could not set PMM AppUserModelID: ' + $_.Exception.Message)
 }
 
-$autoDepsOk = Initialize-PMMDependenciesIfNeeded # fast no-op when already prepared; conditional setup otherwise
+# Dependency verification is intentionally deferred until ContentRendered.
+# Normal startup must reach a visible UI before operational dependencies are checked.
 
 # ---------------------------------------------------------------------------
 # Load localized XAML.
@@ -1384,6 +1386,7 @@ $Script:StartupDetectionDone = $false
 $Window.Add_ContentRendered({
   if ($Script:StartupDetectionDone) { return }
   $Script:StartupDetectionDone = $true
+  $Script:PMMStartupUiVisible = $true
 
   # Do not retire the native splash merely because WPF painted its first frame.
   # Wait until the dispatcher reaches idle, force the top-level HWND into a
@@ -1409,6 +1412,21 @@ $Window.Add_ContentRendered({
         Set-PMMHostStartupState 'startup:UI-ready'
       }
 
+      Set-PMMHostStartupState 'startup:UI-post-render-dependency-check'
+      try {
+        $depsOk=Initialize-PMMDependenciesIfNeeded
+        if($depsOk){
+          Write-PMMLog 'Post-render startup dependency check: ready.'
+          Set-PMMHostStartupState 'startup:UI-dependencies-ready'
+        }else{
+          Write-PMMLog 'Post-render startup dependency check: degraded. UI remains available; repair is explicit in Settings.'
+          Set-PMMHostStartupState 'startup:UI-dependencies-degraded'
+        }
+      } catch {
+        Write-PMMLog ("Post-render dependency check failed without blocking PMM: {0}" -f $_.Exception.Message)
+        Set-PMMHostStartupState 'startup:UI-dependency-check-error'
+      }
+
       try {
         $cfg = Get-PMMConfig
         $valid = $null
@@ -1429,10 +1447,8 @@ $Window.Add_ContentRendered({
   )
 })
 
+Set-PMMHostStartupState 'startup:UI-pre-show-refresh'
 Refresh-UI
-if (-not $autoDepsOk) {
-  Show-Info (L 'Some dependencies are still unavailable. Restart PMM.exe or use Settings > Prepare / repair dependencies.' 'Aun faltan algunas dependencias. Reinicia PMM.exe o usa Configuracion > Preparar / reparar dependencias.')
-}
 . (Join-Path $Script:Root 'Modules\MCP\MCP.UI.ps1')
 . (Join-Path $Script:Root 'Modules\Unreal\Dependencies.UI.ps1')
 . (Join-Path $Script:Root 'Modules\AIIO\AIIO.Workspaces.UI.ps1')
@@ -1443,6 +1459,7 @@ Initialize-PMMDeepAnalysisUI
 . (Join-Path $Script:Root 'Modules/MCP/AppServer.UI.ps1')
 Initialize-PMMCaseAgentUI
 try{Invoke-PMMLocalizeVisualTree $Window $lang;Set-PMMLanguageDirection $Window $lang}catch{Write-PMMLog ('Startup localization sweep failed: '+$_.Exception.Message)}
+Set-PMMHostStartupState 'startup:UI-show-dialog'
 $uiExitState='Normal'
 try {
   [void]$Window.ShowDialog()

@@ -157,3 +157,68 @@ func TestZipExtractRejectsCaseCollidingFiles(t *testing.T) {
 		t.Fatal("expected duplicate/case-colliding ZIP entries to be rejected")
 	}
 }
+
+
+func TestStartupDependencyInspectionIsReadOnly(t *testing.T) {
+	root := t.TempDir()
+	engine := filepath.Join(root, "Engine")
+	if err := os.MkdirAll(engine, 0755); err != nil {
+		t.Fatal(err)
+	}
+	repak := filepath.Join(engine, "repak.exe")
+	oodle := filepath.Join(engine, "oo2core_9_win64.dll")
+	if err := os.WriteFile(repak, []byte("invalid repak"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(oodle, []byte("unexpected oodle"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	const impossibleHash = "0000000000000000000000000000000000000000000000000000000000000000"
+	m := ReleaseManifest{
+		RepakSha256:                  impossibleHash,
+		MappingsSha256:               impossibleHash,
+		OodleExpectedSha256:          impossibleHash,
+		StandardPackageDotnetBundled: true,
+		DotnetRuntimeContract:        "8.0.30",
+		DotnetRuntimeInventory:       "Engine/dotnet/runtime-8.0.30-win-x64.sha256.txt",
+		DotnetRuntimeInventorySha256: impossibleHash,
+		ManagedRuntimeSha256: map[string]string{
+			"Engine/PMMCore/pmmcore.dll":                impossibleHash,
+			"Engine/AssetReader/PMM.AssetReader.dll": impossibleHash,
+		},
+	}
+	beforeRepak, err := os.ReadFile(repak)
+	if err != nil {
+		t.Fatal(err)
+	}
+	beforeOodle, err := os.ReadFile(oodle)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	status := inspectStartupDependencies(root, m)
+	if status.Ready {
+		t.Fatal("invalid startup dependencies must be reported as degraded")
+	}
+
+	afterRepak, err := os.ReadFile(repak)
+	if err != nil {
+		t.Fatal(err)
+	}
+	afterOodle, err := os.ReadFile(oodle)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(beforeRepak) != string(afterRepak) {
+		t.Fatal("startup inspection modified repak.exe")
+	}
+	if string(beforeOodle) != string(afterOodle) {
+		t.Fatal("startup inspection modified Oodle runtime")
+	}
+	if _, err := os.Stat(filepath.Join(root, "Resources", "Mappings", "Mappings.usmap")); !os.IsNotExist(err) {
+		t.Fatal("startup inspection created or changed mappings")
+	}
+	if _, err := os.Stat(filepath.Join(root, "Workspace")); !os.IsNotExist(err) {
+		t.Fatal("startup inspection must not create Workspace state")
+	}
+}

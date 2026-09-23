@@ -550,25 +550,29 @@ function Test-PMMDependencies {
 }
 
 function Initialize-PMMDependenciesIfNeeded {
-  $dep=Test-PMMDependencies
-  if($dep.Repak -and $dep.Mappings -and $dep.PMMCore -and $dep.AssetReader){return $true}
-  # PMM.exe normally performs this before the GUI opens. Keep the same
-  # behavior here as a safety net for advanced users who launch the bootstrap
-  # script directly: setup runs only when something is actually missing.
+  # Hotfix policy: startup dependency checks are diagnostic only.
+  # Repair/download remains an explicit user action from Settings.
   try{
-    Write-PMMLog 'Missing dependency detected at startup; running conditional setup.'
-    & (Join-Path $Script:Root 'Modules\Bootstrap\Setup-Dependencies.ps1') -IfNeeded
     $dep=Test-PMMDependencies
-    return ($dep.Repak -and $dep.Mappings -and $dep.PMMCore -and $dep.AssetReader)
+    $ready=($dep.Repak -and $dep.Mappings -and $dep.PMMCore -and $dep.AssetReader)
+    if(-not $ready){
+      Write-PMMLog 'Startup dependency check found unavailable or invalid operational components. Automatic startup repair is disabled; use Settings > Prepare / repair dependencies.'
+    }
+    return $ready
   }catch{
-    Write-PMMLog ('Conditional dependency setup failed: '+$_.Exception.Message)
+    Write-PMMLog ('Startup dependency check failed without blocking the UI: '+$_.Exception.Message)
     return $false
   }
 }
 
 function Get-PMMStatusLine {
-  $cfg=Get-PMMConfig;$dep=Test-PMMDependencies
+  $cfg=Get-PMMConfig
   $g=if($cfg.GamePath -and (Test-Path -LiteralPath $cfg.GamePath)){Get-PMMText 'Game OK' 'Juego OK'}else{Get-PMMText 'Game not configured' 'Juego sin configurar'}
+  $startupFlag=Get-Variable -Name PMMStartupUiVisible -Scope Script -ErrorAction SilentlyContinue
+  if($startupFlag -and -not [bool]$startupFlag.Value){
+    return "$g | "+(Get-PMMText 'Dependency check pending until the UI is visible' 'Comprobacion de dependencias pendiente hasta que la interfaz sea visible')
+  }
+  $dep=Test-PMMDependencies
   $r=if($dep.Repak){'repak OK'}else{Get-PMMText 'repak missing' 'repak falta'}
   $m=if($dep.Mappings){'mappings OK'}else{Get-PMMText 'mappings missing' 'mappings faltan'}
   $c=if($dep.PMMCore){'PMMCore OK'}else{Get-PMMText 'PMMCore not prepared' 'PMMCore sin preparar'}

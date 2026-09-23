@@ -179,6 +179,84 @@ func ensureDependencies(root string, ifNeeded, refreshMappings bool) (Dependency
 	return status, nil
 }
 
+func inspectStartupDependencies(root string, m ReleaseManifest) DependencyStatus {
+	s := DependencyStatus{Protocol: "PMM_RUNTIME_DEPENDENCIES_STARTUP_V1"}
+	runtimeDir := filepath.Join(root, "Engine", "dotnet", m.DotnetRuntimeContract)
+	bundled := filepath.Join(runtimeDir, "dotnet.exe")
+
+	// Startup inspection is intentionally local, read-only and non-executing.
+	// Full runtime inventory validation and self-tests remain available through
+	// explicit dependency/status or repair commands after the UI is visible.
+	if m.StandardPackageDotnetBundled {
+		inv := filepath.Join(root, filepath.FromSlash(m.DotnetRuntimeInventory))
+		s.RuntimeInventoryOK = existsDir(runtimeDir) && existsFile(bundled) && existsFile(inv)
+		if s.RuntimeInventoryOK && m.DotnetRuntimeInventorySha256 != "" {
+			s.RuntimeInventoryOK = hashMatches(inv, m.DotnetRuntimeInventorySha256)
+		}
+		if s.RuntimeInventoryOK {
+			s.Dotnet = bundled
+			s.DotnetOK = true
+		}
+	} else {
+		s.RuntimeInventoryOK = true
+		if existsFile(bundled) {
+			s.Dotnet = bundled
+			s.DotnetOK = true
+		} else if p := findSystemDotnet(); p != "" {
+			s.Dotnet = p
+			s.DotnetOK = true
+		}
+	}
+
+	repak := filepath.Join(root, "Engine", "repak.exe")
+	s.RepakOK = hashMatches(repak, m.RepakSha256)
+	oodle := filepath.Join(root, "Engine", "oo2core_9_win64.dll")
+	if existsFile(oodle) && m.OodleExpectedSha256 != "" && !hashMatches(oodle, m.OodleExpectedSha256) {
+		s.RepakOK = false
+		s.Notes = append(s.Notes, "unexpected Oodle runtime hash left untouched during startup")
+	}
+
+	mapping := filepath.Join(root, "Resources", "Mappings", "Mappings.usmap")
+	s.MappingsOK = fileSize(mapping) > 1024 && hashMatches(mapping, m.MappingsSha256)
+
+	s.ManagedPayloadOK = true
+	for rel, h := range m.ManagedRuntimeSha256 {
+		if !hashMatches(filepath.Join(root, filepath.FromSlash(rel)), h) {
+			s.ManagedPayloadOK = false
+			break
+		}
+	}
+
+	core := filepath.Join(root, "Engine", "PMMCore", "pmmcore.dll")
+	coreExpected := m.ManagedRuntimeSha256["Engine/PMMCore/pmmcore.dll"]
+	s.PMMCoreOK = existsFile(core) && (coreExpected == "" || hashMatches(core, coreExpected))
+
+	reader := filepath.Join(root, "Engine", "AssetReader", "PMM.AssetReader.dll")
+	readerExpected := m.ManagedRuntimeSha256["Engine/AssetReader/PMM.AssetReader.dll"]
+	s.AssetReaderOK = existsFile(reader) && (readerExpected == "" || hashMatches(reader, readerExpected))
+
+	s.Ready = s.DotnetOK && s.RepakOK && s.MappingsOK && s.ManagedPayloadOK && s.PMMCoreOK && s.AssetReaderOK
+	if !s.DotnetOK {
+		s.Notes = append(s.Notes, "portable .NET runtime unavailable or inventory metadata invalid")
+	}
+	if !s.RepakOK {
+		s.Notes = append(s.Notes, "repak dependency unavailable or invalid")
+	}
+	if !s.MappingsOK {
+		s.Notes = append(s.Notes, "mappings unavailable or invalid")
+	}
+	if !s.ManagedPayloadOK {
+		s.Notes = append(s.Notes, "managed runtime payload unavailable or invalid")
+	}
+	if !s.PMMCoreOK {
+		s.Notes = append(s.Notes, "PMMCore unavailable or invalid")
+	}
+	if !s.AssetReaderOK {
+		s.Notes = append(s.Notes, "AssetReader unavailable or invalid")
+	}
+	return s
+}
+
 func inspectDependencies(root string, m ReleaseManifest) DependencyStatus {
 	s := DependencyStatus{Protocol: "PMM_RUNTIME_DEPENDENCIES_V1"}
 	runtimeDir := filepath.Join(root, "Engine", "dotnet", m.DotnetRuntimeContract)

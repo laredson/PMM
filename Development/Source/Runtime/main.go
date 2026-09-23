@@ -167,11 +167,23 @@ func runtimeState(value string) {
 }
 
 func startApplication(root string) int {
-	runtimeState("startup:runtime-dependency-verification")
-	if _, err := ensureDependencies(root, true, false); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		runtimeState("startup:runtime-dependency-failed")
-		return 5
+	runtimeState("startup:runtime-dependency-status")
+	if m, err := loadReleaseManifest(root); err != nil {
+		logLine(root, "Startup", "Dependency status unavailable; startup will continue without repair: "+err.Error())
+		runtimeState("startup:runtime-dependency-status-unavailable")
+	} else {
+		status := inspectStartupDependencies(root, m)
+		if status.Ready {
+			logLine(root, "Startup", "Startup dependency status is ready; no repair was attempted.")
+			runtimeState("startup:runtime-dependencies-ready")
+		} else {
+			detail := strings.Join(status.Notes, ", ")
+			if detail == "" {
+				detail = "one or more operational dependencies are unavailable"
+			}
+			logLine(root, "Startup", "Startup dependency status is degraded; startup will continue without repair: "+detail)
+			runtimeState("startup:runtime-dependencies-degraded")
+		}
 	}
 	runtimeState("startup:runtime-ui-dispatch")
 	rc := launchUserInterface(root, false)
