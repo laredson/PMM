@@ -1,5 +1,7 @@
 # Palworld Manager Merger (PMM)
 
+> **Development branch note:** active v1.5.0.2 engineering continuity starts at [START_HERE_NEW_PROJECT.md](START_HERE_NEW_PROJECT.md). The release-oriented text below documents the public/product lineage and is not the current development handoff.
+
 **PMM 1.3.1ModCreator — portable mod management and assisted mod creation.**
 
 Download the program-only ZIP from the [latest release](https://github.com/laredson/PMM/releases/latest). Extract it and run `PMM.exe`. Generated mods, game files and optional tool installers are not bundled.

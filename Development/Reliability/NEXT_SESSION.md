@@ -1,92 +1,89 @@
 # NEXT SESSION - PMM v1.5.0.2
 
-## Read first
-
-1. `START_HERE_NEW_PROJECT.md`
-2. `Development/Reliability/V1502_SINGLE_EXE_AND_NOFLAG_PLAN.md`
-3. `Development/Reliability/STATUS.md`
-4. `Development/Reliability/V1502_STATE.json`
-5. relevant prior FINDINGS/CHECKS only as historical evidence.
-
 ## Active block: NF01
 
-**Exact baseline + executable/worker contract inventory**
+**Exact baseline + executable/worker/process contract inventory**
 
-Do not start by fixing the unreproduced startup incident.
+Use a local clone and complete as much of NF01 as can be safely established in one prompt.
 
-Do not start by rewriting all PowerShell.
+## Prompt-start procedure
 
-Do not delete PMMRuntime.exe or PMMFixLab.exe during NF01.
+1. fetch;
+2. checkout `v1.5.0.2`;
+3. fast-forward only;
+4. verify clean working tree;
+5. run `python Development/Tools/build_repo_index.py --check`;
+6. regenerate index if stale;
+7. read current handoff/state/plan.
 
-### Objective
+Record starting HEAD.
 
-Prepare the exact, reversible migration from the current multi-PMM-executable arrangement toward one PMM-owned executable while preserving the open module architecture and every existing user-facing capability.
+## Required NF01 outputs
 
-### Required NF01 outputs
+Using exhaustive local search plus direct source verification:
 
-Create/update reliability evidence that contains:
+1. exact HEAD and clean-tree state;
+2. actual SHA-256 and size of:
+   - `PMM/PMM.exe`;
+   - `PMM/Engine/PMMRuntime.exe`;
+   - `PMM/Engine/PMMFixLab.exe`;
+3. source-status classification for each PMM-owned EXE;
+4. Host commands/routes matrix;
+5. Runtime subcommand/capability matrix;
+6. FixLab commands/contracts actually consumed by current PMM;
+7. every background-worker/process launch site grouped by feature;
+8. every `ExecutionPolicy Bypass` occurrence grouped by runtime/maintainer/test usage;
+9. startup network/repair-capable paths;
+10. current progress/result/locking/journal schemas between UI/workers;
+11. references to `Development/Source` vs Reliability NativeCandidates and exact divergence risk;
+12. old-entrypoint -> proposed PMM.exe role migration matrix;
+13. exact smallest reversible NF02A Host+Runtime implementation proposal;
+14. NF02A tests/gates;
+15. explicit rollback path.
 
-1. exact checked-out branch HEAD;
-2. SHA-256/size/source status for:
-   - PMM.exe;
-   - PMMRuntime.exe;
-   - PMMFixLab.exe;
-3. current Host route/command matrix;
-4. current Runtime subcommand matrix;
-5. current FixLab commands actually consumed by PMM;
-6. every PMM background-worker launch site grouped by feature;
-7. every current `ExecutionPolicy Bypass` launch site grouped by feature;
-8. startup network/repair-capable paths;
-9. current progress/result/locking schemas used between UI and workers;
-10. a migration table:
-   `current entrypoint -> proposed PMM.exe role/subcommand -> files/callers -> acceptance gate`;
-11. an NF02A file-level implementation proposal for merging Host + Runtime first;
-12. explicit rollback path.
+Create durable NF01 findings/evidence under Reliability rather than relying only on chat output.
 
-Reuse prior Reliability evidence where valid; verify against the actual branch rather than copying old claims.
+## Important known issue to verify
 
-### Architectural constraints
+Current repository infrastructure has historically tested `Development/Source/Host` and `Development/Source/Runtime`, while later Reliability NativeCandidates have diverged.
 
-Target:
+NF01 must establish which source becomes canonical before future validation/build automation is trusted as evidence for the unified executable.
 
-```text
-PMM.exe
-PMM.exe --worker <known-operation>
-Modules/
-Resources/
-CKL/
-Tools/
-Documentation/
-Workspace/
-```
+Do not solve this by blindly copying one tree over the other.
 
-This means one **PMM-owned binary**, not one process.
+## Constraints
 
-Workers remain separate OS processes, so a worker crash must not terminate the UI.
+Do not:
+- rewrite all PowerShell;
+- remove PMMRuntime.exe;
+- remove PMMFixLab.exe;
+- change user-facing feature behavior merely to complete inventory;
+- attribute antivirus detections without current exact evidence;
+- chase the unreproduced startup incident without new evidence.
 
-Do not embed all Modules/Resources/CKL into the EXE. Ordinary module/data development should remain possible without recompiling PMM.exe.
+## Prompt completion rule
 
-External executables such as repak/.NET are not migration targets merely because they are executable files.
+Advance NF01 as far as reasonably possible in this prompt.
 
-### AI mod-creation constraint
+Normal output is one coherent commit containing:
+- NF01 findings/evidence;
+- any safe index/continuity corrections discovered;
+- STATUS/NEXT/HANDOFF changes if state materially advances.
 
-Do not design a full internal editor as part of this migration.
-
-The AI is the primary creator of a user-requested mod. PMM exposes bounded evidence/tool/build/test/deploy capabilities that the AI can use safely.
-
-### NF01 exit gate
-
-NF01 is complete when a reviewer can answer, from repository evidence:
-
-- exactly what PMM.exe, Runtime and FixLab each do today;
-- which parts can move into one executable without changing product behavior;
-- what the smallest NF02A code change is;
-- how to test it;
-- how to roll it back;
-- which behaviors remain deliberately external/open.
-
-### GitHub
-
-Development commit/push only after owner authorization for the implementation block.
 Use `[skip ci]`.
-No Actions/CI, PR, tag or release during development unless explicitly requested.
+
+Do not run Actions/remote CI during development.
+
+End report must compare actual findings with the existing plan and record any objectively superior plan modification.
+
+## NF01 exit gate
+
+A new reviewer must be able to answer:
+- what every PMM-owned EXE does today;
+- which source/evidence corresponds to it;
+- every important process/worker boundary;
+- which behaviors are open/module-based;
+- what moves in NF02A;
+- how NF02A is tested and rolled back.
+
+Then NF02A can begin.

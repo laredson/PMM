@@ -1,0 +1,132 @@
+{
+  "schema": "PMM_CURRENT_HANDOFF_STATE_V1",
+  "branch": "v1.5.0.2",
+  "targetVersion": "1.5.0.2",
+  "package": {
+    "version": "1.5.0.2",
+    "buildId": "PMM-v1.5.0.2-development-baseline",
+    "releaseCandidate": "1.5.0.2-development-baseline",
+    "stableCandidate": false,
+    "inheritedFeatureLine": {
+      "localization": "I03",
+      "nexusUpdates": "I04"
+    },
+    "identityChangeMeaning": "development baseline identity only; NF01+ implementation is not claimed complete"
+  },
+  "ownership": {
+    "creator": "laredson",
+    "type": "personal open-source/fan-made",
+    "companyAssociation": "none; PMM is not a Wice Games Studio product",
+    "license": "MIT"
+  },
+  "continuity": {
+    "human": "Development/Handoff/CURRENT_HANDOFF.md",
+    "machine": "Development/Handoff/CURRENT_STATE.json",
+    "historyRegistry": "Development/Handoff/HISTORY_REGISTRY.json",
+    "activePlan": "Development/Reliability/V1502_SINGLE_EXE_AND_NOFLAG_PLAN.md",
+    "status": "Development/Reliability/STATUS.md",
+    "next": "Development/Reliability/NEXT_SESSION.md"
+  },
+  "architectureTarget": {
+    "pmmOwnedBinary": "PMM.exe",
+    "oneBinaryNotOneProcess": true,
+    "workers": "separate OS processes using explicit PMM.exe worker/subcommand contracts",
+    "openEditableSurfaces": [
+      "Modules",
+      "Resources",
+      "CKL",
+      "Localization",
+      "XAML/UI resources",
+      "recipes/config",
+      "Documentation"
+    ],
+    "externalExecutablesRemainExternal": true,
+    "fixLabReplacementRequiresParity": true
+  },
+  "requiredProductScope": [
+    "supported mod updates behave as intended",
+    "compatibility patch workflow",
+    "old-mod restoration/repair",
+    "AI-created mods using PMM capability/evidence plane",
+    "normal Nexus distribution path",
+    "complete regression of inherited functionality"
+  ],
+  "aiModCreation": {
+    "user": "defines desired mod",
+    "ai": "primary author/reasoning agent",
+    "pmm": "bounded tools/evidence/staging/build/validation/test/deploy/recovery",
+    "completeInternalEditorRequired": false
+  },
+  "inherited": {
+    "localization": {
+      "registered": 30,
+      "enabled": 23,
+      "reserve": 7,
+      "integration": "I03"
+    },
+    "nexusUpdates": "I04",
+    "host": "C2B distributed",
+    "runtime": "C2B distributed",
+    "fixLab": "original distributed; reconstruction/research 04A-6E retained",
+    "preserve": [
+      "Workspace",
+      "Mods & Merge",
+      "Deep Analysis",
+      "deployment/rollback/recovery",
+      "AIIO"
+    ]
+  },
+  "knownFacts": [
+    "Host normal startup currently routes to Engine/PMMRuntime.exe start",
+    "PowerShell ExecutionPolicy Bypass remains in normal/feature paths",
+    "Runtime start can invoke dependency repair/network before UI when package components are invalid/missing",
+    "OperationWorker.ps1 is the broad current operation broker",
+    "Runtime includes generic bounded process run capability",
+    "current Host/Runtime candidate builds post-process PE resources",
+    "Development/Source Host/Runtime snapshots diverge from later Reliability NativeCandidates",
+    "historical VirusTotal RC30 sample is not current 1.5.x baseline",
+    "startup pre-UI incident remains OPEN / NOT REPRODUCED / UNKNOWN as watchpoint"
+  ],
+  "roadmap": {
+    "completed": [
+      "NF00",
+      "PRE-NF01-CONTINUITY"
+    ],
+    "next": "NF01",
+    "ordered": [
+      "NF01",
+      "NF02",
+      "NF03",
+      "NF04",
+      "NF04F",
+      "NF05",
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "NF06",
+      "NF07",
+      "NF08 optional"
+    ]
+  },
+  "developmentProtocol": {
+    "localFirst": true,
+    "existingClone": "fetch + checkout branch + fast-forward only + clean tree",
+    "repositoryIndex": "python Development/Tools/build_repo_index.py",
+    "maximizeProgressWithinPrompt": true,
+    "oneCommitPerPrompt": true,
+    "updateContinuityInSameCommit": true,
+    "developmentCommitSuffix": "[skip ci]",
+    "developmentCI": false,
+    "planMayChangeOnlyWithExplicitRecordedRationale": true,
+    "noForcePush": true
+  },
+  "nextBlock": {
+    "id": "NF01",
+    "goal": "exact baseline + executable/worker/process contract inventory and smallest reversible NF02A migration design"
+  },
+  "signing": {
+    "requiredFor1502": false,
+    "signPathFoundation": "optional after product is ready"
+  }
+}

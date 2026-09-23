@@ -1,26 +1,42 @@
 {
-  "schema": "PMM_V1502_STATE_V2",
+  "schema": "PMM_V1502_STATE_V3",
   "branch": "v1.5.0.2",
   "updatedDate": "2026-09-23",
   "sourceBranch": "v1.5.0.1-PMM-reliability",
   "sourceCommit": "2586b4c3999ccc094344bc65710d6559f4858871",
   "targetVersion": "1.5.0.2",
+  "canonicalHandoff": "Development/Handoff/CURRENT_HANDOFF.md",
+  "canonicalMachineState": "Development/Handoff/CURRENT_STATE.json",
+  "historyRegistry": "Development/Handoff/HISTORY_REGISTRY.json",
   "authoritativePlan": "Development/Reliability/V1502_SINGLE_EXE_AND_NOFLAG_PLAN.md",
-  "packageIdentityAtPlanning": {
-    "version": "1.5.0.1",
-    "buildId": "PMM-v1.5.0.1-reliability-i04-nexus-updates",
-    "productBytesChangedByPlan": false
+  "packageIdentity": {
+    "version": "1.5.0.2",
+    "buildId": "PMM-v1.5.0.2-development-baseline",
+    "releaseCandidate": "1.5.0.2-development-baseline",
+    "stableCandidate": false,
+    "identityPhase": "PRE-NF01 development baseline",
+    "inheritedNexusIntegration": "I04"
+  },
+  "preparation": {
+    "continuityLayer": true,
+    "localRepositoryIndexTool": "Development/Tools/build_repo_index.py",
+    "localFirstWorkflow": true,
+    "oneCommitPerPrompt": true,
+    "maximizeProgressWithinGate": true,
+    "planChangesRequireRecordedRationale": true
   },
   "architectureTarget": {
     "pmmOwnedBinaryTarget": "PMM.exe",
     "oneBinaryNotOneProcess": true,
-    "workerModel": "separate OS processes launched from the same PMM.exe with explicit worker/subcommand roles",
+    "workerModel": "separate OS processes launched from same PMM.exe with explicit roles",
     "openSurfaces": [
       "Modules",
       "Resources",
       "CKL",
-      "Documentation",
-      "selected config/recipes"
+      "Localization",
+      "XAML/UI resources",
+      "recipes/config",
+      "Documentation"
     ],
     "externalExecutablesRemainExternal": true,
     "fixLabMergeRequiresParityAcceptance": true
@@ -30,12 +46,13 @@
       "automatic/supported mod updates behaving as intended",
       "compatibility patch workflow",
       "old-mod restoration/repair",
-      "AI-created mods using PMM capabilities"
+      "AI-created mods using PMM capabilities",
+      "normal Nexus distribution path"
     ],
     "aiCreationModel": {
       "user": "defines desired mod/behavior",
       "ai": "primary creator/reasoning agent",
-      "pmm": "bounded evidence, tools, staging, build, validation, deployment/recovery and permitted game-test/observation capability",
+      "pmm": "bounded evidence/tools/staging/build/validation/test/deploy/recovery",
       "internalGeneralEditorRequired": false
     }
   },
@@ -54,20 +71,15 @@
       "Workspace",
       "Mods & Merge",
       "Deep Analysis",
-      "deployment/rollback",
-      "localization",
-      "Nexus Updates",
+      "deployment/rollback/recovery",
       "AIIO"
     ]
   },
-  "knownArchitectureFacts": [
-    "normal Host to Runtime route is native",
-    "normal WPF path can still launch PowerShell with ExecutionPolicy Bypass",
-    "Runtime startup can perform dependency repair/network before UI when components are missing or invalid",
-    "OperationWorker.ps1 remains the broad current operation broker",
-    "current native build post-processes PE resources for icon injection",
-    "historical VT sample belongs to old RC30 artifact, not current candidate"
-  ],
+  "sourceStatusWarning": {
+    "developmentSourceHostRuntime": "older snapshots",
+    "reliabilityNativeCandidates": "later reconstructed work",
+    "action": "NF01 inventories; NF02 consolidates canonical source. Do not blindly overwrite."
+  },
   "incidentPolicy": {
     "id": "STARTUP-PRE-UI-2026-09",
     "state": "OPEN",
@@ -77,31 +89,29 @@
   },
   "roadmap": {
     "completed": [
-      "NF00"
+      "NF00",
+      "PRE-NF01-CONTINUITY"
     ],
     "next": "NF01",
     "ordered": [
-      "NF01 baseline and migration matrix",
-      "NF02 Host+Runtime single-exe convergence",
-      "NF03 startup offline / explicit repair / PowerShell policy cleanup",
-      "NF04 one-executable worker architecture",
-      "NF04F FixLab convergence when parity permits",
-      "NF05 conventional reproducible PMM.exe build",
-      "P01 Updates product cure",
-      "P02 compatibility patch product cure",
-      "P03 old-mod restoration/FixLab product cure",
-      "P04 AI-created mods via PMM capabilities",
-      "NF06 full regression and package preflight",
-      "NF07 current-artifact scanner/Nexus validation",
-      "NF08 optional signing/provenance"
+      "NF01",
+      "NF02",
+      "NF03",
+      "NF04",
+      "NF04F",
+      "NF05",
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "NF06",
+      "NF07",
+      "NF08 optional"
     ]
   },
-  "signing": {
-    "authenticodeRequiredFor1502": false,
-    "signPathFoundation": "OPTIONAL_AFTER_PRODUCT_READY",
-    "ownership": "personal open-source/fan-made project; not Wice Games Studio"
-  },
   "githubPolicy": {
+    "localFirst": true,
+    "oneDevelopmentCommitPerPrompt": true,
     "developmentCommitSuffix": "[skip ci]",
     "developmentCI": false,
     "actions": false,
@@ -109,5 +119,10 @@
     "tagsByInitiative": false,
     "releasesByInitiative": false,
     "forcePush": false
+  },
+  "signing": {
+    "authenticodeRequiredFor1502": false,
+    "signPathFoundation": "OPTIONAL_AFTER_PRODUCT_READY",
+    "ownership": "personal open-source/fan-made project; not Wice Games Studio"
   }
 }

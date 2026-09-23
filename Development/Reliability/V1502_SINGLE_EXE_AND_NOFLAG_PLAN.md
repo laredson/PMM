@@ -706,3 +706,36 @@ The architectural/product discussion that led to this plan is preserved at:
 `Development/Reliability/V1502_DECISION_TRANSCRIPT_2026-09-23.md`
 
 It is historical context, not a competing specification. Use it to understand the owner's intent and the alternatives considered; use this plan for implementation requirements.
+
+
+---
+
+## 11. Local-first prompt execution protocol
+
+Normal implementation work uses a local clone.
+
+At prompt start:
+1. clone if necessary, otherwise fetch;
+2. checkout `v1.5.0.2`;
+3. fast-forward only;
+4. require a clean working tree;
+5. check/regenerate `.pmm-index` with `Development/Tools/build_repo_index.py`;
+6. read canonical handoff/state/status/next.
+
+During a prompt:
+- advance as far as reasonably possible inside the current authorized block and acceptance gate;
+- do not create artificial micro-session boundaries;
+- do not fake a manual/Windows/game/Nexus gate;
+- keep changes coherent and reversible;
+- validate locally.
+
+Normal completion:
+- one coherent development commit per prompt;
+- include code + evidence + continuity updates that belong to that work;
+- commit message ends `[skip ci]`;
+- push when authorized;
+- report start/end HEAD, work, validation category, remaining uncertainty, comparison with the plan and exact next step.
+
+If evidence shows a clearly superior project-wide plan, update this plan/state in that same prompt and record the rationale. Do not silently diverge.
+
+The canonical handoff definition and precedence rules live in `Development/Handoff/README.md`.

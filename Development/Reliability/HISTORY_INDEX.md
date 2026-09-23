@@ -289,3 +289,19 @@ Preserves the owner/assistant discussion that selected the one-PMM-owned-EXE,
 open/module-oriented architecture, deferred signing, Nexus/noflag direction and
 AI-created-mod responsibility model. It is context only; the authoritative
 implementation contract is `V1502_SINGLE_EXE_AND_NOFLAG_PLAN.md`.
+
+
+## Continuity structure introduced before NF01
+
+Current continuation is now centralized under `Development/Handoff/`.
+
+Use:
+- `CURRENT_HANDOFF.md` for complete human continuation;
+- `CURRENT_STATE.json` for machine state;
+- `HISTORY_REGISTRY.json` to classify older material and resolve precedence.
+
+This layer does not replace historical FINDINGS/CHECKS. It prevents legacy handoffs and old release documents from being mistaken for current instructions.
+
+The old `Development/Reliability/NEW_PROJECT_HANDOFF.md`, AI handoffs and localization handoffs are retained as historical/specialized evidence.
+
+Local navigation is assisted by `Development/Tools/build_repo_index.py`; generated `.pmm-index/` is never committed.

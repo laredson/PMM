@@ -1,0 +1,112 @@
+{
+  "schema": "PMM_HISTORY_REGISTRY_V1",
+  "precedence": [
+    "checked-out code/package bytes",
+    "Development/Handoff/CURRENT_STATE.json",
+    "Development/Handoff/CURRENT_HANDOFF.md",
+    "active authoritative plan",
+    "STATUS/NEXT_SESSION",
+    "current-line history/decision context",
+    "FINDINGS/CHECKS/evidence",
+    "legacy handoffs/product docs"
+  ],
+  "current": [
+    {
+      "path": "Development/Handoff/CURRENT_HANDOFF.md",
+      "class": "CURRENT",
+      "purpose": "complete human continuation"
+    },
+    {
+      "path": "Development/Handoff/CURRENT_STATE.json",
+      "class": "CURRENT",
+      "purpose": "machine-readable continuation"
+    },
+    {
+      "path": "Development/Reliability/V1502_SINGLE_EXE_AND_NOFLAG_PLAN.md",
+      "class": "ACTIVE_PLAN",
+      "purpose": "normative 1.5.0.2 execution plan"
+    },
+    {
+      "path": "Development/Reliability/STATUS.md",
+      "class": "CURRENT",
+      "purpose": "compact state"
+    },
+    {
+      "path": "Development/Reliability/NEXT_SESSION.md",
+      "class": "CURRENT",
+      "purpose": "next exact work block"
+    }
+  ],
+  "currentLineHistory": [
+    {
+      "path": "Development/Reliability/V1502_HISTORY.md",
+      "class": "MILESTONE",
+      "scope": "v1.5.0.2 line history"
+    },
+    {
+      "path": "Development/Reliability/HISTORY_INDEX.md",
+      "class": "MILESTONE",
+      "scope": "reliability sessions/evidence index"
+    },
+    {
+      "path": "Development/Reliability/V1502_DECISION_TRANSCRIPT_2026-09-23.md",
+      "class": "DECISION_CONTEXT",
+      "scope": "single-EXE/product-scope rationale"
+    },
+    {
+      "path": "Development/Reliability/Incidents/STARTUP_PRE_UI_2026-09.md",
+      "class": "INCIDENT",
+      "scope": "unreproduced pre-UI startup failure"
+    }
+  ],
+  "laboratories": [
+    {
+      "path": "Development/Reliability/NativeCandidates/Host/",
+      "class": "LAB_CANDIDATE"
+    },
+    {
+      "path": "Development/Reliability/NativeCandidates/Runtime/",
+      "class": "LAB_CANDIDATE"
+    },
+    {
+      "path": "Development/Reliability/NativeCandidates/FixLab/",
+      "class": "LAB_CANDIDATE"
+    },
+    {
+      "path": "Development/Reliability/NativeCandidates/Supervision/",
+      "class": "LAB_CANDIDATE"
+    },
+    {
+      "path": "Development/Reliability/NativeCandidates/UIBridge/",
+      "class": "LAB_CANDIDATE"
+    }
+  ],
+  "legacyHandoffs": [
+    {
+      "path": "Development/Reliability/NEW_PROJECT_HANDOFF.md",
+      "class": "LEGACY_HANDOFF",
+      "scope": "1.5.0.1 reliability line"
+    },
+    {
+      "path": "Development/AI/AI_CONTINUE_HERE.md",
+      "class": "LEGACY_HANDOFF",
+      "scope": "1.3.1 AI/mod-creation preview continuation"
+    },
+    {
+      "path": "Development/AI/CURRENT_STATE.md",
+      "class": "LEGACY_PRODUCT_DOC",
+      "scope": "1.3.1 preview state"
+    },
+    {
+      "path": "Development/AI/HANDOFF.md",
+      "class": "LEGACY_HANDOFF",
+      "scope": "older AI development"
+    },
+    {
+      "path": "Development/Docs/Documentation/History/PMM_MASTER_HANDOFF_2026-08-16.md",
+      "class": "LEGACY_HANDOFF",
+      "scope": "historical master handoff"
+    }
+  ],
+  "rule": "Do not rewrite historical evidence to match later conclusions. Add newer current state/decisions and classify older material instead."
+}

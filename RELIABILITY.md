@@ -1,31 +1,22 @@
-# PMM 1.5.0.1 - reliability
+# PMM v1.5.0.2 - reliability / development entrypoint
 
-**Nuevo proyecto/chat:** empezar por [START_HERE_NEW_PROJECT.md](START_HERE_NEW_PROJECT.md).
+Start with [START_HERE_NEW_PROJECT.md](START_HERE_NEW_PROJECT.md).
 
-El repositorio contiene un handoff autosuficiente con el estado actual, historia,
-identidades, fuentes, pruebas, limitaciones y siguientes pasos. No es necesario
-recuperar el chat anterior ni pedir ZIPs antiguos para entender el proyecto.
+Canonical complete handoff:
+[Development/Handoff/CURRENT_HANDOFF.md](Development/Handoff/CURRENT_HANDOFF.md)
 
-Estado actual:
-- rama `v1.5.0.1-PMM-reliability`;
-- `PMM/` contiene `PMM-v1.5.0.1-reliability-i01`;
-- Host/Runtime C2B se reprodujeron localmente desde Git con sus hashes fijados;
-- los dos EXE I01 y sus tres metadatos ya estan integrados en la rama;
-- FixLab research llega a 04A-6B pero el executable original sigue distribuido;
-- siguiente objetivo ejecutable: probar I01 en Windows y registrar arranque/cierre/tiempos;
-- siguiente research FixLab: 04A-6C.
+Machine-readable state:
+[Development/Handoff/CURRENT_STATE.json](Development/Handoff/CURRENT_STATE.json)
 
-Leer:
-- [handoff completo](Development/Reliability/NEW_PROJECT_HANDOFF.md)
-- [estado machine-readable](Development/Reliability/NEW_PROJECT_STATE.json)
-- [historia por sesiones](Development/Reliability/HISTORY_INDEX.md)
-- [siguiente sesion](Development/Reliability/NEXT_SESSION.md)
-- [estado](Development/Reliability/STATUS.md)
-- [version ejecutable](Development/Reliability/RUNNING_VERSION.md).
+Authoritative plan:
+[Development/Reliability/V1502_SINGLE_EXE_AND_NOFLAG_PLAN.md](Development/Reliability/V1502_SINGLE_EXE_AND_NOFLAG_PLAN.md)
 
-La rama es experimental y puede romperse temporalmente durante integraciones
-controladas. `NativeCandidates/` se conserva como laboratorio/historial; las
-piezas maduras se integran incrementalmente en `PMM/` para pruebas del usuario.
+Current package identity:
+- VERSION `1.5.0.2`
+- BUILD_ID `PMM-v1.5.0.2-development-baseline`
 
-No prometer cero detecciones ni check verde de Nexus. No ocultar comportamiento,
-desactivar protecciones, pedir exclusiones ni restaurar cuarentenas automaticamente.
+The package is the complete inherited I03/I04 baseline renumbered coherently for active 1.5.0.2 development. This identity does not claim NF01+ implementation is already complete.
+
+Normal development is local-first, indexed with `Development/Tools/build_repo_index.py`, and uses one coherent development commit per prompt.
+
+Historical 1.5.0.1 handoffs/FINDINGS/CHECKS remain evidence; they are not the current continuation entrypoint.

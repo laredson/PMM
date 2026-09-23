@@ -1,90 +1,83 @@
-# Estado actual - PMM v1.5.0.2
+# Current status - PMM v1.5.0.2
 
-## Rama
+## Identity
 
-`v1.5.0.2`
+Branch: `v1.5.0.2`
 
-Base heredada:
-`2586b4c3999ccc094344bc65710d6559f4858871`
-(`v1.5.0.1-PMM-reliability`, I04).
+Package:
+- VERSION: `1.5.0.2`
+- BUILD_ID: `PMM-v1.5.0.2-development-baseline`
+- stableCandidate: false
 
-La rama conserva I03/I04 y todas las funciones del HEAD heredado. El bootstrap/documentacion no ha cambiado aun los bytes de `PMM/`.
+The package identity has now been moved atomically from inherited 1.5.0.1/I04 metadata to the 1.5.0.2 development baseline. This is a development-baseline identity change, not completion of NF01+.
 
-## Direccion aprobada para 1.5.0.2
+Canonical handoff:
+`Development/Handoff/CURRENT_HANDOFF.md`
 
-Documento autoritativo:
+## Inherited baseline preserved
 
-`Development/Reliability/V1502_SINGLE_EXE_AND_NOFLAG_PLAN.md`
-
-Objetivo arquitectonico:
-- un unico ejecutable **propio** de PMM;
-- multiples procesos aislados pueden ejecutar el mismo PMM.exe como workers;
-- Modules/Resources/CKL permanecen expuestos/editables donde tenga sentido;
-- herramientas/binarios externos no se absorben por el mero hecho de ser EXE;
-- FixLab solo se unifica cuando la reconstruccion tenga paridad suficiente.
-
-## Producto que 1.5.0.2 debe dejar funcional
-
-1. Updates de mods de acuerdo con el comportamiento definido, empezando por Nexus.
-2. Analisis/conflictos y parche de compatibilidad.
-3. Restauracion/reparacion de mods antiguos mediante Fix Lab.
-4. Creacion de mods dirigida por IA.
-
-En el punto 4:
-- la IA es la responsable principal de crear la solucion/mod pedido por el usuario;
-- PMM ofrece herramientas, evidencia, staging, build, validacion, despliegue/rollback y pruebas/observacion permitidas;
-- un editor interno general no es requisito de 1.5.0.2.
-
-## Baseline heredado que no se debe perder
-
-- paquete actual aun identificado como 1.5.0.1 I04 hasta la primera integracion funcional;
-- 30 idiomas registrados;
-- 23 habilitados;
-- 7 reservas;
+- I03 localization: 30 registered / 23 enabled / 7 reserve;
 - I04 Nexus Updates;
-- Host/Runtime C2B;
-- FixLab original distribuido + research/candidatas 04A-6E;
+- Host C2B distributed;
+- Runtime C2B distributed;
+- PMMFixLab original distributed + 04A-6E research/candidates;
 - Workspace;
-- deploy/rollback/recovery;
+- Mods & Merge;
+- deployment/rollback/recovery;
 - Deep Analysis;
-- AIIO y flujos actuales.
+- AIIO.
 
-## Hallazgos relevantes ya conocidos
+## Architecture target
 
-- Host -> Runtime es nativo, pero la UI WPF normal sigue pudiendo arrancar PowerShell con `-ExecutionPolicy Bypass`.
-- Normal Runtime startup puede entrar en reparacion/descarga de dependencias antes de UI si detecta componentes faltantes/invalidos.
-- `OperationWorker.ps1` sigue siendo broker amplio de operaciones.
-- hay mas rutas PowerShell con Bypass en workers/servicios.
-- el build nativo actual post-procesa los PE para insertar icono; NF05 lo sustituira por recursos Windows convencionales.
-- el VirusTotal historico registrado corresponde a una release RC30 antigua, no prueba el estado de 1.5.0.1/1.5.0.2.
-- Authenticode/SignPath es opcional y posterior; no es requisito de cierre de 1.5.0.2.
+One PMM-owned executable with separate-process worker modes.
 
-## Incidencia STARTUP-PRE-UI-2026-09
+External third-party executables remain external.
 
-Estado:
-**OPEN / NOT REPRODUCED / CAUSE UNKNOWN / WATCHPOINT**
+Modules/Resources/CKL and other useful development surfaces stay open/editable.
 
-No es el siguiente trabajo activo.
+FixLab does not merge until parity/Windows acceptance permits it.
 
-No atribuir a locale, antivirus, Workspace, PowerShell u otra causa sin evidencia.
+## PRE-NF01 preparation
 
-Si reaparece durante las pruebas posteriores, capturar evidencia y tratarla entonces.
+Completed:
+- canonical `Development/Handoff/` continuity layer;
+- machine-readable history classification;
+- local repository-index generator;
+- local-first Codex/developer workflow;
+- one coherent commit per prompt rule;
+- maximize progress within current gate rule;
+- explicit end-of-prompt comparison against plan;
+- package identity moved to 1.5.0.2 development baseline;
+- generated index output excluded from Git.
 
-## Progreso del nuevo plan
+## Known architecture facts
 
-- NF00 plan/contrato: **CLOSED**
-- NF01 baseline + matriz de migracion: **NEXT**
-- NF02 unificacion Host/Runtime: PENDING
-- NF03 startup/politica/dependencies hardening: PENDING
+- Host normal start routes to PMMRuntime.
+- normal WPF/other worker paths still contain ExecutionPolicy Bypass.
+- Runtime start can repair/download missing/invalid dependencies before UI.
+- OperationWorker.ps1 remains broad.
+- generic Runtime process-run capability exists.
+- Host/Runtime candidate builds still post-process PE resources.
+- Development/Source Host/Runtime snapshots diverge from later NativeCandidates.
+- old VT RC30 result is not a current 1.5.x baseline.
+- pre-UI incident remains OPEN / NOT REPRODUCED / UNKNOWN / WATCHPOINT.
+
+## Roadmap
+
+- NF00: CLOSED
+- PRE-NF01 continuity/index/version baseline: **CLOSED**
+- NF01 baseline + migration matrix: **NEXT**
+- NF02 Host+Runtime single-EXE: PENDING
+- NF03 startup/dependency/PowerShell hardening: PENDING
 - NF04 workers single-EXE: PENDING
 - NF04F FixLab convergence: PENDING
-- NF05 build PE convencional/reproducible: PENDING
+- NF05 conventional reproducible PE build: PENDING
 - P01 Updates: PENDING
-- P02 Compatibility patch: PENDING
-- P03 FixLab old-mod restoration: PENDING
-- P04 AI-created mods via PMM capabilities: PENDING
+- P02 compatibility patch: PENDING
+- P03 FixLab restoration: PENDING
+- P04 AI-created mods via PMM: PENDING
 - NF06 full regression: PENDING
 - NF07 scanner/Nexus candidate validation: PENDING
-- NF08 optional signing/provenance: OPTIONAL/LATER
+- NF08 signing/provenance: OPTIONAL/LATER
 
-Continue in `NEXT_SESSION.md`.
+Continue with `NEXT_SESSION.md`.

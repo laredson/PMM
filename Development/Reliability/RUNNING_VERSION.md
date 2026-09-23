@@ -1,15 +1,23 @@
-# Que version estas ejecutando - inicio de v1.5.0.2
+# Running version - PMM v1.5.0.2 development baseline
 
-| Ubicacion | Programa real |
+| Location | Current meaning |
 | --- | --- |
-| `v1.5.0.2` justo tras el bootstrap | Aplicacion I04 heredada, todavia identificada como 1.5.0.1 |
-| `PMM/` | I04 con Nexus Updates, Workspace privado y 23 idiomas habilitados |
-| `NativeCandidates/FixLab/` | Research/candidatas, NO sustituyen por si solas PMMFixLab distribuido |
-| CoreR1/UAsset test executables | Herramientas de prueba, NO PMM |
+| branch `v1.5.0.2` | active development line |
+| `PMM/` | complete inherited I03/I04 package with 1.5.0.2 development identity |
+| `PMM/PMM.exe` | distributed Host C2B |
+| `PMM/Engine/PMMRuntime.exe` | distributed Runtime C2B |
+| `PMM/Engine/PMMFixLab.exe` | original distributed FixLab |
+| `Development/Reliability/NativeCandidates/` | candidate/research source; not automatically distributed |
+| `Development/Source/Host|Runtime` | older source snapshots requiring reconciliation |
 
-BUILD_ID heredado:
-`PMM-v1.5.0.1-reliability-i04-nexus-updates`.
+VERSION:
+`1.5.0.2`
 
-Esto es deliberado: el bootstrap de rama no cambia `PMM/`. La primera integracion funcional 1.5.0.2 debe actualizar VERSION, BUILD_ID, RELEASE_MANIFEST y SHA256SUMS juntos.
+BUILD_ID:
+`PMM-v1.5.0.2-development-baseline`
 
-La rama 1.5.0.2 conserva los 23 idiomas habilitados, I04 Nexus Updates y los binarios nativos del baseline. Abrirla antes de una integracion funcional equivale a ejecutar el mismo paquete I04 que sirvio de origen, no una build nueva solo por el nombre de la rama.
+The package identity is now intentionally 1.5.0.2 so the working branch is a coherent development package.
+
+This does **not** imply Host/Runtime/FixLab architecture migration has occurred. NF01 is still next.
+
+The previous I04 identifiers remain historical integration provenance for the Nexus Updates feature, not the package version.

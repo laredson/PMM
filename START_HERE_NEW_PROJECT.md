@@ -1,113 +1,75 @@
 # START HERE - PMM v1.5.0.2
 
-Este archivo es el punto de entrada autoritativo para continuar el desarrollo de PMM desde la linea 1.5.0.2.
+Repository: `laredson/PMM`
+Active development branch: `v1.5.0.2`
+Current package identity: `PMM-v1.5.0.2-development-baseline`
 
-Repositorio: `laredson/PMM`
-Rama de trabajo: `v1.5.0.2`
-Base exacta heredada: `2586b4c3999ccc094344bc65710d6559f4858871`
-Linea de origen: `v1.5.0.1-PMM-reliability`
+This repository is designed to be self-handing-off. A new chat, Codex session, developer or AI should not need the previous conversation.
 
-## Estado de arranque de 1.5.0.2
-
-La rama nace directamente del HEAD real de la linea reliability. No se ha copiado una carpeta antigua ni se ha reconstruido desde un tag parcial.
-
-Por ello conserva el paquete I04 completo:
-- producto empaquetado actual: 1.5.0.1;
-- BUILD_ID heredado: `PMM-v1.5.0.1-reliability-i04-nexus-updates`;
-- I03 de localizacion: 30 idiomas registrados, 23 habilitados y 7 reservas;
-- I04 de actualizaciones Nexus;
-- Host y Runtime C2B integrados;
-- FixLab original distribuido y research/candidatas 04A-6E aislados;
-- Workspace, recuperacion, despliegue, Deep Analysis y demas funciones ya presentes en esa base.
-
-**1.5.0.2 es la version objetivo de desarrollo.** No se cambia VERSION/BUILD_ID/manifiesto/checksums de forma cosmetica en este bootstrap. Esos metadatos se actualizaran juntos en la primera integracion funcional 1.5.0.2.
-
-## Leer primero
+## Read in this order
 
 1. `AGENTS.md`
-2. `Development/Reliability/V1502_STATE.json`
-3. `Development/Reliability/V1502_HISTORY.md`
-4. `Development/Reliability/STATUS.md`
-5. `Development/Reliability/NEXT_SESSION.md`
-6. `Development/Reliability/V1502_PLAN.md`
-7. `Development/Reliability/Incidents/STARTUP_PRE_UI_2026-09.md`
-8. `Development/Reliability/HISTORY_INDEX.md`
+2. `Development/Handoff/CURRENT_HANDOFF.md`
+3. `Development/Handoff/CURRENT_STATE.json`
+4. `Development/Reliability/V1502_SINGLE_EXE_AND_NOFLAG_PLAN.md`
+5. `Development/Reliability/STATUS.md`
+6. `Development/Reliability/NEXT_SESSION.md`
 
-Los documentos 1.5.0.1, FINDINGS, CHECKS y contratos anteriores siguen siendo evidencia historica valida. No deben reinterpretarse como estado actual si un documento 1.5.0.2 posterior los supera.
+Historical material is classified by:
+`Development/Handoff/HISTORY_REGISTRY.json`
 
-## Dos objetivos activos
+## Normal local workflow
 
-### 1. Fallo de arranque previo a UI
+Use a local clone.
 
-Existe una incidencia real pero no reproducible de forma local:
-- el propietario la vio una vez al abrir 1.5.0.1 por primera vez; el segundo arranque funciono;
-- aproximadamente dos dias despues un usuario chino reporto un fallo del mismo tipo y no logra iniciar;
-- ocurre despues de la barra de carga y antes de que aparezca la UI;
-- el propietario no consigue reproducirlo ni con instalacion nueva ni borrando Workspace;
-- no se conserva todavia el texto exacto del error.
+If the clone already exists: fetch, checkout `v1.5.0.2`, fast-forward only and confirm a clean tree.
 
-No atribuirlo a idioma, pais, antivirus, carrera, Workspace ni ninguna otra causa sin evidencia.
+Then run:
 
-### 2. Reduccion de falsos positivos / distribucion verificable
+```
+python Development/Tools/build_repo_index.py --check
+```
 
-El objetivo es reducir causas legitimas de deteccion mediante ingenieria auditable, no ocultar comportamiento:
-- diagnosticar y simplificar el arranque;
-- retirar `ExecutionPolicy Bypass` donde ya no sea necesario;
-- separar comprobacion de dependencias de reparacion;
-- evitar reparaciones/descargas silenciosas al arrancar;
-- estrechar el broker generico de procesos y migrar operaciones a contratos nativos cuando proceda;
-- build reproducible y recursos PE estandar;
-- firma real cuando el propietario la provisione;
-- preflight del paquete y matriz de escaneo con hashes;
-- usar canales de falsos positivos de fabricantes si quedan detecciones.
+If missing/stale:
 
-No desactivar protecciones, no pedir exclusiones y no introducir tecnicas de evasion.
+```
+python Development/Tools/build_repo_index.py
+```
 
-## Regla de continuidad
+The index lives in local `.pmm-index/` and is not committed.
 
-A partir de este punto, el desarrollo nuevo se hace directamente sobre `v1.5.0.2`. La linea 1.5.0.1 queda como base historica.
+Normal development is one coherent commit per prompt, advancing as far as safely possible within the current acceptance gate. Update the handoff/status/history/next state in the same commit when materially changed.
 
-No perder funcionalidades heredadas para reducir detecciones. Cada cambio debe conservar idiomas, Nexus Updates, Workspace y contratos existentes salvo cambio explicito y probado.
+## Current next step
 
-## Git/GitHub
+**NF01 - exact baseline + executable/worker/process contract inventory.**
 
-- Lectura libre.
-- Escrituras solo con autorizacion explicita del propietario para el bloque correspondiente.
-- Desarrollo: commit/push silencioso con `[skip ci]`.
-- Sin Actions/CI/tests remotos durante desarrollo salvo peticion expresa.
-- No PR, tag, release ni cambio de Latest por iniciativa propia.
-- Pruebas funcionales de desarrollo: locales por el propietario salvo peticion expresa.
+Do not start by:
+- rewriting all PowerShell;
+- deleting Runtime/FixLab;
+- debugging the unreproduced pre-UI incident without new evidence;
+- claiming antivirus causality.
 
-Continua en `Development/Reliability/STATUS.md`.
+See `Development/Reliability/NEXT_SESSION.md` for exact outputs.
 
+## Current architecture direction
 
-## Plan arquitectonico aprobado para 1.5.0.2 (2026-09-23)
+One PMM-owned executable, multiple isolated OS processes:
 
-Antes de iniciar trabajo nuevo, leer:
+```text
+PMM.exe
+PMM.exe --worker <known-operation>
+```
 
-`Development/Reliability/V1502_SINGLE_EXE_AND_NOFLAG_PLAN.md`
+Keep the modding knowledge/modules/resources open and editable. External third-party EXEs remain external.
 
-Ese documento **supera el orden anterior S01-S08** para la ejecucion activa de 1.5.0.2.
+## Current product goal
 
-La direccion actual es:
-- unificar los ejecutables propios de PMM en un solo `PMM.exe`;
-- conservar procesos separados mediante worker modes del mismo ejecutable;
-- mantener Modules/Resources/CKL abiertos y editables;
-- no absorber ejecutables externos;
-- despues hacer hardening startup/PowerShell/dependencias;
-- despues cerrar el build PE;
-- despues reparar/validar las funciones actuales del producto;
-- al final validar el candidato real en Windows/Nexus.
+Finish the capabilities PMM already intends to provide:
+- mod updates;
+- compatibility patches;
+- old-mod restoration/FixLab;
+- AI-created mods using PMM capabilities;
+- reliable/Nexus-friendly packaging and execution.
 
-La incidencia de startup pre-UI permanece registrada como watchpoint, pero no es el siguiente bloque mientras no sea reproducible.
-
-La creacion de mods actual es **AI-directed**: la IA crea la solucion solicitada por el usuario usando las capacidades acotadas que PMM le proporciona. Un editor interno general no es requisito de esta version.
-
-
-## Decision transcript
-
-For the reasoning and product intent behind the current 1.5.0.2 architecture, read:
-
-`Development/Reliability/V1502_DECISION_TRANSCRIPT_2026-09-23.md`
-
-The transcript is contextual history. The authoritative execution requirements remain the single-EXE/noflag plan, STATUS and NEXT_SESSION.
+Large future expansions are not required to close 1.5.0.2.

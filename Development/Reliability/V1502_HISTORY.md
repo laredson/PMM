@@ -96,3 +96,41 @@ El plan REL-00..REL-07 no se descarta. Se reagrupa en `V1502_PLAN.md`:
 - S08: submissions de falsos positivos si aun hacen falta.
 
 Los FINDINGS/CHECKS anteriores siguen siendo evidencia historica y no se reescriben.
+
+
+## PRE-NF01 - continuity, local index and development package identity (2026-09-23)
+
+Before starting NF01, the project continuity model was reorganized so a new Codex/chat/developer can continue directly from Git without an external handoff.
+
+Added canonical continuity layer:
+- `Development/Handoff/CURRENT_HANDOFF.md`;
+- `Development/Handoff/CURRENT_STATE.json`;
+- `Development/Handoff/HISTORY_REGISTRY.json`;
+- `Development/Handoff/README.md`.
+
+Historical FINDINGS/CHECKS/old handoffs were deliberately not moved or rewritten. They remain immutable evidence and are classified by the registry.
+
+Added local repository indexing:
+- `Development/Tools/build_repo_index.py`;
+- generated output lives under ignored `.pmm-index/`;
+- index records tracked files, classifications, symbols, process/network signals and path-reference candidates.
+
+Adopted normal Codex/developer workflow:
+- local clone;
+- fetch + fast-forward only;
+- clean working tree;
+- refresh local index when HEAD changes;
+- advance as far as safely possible in the current prompt/gate;
+- one coherent development commit per prompt;
+- update continuity/state/history/next in the same commit when project state changes;
+- compare result against the original plan and record any superior plan modification explicitly.
+
+Package identity was moved coherently to the active development line:
+- VERSION `1.5.0.2`;
+- BUILD_ID `PMM-v1.5.0.2-development-baseline`;
+- RELEASE_MANIFEST identity updated;
+- SHA256SUMS updated for the changed package metadata.
+
+I03/I04 remain feature/integration provenance. This renumbering does not claim NF01+ implementation is complete.
+
+NF01 remains the next functional/research block.
