@@ -1,0 +1,184 @@
+{
+  "schema": "PMM_NF01_EVIDENCE_V1",
+  "branch": "v1.5.0.2",
+  "inspectedHead": "4d14627ce111aa416491f1fa278473354e70550d",
+  "date": "2026-09-23",
+  "status": "SUBSTANTIALLY_COMPLETE_LOCAL_CONFIRMATION_REQUIRED",
+  "environment": {
+    "localCloneAttempted": true,
+    "localCloneSucceeded": false,
+    "cloneFailure": "Could not resolve host: github.com",
+    "fallback": "authenticated GitHub branch tree + direct file inspection",
+    "claimsLocalExhaustiveSearch": false
+  },
+  "executables": [
+    {
+      "path": "PMM/PMM.exe",
+      "sizeBytes": 2744832,
+      "gitBlobSha": "1e6e1932f7e02a068a5ed154a2d00f3a41ddf138",
+      "sha256FromPackageInventory": "a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c",
+      "sourceStatus": "latest Reliability Host C2B candidate lineage; old Development/Source snapshot diverges"
+    },
+    {
+      "path": "PMM/Engine/PMMRuntime.exe",
+      "sizeBytes": 6506496,
+      "gitBlobSha": "aa170ae00aad1509a1e45d60a410a946da7119e0",
+      "sha256FromPackageInventory": "b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f",
+      "sourceStatus": "latest Reliability Runtime C2B candidate lineage; old Development/Source snapshot diverges"
+    },
+    {
+      "path": "PMM/Engine/PMMFixLab.exe",
+      "sizeBytes": 2790912,
+      "gitBlobSha": "e2a7c8269215f5f02db1408429ddee58fc445b52",
+      "sha256FromPackageInventory": "8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe",
+      "sourceStatus": "distributed original/reference; exact source parity not recovered"
+    }
+  ],
+  "hostRoutes": {
+    "start": [
+      "Engine/PMMRuntime.exe",
+      "start"
+    ],
+    "runtime-self-test": [
+      "Engine/PMMRuntime.exe",
+      "self-test"
+    ],
+    "runtime-doctor": [
+      "Engine/PMMRuntime.exe",
+      "doctor"
+    ],
+    "runtime-security": [
+      "Engine/PMMRuntime.exe",
+      "security"
+    ],
+    "runtime-native-ui": [
+      "Engine/PMMRuntime.exe",
+      "ui-native"
+    ]
+  },
+  "runtimeCommands": [
+    "version",
+    "doctor",
+    "security",
+    "knowledge validate",
+    "game detect",
+    "dependencies status",
+    "dependencies ensure",
+    "hash sha256",
+    "archive extract",
+    "archive create",
+    "process run",
+    "start",
+    "ui",
+    "ui-native",
+    "self-test"
+  ],
+  "mainBrokerOperations": [
+    "Analyze",
+    "Build",
+    "AIHandoff",
+    "AIIOPrepare",
+    "AIIOPendingData",
+    "AIIOImportResponse",
+    "AIIOUseCandidate",
+    "AIIOModBuild",
+    "AIIOArtifactRefresh",
+    "FixLabBuild",
+    "MappingsImport",
+    "DeepAnalysis",
+    "DeepCase",
+    "DeepSource",
+    "UpdateCheck",
+    "UpdateApply",
+    "UpdateRestore",
+    "Recovery"
+  ],
+  "schemas": {
+    "backgroundProgress": "PMM_BACKGROUND_OPERATION_PROGRESS_V2",
+    "backgroundResult": "PMM_BACKGROUND_OPERATION_RESULT_V2",
+    "operationJournal": "PMM_OPERATION_EVENT_V1",
+    "hostSession": "PMM_HOST_SESSION_V1",
+    "runtimeProcess": "PMM_RUNTIME_PROCESS_V1",
+    "gameReferenceProgress": "PMM_GAME_REFERENCE_PROGRESS_V1",
+    "gameReferenceResult": "PMM_GAME_REFERENCE_WORKER_RESULT_V1",
+    "moduleSnapshot": "PMM_MODULE_SNAPSHOT_V1"
+  },
+  "locking": {
+    "mainBackgroundOperation": "Cache/PMM.background-operation.lock; exclusive file share; Recovery exception",
+    "journal": "named mutex Local\\\\PMM_OperationJournal_<hash>",
+    "repairWorker": "worker.lock + launch.lock",
+    "dependencyInstaller": "install.lock"
+  },
+  "directlyVerifiedBypassPaths": [
+    "Development/Reliability/NativeCandidates/Host/main.go",
+    "Development/Reliability/NativeCandidates/Runtime/ui_plan.go",
+    "PMM/Modules/Presentation/Operations.UI.ps1",
+    "PMM/Modules/Unreal/Dependencies.Service.ps1",
+    "PMM/Modules/Analysis/Repair.Service.ps1",
+    "PMM/Modules/MCP/AppServer.Client.ps1",
+    "PMM/Modules/Observations/Observation.Service.ps1",
+    "PMM/Modules/MCP/MCP.Reference.ps1",
+    "PMM/Modules/MCP/MCP.ReferenceWorker.ps1",
+    "PMM/Modules/Analysis/Nexus.Client.ps1"
+  ],
+  "fixLabNativeContracts": {
+    "requirements": [
+      "requirements",
+      "--recipe",
+      "<recipe>"
+    ],
+    "build": [
+      "build",
+      "--recipe",
+      "<recipe>",
+      "--source-root",
+      "<dir>",
+      "--game-reference",
+      "<dir>",
+      "--output",
+      "<pak>",
+      "--report",
+      "<json>"
+    ],
+    "buildReportRequired": [
+      "validation.readback == true",
+      "validation.byteExact == true"
+    ]
+  },
+  "sourceDivergence": {
+    "host": {
+      "oldSourceCoreGoFiles": 1,
+      "candidateGoFiles": 7,
+      "sameMain": false,
+      "candidateOnlyFiles": 6
+    },
+    "runtime": {
+      "oldSourceGoFiles": 18,
+      "candidateGoFiles": 28,
+      "identicalSamePath": 8,
+      "changedSamePath": 10,
+      "candidateOnly": 10
+    }
+  },
+  "nf02a": {
+    "canonicalRoot": "Development/Source/PMM/",
+    "layout": [
+      "cmd/pmm",
+      "internal/host",
+      "internal/runtime",
+      "internal/supervision",
+      "internal/uibridge"
+    ],
+    "processModel": "Host PMM.exe spawns same executable as child: PMM.exe runtime <command>",
+    "preserveSeparateProcessIsolation": true,
+    "packageReplacementDuringCandidatePhase": false,
+    "fixLabMerged": false
+  },
+  "remainingNF01LocalGate": [
+    "git clean/HEAD confirmation on local clone",
+    "recompute SHA-256 of PMM.exe, PMMRuntime.exe, PMMFixLab.exe from bytes",
+    "run build_repo_index.py",
+    "exhaustive local grep for ExecutionPolicy/Bypass/process launch sites",
+    "compare local results to NF01_FINDINGS.md"
+  ]
+}

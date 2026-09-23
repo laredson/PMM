@@ -9,75 +9,74 @@ Package:
 - BUILD_ID: `PMM-v1.5.0.2-development-baseline`
 - stableCandidate: false
 
-The package identity has now been moved atomically from inherited 1.5.0.1/I04 metadata to the 1.5.0.2 development baseline. This is a development-baseline identity change, not completion of NF01+.
-
 Canonical handoff:
 `Development/Handoff/CURRENT_HANDOFF.md`
 
-## Inherited baseline preserved
+## Preserved baseline
 
 - I03 localization: 30 registered / 23 enabled / 7 reserve;
 - I04 Nexus Updates;
 - Host C2B distributed;
 - Runtime C2B distributed;
-- PMMFixLab original distributed + 04A-6E research/candidates;
-- Workspace;
-- Mods & Merge;
-- deployment/rollback/recovery;
-- Deep Analysis;
-- AIIO.
+- original PMMFixLab + 04A-6E research;
+- Workspace, Mods & Merge, Deep Analysis, AIIO, deploy/rollback/recovery.
 
-## Architecture target
+## NF01
 
-One PMM-owned executable with separate-process worker modes.
+Durable evidence:
+- `NF01_FINDINGS.md`
+- `NF01_EVIDENCE.json`
 
-External third-party executables remain external.
-
-Modules/Resources/CKL and other useful development surfaces stay open/editable.
-
-FixLab does not merge until parity/Windows acceptance permits it.
-
-## PRE-NF01 preparation
+State:
+**SUBSTANTIALLY COMPLETE / LOCAL-CLONE CONFIRMATION GATE OPEN**
 
 Completed:
-- canonical `Development/Handoff/` continuity layer;
-- machine-readable history classification;
-- local repository-index generator;
-- local-first Codex/developer workflow;
-- one coherent commit per prompt rule;
-- maximize progress within current gate rule;
-- explicit end-of-prompt comparison against plan;
-- package identity moved to 1.5.0.2 development baseline;
-- generated index output excluded from Git.
+- PMM-owned executable size/blob/package-hash identity;
+- Host routes/commands;
+- Runtime command matrix;
+- Runtime generic process contract;
+- startup repair/network path;
+- primary worker operation set;
+- progress/result/journal/lock contracts;
+- dedicated process families;
+- directly verified Bypass paths;
+- FixLab native requirements/build contract;
+- old-source vs NativeCandidate divergence;
+- migration matrix;
+- exact NF02A architecture/tests/rollback design;
+- process/UI consensus document restored.
 
-## Known architecture facts
+Environment limitation:
+the execution container could not resolve github.com, so a true local clone/index/grep and byte-level SHA recomputation could not be run here.
 
-- Host normal start routes to PMMRuntime.
-- normal WPF/other worker paths still contain ExecutionPolicy Bypass.
-- Runtime start can repair/download missing/invalid dependencies before UI.
-- OperationWorker.ps1 remains broad.
-- generic Runtime process-run capability exists.
-- Host/Runtime candidate builds still post-process PE resources.
-- Development/Source Host/Runtime snapshots diverge from later NativeCandidates.
-- old VT RC30 result is not a current 1.5.x baseline.
-- pre-UI incident remains OPEN / NOT REPRODUCED / UNKNOWN / WATCHPOINT.
+## NF02A design decision
+
+Create canonical `Development/Source/PMM/` with Host and Runtime as separate internal roles in one binary.
+
+Preserve isolation:
+
+`PMM.exe -> PMM.exe runtime start`
+
+Do **not** merge Runtime into the Host process merely to reduce file count.
+
+PMMRuntime.exe remains in the package until Windows acceptance of the replacement.
+
+FixLab remains separate through NF02.
+
+## Known later work
+
+- NF03: startup status-only + explicit repair; remove Bypass by feature.
+- NF04: migrate primary processing broker/workers to explicit same-EXE worker modes.
+- NF04F: FixLab only after parity.
+- NF05: conventional reproducible PE resources/build.
+- P01-P04: cure product workflows.
 
 ## Roadmap
 
 - NF00: CLOSED
-- PRE-NF01 continuity/index/version baseline: **CLOSED**
-- NF01 baseline + migration matrix: **NEXT**
-- NF02 Host+Runtime single-EXE: PENDING
-- NF03 startup/dependency/PowerShell hardening: PENDING
-- NF04 workers single-EXE: PENDING
-- NF04F FixLab convergence: PENDING
-- NF05 conventional reproducible PE build: PENDING
-- P01 Updates: PENDING
-- P02 compatibility patch: PENDING
-- P03 FixLab restoration: PENDING
-- P04 AI-created mods via PMM: PENDING
-- NF06 full regression: PENDING
-- NF07 scanner/Nexus candidate validation: PENDING
-- NF08 signing/provenance: OPTIONAL/LATER
+- PRE-NF01: CLOSED
+- NF01: **LOCAL CONFIRMATION PENDING**
+- NF02A: READY AFTER NF01-L
+- NF03+: PENDING
 
 Continue with `NEXT_SESSION.md`.

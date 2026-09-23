@@ -57,6 +57,21 @@
       "path": "Development/Reliability/Incidents/STARTUP_PRE_UI_2026-09.md",
       "class": "INCIDENT",
       "scope": "unreproduced pre-UI startup failure"
+    },
+    {
+      "path": "Development/Reliability/NF01_FINDINGS.md",
+      "class": "EVIDENCE",
+      "scope": "NF01 current baseline, process contracts and NF02A migration design"
+    },
+    {
+      "path": "Development/Reliability/NF01_EVIDENCE.json",
+      "class": "EVIDENCE",
+      "scope": "machine-readable NF01 facts and remaining local confirmation gate"
+    },
+    {
+      "path": "Development/Docs/Architecture/PMM_PROCESS_AND_UI_CONSENSUS.md",
+      "class": "ACTIVE_PLAN",
+      "scope": "current/target process and UI ownership contract"
     }
   ],
   "laboratories": [

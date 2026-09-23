@@ -305,3 +305,16 @@ This layer does not replace historical FINDINGS/CHECKS. It prevents legacy hando
 The old `Development/Reliability/NEW_PROJECT_HANDOFF.md`, AI handoffs and localization handoffs are retained as historical/specialized evidence.
 
 Local navigation is assisted by `Development/Tools/build_repo_index.py`; generated `.pmm-index/` is never committed.
+
+
+## NF01 - v1.5.0.2 executable/process baseline
+
+- `NF01_FINDINGS.md`
+- `NF01_EVIDENCE.json`
+- `../Docs/Architecture/PMM_PROCESS_AND_UI_CONSENSUS.md`
+
+NF01 maps current Host/Runtime/FixLab boundaries, worker/result/lock contracts,
+source-tree divergence and the NF02A single-file/self-child Runtime design.
+
+Status is substantially complete with a short local-clone confirmation gate
+because the NF01 execution container could not resolve GitHub for cloning.

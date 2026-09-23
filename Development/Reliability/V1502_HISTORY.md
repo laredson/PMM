@@ -134,3 +134,30 @@ Package identity was moved coherently to the active development line:
 I03/I04 remain feature/integration provenance. This renumbering does not claim NF01+ implementation is complete.
 
 NF01 remains the next functional/research block.
+
+
+## NF01 - baseline and migration inventory (2026-09-23)
+
+NF01 inspected the exact v1.5.0.2 branch at HEAD `4d14627ce111aa416491f1fa278473354e70550d`.
+
+The normal local clone was attempted first but the execution container could not resolve `github.com`. Work continued against the authenticated exact branch tree. This is recorded rather than being misrepresented as a local run.
+
+NF01 established:
+- executable tree identities/sizes and package SHA pins;
+- Host route/supervision contract;
+- Runtime subcommands and generic process boundary;
+- startup dependency repair/network behavior;
+- OperationWorker operation/progress/result/lock/journal contracts;
+- current FixLab native requirements/build interface;
+- verified Bypass launch families;
+- major source divergence between old Development/Source snapshots and later NativeCandidates;
+- NF02A migration/rollback/Windows acceptance design.
+
+Architectural refinement:
+the one-EXE target will retain Host/Runtime isolation by launching the same executable as a separate Runtime child:
+
+`PMM.exe -> PMM.exe runtime start`
+
+NF02A will establish a new canonical source at `Development/Source/PMM/` instead of promoting the stale snapshots.
+
+NF01 remains open only for a short local confirmation gate: local SHA recomputation + generated index + exhaustive grep.

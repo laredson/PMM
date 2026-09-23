@@ -739,3 +739,56 @@ Normal completion:
 If evidence shows a clearly superior project-wide plan, update this plan/state in that same prompt and record the rationale. Do not silently diverge.
 
 The canonical handoff definition and precedence rules live in `Development/Handoff/README.md`.
+
+
+---
+
+## 12. NF01 refinement: preserve Host/Runtime process isolation in the single-EXE design
+
+NF01 established that the best NF02A implementation is **one executable file with a self-child Runtime process**, not an in-process Host+Runtime merge.
+
+Target normal startup:
+
+`PMM.exe (Host) -> PMM.exe runtime start (child process)`
+
+Rationale:
+- retains separate address spaces;
+- preserves supervision/exit-code/log contracts;
+- Host can survive/diagnose Runtime child failure;
+- achieves the physical single-PMM-binary goal;
+- creates the same pattern later used for `PMM.exe --worker ...`.
+
+### Canonical source
+
+NF02A should create a new canonical module at:
+
+`Development/Source/PMM/`
+
+Recommended layout:
+- `cmd/pmm/`;
+- `internal/host/`;
+- `internal/runtime/`;
+- `internal/supervision/`;
+- `internal/uibridge/`.
+
+Inputs are the latest Reliability candidate sources, not the older Development/Source Host/Runtime snapshots.
+
+Do not delete old snapshots/candidates during NF02; retain them as historical/reference evidence until acceptance.
+
+### Validation-source drift
+
+Current validation infrastructure that tests only `Development/Source/Host` and `Development/Source/Runtime` is not proof of the latest C2B behavior.
+
+Update validation to the unified canonical source only after NF02A establishes it, avoiding another temporary source-of-truth.
+
+### NF01 local confirmation
+
+The NF01 session that established this design could not clone because its execution container had no DNS route to GitHub.
+
+Before implementation, a local-capable Codex session must:
+- regenerate the repository index;
+- recompute the three PMM-owned executable SHA-256 values;
+- run exhaustive launch/Bypass grep;
+- compare with NF01 evidence.
+
+This is a confirmation gate, not a restart of NF01 research.

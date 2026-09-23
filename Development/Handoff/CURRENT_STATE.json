@@ -85,14 +85,16 @@
     "current Host/Runtime candidate builds post-process PE resources",
     "Development/Source Host/Runtime snapshots diverge from later Reliability NativeCandidates",
     "historical VirusTotal RC30 sample is not current 1.5.x baseline",
-    "startup pre-UI incident remains OPEN / NOT REPRODUCED / UNKNOWN as watchpoint"
+    "startup pre-UI incident remains OPEN / NOT REPRODUCED / UNKNOWN as watchpoint",
+    "NF01 verified that single-EXE Host+Runtime should retain process isolation through PMM.exe runtime <command> self-child dispatch",
+    "current validation against Development/Source/Host and Runtime does not validate the later C2B NativeCandidate lineage"
   ],
   "roadmap": {
     "completed": [
       "NF00",
       "PRE-NF01-CONTINUITY"
     ],
-    "next": "NF01",
+    "next": "NF01-L then NF02A",
     "ordered": [
       "NF01",
       "NF02",
@@ -122,11 +124,19 @@
     "noForcePush": true
   },
   "nextBlock": {
-    "id": "NF01",
-    "goal": "exact baseline + executable/worker/process contract inventory and smallest reversible NF02A migration design"
+    "id": "NF01-L",
+    "goal": "local clone/index/hash/grep confirmation; then begin NF02A if evidence matches"
   },
   "signing": {
     "requiredFor1502": false,
     "signPathFoundation": "optional after product is ready"
+  },
+  "nf01": {
+    "status": "SUBSTANTIALLY_COMPLETE_LOCAL_CONFIRMATION_REQUIRED",
+    "findings": "Development/Reliability/NF01_FINDINGS.md",
+    "evidence": "Development/Reliability/NF01_EVIDENCE.json",
+    "localCloneFailure": "Could not resolve host: github.com",
+    "nf02aProcessModel": "PMM.exe Host spawns same PMM.exe as separate child: runtime <command>",
+    "canonicalSourceTarget": "Development/Source/PMM/"
   }
 }

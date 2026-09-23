@@ -358,3 +358,24 @@ Until an explicit scoped change says otherwise preserve:
 - exact historical evidence.
 
 A cleaner architecture is not success if it silently loses product behavior.
+
+
+---
+
+## 14. NF01 result
+
+NF01 durable findings:
+- `Development/Reliability/NF01_FINDINGS.md`
+- `Development/Reliability/NF01_EVIDENCE.json`
+
+NF01 is substantially complete, with one local confirmation gate remaining because the session environment could not resolve GitHub for a local clone.
+
+The important design result is now fixed:
+
+`PMM.exe Host -> separate child PMM.exe runtime start`
+
+The single-executable goal does **not** remove the Host/Runtime process isolation boundary.
+
+A new canonical source tree will be created under `Development/Source/PMM/` in NF02A from the latest Reliability candidate lineage. The older Host/Runtime source snapshots remain historical/reference material.
+
+See `Development/Reliability/NEXT_SESSION.md` for NF01-L and NF02A.
