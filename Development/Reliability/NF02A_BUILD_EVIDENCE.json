@@ -1,0 +1,102 @@
+{
+  "schema": "PMM_NF02A_BUILD_EVIDENCE_V1",
+  "date": "2026-09-23",
+  "branch": "v1.5.0.2",
+  "sourceHead": "229e8e9f4eddcbea6f0df3ee8fb336cd26c414d3",
+  "validationClass": "CONNECTOR_BACKED_LOCAL_RECONSTRUCTION_CROSS_BUILD",
+  "localClone": {
+    "attempted": true,
+    "succeeded": false,
+    "failure": "Could not resolve host: github.com",
+    "consequence": "NF01-L full-repository index/hash confirmation and exact-clone build remain open"
+  },
+  "toolchain": {
+    "go": "go1.23.2 linux/amd64",
+    "target": "windows/amd64",
+    "cgo": false,
+    "goToolchain": "local",
+    "goProxy": "off",
+    "goSumDb": "off",
+    "goWork": "off"
+  },
+  "sourceMaterialization": {
+    "method": "canonical Development/Source/PMM files read from exact GitHub branch through authenticated connector and reconstructed in the execution container",
+    "exactGitCheckout": false,
+    "note": "Candidate hash below is compile evidence for the reconstructed canonical source and is NOT the release-candidate identity."
+  },
+  "validation": [
+    {
+      "step": "go test ./internal/dispatch",
+      "result": "PASS",
+      "notes": "dispatcher tests executed"
+    },
+    {
+      "step": "go test ./internal/runtime",
+      "result": "PASS_COMPILE",
+      "notes": "canonical Runtime source compiled on Linux; migrated remote _test.go files were not all materialized in this reconstruction"
+    },
+    {
+      "step": "go test ./internal/supervision",
+      "result": "PASS_COMPILE",
+      "notes": "source compiled; full remote test set not materialized"
+    },
+    {
+      "step": "go test ./internal/uibridge",
+      "result": "PASS_COMPILE",
+      "notes": "source compiled; full remote test set not materialized"
+    },
+    {
+      "step": "GOOS=windows GOARCH=amd64 go test -c ./internal/host",
+      "result": "PASS",
+      "artifactSha256": "bff9886a0972ed50e38236d04b0700cebfd3e2ec18ac4fb972c424e5eceffc95"
+    },
+    {
+      "step": "GOOS=windows GOARCH=amd64 go test -c ./internal/runtime",
+      "result": "PASS_COMPILE",
+      "notes": "Windows Runtime package cross-compiled"
+    },
+    {
+      "step": "GOOS=windows GOARCH=amd64 go build ./cmd/pmm",
+      "result": "PASS",
+      "artifact": "PMMUnified-candidate.exe",
+      "artifactSha256": "e0ad8c0a4cc872f30c7077428aedcc66895966111bfc95a38d0e3bb8cd0cae14",
+      "sizeBytes": 6526464
+    }
+  ],
+  "peInspection": {
+    "format": "PE32+",
+    "machine": "x86-64 / 0x8664",
+    "optionalHeader": "PE32+ / 0x20b",
+    "subsystem": "Windows GUI / 2",
+    "sections": 8
+  },
+  "connectorStaticChecks": {
+    "migratedTestFiles": 16,
+    "packageDeclarations": "expected",
+    "oldSupervisionOrUIBridgeImportsFound": false,
+    "unexpectedMainCallsFound": false
+  },
+  "compileDefects": {
+    "actualCanonicalSourceDefectsFound": 0,
+    "reconstructionGapsEncountered": [
+      "missing Runtime source files during staged local reconstruction; resolved by materializing their canonical branch content",
+      "no source patch was required to make NF02A architecture compile"
+    ]
+  },
+  "windowsRuntime": {
+    "executed": false,
+    "reason": "Linux execution container has no Windows runtime/Wine; Windows acceptance remains mandatory"
+  },
+  "package": {
+    "distributedBinariesChanged": false,
+    "packagedCandidateInstalled": false,
+    "pmmRuntimeRemoved": false,
+    "fixLabMerged": false
+  },
+  "nextGate": [
+    "network-capable exact local clone",
+    "NF01-L full repository index + byte SHA confirmation",
+    "run canonical build.py against exact checkout including all migrated tests",
+    "execute NF02A Windows acceptance checklist"
+  ]
+}

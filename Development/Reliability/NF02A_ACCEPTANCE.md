@@ -56,3 +56,25 @@ Only after the Windows behavior gate passes:
 - then prove no runtime route still consumes it before removal.
 
 FixLab remains separate.
+
+
+---
+
+## Current evidence status - 2026-09-23
+
+A connector-backed reconstruction of the canonical NF02A source has reached the Windows gate:
+
+- Go 1.23.2 offline compile: PASS;
+- dispatcher tests: PASS;
+- Runtime/Supervision/UIBridge compile on Linux: PASS;
+- Host windows/amd64 test binary compile: PASS;
+- Runtime windows/amd64 compile: PASS;
+- unified windows/amd64 GUI executable build: PASS;
+- PE format/subsystem inspection: PASS.
+
+Evidence:
+`NF02A_BUILD_EVIDENCE.json`
+
+This is **not yet the exact-clone static/build gate**, because the execution container could not clone GitHub and therefore did not execute the complete migrated test set from an exact checkout.
+
+The next network-capable environment should run the canonical `build.py` once. If it passes, proceed directly to the Windows behavior gate above.

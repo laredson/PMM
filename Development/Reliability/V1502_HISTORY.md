@@ -191,3 +191,31 @@ Added:
 - canonical source-status documentation.
 
 NF02A now awaits a real local build plus Windows acceptance.
+
+
+## NF02A compile proof - connector-backed reconstruction (2026-09-23)
+
+The environment again failed to clone GitHub because outbound DNS/connectivity is unavailable.
+
+To avoid blocking the development gate, the canonical `Development/Source/PMM/` source was reconstructed locally from the exact branch files available through the authenticated GitHub connector and compiled with Go 1.23.2.
+
+The staged reconstruction initially failed only because not all Runtime source files had yet been materialized. After materializing the canonical files, no actual NF02A source compile error remained.
+
+Validation reached:
+- dispatcher test PASS;
+- Runtime/Supervision/UIBridge Linux compile PASS;
+- Host Windows test cross-compile PASS;
+- Runtime Windows cross-compile PASS;
+- unified Windows GUI executable cross-build PASS;
+- PE32+ x86-64 / GUI subsystem verified.
+
+The reconstruction candidate is 6,526,464 bytes with SHA-256
+`e0ad8c0a4cc872f30c7077428aedcc66895966111bfc95a38d0e3bb8cd0cae14`.
+
+That hash is deliberately **not** treated as a release/canonical candidate hash because the build was not made from a literal Git clone and not every migrated remote test file was materialized.
+
+No distributed package binary changed.
+
+The canonical build script was improved to record per-file source SHA-256 inventory and corrected the build-report field name to `pmmRuntimeRemoved`.
+
+Next gate: exact-clone build confirmation, then Windows acceptance.

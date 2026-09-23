@@ -25,6 +25,20 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
+def source_inventory(src: Path) -> dict[str, str]:
+    files: list[Path] = []
+    for path in src.rglob("*"):
+        if not path.is_file():
+            continue
+        if "__pycache__" in path.parts or path.suffix in {".pyc", ".pyo"}:
+            continue
+        files.append(path)
+    return {
+        path.relative_to(src).as_posix(): sha256(path)
+        for path in sorted(files)
+    }
+
+
 def run(argv, cwd: Path, env):
     p = subprocess.run(
         [str(x) for x in argv],
@@ -121,13 +135,14 @@ def main() -> int:
         "classification": "CANDIDATE_NOT_PACKAGED",
         "goVersion": GO_VERSION,
         "target": "windows/amd64",
+        "sourceSha256": source_inventory(src),
         "candidate": candidate.name,
         "candidateSha256": sha256(candidate),
         "candidateSizeBytes": candidate.stat().st_size,
         "hostTestBinarySha256": sha256(host_test),
         "commands": commands,
         "packagedBinaryReplaced": False,
-        "pmMRuntimeRemoved": False,
+        "pmmRuntimeRemoved": False,
         "fixLabMerged": False,
         "windowsExecuted": False,
         "note": "NF02A candidate only. Copy beside a complete PMM package for Windows acceptance; do not replace the release binary until acceptance passes.",

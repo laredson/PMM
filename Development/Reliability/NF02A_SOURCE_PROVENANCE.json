@@ -26,7 +26,13 @@
     "no FixLab merge",
     "no Updates behavior change"
   ],
-  "localBuildExecuted": false,
+  "localBuildExecuted": "CONNECTOR_BACKED_RECONSTRUCTION_ONLY",
   "windowsExecuted": false,
-  "reasonLocalBuildNotExecuted": "execution container cannot resolve github.com, so exact branch could not be cloned/materialized locally"
+  "reasonLocalBuildNotExecuted": "exact git clone unavailable because execution container cannot resolve/connect to github.com; canonical source was connector-materialized for compile proof",
+  "connectorBackedCrossBuild": {
+    "status": "PASS",
+    "evidence": "Development/Reliability/NF02A_BUILD_EVIDENCE.json",
+    "exactClone": false,
+    "windowsExecuted": false
+  }
 }

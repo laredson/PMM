@@ -326,3 +326,10 @@ because the NF01 execution container could not resolve GitHub for cloning.
 - `NF02A_ACCEPTANCE.md`
 
 Canonical candidate source now exists for one PMM-owned Host+Runtime executable while preserving a separate child Runtime process. Distributed binaries remain unchanged until build/Windows acceptance.
+
+
+## NF02A cross-build evidence
+
+- `NF02A_BUILD_EVIDENCE.json`
+
+Records the connector-backed Go 1.23.2 compile/cross-build proof that the unified Host+Runtime source reaches a valid Windows GUI PE candidate. Exact-clone test execution and Windows runtime acceptance remain separate gates.

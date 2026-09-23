@@ -72,6 +72,11 @@
       "path": "Development/Docs/Architecture/PMM_PROCESS_AND_UI_CONSENSUS.md",
       "class": "ACTIVE_PLAN",
       "scope": "current/target process and UI ownership contract"
+    },
+    {
+      "path": "Development/Reliability/NF02A_BUILD_EVIDENCE.json",
+      "class": "EVIDENCE",
+      "scope": "NF02A connector-backed compile/cross-build proof; exact-clone and Windows gates remain separate"
     }
   ],
   "laboratories": [

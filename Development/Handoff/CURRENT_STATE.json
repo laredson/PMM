@@ -94,7 +94,7 @@
       "NF00",
       "PRE-NF01-CONTINUITY"
     ],
-    "next": "NF01-L confirmation + NF02A build/Windows acceptance",
+    "next": "exact-clone confirmation + NF02A Windows acceptance",
     "ordered": [
       "NF01",
       "NF02",
@@ -124,15 +124,15 @@
     "noForcePush": true
   },
   "nextBlock": {
-    "id": "NF02A-BUILD",
-    "goal": "run local NF01-L confirmation, build Development/Source/PMM offline, then execute Windows acceptance"
+    "id": "NF02A-WINDOWS",
+    "goal": "run exact-checkout NF01-L/build confirmation, then execute NF02A Windows behavior acceptance"
   },
   "signing": {
     "requiredFor1502": false,
     "signPathFoundation": "optional after product is ready"
   },
   "nf01": {
-    "status": "EVIDENCE_COMPLETE_LOCAL_CONFIRMATION_PENDING",
+    "status": "EVIDENCE_COMPLETE_EXACT_LOCAL_CONFIRMATION_PENDING",
     "findings": "Development/Reliability/NF01_FINDINGS.md",
     "evidence": "Development/Reliability/NF01_EVIDENCE.json",
     "localCloneFailure": "Could not resolve host: github.com",
@@ -140,13 +140,22 @@
     "canonicalSourceTarget": "Development/Source/PMM/"
   },
   "nf02a": {
-    "status": "CANONICAL_SOURCE_CONSOLIDATED_BUILD_AND_WINDOWS_ACCEPTANCE_PENDING",
+    "status": "CANONICAL_SOURCE_CONSOLIDATED_CROSS_BUILD_PASS_EXACT_CLONE_AND_WINDOWS_PENDING",
     "canonicalSource": "Development/Source/PMM/",
     "processModel": "PMM.exe Host spawns same PMM.exe as separate child: runtime <command>",
     "buildScript": "Development/Source/PMM/build.py",
     "acceptance": "Development/Reliability/NF02A_ACCEPTANCE.md",
     "distributedPackageChanged": false,
     "runtimeExeRemoved": false,
-    "fixLabMerged": false
+    "fixLabMerged": false,
+    "connectorBackedCrossBuild": "PASS",
+    "buildEvidence": "Development/Reliability/NF02A_BUILD_EVIDENCE.json",
+    "reconstructionCandidate": {
+      "sha256": "e0ad8c0a4cc872f30c7077428aedcc66895966111bfc95a38d0e3bb8cd0cae14",
+      "sizeBytes": 6526464,
+      "officialCandidate": false
+    },
+    "exactCloneBuild": "NOT_VERIFIED",
+    "windowsAcceptance": "NOT_VERIFIED"
   }
 }

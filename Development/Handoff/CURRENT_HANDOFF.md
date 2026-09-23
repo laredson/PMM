@@ -403,3 +403,29 @@ The execution environment again could not clone GitHub due DNS failure, so NF01-
 
 Next:
 `Development/Reliability/NEXT_SESSION.md`
+
+
+---
+
+## 16. NF02A compile validation
+
+NF02A's unified source has now been cross-compiled successfully from a connector-backed local reconstruction.
+
+Evidence:
+`Development/Reliability/NF02A_BUILD_EVIDENCE.json`
+
+Confirmed:
+- unified dispatcher compiles/tests;
+- Runtime/Supervision/UIBridge compile;
+- Host cross-compiles for Windows;
+- Runtime cross-compiles for Windows;
+- full `cmd/pmm` produces a Windows GUI x86-64 executable;
+- separate Host -> same-binary Runtime child architecture compiles.
+
+No actual canonical-source compilation error was found.
+
+The generated reconstruction EXE is evidence only and is not packaged/distributed.
+
+The environment still cannot make an exact Git clone, so NF01-L byte/hash/index confirmation and an exact-checkout run of all migrated tests remain open.
+
+The project is now operationally at the **NF02A Windows acceptance gate**, preceded by one short exact-clone confirmation/build when a network-capable local environment is available.
