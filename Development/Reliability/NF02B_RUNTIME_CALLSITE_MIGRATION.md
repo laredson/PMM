@@ -121,3 +121,38 @@ helper, so migrate them explicitly to root `PMM.exe runtime ...`.
 
 Do not apply these edits before NF02A integration because the currently
 distributed PMM.exe does not yet own the accepted Runtime role.
+
+---
+
+## Guarded migration tooling
+
+Prepared tool:
+
+`Development/Tools/nf02b_migrate.py`
+
+It is dry-run by default and encodes the current pre-inventory contract:
+- exactly 18 Runtime command migrations;
+- 14 edited PowerShell files including the shared path helper;
+- explicit Runner and dependency-wrapper handling;
+- Library cancelable extraction keeps the same external-process helper and only
+  prefixes its argument array with `runtime`;
+- file BOM choice is preserved.
+
+`--apply` is intentionally gated. It requires:
+1. the exact accepted NF02A candidate SHA-256;
+2. `PMM/PMM.exe` to match that hash;
+3. the five native Host routes already to be `PMM.exe runtime ...`;
+4. `PMMRuntime.exe` still to exist as the NF02B rollback/legacy safety net;
+5. all inventoried source contracts and counts still to match.
+
+Validation performed while preparing the tool:
+- transformation simulation against the exact remote `v1.5.0.2` files: 18/18;
+- zero active physical `Engine/PMMRuntime.exe` paths in the transformed target set;
+- zero unprefixed direct Runtime invocations in that transformed target set;
+- Python syntax: PASS;
+- synthetic dry-run + gated apply fixture: PASS, 18 migrations / 14 changed files;
+- exact local-repository execution: still pending because this environment cannot
+  resolve github.com.
+
+This tooling does not authorize skipping NF02A Windows acceptance and does not
+remove PMMRuntime.exe.

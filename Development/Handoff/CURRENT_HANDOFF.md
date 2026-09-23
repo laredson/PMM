@@ -497,3 +497,33 @@ The migration should not happen before NF02A integration. After integration,
 cancellation contracts.
 
 See `Development/Reliability/NEXT_SESSION.md`.
+
+---
+
+## 19. NF02B guarded migration tooling prepared
+
+The Windows NF02A acceptance gate is still not executable in this environment,
+so PMM.exe remains unintegrated and every distributed PMM product file remains
+unchanged.
+
+To reduce the next Windows/local step without violating that gate, a guarded
+NF02B migrator was prepared:
+
+`Development/Tools/nf02b_migrate.py`
+
+The transformation was simulated against the exact current branch files and
+matched all 18 inventoried Runtime command sites. The transformed target set has
+zero active physical `Engine/PMMRuntime.exe` paths and zero direct unprefixed
+Runtime invocations.
+
+The tool was also syntax-checked and exercised through a synthetic dry-run +
+apply fixture: 18 command migrations, 14 changed files, PMMRuntime retained.
+
+Actual apply is intentionally impossible until:
+- PMM.exe equals the accepted NF02A candidate SHA-256;
+- all five native routes are already `PMM.exe runtime ...`;
+- PMMRuntime.exe still exists for NF02B rollback/legacy safety;
+- the exact inventoried source contracts still match.
+
+This does not close NF02A Windows acceptance and does not perform NF02B product
+migration yet.

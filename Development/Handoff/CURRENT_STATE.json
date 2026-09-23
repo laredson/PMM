@@ -94,7 +94,7 @@
       "NF00",
       "PRE-NF01-CONTINUITY"
     ],
-    "next": "Windows exact NF02A acceptance, first integration, then NF02B migration from preinventory",
+    "next": "Windows exact NF02A acceptance and first integration; then run the prepared guarded NF02B migrator and zero-caller proof",
     "ordered": [
       "NF01",
       "NF02",
@@ -168,7 +168,7 @@
     }
   },
   "nf02b": {
-    "status": "PREINVENTORY_COMPLETE_MIGRATION_BLOCKED_UNTIL_NF02A_INTEGRATION",
+    "status": "PREINVENTORY_COMPLETE_MIGRATION_TOOLING_PREPARED_APPLY_BLOCKED_UNTIL_NF02A_INTEGRATION",
     "plan": "Development/Reliability/NF02B_RUNTIME_CALLSITE_MIGRATION.md",
     "goal": "migrate all active direct PMMRuntime.exe callers to PMM.exe runtime",
     "preinventoryHuman": "Development/Reliability/NF02B_PREINVENTORY.md",
@@ -182,6 +182,17 @@
       "dependenciesEnsure": 2,
       "ui": 1,
       "selfTest": 1
+    },
+    "migrationTool": "Development/Tools/nf02b_migrate.py",
+    "migrationToolEvidence": "Development/Reliability/NF02B_MIGRATION_TOOL_EVIDENCE.json",
+    "expectedEditedFiles": 14,
+    "toolValidation": {
+      "remoteTransformationSimulation": "PASS_18_OF_18",
+      "postTransformLegacyPhysicalPathsInTargets": 0,
+      "postTransformUnprefixedDirectInvocationsInTargets": 0,
+      "pythonSyntax": "PASS",
+      "syntheticDryRunApply": "PASS",
+      "exactLocalRepositoryExecution": "NOT_RUN_DNS_BLOCKED"
     }
   },
   "nf02c": {

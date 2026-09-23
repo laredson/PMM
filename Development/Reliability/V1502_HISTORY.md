@@ -266,3 +266,25 @@ The central migration point is `Get-PMMRuntimePath` in Shared/Paths.ps1.
 ModuleRuntime's binary snapshot keeps PMMRuntime until NF02C.
 
 No PMM product file was changed in this prompt.
+
+## NF02B guarded migrator preparation (2026-09-23)
+
+NF02A Windows execution remained unavailable, so no distributed binary or PMM
+product file was changed.
+
+A guarded NF02B migration tool was prepared to make the post-acceptance caller
+migration deterministic. The exact remote target files were transformation-
+simulated successfully: all 18 inventoried Runtime command sites were covered,
+with no active physical PMMRuntime path or unprefixed direct Runtime invocation
+remaining in the transformed target set.
+
+The tool is dry-run by default. Apply requires the accepted candidate SHA-256,
+the five already-integrated PMM.exe Runtime routes, source-contract/count parity,
+and retention of PMMRuntime.exe until NF02C.
+
+Local validation of the tool itself:
+- Python syntax PASS;
+- synthetic dry-run PASS;
+- synthetic gated apply PASS;
+- 18 command migrations / 14 changed files;
+- legacy Runtime EXE retained.

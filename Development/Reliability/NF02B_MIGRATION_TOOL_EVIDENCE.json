@@ -1,0 +1,35 @@
+{
+  "schema": "PMM_NF02B_MIGRATION_TOOL_EVIDENCE_V1",
+  "branch": "v1.5.0.2",
+  "branchHead": "a57069bb580ae87bfa8282109038009e550cd828",
+  "date": "2026-09-23",
+  "distributedPackageChanged": false,
+  "tooling": "Development/Tools/nf02b_migrate.py",
+  "remoteTransformationSimulation": {
+    "status": "PASS",
+    "commandMigrations": 18,
+    "expectedCommandMigrations": 18,
+    "changedFilesExpected": 14,
+    "legacyPhysicalPathsRemainingInTargetSet": 0,
+    "unprefixedDirectRuntimeInvocationsRemainingInTargetSet": 0,
+    "note": "Simulation used the exact v1.5.0.2 remote file contents at branchHead; product files were not written."
+  },
+  "localToolValidation": {
+    "pythonSyntax": "PASS",
+    "syntheticDryRun": "PASS",
+    "syntheticApply": "PASS",
+    "syntheticCommandMigrations": 18,
+    "syntheticChangedFiles": 14,
+    "pmmRuntimeRetained": true
+  },
+  "applyGuards": [
+    "accepted NF02A candidate SHA-256 must match PMM/PMM.exe",
+    "five native Host routes must already be PMM.exe runtime ...",
+    "PMMRuntime.exe must still exist during NF02B",
+    "inventoried source contracts/counts must still match"
+  ],
+  "exactLocalRepositoryExecution": "NOT_RUN_CURRENT_ENVIRONMENT_DNS_BLOCKED",
+  "windowsAcceptance": "NOT_VERIFIED",
+  "nf02bApplied": false,
+  "nf02cRuntimeRemoved": false
+}

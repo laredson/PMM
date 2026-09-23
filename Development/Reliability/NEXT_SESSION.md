@@ -68,15 +68,31 @@ In the same prompt if possible:
 
 ## 5. Begin NF02B immediately after accepted integration
 
-Use `NF02B_PREINVENTORY.md` as the starting map.
+Use `NF02B_PREINVENTORY.md` as the starting map and the guarded migration tool:
 
-Migrate:
-- central `Get-PMMRuntimePath` to PMM.exe;
-- 18 known invocations to add the explicit `runtime` prefix;
-- Runner and dependency wrapper explicitly;
-- preserve Library cancellation semantics.
+```text
+python Development/Tools/nf02b_migrate.py --root . --report <preview-report>
+```
 
-Then run exact local grep and add any missed non-PowerShell/config callers.
+The dry-run must report exactly 18 command migrations across the 14 known edited
+files. After the accepted NF02A candidate is integrated and all five native
+routes are already `PMM.exe runtime ...`, apply with the accepted candidate
+hash:
+
+```text
+python Development/Tools/nf02b_migrate.py \
+  --root . \
+  --apply \
+  --accepted-candidate-sha256 <accepted-hash> \
+  --report <applied-report>
+```
+
+The tool refuses apply on candidate-hash mismatch, route drift, callsite-count
+drift or missing retained PMMRuntime.exe. It preserves Library's cancelable
+external-process argument contract and UTF-8 BOM choice.
+
+Then run the exact local repository grep and classify any missed
+non-PowerShell/config callers.
 
 Do not delete PMMRuntime.exe until the post-migration zero-active-caller proof passes.
 

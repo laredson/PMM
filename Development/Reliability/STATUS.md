@@ -86,6 +86,22 @@ Evidence:
 - NF02A Windows acceptance: NEXT ON WINDOWS
 - NF02A package integration: BLOCKED UNTIL WINDOWS PASS
 - NF02B pre-inventory: **COMPLETE FOR DISTRIBUTED POWERSHELL**
-- NF02B migration: BLOCKED UNTIL NF02A INTEGRATION
+- NF02B migration tooling: PREPARED + VALIDATED; APPLY BLOCKED UNTIL NF02A INTEGRATION
 - NF02C Runtime deletion: BLOCKED UNTIL NF02B
 - NF03+: PENDING
+
+## NF02B guarded migration tooling
+
+Prepared `Development/Tools/nf02b_migrate.py` without changing any distributed
+`PMM/` product file.
+
+Validation:
+- exact remote transformation simulation: 18/18 known command migrations;
+- post-transform target-set check: 0 active physical PMMRuntime paths and 0
+  unprefixed direct Runtime invocations;
+- Python syntax: PASS;
+- synthetic dry-run/apply fixture: PASS (18 migrations, 14 changed files);
+- PMMRuntime retained by design.
+
+Apply is locked behind the accepted PMM.exe SHA-256 and the already-integrated
+five `PMM.exe runtime ...` Host routes.
