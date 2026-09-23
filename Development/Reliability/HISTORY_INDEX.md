@@ -318,3 +318,11 @@ source-tree divergence and the NF02A single-file/self-child Runtime design.
 
 Status is substantially complete with a short local-clone confirmation gate
 because the NF01 execution container could not resolve GitHub for cloning.
+
+
+## NF02A - unified Host/Runtime source
+
+- `../Source/PMM/`
+- `NF02A_ACCEPTANCE.md`
+
+Canonical candidate source now exists for one PMM-owned Host+Runtime executable while preserving a separate child Runtime process. Distributed binaries remain unchanged until build/Windows acceptance.

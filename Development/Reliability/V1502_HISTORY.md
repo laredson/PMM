@@ -161,3 +161,33 @@ the one-EXE target will retain Host/Runtime isolation by launching the same exec
 NF02A will establish a new canonical source at `Development/Source/PMM/` instead of promoting the stale snapshots.
 
 NF01 remains open only for a short local confirmation gate: local SHA recomputation + generated index + exhaustive grep.
+
+
+## NF02A - unified canonical source consolidation (2026-09-23)
+
+The local-clone NF01-L gate was attempted again but the execution container still could not resolve github.com.
+
+Work advanced without pretending that gate passed.
+
+A new canonical Go module was created at:
+`Development/Source/PMM/`
+
+It consolidates the latest Reliability Host, Runtime, Supervision and UIBridge candidates.
+
+Key migration behavior:
+- default invocation remains Host;
+- `runtime` prefix dispatches to the internal Runtime role;
+- Host native routes that logically target PMMRuntime are translated to a self-child invocation of the same executable;
+- Host/Runtime remain separate OS processes;
+- current external editable UI/modules/resources remain external.
+
+No distributed executable was replaced and no package feature behavior was intentionally changed.
+
+Added:
+- offline build script;
+- dispatcher tests;
+- migrated candidate tests;
+- Windows acceptance checklist;
+- canonical source-status documentation.
+
+NF02A now awaits a real local build plus Windows acceptance.

@@ -379,3 +379,27 @@ The single-executable goal does **not** remove the Host/Runtime process isolatio
 A new canonical source tree will be created under `Development/Source/PMM/` in NF02A from the latest Reliability candidate lineage. The older Host/Runtime source snapshots remain historical/reference material.
 
 See `Development/Reliability/NEXT_SESSION.md` for NF01-L and NF02A.
+
+
+---
+
+## 15. NF02A source consolidation
+
+NF02A now has a canonical unified source tree:
+
+`Development/Source/PMM/`
+
+It contains Host + Runtime + Supervision + UIBridge in one Go module.
+
+Process architecture remains:
+
+`PMM.exe Host -> separate child PMM.exe runtime <command>`
+
+The distributed package has **not** been changed. PMMRuntime.exe and PMMFixLab.exe remain present.
+
+Build and Windows acceptance are still required before package integration.
+
+The execution environment again could not clone GitHub due DNS failure, so NF01-L local hash/index confirmation is still pending. This does not invalidate the source consolidation; it remains a required local gate before release integration.
+
+Next:
+`Development/Reliability/NEXT_SESSION.md`

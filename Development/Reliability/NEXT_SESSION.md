@@ -1,79 +1,52 @@
 # NEXT SESSION - PMM v1.5.0.2
 
-## Active block: NF01-L -> NF02A
+## Active gate: NF01-L confirmation + NF02A build/acceptance
 
-NF01 architecture/inventory work is substantially complete.
+Use a network-capable local clone.
 
-First perform a short local confirmation gate; if it matches the committed evidence, close NF01 and continue directly into NF02A in the same prompt if context allows.
+### 1. NF01-L confirmation
 
-## NF01-L local confirmation
+- fetch + checkout `v1.5.0.2`;
+- fast-forward only;
+- clean tree;
+- run `python Development/Tools/build_repo_index.py`;
+- recompute SHA-256 of PMM.exe, PMMRuntime.exe, PMMFixLab.exe;
+- exhaustive local search for Bypass/process-launch sites;
+- compare with `Development/Reliability/NF01_FINDINGS.md`.
 
-On a network-capable local clone:
+If no critical contradiction appears, mark NF01 CLOSED.
 
-1. fetch + checkout `v1.5.0.2`;
-2. fast-forward only;
-3. verify clean tree and starting HEAD;
-4. run:
-   `python Development/Tools/build_repo_index.py`;
-5. recompute SHA-256:
-   - PMM/PMM.exe
-   - PMM/Engine/PMMRuntime.exe
-   - PMM/Engine/PMMFixLab.exe
-6. compare them with `NF01_EVIDENCE.json`;
-7. exhaustive local search for:
-   - `ExecutionPolicy` + `Bypass`;
-   - `Start-Process`;
-   - `ProcessStartInfo`;
-   - `exec.Command`;
-   - references to PMMRuntime.exe / PMMFixLab.exe / OperationWorker;
-8. compare with `NF01_FINDINGS.md`.
+### 2. Build NF02A canonical source
 
-If no new critical boundary appears:
-- mark NF01 CLOSED;
-- begin NF02A immediately.
+Run:
 
-If additional process paths appear:
-- add them to NF01 evidence;
-- only change the NF02 plan if they alter the migration boundary.
-
-## NF02A
-
-Follow the exact design in `NF01_FINDINGS.md`.
-
-Create canonical source:
-
-```text
-Development/Source/PMM/
-  go.mod
-  cmd/pmm/main.go
-  internal/host/
-  internal/runtime/
-  internal/supervision/
-  internal/uibridge/
+```
+python Development/Source/PMM/build.py --out <new-directory-outside-repo>
 ```
 
-Behavior:
-- default PMM invocation = Host;
-- `PMM.exe runtime <command>` = Runtime role;
-- Host launches the same executable as a **separate child process** for Runtime routes.
+Expected:
+- local tests PASS;
+- Windows Host test compile PASS;
+- `PMMUnified-candidate.exe` produced;
+- build-report.json produced;
+- package untouched.
 
-Build a candidate outside the package.
+If compilation reveals migration defects, fix only the unified source under `Development/Source/PMM/` and keep the old snapshots/candidates unchanged.
+
+### 3. Windows acceptance
+
+Follow:
+`Development/Reliability/NF02A_ACCEPTANCE.md`
+
+If Windows acceptance passes:
+- record evidence;
+- then prepare NF02 package integration in the same prompt if context permits.
 
 Do not yet:
-- overwrite PMM/PMM.exe;
 - remove PMMRuntime.exe;
-- remove Bypass;
-- change dependency-repair semantics;
-- migrate OperationWorker;
 - merge FixLab;
+- remove Bypass;
+- change startup repair semantics;
 - change Updates behavior.
 
-Run all applicable Go/static tests locally and prepare Windows acceptance instructions.
-
-## One-prompt rule
-
-Advance NF01-L + NF02A as far as safely possible in one prompt.
-
-One coherent development commit, `[skip ci]`, with findings/tests/handoff/status/next updates.
-
-No Actions/remote CI during development.
+One coherent commit per prompt, `[skip ci]`, no Actions/remote CI.

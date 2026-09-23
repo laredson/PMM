@@ -4,79 +4,65 @@
 
 Branch: `v1.5.0.2`
 
-Package:
+Package remains unchanged:
 - VERSION: `1.5.0.2`
 - BUILD_ID: `PMM-v1.5.0.2-development-baseline`
-- stableCandidate: false
+- distributed PMM.exe / PMMRuntime.exe / PMMFixLab.exe: unchanged
 
-Canonical handoff:
-`Development/Handoff/CURRENT_HANDOFF.md`
+## NF01-L
 
-## Preserved baseline
+Local clone was attempted again and failed because the execution container could not resolve `github.com`.
 
-- I03 localization: 30 registered / 23 enabled / 7 reserve;
-- I04 Nexus Updates;
-- Host C2B distributed;
-- Runtime C2B distributed;
-- original PMMFixLab + 04A-6E research;
-- Workspace, Mods & Merge, Deep Analysis, AIIO, deploy/rollback/recovery.
+Therefore:
+- byte-level local SHA recomputation: still pending;
+- local `.pmm-index` exhaustive grep: still pending.
 
-## NF01
+NF01 architectural findings remain valid and no contradiction was found.
 
-Durable evidence:
-- `NF01_FINDINGS.md`
-- `NF01_EVIDENCE.json`
+## NF02A
 
-State:
-**SUBSTANTIALLY COMPLETE / LOCAL-CLONE CONFIRMATION GATE OPEN**
+State: **CANONICAL SOURCE CONSOLIDATED / BUILD + WINDOWS ACCEPTANCE PENDING**
 
-Completed:
-- PMM-owned executable size/blob/package-hash identity;
-- Host routes/commands;
-- Runtime command matrix;
-- Runtime generic process contract;
-- startup repair/network path;
-- primary worker operation set;
-- progress/result/journal/lock contracts;
-- dedicated process families;
-- directly verified Bypass paths;
-- FixLab native requirements/build contract;
-- old-source vs NativeCandidate divergence;
-- migration matrix;
-- exact NF02A architecture/tests/rollback design;
-- process/UI consensus document restored.
+New canonical source:
+`Development/Source/PMM/`
 
-Environment limitation:
-the execution container could not resolve github.com, so a true local clone/index/grep and byte-level SHA recomputation could not be run here.
+Architecture:
+`PMM.exe Host -> separate child PMM.exe runtime <command>`
 
-## NF02A design decision
+Consolidated from latest Reliability candidates:
+- Host;
+- Runtime;
+- Supervision;
+- UIBridge.
 
-Create canonical `Development/Source/PMM/` with Host and Runtime as separate internal roles in one binary.
+Preserved:
+- separate Host/Runtime OS-process boundary;
+- external editable Modules/Resources/CKL/XAML;
+- current PowerShell/WPF route;
+- current workers;
+- PMMRuntime.exe in distributed package;
+- PMMFixLab.exe;
+- third-party tools.
 
-Preserve isolation:
+Not yet changed:
+- startup repair/network policy;
+- ExecutionPolicy Bypass;
+- OperationWorker;
+- Updates;
+- FixLab engine;
+- package binaries.
 
-`PMM.exe -> PMM.exe runtime start`
+Candidate build:
+`python Development/Source/PMM/build.py --out <outside-repo>`
 
-Do **not** merge Runtime into the Host process merely to reduce file count.
-
-PMMRuntime.exe remains in the package until Windows acceptance of the replacement.
-
-FixLab remains separate through NF02.
-
-## Known later work
-
-- NF03: startup status-only + explicit repair; remove Bypass by feature.
-- NF04: migrate primary processing broker/workers to explicit same-EXE worker modes.
-- NF04F: FixLab only after parity.
-- NF05: conventional reproducible PE resources/build.
-- P01-P04: cure product workflows.
+The build is offline, uses Go 1.23.2, runs package tests, cross-compiles Host tests and emits `PMMUnified-candidate.exe` without touching the package.
 
 ## Roadmap
 
 - NF00: CLOSED
 - PRE-NF01: CLOSED
-- NF01: **LOCAL CONFIRMATION PENDING**
-- NF02A: READY AFTER NF01-L
+- NF01: evidence complete, local confirmation still pending
+- NF02A source consolidation: **COMPLETE**
+- NF02A compile/Windows acceptance: **NEXT**
+- NF02 package integration: PENDING
 - NF03+: PENDING
-
-Continue with `NEXT_SESSION.md`.

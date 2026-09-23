@@ -1,9 +1,43 @@
-# Native source snapshot status
+# PMM native source status
 
-This directory was imported from `PMM_v1.2.1_RESTRUCTURED_REPOSITORY`.
+## Canonical active source
 
-The packaged `PMM/` directory is the later Guided Flow build confirmed working by the user. Its `PMM.exe` and `Engine/PMMRuntime.exe` contain native changes that are not present in this source snapshot.
+For v1.5.0.2 NF02A onward, the canonical Host+Runtime convergence source is:
 
-For that reason the repository build scripts currently compile into a temporary file and intentionally **do not overwrite the packaged binaries**. Reconcile/recover the matching Guided Flow Host/Runtime source before restoring automatic replacement of those executables.
+`Development/Source/PMM/`
 
-This warning does not apply to the PowerShell/WPF application code under `PMM/Modules/` and `PMM/Resources/`, which comes directly from the working Guided Flow package.
+It contains:
+- unified PMM entrypoint;
+- internal Host;
+- internal Runtime;
+- internal Supervision;
+- internal UIBridge;
+- offline candidate build tooling and tests.
+
+Status: **candidate source canonical; distributed binary replacement pending build + Windows acceptance**.
+
+## Historical snapshots
+
+The following remain for provenance/reference and must not be treated as the active unified source:
+
+- `Development/Source/Host/`
+- `Development/Source/Runtime/`
+
+Those snapshots predate later C2B Reliability reconstruction work.
+
+## Pre-consolidation Reliability candidates
+
+These are retained as exact migration evidence:
+
+- `Development/Reliability/NativeCandidates/Host/`
+- `Development/Reliability/NativeCandidates/Runtime/`
+- `Development/Reliability/NativeCandidates/Supervision/`
+- `Development/Reliability/NativeCandidates/UIBridge/`
+
+Do not edit both the pre-consolidation candidates and `Development/Source/PMM/` for the same new change.
+
+## FixLab
+
+FixLab is not part of NF02A convergence.
+
+Distributed `PMM/Engine/PMMFixLab.exe` remains authoritative until the later FixLab parity gate permits replacement.
