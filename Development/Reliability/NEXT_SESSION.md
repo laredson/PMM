@@ -1,25 +1,67 @@
-# Retomar - I04 Nexus preparado / pendiente de prueba real y publicacion
+# NEXT SESSION - PMM v1.5.0.2
 
-## Estado actual
+## Bloque siguiente: V1502-S01
 
-El worktree contiene I04 sin commit/push:
-- BUILD_ID `PMM-v1.5.0.1-reliability-i04-nexus-updates`;
-- 637 archivos / 636 checksums / 0 mismatches;
-- inventario `8c996734234ba200c2a198be92fe5c178fe1102839a2d1790ac7641afe7cc456`;
-- 51 módulos;
-- 23 idiomas habilitados;
-- binarios Host/Runtime/FixLab sin cambios.
+**Startup diagnosable + inventario de superficie de ejecucion**
 
-## Primera accion
+No empezar por mutar binarios al azar para intentar bajar detecciones. Primero dejar el arranque observable y fijar la superficie real que puede estar contribuyendo tanto al fallo pre-UI como a falsos positivos.
 
-1. Confirmar rama, HEAD y `git status`; no perder el diff I04.
-2. Abrir PMM y revisar el orden de las siete subpestañas de Mods & Merge.
-3. Probar Check Updates sin credencial y confirmar que no modifica mods.
-4. Conectar la API key personal de Nexus desde Updates y verificar usuario/tipo/cuotas.
-5. Probar un mod vinculado exacto. En Free, habilitar PMM para `nxm://`, pulsar Download en Nexus y confirmar que PMM continua solo.
-6. Confirmar archivo anterior, sustitucion, `~mods`, Restore previous version y segundo arranque.
-7. Con PMM cerrado y tras revisar el diff, autorizar si procede un unico commit/push `[skip ci]`.
+## Entrada
 
-No probar SSO hasta registrar PMM. No incluir credenciales en capturas, logs, Git o informes. No PR, tag, release ni Actions.
+Rama: `v1.5.0.2`.
+Base funcional heredada: I04 del commit `2586b4c3999ccc094344bc65710d6559f4858871`.
 
-Despues se puede retomar SESSION04A6E sin repetir arrays escalares V2, job/CLI ni el commit Windows por marcador.
+El paquete inicial sigue identificado como 1.5.0.1/I04 hasta la primera integracion funcional de 1.5.0.2.
+
+## Incidencia a conservar
+
+`Development/Reliability/Incidents/STARTUP_PRE_UI_2026-09.md`
+
+No intentar "arreglarla" borrando Workspace, añadiendo retries ciegos o tragando excepciones. La primera mejora debe aumentar observabilidad.
+
+## Trabajo de S01
+
+1. Trazar el recorrido real desde `PMM.exe` hasta ventana WPF utilizable.
+2. Enumerar las etapas ya visibles en splash y relacionarlas con codigo real.
+3. Garantizar un log de arranque acotado que sobreviva a un fallo pre-UI.
+4. Capturar de forma segura:
+   - etapa alcanzada;
+   - componente/proceso;
+   - codigo de salida o excepcion;
+   - version/build;
+   - arquitectura/Windows/PowerShell/.NET relevantes;
+   - locale/cultura solo como dato diagnostico, nunca como diagnostico automatico;
+   - sin credenciales, tokens ni datos personales.
+5. Revisar manejadores de excepcion y handoff Host -> Runtime -> UI para evitar fallos silenciosos.
+6. Inventariar, sin cambiar aun por conveniencia:
+   - invocaciones PowerShell y argumentos de politica;
+   - creacion de procesos ocultos/sin consola;
+   - broker generico;
+   - comprobacion/reparacion de dependencias;
+   - descargas o red durante arranque;
+   - ejecutables/scripts distribuidos.
+7. Registrar hashes del baseline que se vaya a comparar en S02+.
+8. Preparar la integracion 1.5.0.2 de metadata solo cuando exista un cambio funcional real; VERSION/BUILD_ID/manifiesto/checksums se actualizan juntos.
+
+## Criterio de cierre S01
+
+- un fallo entre splash y UI deja evidencia suficiente para localizar la etapa;
+- un arranque sano no gana reparaciones o red silenciosas;
+- existe inventario concreto de procesos/PowerShell/repair/startup;
+- ninguna feature I03/I04 se elimina;
+- queda definido el cambio exacto de S02;
+- pruebas realizadas y no realizadas quedan separadas.
+
+## S02 previsto
+
+Reducir superficie de ejecucion:
+- retirar `ExecutionPolicy Bypass` donde no sea necesario;
+- conservar errores claros cuando la politica bloquee;
+- estructurar argumentos;
+- evitar shell generico cuando exista operacion concreta;
+- mantener GUI sin consola donde sea normal, sin confundir eso con ocultacion maliciosa.
+
+## GitHub
+
+Commit/push silencioso con `[skip ci]` solo tras autorizacion del propietario para el bloque.
+Sin Actions, PR, tag ni release.

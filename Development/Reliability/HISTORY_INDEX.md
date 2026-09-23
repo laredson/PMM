@@ -253,3 +253,29 @@ plan por fingerprint, `nxm://` Free validado, descarga/extraccion acotadas,
 Deep Analysis previo, archivo indefinido, rollback y despliegue transaccional.
 Los tres ejecutables permanecen byte-identicos. La cuenta Nexus real, SSO y
 Palworld siguen pendientes. El cambio aun no se ha publicado.
+
+## PMM v1.5.0.2 - nueva linea
+
+### V1502_BOOTSTRAP
+
+- `V1502_HISTORY.md`
+- `V1502_STATE.json`
+- `V1502_PLAN.md`
+- `Incidents/STARTUP_PRE_UI_2026-09.md`
+
+La rama `v1.5.0.2` nace directamente del commit
+`2586b4c3999ccc094344bc65710d6559f4858871` de la linea reliability, por lo que
+hereda I03 (23 idiomas habilitados) e I04 Nexus Updates completos.
+
+El bootstrap no modifica `PMM/`: el paquete conserva identidad 1.5.0.1/I04 hasta
+la primera integracion funcional 1.5.0.2, momento en que VERSION, BUILD_ID,
+manifiesto y checksums deben moverse juntos.
+
+Se registra tambien STARTUP-PRE-UI-2026-09: fallo observado despues del splash y
+antes de UI, una vez por el propietario y posteriormente por un usuario chino.
+No es reproducible actualmente por el propietario y su causa sigue UNKNOWN.
+
+Nota de continuidad I04: aunque el registro original de I04 conserva el estado
+"pendiente de publicacion" de aquella tanda, la base fijada para v1.5.0.2 ya
+contiene sus cambios en el historial posterior de la rama reliability. No
+reescribir la evidencia historica; usar V1502_STATE/STATUS para el estado actual.

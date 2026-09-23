@@ -1,84 +1,81 @@
-# START HERE - PMM reliability / nuevo proyecto
+# START HERE - PMM v1.5.0.2
 
-Este archivo es el punto de entrada autoritativo para cualquier chat, proyecto, Work o Codex nuevo que deba continuar el desarrollo de PMM.
+Este archivo es el punto de entrada autoritativo para continuar el desarrollo de PMM desde la linea 1.5.0.2.
 
-Repositorio: `laredson/PMM`  
-Rama de trabajo: `v1.5.0.1-PMM-reliability`  
-Base de integracion I01B: `e83b191e56c916b4de12c34a9d054f4bd6bbd485`
-Base de la tanda 04A-6E: `4763e6834c9a797b3fece6b6b0517b65f2881b2a`
-Base del paquete I03: `fcd4b5ef8401ada4b6b8c2d79b9477738e15a3ee`
-Donante de traducciones I03: `681f7994474ebfd6c2538775767d2002014170f7`
+Repositorio: `laredson/PMM`
+Rama de trabajo: `v1.5.0.2`
+Base exacta heredada: `2586b4c3999ccc094344bc65710d6559f4858871`
+Linea de origen: `v1.5.0.1-PMM-reliability`
 
-## Regla principal
+## Estado de arranque de 1.5.0.2
 
-NO pedir al usuario un ZIP de conversaciones anteriores como primer paso.
+La rama nace directamente del HEAD real de la linea reliability. No se ha copiado una carpeta antigua ni se ha reconstruido desde un tag parcial.
 
-El estado de desarrollo, las decisiones, las evidencias y la historia necesaria estan versionados en GitHub. Si el entorno dispone de un checkout local, usar ese checkout y Git directamente. Si solo dispone de GitHub remoto, leer esta rama y reconstruir desde fuentes/pins documentados.
+Por ello conserva el paquete I04 completo:
+- producto empaquetado actual: 1.5.0.1;
+- BUILD_ID heredado: `PMM-v1.5.0.1-reliability-i04-nexus-updates`;
+- I03 de localizacion: 30 idiomas registrados, 23 habilitados y 7 reservas;
+- I04 de actualizaciones Nexus;
+- Host y Runtime C2B integrados;
+- FixLab original distribuido y research/candidatas 04A-6E aislados;
+- Workspace, recuperacion, despliegue, Deep Analysis y demas funciones ya presentes en esa base.
 
-La excepcion anterior de DOS binarios I01 sin transferir quedo cerrada en SESSION_I01B: se reconstruyeron localmente desde las fuentes versionadas, se verificaron sus hashes y se integraron en `PMM/` junto con los tres metadatos I01.
+**1.5.0.2 es la version objetivo de desarrollo.** No se cambia VERSION/BUILD_ID/manifiesto/checksums de forma cosmetica en este bootstrap. Esos metadatos se actualizaran juntos en la primera integracion funcional 1.5.0.2.
 
-## Cargar estos archivos primero, en este orden
+## Leer primero
 
 1. `AGENTS.md`
-2. `Development/Reliability/NEW_PROJECT_HANDOFF.md`
-3. `Development/Reliability/NEW_PROJECT_STATE.json`
-4. `Development/Reliability/HISTORY_INDEX.md`
+2. `Development/Reliability/V1502_STATE.json`
+3. `Development/Reliability/V1502_HISTORY.md`
+4. `Development/Reliability/STATUS.md`
 5. `Development/Reliability/NEXT_SESSION.md`
-6. `Development/Reliability/STATUS.md`
-7. `Development/Reliability/RUNNING_VERSION.md`
-8. `Development/Reliability/IMPLEMENTATION_PLAN.md`
-9. `Development/Reliability/TRANSLATION_INTEGRATION.md`
-10. `Development/Reliability/SESSION_PLAN.md`
-11. `Development/Reliability/Integration/I04/README.md`
-12. `Development/Reliability/Integration/I03/README.md`
-13. `Development/Reliability/SESSION_I03_TRANSLATION_FINDINGS.md`
-14. `Development/Reliability/SESSION_I03_TRANSLATION_CHECKS.json`
-15. `Development/Reliability/Integration/I01/README.md`
-16. Ultimos `SESSION*_FINDINGS.md` / `SESSION*_CHECKS.json` relevantes al bloque que se vaya a tocar.
+6. `Development/Reliability/V1502_PLAN.md`
+7. `Development/Reliability/Incidents/STARTUP_PRE_UI_2026-09.md`
+8. `Development/Reliability/HISTORY_INDEX.md`
 
-Despues leer el contrato de la candidata concreta antes de modificarla.
+Los documentos 1.5.0.1, FINDINGS, CHECKS y contratos anteriores siguen siendo evidencia historica valida. No deben reinterpretarse como estado actual si un documento 1.5.0.2 posterior los supera.
 
-## Estado ejecutivo en una frase
+## Dos objetivos activos
 
-El checkout de desarrollo contiene research hasta 04A-6E y el paquete I04 preparado: conserva los 23 idiomas de I03 y añade actualizaciones Nexus seguras, transaccionales y recuperables sin cambiar ejecutables. La rama remota sigue en I03 hasta que el propietario autorice commit/push. FixLab candidato/CLI sigue aislado y NO sustituye al original.
+### 1. Fallo de arranque previo a UI
 
-## Objetivo inmediato
+Existe una incidencia real pero no reproducible de forma local:
+- el propietario la vio una vez al abrir 1.5.0.1 por primera vez; el segundo arranque funciono;
+- aproximadamente dos dias despues un usuario chino reporto un fallo del mismo tipo y no logra iniciar;
+- ocurre despues de la barra de carga y antes de que aparezca la UI;
+- el propietario no consigue reproducirlo ni con instalacion nueva ni borrando Workspace;
+- no se conserva todavia el texto exacto del error.
 
-1. comprobar que la rama/checkout corresponden a este handoff y que el diff I04 sigue sin publicar;
-2. confirmar BUILD_ID I04, 637 archivos, 636 checksums y binarios congelados;
-3. probar Updates primero sin credencial y luego con la cuenta Nexus del propietario;
-4. validar un caso Premium o Free real, espera `nxm://`, archivo, lote, aplazamiento con Palworld abierto, sustitucion, restauracion y segundo arranque;
-5. mantener la prueba de idiomas I03, en especial العربية y persistencia tras reiniciar;
-6. corregir cualquier regresion antes de autorizar un unico commit/push `[skip ci]`;
-7. continuar despues con SESSION04A6E sin repetir trabajo;
-8. no crear PR, tag, release ni ejecutar Actions.
+No atribuirlo a idioma, pais, antivirus, carrera, Workspace ni ninguna otra causa sin evidencia.
 
-No modificar pins para conseguir que una compilacion distinta pase.
+### 2. Reduccion de falsos positivos / distribucion verificable
 
-## Identidades importantes
+El objetivo es reducir causas legitimas de deteccion mediante ingenieria auditable, no ocultar comportamiento:
+- diagnosticar y simplificar el arranque;
+- retirar `ExecutionPolicy Bypass` donde ya no sea necesario;
+- separar comprobacion de dependencias de reparacion;
+- evitar reparaciones/descargas silenciosas al arrancar;
+- estrechar el broker generico de procesos y migrar operaciones a contratos nativos cuando proceda;
+- build reproducible y recursos PE estandar;
+- firma real cuando el propietario la provisione;
+- preflight del paquete y matriz de escaneo con hashes;
+- usar canales de falsos positivos de fabricantes si quedan detecciones.
 
-Paquete de trabajo I04 (pendiente de commit/push):
-- build: `PMM-v1.5.0.1-reliability-i04-nexus-updates`
-- inventario: SHA-256 `8c996734234ba200c2a198be92fe5c178fe1102839a2d1790ac7641afe7cc456`
-- 637 archivos / 636 filas de checksum / 0 mismatches.
-- 30 idiomas registrados / 23 habilitados / 7 reservas.
-- proyecto Desktop y configuracion privada: `Workspace` y `Workspace/.codex/config.toml`.
-- Host SHA-256: `a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c`
-- Runtime SHA-256: `b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f`
-- FixLab original conservado SHA-256: `8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe`.
+No desactivar protecciones, no pedir exclusiones y no introducir tecnicas de evasion.
 
-## Filosofia de integracion acordada con el propietario
+## Regla de continuidad
 
-`Development/Reliability/NativeCandidates/` se conserva como laboratorio, evidencia e historial. Pero esta rama SI es la rama de prueba ejecutable: cuando un bloque este suficientemente cerrado, se integra tambien en `PMM/` para que el propietario pueda probarlo mediante GitHub Desktop. No es necesario mantener la rama siempre funcional durante el desarrollo.
+A partir de este punto, el desarrollo nuevo se hace directamente sobre `v1.5.0.2`. La linea 1.5.0.1 queda como base historica.
 
-Evitar acumular todos los reemplazos hasta el final. Preferir:
+No perder funcionalidades heredadas para reducir detecciones. Cada cambio debe conservar idiomas, Nexus Updates, Workspace y contratos existentes salvo cambio explicito y probado.
 
-`candidata -> pruebas -> integracion PMM -> prueba Windows del usuario -> siguiente bloque`.
+## Git/GitHub
 
-El snapshot aprobado de traducciones ya esta integrado en I03. La rama donante sigue separada para cambios futuros; cualquier delta posterior requiere otra revision controlada.
+- Lectura libre.
+- Escrituras solo con autorizacion explicita del propietario para el bloque correspondiente.
+- Desarrollo: commit/push silencioso con `[skip ci]`.
+- Sin Actions/CI/tests remotos durante desarrollo salvo peticion expresa.
+- No PR, tag, release ni cambio de Latest por iniciativa propia.
+- Pruebas funcionales de desarrollo: locales por el propietario salvo peticion expresa.
 
-## Seguridad y AV
-
-El objetivo es fiabilidad, procedencia y un paquete auditable; no ocultar comportamiento a antivirus. No desactivar protecciones, no pedir exclusiones y no restaurar automaticamente archivos en cuarentena. No prometer check verde de Nexus. Los escaneos reales y envios externos requieren autorizacion.
-
-Continua en `Development/Reliability/NEW_PROJECT_HANDOFF.md`.
+Continua en `Development/Reliability/STATUS.md`.

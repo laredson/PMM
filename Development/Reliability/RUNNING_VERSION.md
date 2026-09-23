@@ -1,14 +1,15 @@
-# Que version estas ejecutando - integracion I04
+# Que version estas ejecutando - inicio de v1.5.0.2
 
 | Ubicacion | Programa real |
 | --- | --- |
-| PMM/ en este worktree | Aplicacion I04 con Updates Nexus, Workspace privado y 23 idiomas |
-| Rama remota antes del push I04 | Aplicacion I03 |
-| CoreR1-tests.exe / UAsset-tests.exe | Solo pruebas FixLab, NO PMM |
-| CoreR1-candidate.exe | CLI candidato-only, NO PMMFixLab ni instalador |
+| `v1.5.0.2` justo tras el bootstrap | Aplicacion I04 heredada, todavia identificada como 1.5.0.1 |
+| `PMM/` | I04 con Nexus Updates, Workspace privado y 23 idiomas habilitados |
+| `NativeCandidates/FixLab/` | Research/candidatas, NO sustituyen por si solas PMMFixLab distribuido |
+| CoreR1/UAsset test executables | Herramientas de prueba, NO PMM |
 
-I04 = `PMM-v1.5.0.1-reliability-i04-nexus-updates` en `Resources/Metadata/BUILD_ID.txt`.
+BUILD_ID heredado:
+`PMM-v1.5.0.1-reliability-i04-nexus-updates`.
 
-I04 no recompila ejecutables. Conserva Host `a5601742a3fe0ee214bab3ce96835e3bd7cca8d9a94d629dc027d5fcad69b19c`, Runtime `b338faf9b76df0f44749b673c53aa7abc41b6c29994e7efafb8e1c2210426b1f` y FixLab `8807635af5073c784e003561b72137d011a5b1bfffbfe7b472dd1ae316bc0afe`.
+Esto es deliberado: el bootstrap de rama no cambia `PMM/`. La primera integracion funcional 1.5.0.2 debe actualizar VERSION, BUILD_ID, RELEASE_MANIFEST y SHA256SUMS juntos.
 
-Abrir I04 prueba la interfaz y lógica local, pero no demuestra una descarga Nexus real, SSO, ejecución Palworld, firma o antivirus. La API key pertenece al usuario y solo debe guardarse cifrada dentro de Workspace.
+La rama 1.5.0.2 conserva los 23 idiomas habilitados, I04 Nexus Updates y los binarios nativos del baseline. Abrirla antes de una integracion funcional equivale a ejecutar el mismo paquete I04 que sirvio de origen, no una build nueva solo por el nombre de la rama.

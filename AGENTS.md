@@ -1,43 +1,94 @@
-# PMM: desarrollo de fiabilidad v1.5.0.1
+# PMM v1.5.0.2 - reglas de desarrollo
 
-> NUEVO PROYECTO / NUEVO CHAT: leer primero `START_HERE_NEW_PROJECT.md`.
-> `Development/Reliability/NEW_PROJECT_HANDOFF.md` y `NEW_PROJECT_STATE.json`
-> concentran el estado actual y evitan depender de conversaciones o ZIPs antiguos.
-> Las reglas de seguridad/GitHub de este archivo siguen siendo obligatorias.
+Rama activa: `v1.5.0.2`.
+Base heredada exacta: `2586b4c3999ccc094344bc65710d6559f4858871` de `v1.5.0.1-PMM-reliability`.
 
-Esta rama es `v1.5.0.1-PMM-reliability`, derivada de `v1.5.0.0-PMM-translated` en el commit `38bd5a934488ac11a6200d3142b889ca86a82f57`.
+## Leer al entrar
 
-I03 integra el snapshot de traducciones `681f7994474ebfd6c2538775767d2002014170f7`: 30 idiomas registrados, 23 habilitados y siete reservas. Los cambios futuros de la rama donante siguen requiriendo revision semantica; no repetir ni convertir esta integracion en un merge automatico.
+1. `START_HERE_NEW_PROJECT.md`
+2. `Development/Reliability/V1502_STATE.json`
+3. `Development/Reliability/V1502_HISTORY.md`
+4. `Development/Reliability/STATUS.md`
+5. `Development/Reliability/NEXT_SESSION.md`
+6. `Development/Reliability/V1502_PLAN.md`
+7. El incidente o contrato concreto del bloque que se vaya a tocar.
 
-## Leer primero
+`Development/Reliability/NEW_PROJECT_HANDOFF.md` y `NEW_PROJECT_STATE.json` describen la linea 1.5.0.1/I04 y son contexto historico, no el punto de entrada actual.
 
-1. `START_HERE_NEW_PROJECT.md`.
-2. `Development/Reliability/NEW_PROJECT_HANDOFF.md`, `NEW_PROJECT_STATE.json` y `HISTORY_INDEX.md`.
-3. `RELIABILITY.md`.
-4. `Development/Reliability/NEXT_SESSION.md`, `STATUS.md` y el ultimo registro; BASELINE.json es historico.
-5. `Development/Reliability/IMPLEMENTATION_PLAN.md`.
-6. `Development/Reliability/TRANSLATION_INTEGRATION.md`.
-7. `Development/Reliability/Integration/I03/README.md` y `SESSION_I03_TRANSLATION_FINDINGS.md`.
-8. `Development/Source/SOURCE_STATUS.md` antes de cualquier compilacion nativa; despues, los handoffs historicos de `Development/AI/` como contexto, no como estado de esta nueva linea.
+## Baseline funcional que no se puede perder accidentalmente
 
-## Limites de esta linea
+La rama hereda el paquete I04 completo:
+- I03: 30 idiomas registrados, 23 habilitados y 7 reservas;
+- selector/localizacion con nativeName, RTL/LTR y compatibilidad PowerShell 5.1 heredada;
+- I04: Updates Nexus seguro, archivo/rollback y flujo Premium/Free preparado;
+- Host/Runtime C2B;
+- Workspace privado y contratos de recuperacion/despliegue;
+- Deep Analysis, Mods & Merge y flujos ya existentes;
+- PMMFixLab distribuido original; research 04A-6E sigue candidato-only hasta integracion expresa.
 
-- La rama de traducciones sigue su desarrollo independiente. No escribir alli, no cambiar su version y no fusionar de vuelta cambios de fiabilidad por iniciativa propia.
-- Mantener ancestro comun. La integracion futura es traducciones -> fiabilidad, revisada por diferencias; nunca copiar una carpeta antigua sobre el programa nuevo.
-- La tanda 01B alinea la identidad a 1.5.0.1 y regenera el inventario; los otros 625 archivos de PMM quedan intactos. No afirmar que esto significa hardening terminado o release publicada.
-- Mantener version, build y hashes coherentes en cada tanda. No renumerar componentes ni hacer sustituciones globales. No repetir 01B, ya cerrada.
-- Host/Runtime reconstruidos y el research FixLab viven en `Development/Reliability/NativeCandidates/`. Consultar el handoff actual antes de usar indicaciones historicas de una sesion concreta.
-- Los fuentes Host/Runtime tienen advertencias de procedencia/paridad. No sobreescribir ejecutables sin una integracion identificable, hashes, rollback y prueba incremental del usuario.
-- Preservar contratos de Workspace, casos, CKL, merge y recuperacion; cualquier migracion debe ser explicita, reversible y probada.
-- No renombrar masivamente rutas compartidas mientras se traducen. Mantener claves de catalogos, placeholders, nativeName, fallback, activacion y RTL/LTR. El contrato heredado de localizacion requiere Windows PowerShell 5.1 hasta que exista una migracion real verificada.
-- Las mejoras buscan seguridad, fiabilidad y procedencia verificable: no ocultar funciones al antivirus, no desactivar protecciones, no pedir exclusiones y no restaurar automaticamente archivos puestos en cuarentena.
+No copiar carpetas antiguas sobre PMM. No reemplazar binarios por candidatas solo porque compilen o tengan hash conocido.
 
-## GitHub y comprobaciones
+## Incidencia de arranque obligatoria
 
-No hay autorizacion permanente para escrituras remotas. Solicitar autorizacion explicita para cada intervencion que no la tenga ya. Agrupar cambios relacionados en un commit coherente. Los commits de desarrollo llevan `[skip ci]` y no deben disparar Actions, CI ni tests remotos. No crear PR, tag, release ni cambiar Latest por iniciativa propia. Revisar los triggers antes de publicar: `[skip ci]` no es una garantia universal para todos los eventos.
+Leer `Development/Reliability/Incidents/STARTUP_PRE_UI_2026-09.md`.
 
-No ejecutar workflows para esta rama. Las pruebas funcionales de desarrollo las realiza el usuario localmente salvo peticion expresa. Separar inspeccion estatica de pruebas funcionales y de analisis antivirus reales; documentar exactamente lo realizado. La autorizacion para preparar esta rama no autoriza subidas de muestras a terceros ni compra/emision de certificados.
+El fallo conocido sucede despues de la barra de carga y antes de UI. No es reproducible actualmente por el propietario. Debe mantenerse abierto hasta disponer de evidencia suficiente o una correccion que cubra una causa demostrada.
 
-Actualizar `Development/Reliability/STATUS.md` al completar un paso. No marcar pendientes como implementados ni prometer cero detecciones o aprobacion automatica de Nexus.
+Toda modificacion del startup debe:
+- conservar logs/diagnostico;
+- distinguir etapa alcanzada;
+- no esconder excepciones para aparentar un arranque correcto;
+- no borrar Workspace automaticamente;
+- no descargar/reinstalar dependencias en silencio;
+- no asumir que el locale chino es la causa.
 
-C1 usa el modulo LOCAL NativeCandidates/Supervision desde Host/Runtime. Conservar sus hashes y staging en ambas recetas. Ver SESSION_PLAN.md para orden real; IDs 02/03 son areas, no cronologia.
+## Objetivo de hardening para Nexus/antivirus
+
+Reducir falsos positivos mediante comportamiento mas claro y auditable:
+- retirar Bypass donde exista una ruta soportada;
+- argumentos estructurados y procesos delimitados;
+- check separado de repair;
+- arranque sano sin red;
+- reparacion explicita, verificada y reversible;
+- broker de operaciones estrecho/native cuando proceda;
+- build reproducible;
+- recursos PE estandar;
+- firma real si se provisiona;
+- preflight y escaneos comparables por hash.
+
+No implementar tecnicas para ocultar ejecutables, evadir motores, desactivar seguridad o restaurar cuarentenas automaticamente.
+
+## Version e integridad
+
+La rama se llama 1.5.0.2 pero el paquete inicial sigue identificado como I04/1.5.0.1. Eso es deliberado.
+
+En la primera integracion funcional 1.5.0.2 deben actualizarse de forma atomica:
+- VERSION;
+- BUILD_ID;
+- RELEASE_MANIFEST;
+- SHA256SUMS;
+- cualquier estado/version visible que dependa de ellos.
+
+No cambiar solo la etiqueta visible.
+
+## Politica GitHub
+
+- No hay permiso permanente de escritura.
+- Cada bloque remoto requiere autorizacion del propietario.
+- Desarrollo: un commit coherente con `[skip ci]`.
+- No Actions, CI ni tests remotos salvo peticion expresa.
+- No PR, tag, release ni Latest por iniciativa propia.
+- No force push.
+- Antes de publicar, confirmar HEAD y que el avance es fast-forward.
+
+## Pruebas
+
+Separar siempre:
+- inspeccion estatica;
+- tests de herramientas/fixtures;
+- build Windows;
+- ejecucion Windows real;
+- escaneo antivirus real;
+- prueba Nexus real.
+
+No convertir una categoria en PASS de otra.

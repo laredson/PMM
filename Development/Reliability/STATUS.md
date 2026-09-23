@@ -1,35 +1,66 @@
-# Estado actual - I04 actualizaciones Nexus seguras / I03 idiomas conservados
+# Estado actual - PMM v1.5.0.2
 
-## Paquete de trabajo
+## Rama
 
-`PMM/` esta preparado como I04, aun sin commit/push:
-- version `1.5.0.1`;
+`v1.5.0.2`
+
+Base de origen:
+`2586b4c3999ccc094344bc65710d6559f4858871`
+(`v1.5.0.1-PMM-reliability`, I04).
+
+Estado de este bootstrap: **documentacion/continuidad solamente**. El paquete `PMM/` no se modifica en este paso.
+
+## Baseline heredado
+
+La rama contiene todo lo presente en I04:
+- version empaquetada 1.5.0.1;
 - BUILD_ID `PMM-v1.5.0.1-reliability-i04-nexus-updates`;
-- 637 archivos / 636 checksums / 0 mismatches;
-- inventario SHA-256 `8c996734234ba200c2a198be92fe5c178fe1102839a2d1790ac7641afe7cc456`;
-- 30 idiomas registrados / 23 habilitados / 7 reservas;
-- Host, Runtime y FixLab byte-identicos a I03.
+- 30 idiomas registrados, 23 habilitados, 7 reservas;
+- I04 Nexus Updates;
+- Host y Runtime C2B;
+- FixLab original en distribucion y candidatas 04A-6E fuera del paquete;
+- Workspace, despliegue, rollback, Deep Analysis y flujos existentes.
 
-La rama remota continua en I03 hasta autorizacion expresa del propietario.
+1.5.0.2 es la version objetivo y se aplicara a metadata/checksums junto con la primera integracion funcional.
 
-## Actualizaciones Nexus I04
+## Incidencia abierta: STARTUP-PRE-UI-2026-09
 
-Updates es una subpestaña propia dentro de Mods & Merge. Check Updates produce un plan de solo lectura ligado al fingerprint. AUTO descarga e instala solo cadenas FileId unicas con un unico PAK seguro, hash instalado intacto, analisis suficiente, cero bloqueos nuevos, cero retiradas pendientes y ningun parche desplegado que quede obsoleto.
+Se mantiene como prioridad de fiabilidad:
+- fallo despues de la barra de carga y antes de UI;
+- propietario: una ocurrencia en primer arranque de 1.5.0.1, segundo arranque correcto;
+- usuario chino: mismo tipo de fallo reportado posteriormente y persistente segun su reporte;
+- el propietario no puede reproducirlo con instalacion nueva ni borrando Workspace;
+- mensaje exacto/stack aun no disponibles.
 
-La credencial personal se cifra con DPAPI en `Workspace/State`. Premium usa descarga directa. Free abre Nexus y reanuda solo cuando recibe el `nxm://` exacto, vigente y no repetido correspondiente al plan pendiente. El registro del protocolo es opt-in y restaura la asociacion anterior.
+Estado: **OPEN / NOT REPRODUCED / CAUSE UNKNOWN**.
 
-La descarga controla HTTPS, cada redireccion, espacio, tiempo, tamaño, cancelacion y hash. La extraccion bloquea traversal, ADS, enlaces, colisiones, ejecutables y archivos anidados peligrosos. La sustitucion archiva indefinidamente la version anterior y coordina la biblioteca con la transaccion de despliegue existente; fallos e interrupciones revierten biblioteca, `~mods` y estado. Un lote avanza su fingerprint solo tras verificar el cambio propio; si Palworld esta abierto, conserva el candidato ya descargado/analizado y lo reanuda automaticamente cuando el juego se cierra.
+No vincularlo al idioma chino ni a otra causa sin evidencia.
 
-Deep Analysis consume el plan de Updates y ya no consulta proveedores por separado.
+## Hardening Nexus/antivirus
 
-Correccion posterior I04: el arranque ya no evalua botones de Updates antes de que WPF los cree. ColorFlow espera esos controles y se recalcula tras inicializarlos; la regresion de orden de inicio lo cubre.
+Trabajo heredado que sigue pendiente o parcial:
+- argumentos de politica PowerShell heredados;
+- rutas de reparacion automatica de dependencias;
+- broker `Modules/Operations/OperationWorker.ps1` aun presente;
+- migracion a subcomandos nativos no cerrada;
+- recursos PE/build reproducible por cerrar;
+- firma de codigo no provisionada;
+- preflight y matriz de escaneos reales no realizados para 1.5.0.2.
 
-## Validacion
+## Paso actual
 
-PASS local: parser PowerShell 5.1, módulos, Nexus/NXM, rollback post-despliegue, recuperación tras reinicio, workers, persistencia, analisis, compatibilidad semantica y WPF EN/ES (27 aserciones por idioma). Localizacion I03: 1.292 claves, 23/23 cargas PS5.1 y smoke zh-CN/ar/vi/uk/cs/ga.
+**V1502-S00 - BOOTSTRAP: CERRADO con esta rama/documentacion.**
 
-Pendiente: cuenta Nexus real, modalidad Premium/Free no disponible, SSO tras registro de PMM, Palworld real y aceptacion visual del propietario. La regresion RC28 heredada busca funciones ya modularizadas en un archivo antiguo y falla tambien contra la base I03.
+Siguiente:
+**V1502-S01 - Startup diagnosable + inventario de superficie de ejecucion.**
 
-## Research conservado
+Objetivo de S01:
+1. hacer que cualquier fallo entre splash y UI deje etapa y error accionables;
+2. inventariar exactamente PowerShell, procesos, repair y red en startup;
+3. fijar un baseline de artefactos/hashes antes de modificar el comportamiento;
+4. no perder ninguna feature heredada.
 
-04A-6E permanece candidato-only y no sustituye PMMFixLab. No release, tag, PR, workflow ni Actions.
+Despues:
+S02 procesos/PowerShell -> S03 check/repair -> S04 broker -> S05 build/PE -> S06 firma -> S07 preflight/escaneos -> S08 falsos positivos de vendors si siguen existiendo.
+
+Ver `V1502_PLAN.md`.

@@ -1,0 +1,90 @@
+{
+  "schema": "PMM_V1502_STATE_V1",
+  "branch": "v1.5.0.2",
+  "createdDate": "2026-09-22",
+  "sourceBranch": "v1.5.0.1-PMM-reliability",
+  "sourceCommit": "2586b4c3999ccc094344bc65710d6559f4858871",
+  "targetVersion": "1.5.0.2",
+  "packageIdentityAtBootstrap": {
+    "version": "1.5.0.1",
+    "buildId": "PMM-v1.5.0.1-reliability-i04-nexus-updates",
+    "intentionallyUnchanged": true,
+    "reason": "Bootstrap changes documentation only; product metadata and checksums move together with the first functional 1.5.0.2 integration."
+  },
+  "inherited": {
+    "localization": {
+      "registered": 30,
+      "enabled": 23,
+      "reserve": 7,
+      "integration": "I03"
+    },
+    "nexusUpdates": "I04",
+    "host": "C2B distributed",
+    "runtime": "C2B distributed",
+    "fixLab": "original distributed; 04A-6E research/candidates retained",
+    "preserve": [
+      "Workspace",
+      "Mods & Merge",
+      "Deep Analysis",
+      "deployment/rollback",
+      "localization",
+      "Nexus Updates"
+    ]
+  },
+  "incidents": [
+    {
+      "id": "STARTUP-PRE-UI-2026-09",
+      "state": "OPEN",
+      "severity": "HIGH",
+      "reproducibleByOwner": false,
+      "symptom": "Failure after loading bar/splash and before main UI",
+      "reports": [
+        "Owner saw it once on first 1.5.0.1 launch; second launch succeeded",
+        "Chinese user later reported the same apparent startup point and persistent inability to launch"
+      ],
+      "exactErrorKnown": false,
+      "cause": "UNKNOWN",
+      "doNotAssume": [
+        "locale",
+        "antivirus",
+        "Workspace",
+        "race",
+        "dependency",
+        "PowerShell"
+      ]
+    }
+  ],
+  "roadmap": {
+    "current": "V1502-S00 CLOSED",
+    "next": "V1502-S01 Startup diagnosable + execution-surface inventory",
+    "stages": [
+      "S01 startup observability and baseline",
+      "S02 PowerShell/process policy cleanup",
+      "S03 separate dependency check from explicit repair",
+      "S04 narrow/native operation broker",
+      "S05 reproducible build and standard PE resources",
+      "S06 real code signing when provisioned",
+      "S07 preflight and authorized scan matrix",
+      "S08 vendor false-positive submissions if needed"
+    ]
+  },
+  "securityIntent": {
+    "goal": "Reduce legitimate false positives through auditable engineering",
+    "prohibitedByProjectPolicy": [
+      "disable antivirus",
+      "ask users for exclusions",
+      "hide behavior from scanners",
+      "silently restore quarantined files"
+    ]
+  },
+  "githubPolicy": {
+    "remoteWritesRequireExplicitAuthorization": true,
+    "developmentCommitSuffix": "[skip ci]",
+    "developmentCI": false,
+    "actions": false,
+    "pullRequestsByInitiative": false,
+    "tagsByInitiative": false,
+    "releasesByInitiative": false,
+    "forcePush": false
+  }
+}
