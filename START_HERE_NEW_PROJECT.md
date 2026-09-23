@@ -102,3 +102,12 @@ La direccion actual es:
 La incidencia de startup pre-UI permanece registrada como watchpoint, pero no es el siguiente bloque mientras no sea reproducible.
 
 La creacion de mods actual es **AI-directed**: la IA crea la solucion solicitada por el usuario usando las capacidades acotadas que PMM le proporciona. Un editor interno general no es requisito de esta version.
+
+
+## Decision transcript
+
+For the reasoning and product intent behind the current 1.5.0.2 architecture, read:
+
+`Development/Reliability/V1502_DECISION_TRANSCRIPT_2026-09-23.md`
+
+The transcript is contextual history. The authoritative execution requirements remain the single-EXE/noflag plan, STATUS and NEXT_SESSION.

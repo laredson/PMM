@@ -279,3 +279,13 @@ Nota de continuidad I04: aunque el registro original de I04 conserva el estado
 "pendiente de publicacion" de aquella tanda, la base fijada para v1.5.0.2 ya
 contiene sus cambios en el historial posterior de la rama reliability. No
 reescribir la evidencia historica; usar V1502_STATE/STATUS para el estado actual.
+
+
+### V1502_ARCHITECTURE_DECISION_TRANSCRIPT
+
+- `V1502_DECISION_TRANSCRIPT_2026-09-23.md`
+
+Preserves the owner/assistant discussion that selected the one-PMM-owned-EXE,
+open/module-oriented architecture, deferred signing, Nexus/noflag direction and
+AI-created-mod responsibility model. It is context only; the authoritative
+implementation contract is `V1502_SINGLE_EXE_AND_NOFLAG_PLAN.md`.

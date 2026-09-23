@@ -695,3 +695,14 @@ NF01 should end with:
 - no unsupported claims about scanner causality.
 
 Then NF02A can implement the first reversible combined-executable candidate.
+
+
+---
+
+## 10. Decision-context transcript
+
+The architectural/product discussion that led to this plan is preserved at:
+
+`Development/Reliability/V1502_DECISION_TRANSCRIPT_2026-09-23.md`
+
+It is historical context, not a competing specification. Use it to understand the owner's intent and the alternatives considered; use this plan for implementation requirements.
