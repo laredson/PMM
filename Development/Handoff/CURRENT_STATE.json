@@ -94,7 +94,7 @@
       "NF00",
       "PRE-NF01-CONTINUITY"
     ],
-    "next": "exact-clone confirmation + NF02A Windows acceptance",
+    "next": "exact NF02A build + disposable Windows acceptance stage",
     "ordered": [
       "NF01",
       "NF02",
@@ -124,15 +124,15 @@
     "noForcePush": true
   },
   "nextBlock": {
-    "id": "NF02A-WINDOWS",
-    "goal": "run exact-checkout NF01-L/build confirmation, then execute NF02A Windows behavior acceptance"
+    "id": "NF02A-WINDOWS-EXACT",
+    "goal": "exact clone/build V2, stage final PMM.exe runtime routes, pass automated and manual Windows acceptance, then integrate PMM.exe while retaining PMMRuntime.exe"
   },
   "signing": {
     "requiredFor1502": false,
     "signPathFoundation": "optional after product is ready"
   },
   "nf01": {
-    "status": "EVIDENCE_COMPLETE_EXACT_LOCAL_CONFIRMATION_PENDING",
+    "status": "EVIDENCE_COMPLETE_EXACT_LOCAL_CONFIRMATION_BLOCKED_BY_CONTAINER_NETWORK",
     "findings": "Development/Reliability/NF01_FINDINGS.md",
     "evidence": "Development/Reliability/NF01_EVIDENCE.json",
     "localCloneFailure": "Could not resolve host: github.com",
@@ -140,7 +140,7 @@
     "canonicalSourceTarget": "Development/Source/PMM/"
   },
   "nf02a": {
-    "status": "CANONICAL_SOURCE_CONSOLIDATED_CROSS_BUILD_PASS_EXACT_CLONE_AND_WINDOWS_PENDING",
+    "status": "INTEGRATION_PREP_COMPLETE_EXACT_BUILD_AND_WINDOWS_ACCEPTANCE_PENDING",
     "canonicalSource": "Development/Source/PMM/",
     "processModel": "PMM.exe Host spawns same PMM.exe as separate child: runtime <command>",
     "buildScript": "Development/Source/PMM/build.py",
@@ -156,6 +156,19 @@
       "officialCandidate": false
     },
     "exactCloneBuild": "NOT_VERIFIED",
-    "windowsAcceptance": "NOT_VERIFIED"
+    "windowsAcceptance": "NOT_VERIFIED",
+    "buildSchema": "PMM_NF02A_UNIFIED_BUILD_V2",
+    "stagingTool": "Development/Tools/nf02a_windows_stage.py",
+    "priorCrossBuildEvidenceAppliesThrough": "1dea2074322215d65ab75ed963f4f82aec74a577",
+    "currentSourceRequiresExactRebuild": true
+  },
+  "nf02b": {
+    "status": "PLANNED_REQUIRED_BEFORE_RUNTIME_EXE_DELETION",
+    "plan": "Development/Reliability/NF02B_RUNTIME_CALLSITE_MIGRATION.md",
+    "goal": "migrate all active direct PMMRuntime.exe callers to PMM.exe runtime"
+  },
+  "nf02c": {
+    "status": "BLOCKED_ON_NF02B",
+    "goal": "remove PMMRuntime.exe and package inventory only after zero active direct callers"
   }
 }

@@ -333,3 +333,13 @@ Canonical candidate source now exists for one PMM-owned Host+Runtime executable 
 - `NF02A_BUILD_EVIDENCE.json`
 
 Records the connector-backed Go 1.23.2 compile/cross-build proof that the unified Host+Runtime source reaches a valid Windows GUI PE candidate. Exact-clone test execution and Windows runtime acceptance remain separate gates.
+
+
+## NF02 integration preparation
+
+- `NF02_PACKAGE_INTEGRATION.md`
+- `NF02B_RUNTIME_CALLSITE_MIGRATION.md`
+- `../Tools/nf02a_windows_stage.py`
+
+Defines the safe three-part convergence: NF02A unified candidate and Windows
+acceptance, NF02B direct Runtime callsite migration, NF02C legacy Runtime deletion.

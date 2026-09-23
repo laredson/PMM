@@ -792,3 +792,41 @@ Before implementation, a local-capable Codex session must:
 - compare with NF01 evidence.
 
 This is a confirmation gate, not a restart of NF01 research.
+
+
+---
+
+## 13. NF02 refinement: convergence, caller migration, deletion are separate gates
+
+A later NF02 review found that unifying Host+Runtime source and startup routing is
+not sufficient proof that `PMMRuntime.exe` can be deleted. Editable PowerShell
+modules may invoke the legacy Runtime executable directly, outside
+`routes.json`.
+
+Therefore NF02 is explicitly split:
+
+### NF02A - unified executable candidate
+
+- one PMM-owned Host+Runtime binary;
+- same executable launches Runtime as a separate child process;
+- exact build + disposable final-route Windows staging;
+- Windows diagnostics, splash/WPF and crash-isolation acceptance.
+
+### NF02B - direct Runtime callsite migration
+
+- exhaustive exact-clone search for active `PMMRuntime.exe` consumers;
+- migrate each active caller to `PMM.exe runtime <command>`;
+- preserve timeout/exit/output/cancellation semantics;
+- prove zero active distributed direct Runtime callers remain.
+
+### NF02C - legacy Runtime deletion
+
+Only after NF02B passes:
+
+- delete `PMM/Engine/PMMRuntime.exe`;
+- remove checksum/inventory references;
+- run clean-install/update regression;
+- verify Host and Runtime still execute as separate PMM.exe processes.
+
+This is a safer refinement of the original single-EXE plan, not a change to the
+architectural target.

@@ -20,3 +20,13 @@ Do not edit both old and new trees in parallel.
 During NF02A onward, changes intended for the unified Host/Runtime candidate belong under `Development/Source/PMM/`.
 
 The old trees remain evidence until the unified candidate passes Windows acceptance and the package integration is complete.
+
+
+## NF02 integration preparation
+
+The canonical source no longer treats `Engine/PMMRuntime.exe` as a required
+doctor dependency. The Host still recognizes legacy Runtime route entries during
+migration, but final staged routes use `PMM.exe runtime ...`.
+
+The source requires an exact-clone rebuild and Windows acceptance after this
+integration-preparation delta.

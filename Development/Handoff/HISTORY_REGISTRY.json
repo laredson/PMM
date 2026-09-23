@@ -77,6 +77,21 @@
       "path": "Development/Reliability/NF02A_BUILD_EVIDENCE.json",
       "class": "EVIDENCE",
       "scope": "NF02A connector-backed compile/cross-build proof; exact-clone and Windows gates remain separate"
+    },
+    {
+      "path": "Development/Reliability/NF02_PACKAGE_INTEGRATION.md",
+      "class": "ACTIVE_PLAN",
+      "scope": "NF02 staged package integration sequence and rollback boundary"
+    },
+    {
+      "path": "Development/Reliability/NF02B_RUNTIME_CALLSITE_MIGRATION.md",
+      "class": "ACTIVE_PLAN",
+      "scope": "required direct PMMRuntime caller migration before deleting legacy executable"
+    },
+    {
+      "path": "Development/Tools/nf02a_windows_stage.py",
+      "class": "ACTIVE_TOOLING",
+      "scope": "disposable final-route Windows acceptance staging and diagnostics"
     }
   ],
   "laboratories": [

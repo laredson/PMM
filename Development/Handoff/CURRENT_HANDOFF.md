@@ -429,3 +429,36 @@ The generated reconstruction EXE is evidence only and is not packaged/distribute
 The environment still cannot make an exact Git clone, so NF01-L byte/hash/index confirmation and an exact-checkout run of all migrated tests remain open.
 
 The project is now operationally at the **NF02A Windows acceptance gate**, preceded by one short exact-clone confirmation/build when a network-capable local environment is available.
+
+
+---
+
+## 17. NF02A integration preparation and environment block
+
+A third exact local clone attempt failed because the execution container still
+cannot resolve github.com. The container also has no Windows/Wine runtime.
+
+Therefore the distributed PMM.exe was **not** replaced. Windows acceptance remains
+a hard gate.
+
+Work advanced safely in canonical source/tooling:
+
+- removed PMMRuntime.exe as a Host/Runtime doctor requirement;
+- added same-executable Runtime route contract test;
+- expanded build.py Windows cross-test compilation and PE validation;
+- added disposable Windows staging/diagnostics tool;
+- validated staging conversion against the exact current routes.json (5 routes);
+- updated native-shell terminology/version handling.
+
+A project-wide plan refinement is now authoritative:
+
+`NF02A unified candidate -> NF02B migrate direct PMMRuntime callers -> NF02C delete PMMRuntime.exe`.
+
+Reason: modules can call PMMRuntime.exe directly without going through Host
+routes. Removing it immediately after startup acceptance could break otherwise
+unrelated features.
+
+See:
+- `Development/Reliability/NF02_PACKAGE_INTEGRATION.md`
+- `Development/Reliability/NF02B_RUNTIME_CALLSITE_MIGRATION.md`
+- `Development/Reliability/NEXT_SESSION.md`

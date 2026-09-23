@@ -105,7 +105,7 @@ func Main() {
 		jsonMode := hasArg(args[1:], "--json")
 		d := doctor(root)
 		printObject(d, jsonMode)
-		if !d.RequiredFiles["Engine/PMMRuntime.exe"] || !d.RequiredFiles["Engine/Runner/routes.json"] {
+		if !d.RequiredFiles["Engine/Runner/routes.json"] {
 			os.Exit(12)
 		}
 		return
@@ -328,7 +328,7 @@ func configureChildProcess(cmd *exec.Cmd) {
 		return
 	}
 	// PMM.exe is a Windows GUI-subsystem application. Any console-subsystem
-	// child (PMMRuntime.exe, PowerShell, helpers) must therefore be started
+	// child (PMM runtime role, PowerShell, helpers) must therefore be started
 	// without allocating a transient console window. GUI children such as the
 	// WPF workspace remain visible normally.
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: 0x08000000} // CREATE_NO_WINDOW
@@ -451,7 +451,7 @@ func readTail(path string, max int) string {
 }
 
 func doctor(root string) Doctor {
-	req := []string{"Engine/PMMRuntime.exe", "Engine/Runner/routes.json", "Engine/Runner/PMM-Runner.ps1", "Modules/Bootstrap/Setup-Dependencies.ps1", "Modules/Bootstrap/Start-PalModMerger.ps1", "CKL/Stable/package-rules.json", "CKL/Catalog/case-index.json", "Engine/repak.exe", "Engine/PMMCore/pmmcore.dll"}
+	req := []string{"Engine/Runner/routes.json", "Engine/Runner/PMM-Runner.ps1", "Modules/Bootstrap/Setup-Dependencies.ps1", "Modules/Bootstrap/Start-PalModMerger.ps1", "CKL/Stable/package-rules.json", "CKL/Catalog/case-index.json", "Engine/repak.exe", "Engine/PMMCore/pmmcore.dll"}
 	files := map[string]bool{}
 	hashes := map[string]string{}
 	for _, r := range req {

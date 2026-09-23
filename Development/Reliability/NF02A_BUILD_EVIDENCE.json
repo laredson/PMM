@@ -98,5 +98,8 @@
     "NF01-L full repository index + byte SHA confirmation",
     "run canonical build.py against exact checkout including all migrated tests",
     "execute NF02A Windows acceptance checklist"
-  ]
+  ],
+  "evidenceAppliesThroughCommit": "1dea2074322215d65ab75ed963f4f82aec74a577",
+  "currentCanonicalSourceRebuildRequired": true,
+  "currentCanonicalSourceReason": "NF02A integration-preparation changed doctor requirements, native-shell metadata, Host route tests and build tooling after this reconstruction evidence was captured"
 }

@@ -11,20 +11,22 @@ Distributed package remains unchanged:
 - PMMRuntime.exe: unchanged
 - PMMFixLab.exe: unchanged
 
-## NF01-L
+## Environment gate
 
-A true local clone was attempted again and the execution container still cannot resolve/connect to `github.com`.
+A real local clone was attempted again on 2026-09-23 and failed:
 
-Therefore these exact-checkout confirmations remain open:
-- local `.pmm-index` full-repository scan;
-- byte-level SHA-256 recomputation of the three distributed PMM-owned EXEs.
+`Could not resolve host: github.com`
 
-NF01 architectural evidence remains uncontradicted.
+The execution environment also has no Wine/Windows runtime.
 
-## NF02A source/build
+Therefore this prompt could not honestly close:
+- NF01-L exact checkout/index/hash confirmation;
+- NF02A exact-clone build;
+- NF02A Windows runtime acceptance.
 
-State:
-**CANONICAL SOURCE CONSOLIDATED / CROSS-BUILD PROOF PASS / EXACT-CLONE + WINDOWS ACCEPTANCE PENDING**
+No package integration was performed because Windows acceptance is mandatory.
+
+## NF02A integration preparation
 
 Canonical source:
 `Development/Source/PMM/`
@@ -32,56 +34,52 @@ Canonical source:
 Architecture:
 `PMM.exe Host -> separate child PMM.exe runtime <command>`
 
-A connector-backed local reconstruction of the canonical source was compiled with:
-- Go 1.23.2;
-- GOTOOLCHAIN=local;
-- GOPROXY=off;
-- GOSUMDB=off;
-- CGO_ENABLED=0;
-- target windows/amd64.
+Prepared in this block:
+- Host doctor no longer requires `Engine/PMMRuntime.exe`;
+- Runtime doctor no longer requires `Engine/PMMRuntime.exe`;
+- native-shell text/version handling reflects same-binary Runtime mode;
+- Windows Host contract test added for same-executable Runtime routing;
+- build.py now cross-compiles Windows test sets for dispatch/host/runtime/supervision/uibridge;
+- build.py validates PE32+ / x86-64 / Windows GUI metadata;
+- build-report schema advanced to `PMM_NF02A_UNIFIED_BUILD_V2`;
+- disposable `Development/Tools/nf02a_windows_stage.py` added;
+- staging transformation tested against current routes.json: all 5 native routes convert to `PMM.exe runtime ...`;
+- Python syntax validation for build/staging tooling: PASS.
 
-Results:
-- dispatcher tests: PASS;
-- Runtime Linux compile: PASS;
-- Supervision Linux compile: PASS;
-- UIBridge Linux compile: PASS;
-- Host Windows test binary cross-compile: PASS;
-- Runtime Windows cross-compile: PASS;
-- unified Windows GUI executable cross-build: PASS.
+## NF02 plan refinement
 
-Reconstruction candidate:
-- size: 6,526,464 bytes;
-- SHA-256: `e0ad8c0a4cc872f30c7077428aedcc66895966111bfc95a38d0e3bb8cd0cae14`;
-- PE32+ x86-64;
-- Windows GUI subsystem.
+NF02 is explicitly split:
 
-This hash is **compile evidence only**, not an official package/candidate identity, because the execution environment could not produce an exact Git checkout and did not materialize every remote test file.
+- **NF02A:** unified Host+Runtime candidate + Windows acceptance;
+- **NF02B:** migrate every active direct PMMRuntime.exe caller;
+- **NF02C:** delete PMMRuntime.exe only after zero active direct callers remain.
 
-No actual canonical-source compile defect was found.
+Reason: editable modules may call PMMRuntime.exe directly outside Host routes.
 
-Build tooling was improved so future exact builds record a per-file source SHA-256 inventory and use the corrected `pmmRuntimeRemoved` field.
+Docs:
+- `NF02_PACKAGE_INTEGRATION.md`
+- `NF02B_RUNTIME_CALLSITE_MIGRATION.md`
 
-Evidence:
-`Development/Reliability/NF02A_BUILD_EVIDENCE.json`
+## Prior cross-build evidence
 
-## Remaining NF02A gate
+`NF02A_BUILD_EVIDENCE.json` remains historical evidence for the canonical source
+through commit `1dea2074322215d65ab75ed963f4f82aec74a577`.
 
-A network-capable local/Windows environment must:
-1. complete NF01-L against the exact checkout;
-2. run canonical `build.py` from that checkout, including all migrated tests;
-3. execute `NF02A_ACCEPTANCE.md` on Windows.
-
-Only then may package integration replace PMM.exe or retire PMMRuntime.exe.
+This block changes canonical source/build tooling, so the current source must be
+rebuilt from an exact clone before Windows acceptance. Do not reuse the old
+reconstruction EXE hash as current evidence.
 
 ## Roadmap
 
 - NF00: CLOSED
 - PRE-NF01: CLOSED
 - NF01 evidence: COMPLETE
-- NF01-L exact local confirmation: PENDING
-- NF02A source consolidation: COMPLETE
-- NF02A connector-backed cross-build proof: **PASS**
-- NF02A exact-clone build: PENDING
-- NF02A Windows acceptance: **NEXT**
-- NF02 package integration: PENDING
+- NF01-L exact local confirmation: PENDING ENVIRONMENT
+- NF02A canonical source: COMPLETE
+- NF02A integration-prep delta: COMPLETE
+- NF02A exact-clone build: NEXT
+- NF02A Windows acceptance: NEXT
+- NF02A package integration: BLOCKED UNTIL WINDOWS PASS
+- NF02B direct-call migration: PENDING
+- NF02C PMMRuntime deletion: PENDING
 - NF03+: PENDING

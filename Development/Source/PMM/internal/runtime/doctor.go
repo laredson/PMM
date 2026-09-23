@@ -41,7 +41,7 @@ type RuntimeDoctor struct {
 
 func runtimeSecurity(root string) SecurityStatus {
 	exe, _ := os.Executable()
-	s := SecurityStatus{Protocol: "PMM_RUNTIME_SECURITY_V1", RuntimeVersion: runtimeVersion, RuntimeExecutable: exe, Root: root, OS: runtime.GOOS, Architecture: runtime.GOARCH, RuntimeRequiresPowerShell: false, RuntimeRequiresFullLanguage: false, Note: "PMMRuntime native capabilities do not request or force PowerShell FullLanguage. PowerShell is probed only to report the environment while the legacy UI remains available during migration."}
+	s := SecurityStatus{Protocol: "PMM_RUNTIME_SECURITY_V1", RuntimeVersion: runtimeVersion, RuntimeExecutable: exe, Root: root, OS: runtime.GOOS, Architecture: runtime.GOARCH, RuntimeRequiresPowerShell: false, RuntimeRequiresFullLanguage: false, Note: "PMM runtime-mode native capabilities do not request or force PowerShell FullLanguage. PowerShell is probed only to report the environment while the legacy UI remains available during migration."}
 	p := supervision.Probe(root)
 	s.DetectedPowerShell = p.Path
 	s.PowerShellAvailable = p.Path != ""
@@ -59,7 +59,7 @@ func runtimeSecurity(root string) SecurityStatus {
 func runtimeDoctor(root string) RuntimeDoctor {
 	m, _ := loadReleaseManifest(root)
 	deps := inspectDependencies(root, m)
-	req := []string{"PMM.exe", "Engine/PMMRuntime.exe", "CKL/Stable/package-rules.json", "CKL/Catalog/case-index.json", "Engine/repak.exe", "Engine/PMMCore/pmmcore.dll", "Engine/AssetReader/PMM.AssetReader.dll", "Resources/Mappings/Mappings.usmap"}
+	req := []string{"PMM.exe", "CKL/Stable/package-rules.json", "CKL/Catalog/case-index.json", "Engine/repak.exe", "Engine/PMMCore/pmmcore.dll", "Engine/AssetReader/PMM.AssetReader.dll", "Resources/Mappings/Mappings.usmap"}
 	files := map[string]bool{}
 	for _, r := range req {
 		p := filepath.Join(root, filepath.FromSlash(r))

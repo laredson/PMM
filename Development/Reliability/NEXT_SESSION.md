@@ -1,69 +1,75 @@
 # NEXT SESSION - PMM v1.5.0.2
 
-## Active gate: exact-clone confirmation + NF02A Windows acceptance
+## Active gate: exact build -> disposable Windows stage -> NF02A acceptance
 
-NF02A no longer needs architectural investigation. The unified source cross-compiles successfully.
+Do not repeat architecture research.
 
-### A. Exact local confirmation
+### 1. Exact local confirmation
 
-On a network-capable local clone:
+On a network-capable Windows/local Codex clone:
 
 1. fetch + checkout `v1.5.0.2`;
 2. fast-forward only;
 3. require clean tree;
-4. run:
-   `python Development/Tools/build_repo_index.py`;
-5. recompute SHA-256 of:
-   - PMM/PMM.exe
-   - PMM/Engine/PMMRuntime.exe
-   - PMM/Engine/PMMFixLab.exe
+4. run `python Development/Tools/build_repo_index.py`;
+5. recompute SHA-256 of PMM.exe, PMMRuntime.exe, PMMFixLab.exe;
 6. compare Bypass/process inventory with `NF01_FINDINGS.md`.
 
-If no critical contradiction appears, mark NF01-L CLOSED.
+If no critical contradiction appears, close NF01-L.
 
-### B. Exact NF02A build
+### 2. Build current canonical source
 
-Run from the exact clone:
+Run:
 
+```text
+python Development/Source/PMM/build.py --out <new-dir-outside-repo>
 ```
-python Development/Source/PMM/build.py --out <new-directory-outside-repo>
-```
 
-The updated build report records:
-- source SHA-256 inventory;
-- package tests;
-- Windows Host test compile;
-- candidate SHA/size;
-- no package installation.
-
-Required:
-- all migrated tests that are present in Git execute/compile as appropriate;
-- no network/toolchain download;
-- build-report.json PASS;
+Require:
+- schema `PMM_NF02A_UNIFIED_BUILD_V2`;
+- cross-platform tests PASS;
+- Windows test binaries compile for dispatch/host/runtime/supervision/uibridge;
+- PE contract = 0x8664 / PE32+ / GUI subsystem;
 - source tree remains clean.
 
-Do not compare the exact candidate hash with the connector-reconstruction hash as a parity requirement; the reconstruction hash is evidence only.
+### 3. Create disposable final-route Windows stage
 
-### C. Windows gate
+Run:
 
-Follow:
-`Development/Reliability/NF02A_ACCEPTANCE.md`
+```text
+python Development/Tools/nf02a_windows_stage.py \
+  --candidate <build>/PMMUnified-candidate.exe \
+  --build-report <build>/build-report.json \
+  --out <new-dir-outside-repo> \
+  --run-diagnostics
+```
 
-Run the exact-clone-built candidate beside a disposable complete PMM package.
+Require all five automated diagnostic exit codes = 0.
+The stage must report five Runtime routes rewritten to `PMM.exe runtime ...`.
 
-If all Windows checks pass:
-- record acceptance evidence;
-- then perform NF02 package integration in the same prompt if context permits.
+### 4. Manual Windows behavior gate
 
-### Still out of scope
+Follow `NF02A_ACCEPTANCE.md`:
+- normal startup;
+- splash;
+- WPF foreground handoff;
+- clean close;
+- Host session/result evidence;
+- forced Runtime child failure -> Host survives/records it;
+- no unexpected console window.
 
-Do not yet:
-- remove ExecutionPolicy Bypass;
-- change startup repair/network behavior;
-- migrate OperationWorker;
-- merge FixLab;
-- repair Updates.
+### 5. If and only if NF02A passes
 
-Those remain NF03/NF04/P01.
+Perform NF02A first package integration in the same prompt if context permits:
 
-One coherent commit per prompt, `[skip ci]`; no Actions/remote CI.
+- replace repository PMM.exe with the exact accepted candidate;
+- rewrite distributed native routes to `PMM.exe runtime ...`;
+- update VERSION/BUILD_ID/RELEASE_MANIFEST/SHA256SUMS atomically;
+- **retain PMMRuntime.exe**.
+
+Then begin NF02B:
+`NF02B_RUNTIME_CALLSITE_MIGRATION.md`.
+
+Do not delete PMMRuntime.exe until NF02B proves zero active direct callers.
+
+Still do not mix NF03/NF04/P01 work into NF02.

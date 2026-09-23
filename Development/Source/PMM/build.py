@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import struct
 import subprocess
 import sys
 
@@ -36,6 +37,25 @@ def source_inventory(src: Path) -> dict[str, str]:
     return {
         path.relative_to(src).as_posix(): sha256(path)
         for path in sorted(files)
+    }
+
+
+def pe_metadata(path: Path) -> dict[str, int]:
+    data = path.read_bytes()
+    if len(data) < 0x100 or data[:2] != b"MZ":
+        raise RuntimeError("candidate is not a valid DOS/PE image")
+    pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
+    if pe_offset + 24 + 70 > len(data) or data[pe_offset:pe_offset + 4] != b"PE\0\0":
+        raise RuntimeError("candidate is missing a valid PE signature")
+    machine, sections = struct.unpack_from("<HH", data, pe_offset + 4)
+    optional = pe_offset + 24
+    magic = struct.unpack_from("<H", data, optional)[0]
+    subsystem = struct.unpack_from("<H", data, optional + 68)[0]
+    return {
+        "machine": machine,
+        "sections": sections,
+        "optionalHeaderMagic": magic,
+        "subsystem": subsystem,
     }
 
 
@@ -107,14 +127,28 @@ def main() -> int:
             (out / "FAILED.json").write_text(json.dumps({"commands": commands}, indent=2) + "\n", encoding="utf-8")
             return result["exitCode"]
 
-    # Compile Windows-only Host tests without executing them on a non-Windows host.
+    # Cross-compile every package test set for Windows so Windows-only files are
+    # at least compiled even when this build runs on Linux.
     winenv = dict(env, GOOS="windows", GOARCH="amd64")
-    host_test = out / "host.test.exe"
-    result = run([go, "test", "-c", "-o", host_test, "./internal/host"], src, winenv)
-    commands.append(result)
-    if result["exitCode"] != 0:
-        (out / "FAILED.json").write_text(json.dumps({"commands": commands}, indent=2) + "\n", encoding="utf-8")
-        return result["exitCode"]
+    windows_test_bins = {}
+    for pkg in (
+        "dispatch",
+        "host",
+        "runtime",
+        "supervision",
+        "uibridge",
+    ):
+        test_bin = out / f"{pkg}.test.exe"
+        result = run([go, "test", "-c", "-o", test_bin, f"./internal/{pkg}"], src, winenv)
+        commands.append(result)
+        if result["exitCode"] != 0:
+            (out / "FAILED.json").write_text(json.dumps({"commands": commands}, indent=2) + "\n", encoding="utf-8")
+            return result["exitCode"]
+        windows_test_bins[pkg] = {
+            "file": test_bin.name,
+            "sha256": sha256(test_bin),
+            "sizeBytes": test_bin.stat().st_size,
+        }
 
     candidate = out / "PMMUnified-candidate.exe"
     result = run([
@@ -130,8 +164,12 @@ def main() -> int:
         (out / "FAILED.json").write_text(json.dumps({"commands": commands}, indent=2) + "\n", encoding="utf-8")
         return result["exitCode"]
 
+    pe = pe_metadata(candidate)
+    if pe["machine"] != 0x8664 or pe["optionalHeaderMagic"] != 0x20B or pe["subsystem"] != 2:
+        raise RuntimeError(f"unexpected Windows candidate PE contract: {pe}")
+
     report = {
-        "schema": "PMM_NF02A_UNIFIED_BUILD_V1",
+        "schema": "PMM_NF02A_UNIFIED_BUILD_V2",
         "classification": "CANDIDATE_NOT_PACKAGED",
         "goVersion": GO_VERSION,
         "target": "windows/amd64",
@@ -139,7 +177,8 @@ def main() -> int:
         "candidate": candidate.name,
         "candidateSha256": sha256(candidate),
         "candidateSizeBytes": candidate.stat().st_size,
-        "hostTestBinarySha256": sha256(host_test),
+        "candidatePE": pe,
+        "windowsTestBinaries": windows_test_bins,
         "commands": commands,
         "packagedBinaryReplaced": False,
         "pmmRuntimeRemoved": False,

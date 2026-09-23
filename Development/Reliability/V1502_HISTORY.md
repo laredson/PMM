@@ -219,3 +219,25 @@ No distributed package binary changed.
 The canonical build script was improved to record per-file source SHA-256 inventory and corrected the build-report field name to `pmmRuntimeRemoved`.
 
 Next gate: exact-clone build confirmation, then Windows acceptance.
+
+
+## NF02A integration preparation / NF02B split (2026-09-23)
+
+The exact clone was attempted again and failed because the execution container
+still cannot resolve github.com. No Windows/Wine runtime is available either.
+
+Package integration was therefore correctly withheld.
+
+Canonical source/tooling preparation:
+- Host/Runtime doctors no longer require PMMRuntime.exe;
+- native-shell wording reflects same-binary Runtime mode;
+- Host same-executable route test added;
+- build report V2 cross-compiles every Windows package test set and validates PE metadata;
+- disposable Windows staging tool added;
+- staging route rewrite tested against current routes.json: all five native Runtime routes converted to PMM.exe runtime form.
+
+A direct-caller risk was promoted into the formal plan:
+NF02A accepts/integrates the unified PMM.exe while retaining PMMRuntime.exe;
+NF02B migrates all remaining direct callers; NF02C deletes the legacy executable.
+
+This prevents a startup-successful but feature-broken single-EXE transition.

@@ -270,13 +270,13 @@ func nativeShellRefresh() {
 		"Build: " + readTrim(filepath.Join(s.root, "Resources", "Metadata", "BUILD_ID.txt")),
 		"PowerShell LanguageMode: " + mode,
 		"Normal startup requires PowerShell: NO",
-		"PMMRuntime requires FullLanguage: NO",
+		"PMM runtime mode requires FullLanguage: NO",
 		"Dependencies ready: " + yesNo(deps.Ready),
 		fmt.Sprintf("Knowledge valid: %s (package rules: %d)", yesNo(knowledge.OK), knowledge.PackageRuleCount),
 		"Palworld: " + gameText,
 		"",
-		"This native shell is launched by PMMRuntime.exe and does not use WPF/Add-Type/PowerShell objects.",
-		"The current full Mods & Merge workspace remains available only through the temporary legacy UI on FullLanguage systems while its operations are migrated into PMMRuntime.",
+		"This native shell is launched by PMM.exe runtime mode and does not use WPF/Add-Type/PowerShell objects.",
+		"The current full Mods & Merge workspace remains available through the editable legacy UI while worker operations are migrated behind explicit PMM.exe modes.",
 	}, "\r\n")
 	setWindowText(s.statusEdit, text)
 	uiEnableWindow.Call(s.gameButton, boolUintptr(game.Found))

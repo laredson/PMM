@@ -78,3 +78,34 @@ Evidence:
 This is **not yet the exact-clone static/build gate**, because the execution container could not clone GitHub and therefore did not execute the complete migrated test set from an exact checkout.
 
 The next network-capable environment should run the canonical `build.py` once. If it passes, proceed directly to the Windows behavior gate above.
+
+
+---
+
+## Disposable final-route staging
+
+Use the exact build output with:
+
+```text
+python Development/Tools/nf02a_windows_stage.py \
+  --candidate <build>/PMMUnified-candidate.exe \
+  --build-report <build>/build-report.json \
+  --out <new-dir-outside-repo> \
+  --run-diagnostics
+```
+
+The staging tool:
+- verifies candidate SHA-256 against the build report;
+- copies PMM/ outside the repository;
+- replaces only staged PMM.exe;
+- rewrites the five current native routes to `PMM.exe runtime ...`;
+- records old/new hashes and route changes;
+- retains PMMRuntime.exe and PMMFixLab.exe;
+- runs the five non-interactive diagnostics on Windows.
+
+All five diagnostics must return exit code 0 before the manual splash/WPF and
+forced Runtime-child-failure checks.
+
+Passing NF02A does **not** authorize deleting PMMRuntime.exe. NF02B must first
+migrate every direct module/process callsite outside Host routes. NF02C performs
+the eventual legacy Runtime deletion.

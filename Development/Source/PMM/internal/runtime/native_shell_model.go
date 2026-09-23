@@ -23,7 +23,7 @@ type NativeShellLabels struct {
 
 func loadNativeShellLabels(root string) NativeShellLabels {
 	labels := NativeShellLabels{
-		Title:           "Palworld Manager Merger 1.2.1",
+		Title:           "Palworld Manager Merger",
 		Heading:         "PALWORLD MANAGER MERGER",
 		Subtitle:        "Native runtime shell - no PowerShell FullLanguage required",
 		Refresh:         "Refresh",
@@ -34,7 +34,10 @@ func loadNativeShellLabels(root string) NativeShellLabels {
 		OpenLegacyUI:    "Open current PMM interface",
 		RuntimeSelfTest: "Runtime self-test",
 		Close:           "Close",
-		MigrationNote:   "Native startup/UI bootstrap is active. Analyze, Build, Deploy and the full management workspace are still being migrated into PMMRuntime in later 1.2 alphas.",
+		MigrationNote:   "Native startup/runtime bootstrap is active. The editable Mods & Merge workspace remains external while worker migration continues.",
+	}
+	if version := readTrim(filepath.Join(root, "Resources", "Metadata", "VERSION.txt")); version != "" {
+		labels.Title = "Palworld Manager Merger " + version
 	}
 	p := filepath.Join(root, "Resources", "UI", "native-shell.json")
 	if b, err := os.ReadFile(p); err == nil {
