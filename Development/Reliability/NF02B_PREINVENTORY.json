@@ -1,0 +1,144 @@
+{
+  "schema": "PMM_NF02B_PREINVENTORY_V1",
+  "date": "2026-09-23",
+  "branch": "v1.5.0.2",
+  "scannedHead": "5425c8d5e7b324341cf9323ff6565941d241fbd3",
+  "coverage": {
+    "scope": "all distributed PMM/**/*.ps1 and PMM/**/*.psm1",
+    "filesScanned": 132,
+    "tokenHitFiles": 18,
+    "activeDirectConsumerFiles": 13,
+    "directInvocationSites": 18,
+    "helperFiles": 1,
+    "snapshotInventoryFiles": 1,
+    "nominalNonExecutableReferenceFiles": 3
+  },
+  "commandTotals": {
+    "archive create": 10,
+    "archive extract": 4,
+    "dependencies ensure": 2,
+    "ui": 1,
+    "self-test": 1
+  },
+  "consumers": [
+    {
+      "path": "PMM/Engine/Runner/Operations/start.ps1",
+      "commands": [
+        "dependencies ensure --if-needed",
+        "ui"
+      ],
+      "sites": 2
+    },
+    {
+      "path": "PMM/Engine/Runner/Operations/validate.ps1",
+      "commands": [
+        "self-test"
+      ],
+      "sites": 1
+    },
+    {
+      "path": "PMM/Modules/AIIO/AIIO.PendingDataService.ps1",
+      "commands": [
+        "archive create"
+      ],
+      "sites": 1
+    },
+    {
+      "path": "PMM/Modules/AIIO/AIIO.ps1",
+      "commands": [
+        "archive create"
+      ],
+      "sites": 1
+    },
+    {
+      "path": "PMM/Modules/AIIO/AIIO.ResponseService.ps1",
+      "commands": [
+        "archive create",
+        "archive create"
+      ],
+      "sites": 2
+    },
+    {
+      "path": "PMM/Modules/AIIO/AIIO.SessionService.ps1",
+      "commands": [
+        "archive create"
+      ],
+      "sites": 1
+    },
+    {
+      "path": "PMM/Modules/Bootstrap/Setup-Dependencies.ps1",
+      "commands": [
+        "dependencies ensure"
+      ],
+      "sites": 1
+    },
+    {
+      "path": "PMM/Modules/CKL/KnowledgeContributionService.ps1",
+      "commands": [
+        "archive create"
+      ],
+      "sites": 1
+    },
+    {
+      "path": "PMM/Modules/FixLab/FixLabService.ps1",
+      "commands": [
+        "archive extract",
+        "archive create"
+      ],
+      "sites": 2
+    },
+    {
+      "path": "PMM/Modules/Library/LibraryService.ps1",
+      "commands": [
+        "archive extract"
+      ],
+      "sites": 1,
+      "notes": "uses Invoke-PMMCancelableExternalProcess; preserve cancellation contract"
+    },
+    {
+      "path": "PMM/Modules/Merge/MergeEngine.ps1",
+      "commands": [
+        "archive extract"
+      ],
+      "sites": 1
+    },
+    {
+      "path": "PMM/Modules/Saves/SaveService.ps1",
+      "commands": [
+        "archive create",
+        "archive extract"
+      ],
+      "sites": 2
+    },
+    {
+      "path": "PMM/Modules/Theme/ThemeEditorService.ps1",
+      "commands": [
+        "archive create",
+        "archive create"
+      ],
+      "sites": 2
+    }
+  ],
+  "helper": {
+    "path": "PMM/Modules/Shared/Paths.ps1",
+    "current": "Get-PMMRuntimePath -> Engine/PMMRuntime.exe",
+    "targetAfterNF02A": "Get-PMMRuntimePath -> PMM.exe; callsites prefix arguments with runtime"
+  },
+  "snapshotInventory": {
+    "path": "PMM/Modules/Operations/ModuleRuntime.ps1",
+    "action": "retain PMMRuntime.exe member until NF02C"
+  },
+  "nominalReferences": [
+    "PMM/Modules/Analysis/MCP.Analysis.ps1",
+    "PMM/Modules/Analysis/Repair.Service.ps1",
+    "PMM/Modules/Presentation/DeepAnalysis.UI.ps1"
+  ],
+  "packageReferences": [
+    "PMM/Engine/Runner/routes.json",
+    "PMM/Resources/Metadata/runtime-contract.json",
+    "PMM/Resources/Metadata/RELEASE_MANIFEST.json",
+    "PMM/Resources/Metadata/SHA256SUMS.txt"
+  ],
+  "migrationAllowedNow": false,
+  "reason": "NF02A Windows acceptance/package integration has not passed; current PMM.exe cannot yet replace active Runtime consumers"
+}

@@ -94,7 +94,7 @@
       "NF00",
       "PRE-NF01-CONTINUITY"
     ],
-    "next": "exact NF02A build + disposable Windows acceptance stage",
+    "next": "Windows exact NF02A acceptance, first integration, then NF02B migration from preinventory",
     "ordered": [
       "NF01",
       "NF02",
@@ -124,15 +124,15 @@
     "noForcePush": true
   },
   "nextBlock": {
-    "id": "NF02A-WINDOWS-EXACT",
-    "goal": "exact clone/build V2, stage final PMM.exe runtime routes, pass automated and manual Windows acceptance, then integrate PMM.exe while retaining PMMRuntime.exe"
+    "id": "NF02A-WINDOWS-REQUIRED",
+    "goal": "use network-capable Windows clone to close NF01-L, build/accept NF02A V2, integrate PMM.exe retaining PMMRuntime.exe, then migrate known NF02B callsites"
   },
   "signing": {
     "requiredFor1502": false,
     "signPathFoundation": "optional after product is ready"
   },
   "nf01": {
-    "status": "EVIDENCE_COMPLETE_EXACT_LOCAL_CONFIRMATION_BLOCKED_BY_CONTAINER_NETWORK",
+    "status": "EVIDENCE_COMPLETE_EXACT_LOCAL_CONFIRMATION_BLOCKED_BY_CURRENT_ENVIRONMENT",
     "findings": "Development/Reliability/NF01_FINDINGS.md",
     "evidence": "Development/Reliability/NF01_EVIDENCE.json",
     "localCloneFailure": "Could not resolve host: github.com",
@@ -140,7 +140,7 @@
     "canonicalSourceTarget": "Development/Source/PMM/"
   },
   "nf02a": {
-    "status": "INTEGRATION_PREP_COMPLETE_EXACT_BUILD_AND_WINDOWS_ACCEPTANCE_PENDING",
+    "status": "INTEGRATION_PREP_COMPLETE_WINDOWS_ACCEPTANCE_BLOCKED_BY_CURRENT_ENVIRONMENT",
     "canonicalSource": "Development/Source/PMM/",
     "processModel": "PMM.exe Host spawns same PMM.exe as separate child: runtime <command>",
     "buildScript": "Development/Source/PMM/build.py",
@@ -160,12 +160,29 @@
     "buildSchema": "PMM_NF02A_UNIFIED_BUILD_V2",
     "stagingTool": "Development/Tools/nf02a_windows_stage.py",
     "priorCrossBuildEvidenceAppliesThrough": "1dea2074322215d65ab75ed963f4f82aec74a577",
-    "currentSourceRequiresExactRebuild": true
+    "currentSourceRequiresExactRebuild": true,
+    "currentEnvironment": {
+      "githubClone": "FAIL_DNS",
+      "windowsRuntime": false,
+      "packageIntegrationPerformed": false
+    }
   },
   "nf02b": {
-    "status": "PLANNED_REQUIRED_BEFORE_RUNTIME_EXE_DELETION",
+    "status": "PREINVENTORY_COMPLETE_MIGRATION_BLOCKED_UNTIL_NF02A_INTEGRATION",
     "plan": "Development/Reliability/NF02B_RUNTIME_CALLSITE_MIGRATION.md",
-    "goal": "migrate all active direct PMMRuntime.exe callers to PMM.exe runtime"
+    "goal": "migrate all active direct PMMRuntime.exe callers to PMM.exe runtime",
+    "preinventoryHuman": "Development/Reliability/NF02B_PREINVENTORY.md",
+    "preinventoryMachine": "Development/Reliability/NF02B_PREINVENTORY.json",
+    "distributedPowerShellFilesScanned": 132,
+    "activeDirectConsumerFiles": 13,
+    "directInvocationSites": 18,
+    "commandTotals": {
+      "archiveCreate": 10,
+      "archiveExtract": 4,
+      "dependenciesEnsure": 2,
+      "ui": 1,
+      "selfTest": 1
+    }
   },
   "nf02c": {
     "status": "BLOCKED_ON_NF02B",

@@ -462,3 +462,38 @@ See:
 - `Development/Reliability/NF02_PACKAGE_INTEGRATION.md`
 - `Development/Reliability/NF02B_RUNTIME_CALLSITE_MIGRATION.md`
 - `Development/Reliability/NEXT_SESSION.md`
+
+
+---
+
+## 18. NF02A environment gate remains blocked; NF02B PowerShell pre-inventory completed
+
+The requested exact clone/build/Windows gate was attempted again.
+
+Environment facts:
+- Git clone cannot resolve github.com;
+- no Wine/Windows runtime is present.
+
+Therefore NF02A was not falsely marked accepted and no package binary was
+replaced.
+
+To advance safely, every distributed `.ps1/.psm1` under `PMM/` was scanned
+from the exact branch tree at `5425c8d5e7b324341cf9323ff6565941d241fbd3`.
+
+NF02B pre-inventory:
+- 132 scripts scanned;
+- 13 active PMMRuntime consumer files;
+- 18 direct invocations;
+- command profile: 10 archive-create, 4 archive-extract, 2 dependency-ensure,
+  1 UI and 1 self-test.
+
+Evidence:
+- `Development/Reliability/NF02B_PREINVENTORY.md`
+- `Development/Reliability/NF02B_PREINVENTORY.json`
+
+The migration should not happen before NF02A integration. After integration,
+`Get-PMMRuntimePath` can target root PMM.exe and callers add an explicit
+`runtime` prefix while preserving their existing stdout/stderr, exit-code and
+cancellation contracts.
+
+See `Development/Reliability/NEXT_SESSION.md`.

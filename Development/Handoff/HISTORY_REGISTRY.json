@@ -92,6 +92,16 @@
       "path": "Development/Tools/nf02a_windows_stage.py",
       "class": "ACTIVE_TOOLING",
       "scope": "disposable final-route Windows acceptance staging and diagnostics"
+    },
+    {
+      "path": "Development/Reliability/NF02B_PREINVENTORY.md",
+      "class": "EVIDENCE",
+      "scope": "human-readable exhaustive distributed PowerShell PMMRuntime caller inventory"
+    },
+    {
+      "path": "Development/Reliability/NF02B_PREINVENTORY.json",
+      "class": "EVIDENCE",
+      "scope": "machine-readable NF02B caller/command inventory"
     }
   ],
   "laboratories": [

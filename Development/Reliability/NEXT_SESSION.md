@@ -1,23 +1,28 @@
 # NEXT SESSION - PMM v1.5.0.2
 
-## Active gate: exact build -> disposable Windows stage -> NF02A acceptance
+## Required environment
 
-Do not repeat architecture research.
+Use a network-capable **Windows** local clone or another environment that can:
+- access GitHub;
+- run Go 1.23.2;
+- execute the built Windows PMM candidate;
+- observe the WPF/splash behavior.
 
-### 1. Exact local confirmation
+Do not repeat NF02 architecture research or the distributed PowerShell
+PMMRuntime pre-inventory.
 
-On a network-capable Windows/local Codex clone:
+## 1. Exact NF01-L
 
 1. fetch + checkout `v1.5.0.2`;
 2. fast-forward only;
 3. require clean tree;
-4. run `python Development/Tools/build_repo_index.py`;
-5. recompute SHA-256 of PMM.exe, PMMRuntime.exe, PMMFixLab.exe;
-6. compare Bypass/process inventory with `NF01_FINDINGS.md`.
+4. generate `.pmm-index`;
+5. recompute SHA-256 of current PMM.exe / PMMRuntime.exe / PMMFixLab.exe;
+6. compare exhaustive local process/Bypass search with NF01 findings.
 
-If no critical contradiction appears, close NF01-L.
+Close NF01-L if no critical contradiction appears.
 
-### 2. Build current canonical source
+## 2. Exact NF02A V2 build
 
 Run:
 
@@ -25,14 +30,9 @@ Run:
 python Development/Source/PMM/build.py --out <new-dir-outside-repo>
 ```
 
-Require:
-- schema `PMM_NF02A_UNIFIED_BUILD_V2`;
-- cross-platform tests PASS;
-- Windows test binaries compile for dispatch/host/runtime/supervision/uibridge;
-- PE contract = 0x8664 / PE32+ / GUI subsystem;
-- source tree remains clean.
+Require `PMM_NF02A_UNIFIED_BUILD_V2` and all tests/cross-compiles/PE checks PASS.
 
-### 3. Create disposable final-route Windows stage
+## 3. Disposable Windows acceptance stage
 
 Run:
 
@@ -44,32 +44,40 @@ python Development/Tools/nf02a_windows_stage.py \
   --run-diagnostics
 ```
 
-Require all five automated diagnostic exit codes = 0.
-The stage must report five Runtime routes rewritten to `PMM.exe runtime ...`.
+Require:
+- candidate hash matches build report;
+- five Runtime routes rewritten;
+- all five automated diagnostics exit 0.
 
-### 4. Manual Windows behavior gate
-
-Follow `NF02A_ACCEPTANCE.md`:
-- normal startup;
-- splash;
-- WPF foreground handoff;
+Then complete manual gate:
+- normal start;
+- splash -> WPF foreground;
 - clean close;
-- Host session/result evidence;
-- forced Runtime child failure -> Host survives/records it;
-- no unexpected console window.
+- Host-session evidence;
+- forced Runtime-child failure -> Host survives and records it;
+- no unexpected console.
 
-### 5. If and only if NF02A passes
+## 4. If NF02A passes: first package integration
 
-Perform NF02A first package integration in the same prompt if context permits:
-
+In the same prompt if possible:
 - replace repository PMM.exe with the exact accepted candidate;
 - rewrite distributed native routes to `PMM.exe runtime ...`;
 - update VERSION/BUILD_ID/RELEASE_MANIFEST/SHA256SUMS atomically;
-- **retain PMMRuntime.exe**.
+- retain PMMRuntime.exe;
+- rerun diagnostics/regression on integrated package.
 
-Then begin NF02B:
-`NF02B_RUNTIME_CALLSITE_MIGRATION.md`.
+## 5. Begin NF02B immediately after accepted integration
 
-Do not delete PMMRuntime.exe until NF02B proves zero active direct callers.
+Use `NF02B_PREINVENTORY.md` as the starting map.
 
-Still do not mix NF03/NF04/P01 work into NF02.
+Migrate:
+- central `Get-PMMRuntimePath` to PMM.exe;
+- 18 known invocations to add the explicit `runtime` prefix;
+- Runner and dependency wrapper explicitly;
+- preserve Library cancellation semantics.
+
+Then run exact local grep and add any missed non-PowerShell/config callers.
+
+Do not delete PMMRuntime.exe until the post-migration zero-active-caller proof passes.
+
+One coherent commit for the prompt; `[skip ci]`; no Actions unless explicitly requested.

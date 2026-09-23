@@ -241,3 +241,28 @@ NF02A accepts/integrates the unified PMM.exe while retaining PMMRuntime.exe;
 NF02B migrates all remaining direct callers; NF02C deletes the legacy executable.
 
 This prevents a startup-successful but feature-broken single-EXE transition.
+
+
+## NF02A Windows gate blocked; NF02B distributed PowerShell pre-inventory (2026-09-23)
+
+The exact local clone was attempted again and failed before authentication because
+the execution container cannot resolve github.com. No Wine/Windows runtime is
+installed.
+
+NF02A acceptance and package integration were therefore correctly withheld.
+
+To advance without changing product behavior, the exact branch tree was used to
+read all 132 distributed PMM PowerShell scripts.
+
+The scan found 13 active PMMRuntime consumer files and 18 direct native
+invocations:
+- 10 archive create;
+- 4 archive extract;
+- 2 dependencies ensure;
+- 1 UI;
+- 1 self-test.
+
+The central migration point is `Get-PMMRuntimePath` in Shared/Paths.ps1.
+ModuleRuntime's binary snapshot keeps PMMRuntime until NF02C.
+
+No PMM product file was changed in this prompt.

@@ -343,3 +343,14 @@ Records the connector-backed Go 1.23.2 compile/cross-build proof that the unifie
 
 Defines the safe three-part convergence: NF02A unified candidate and Windows
 acceptance, NF02B direct Runtime callsite migration, NF02C legacy Runtime deletion.
+
+
+## NF02B pre-inventory
+
+- `NF02B_PREINVENTORY.md`
+- `NF02B_PREINVENTORY.json`
+
+Exhaustive distributed-PowerShell scan at branch HEAD
+`5425c8d5e7b324341cf9323ff6565941d241fbd3`: 132 scripts, 13 active direct
+PMMRuntime consumers, 18 native invocation sites. Migration remains gated on
+accepted NF02A PMM.exe integration.

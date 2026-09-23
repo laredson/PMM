@@ -11,75 +11,81 @@ Distributed package remains unchanged:
 - PMMRuntime.exe: unchanged
 - PMMFixLab.exe: unchanged
 
-## Environment gate
+## This prompt
 
-A real local clone was attempted again on 2026-09-23 and failed:
+Requested:
+- exact NF01-L local confirmation;
+- exact NF02A V2 build;
+- Windows staging/diagnostics;
+- integrate PMM.exe only if all gates pass;
+- begin NF02B after that.
 
-`Could not resolve host: github.com`
+Actual environment:
+- `git clone`: FAIL before auth, `Could not resolve host: github.com`;
+- Windows runtime/Wine: unavailable.
 
-The execution environment also has no Wine/Windows runtime.
+Therefore:
+- NF01-L exact checkout confirmation: NOT EXECUTABLE HERE;
+- NF02A exact-clone build: NOT EXECUTABLE HERE;
+- NF02A Windows diagnostics/manual gate: NOT EXECUTABLE HERE;
+- PMM.exe package integration: **CORRECTLY NOT PERFORMED**.
 
-Therefore this prompt could not honestly close:
-- NF01-L exact checkout/index/hash confirmation;
-- NF02A exact-clone build;
-- NF02A Windows runtime acceptance.
+No `PMM/` product file is changed by this prompt.
 
-No package integration was performed because Windows acceptance is mandatory.
+## NF02B pre-inventory advanced safely
 
-## NF02A integration preparation
+Even though migration is gated on NF02A acceptance, the distributed PowerShell
+surface was exhaustively inventoried through the exact Git branch tree.
 
-Canonical source:
-`Development/Source/PMM/`
+Coverage:
+- 132 distributed `.ps1/.psm1` files scanned;
+- 18 files contained Runtime terminology;
+- 13 files are active direct PMMRuntime consumers;
+- 18 direct native invocations.
 
-Architecture:
-`PMM.exe Host -> separate child PMM.exe runtime <command>`
+Command totals:
+- archive create: 10
+- archive extract: 4
+- dependencies ensure: 2
+- ui: 1
+- self-test: 1
 
-Prepared in this block:
-- Host doctor no longer requires `Engine/PMMRuntime.exe`;
-- Runtime doctor no longer requires `Engine/PMMRuntime.exe`;
-- native-shell text/version handling reflects same-binary Runtime mode;
-- Windows Host contract test added for same-executable Runtime routing;
-- build.py now cross-compiles Windows test sets for dispatch/host/runtime/supervision/uibridge;
-- build.py validates PE32+ / x86-64 / Windows GUI metadata;
-- build-report schema advanced to `PMM_NF02A_UNIFIED_BUILD_V2`;
-- disposable `Development/Tools/nf02a_windows_stage.py` added;
-- staging transformation tested against current routes.json: all 5 native routes convert to `PMM.exe runtime ...`;
-- Python syntax validation for build/staging tooling: PASS.
+Key consumers include:
+- legacy Runner start/validate;
+- AIIO;
+- dependency bootstrap;
+- CKL contribution;
+- FixLab;
+- Library ZIP import;
+- Merge solution import;
+- save backup/restore;
+- theme export/AI handoff.
 
-## NF02 plan refinement
+Central helper:
+`Modules/Shared/Paths.ps1 -> Get-PMMRuntimePath`.
 
-NF02 is explicitly split:
+Evidence:
+- `NF02B_PREINVENTORY.md`
+- `NF02B_PREINVENTORY.json`
 
-- **NF02A:** unified Host+Runtime candidate + Windows acceptance;
-- **NF02B:** migrate every active direct PMMRuntime.exe caller;
-- **NF02C:** delete PMMRuntime.exe only after zero active direct callers remain.
+## NF02 plan
 
-Reason: editable modules may call PMMRuntime.exe directly outside Host routes.
-
-Docs:
-- `NF02_PACKAGE_INTEGRATION.md`
-- `NF02B_RUNTIME_CALLSITE_MIGRATION.md`
-
-## Prior cross-build evidence
-
-`NF02A_BUILD_EVIDENCE.json` remains historical evidence for the canonical source
-through commit `1dea2074322215d65ab75ed963f4f82aec74a577`.
-
-This block changes canonical source/build tooling, so the current source must be
-rebuilt from an exact clone before Windows acceptance. Do not reuse the old
-reconstruction EXE hash as current evidence.
+- NF02A: unified PMM.exe exact build + Windows acceptance.
+- NF02A first integration: replace PMM.exe + final routes, retain PMMRuntime.exe.
+- NF02B: migrate the 18 direct invocations and any exact-local additional hits.
+- NF02C: only then delete PMMRuntime.exe and clean metadata/checksums/snapshots.
 
 ## Roadmap
 
 - NF00: CLOSED
 - PRE-NF01: CLOSED
 - NF01 evidence: COMPLETE
-- NF01-L exact local confirmation: PENDING ENVIRONMENT
-- NF02A canonical source: COMPLETE
-- NF02A integration-prep delta: COMPLETE
-- NF02A exact-clone build: NEXT
-- NF02A Windows acceptance: NEXT
+- NF01-L exact local confirmation: BLOCKED BY THIS ENVIRONMENT
+- NF02A canonical source/integration prep: COMPLETE
+- NF02A exact-clone build: NEXT IN NETWORK-CAPABLE LOCAL ENV
+- NF02A Windows acceptance: NEXT ON WINDOWS
 - NF02A package integration: BLOCKED UNTIL WINDOWS PASS
-- NF02B direct-call migration: PENDING
-- NF02C PMMRuntime deletion: PENDING
+- NF02B pre-inventory: **COMPLETE FOR DISTRIBUTED POWERSHELL**
+- NF02B migration: BLOCKED UNTIL NF02A INTEGRATION
+- NF02C Runtime deletion: BLOCKED UNTIL NF02B
 - NF03+: PENDING

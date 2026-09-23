@@ -60,3 +60,64 @@ Final native routes should name `PMM.exe` and prefix Runtime arguments with
 
 Until NF02B closes, keep PMMRuntime.exe in the package. It is a rollback/legacy
 caller safety net, even when NF02A staging routes no longer use it.
+
+
+---
+
+## Concrete pre-inventory at v1.5.0.2
+
+See:
+- `NF02B_PREINVENTORY.md`
+- `NF02B_PREINVENTORY.json`
+
+The exact branch tree at commit `5425c8d5e7b324341cf9323ff6565941d241fbd3`
+was used to read all 132 distributed `.ps1/.psm1` files under `PMM/`.
+
+Found:
+- 13 active direct Runtime consumer files;
+- 18 native invocation sites;
+- 10 `archive create`;
+- 4 `archive extract`;
+- 2 `dependencies ensure`;
+- 1 `ui`;
+- 1 `self-test`;
+- one central `Get-PMMRuntimePath` helper;
+- one native snapshot entry;
+- three nominal Runtime-capability references with no executable launch.
+
+### Preferred migration pattern
+
+After NF02A PMM.exe passes Windows acceptance and is integrated:
+
+1. change `Get-PMMRuntimePath` to return root `PMM.exe`;
+2. add explicit leading `runtime` to every native Runtime argument list;
+3. preserve direct native invocation semantics rather than wrapping everything in
+   a new PowerShell abstraction.
+
+Example:
+
+```text
+before:
+  & $runtime archive create ...
+
+after:
+  & $runtime runtime archive create ...
+```
+
+For `Invoke-PMMCancelableExternalProcess`:
+
+```text
+before Arguments:
+  archive extract ...
+
+after Arguments:
+  runtime archive extract ...
+```
+
+This preserves existing output, exit-code, timeout and cancellation behavior.
+
+Runner fallback scripts and `Setup-Dependencies.ps1` do not rely on the shared
+helper, so migrate them explicitly to root `PMM.exe runtime ...`.
+
+Do not apply these edits before NF02A integration because the currently
+distributed PMM.exe does not yet own the accepted Runtime role.
